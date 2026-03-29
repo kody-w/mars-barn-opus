@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Mars Barn Opus — Multiplayer Colony Network</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d1117;color:#c9d1d9;font-family:'Courier New',monospace;min-height:100vh}
+.nav{background:#080b10;border-bottom:1px solid rgba(88,166,255,0.15);padding:6px 20px;display:flex;align-items:center;gap:12px;font-size:12px}
+.nav a{color:#484f58;text-decoration:none;padding:3px 8px}.nav a:hover{color:#c9d1d9}
+.nav a.active{color:#79c0ff;background:rgba(88,166,255,0.15);border:1px solid rgba(88,166,255,0.3);border-radius:3px}
+.nav .brand{color:#79c0ff;font-weight:700;letter-spacing:1px;margin-right:8px}
+.container{max-width:900px;margin:0 auto;padding:20px}
+h1{font-size:20px;color:#fff;margin-bottom:4px}
+.sub{color:#484f58;font-size:12px;margin-bottom:20px}
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px;margin:12px 0}
+.card h2{font-size:12px;color:#484f58;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.btn{padding:8px 16px;border-radius:6px;border:1px solid #30363d;background:#21262d;color:#c9d1d9;
+  cursor:pointer;font-family:inherit;font-size:13px;margin:4px}
+.btn:hover{background:#30363d}.btn-go{background:#1f6feb;border-color:#1f6feb;color:#fff}
+.btn-danger{background:#da3633;border-color:#da3633;color:#fff}
+textarea{width:100%;background:#0d1117;border:1px solid #30363d;color:#c9d1d9;padding:8px;
+  border-radius:4px;font-family:inherit;font-size:11px;resize:vertical}
+.status{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.status-off{background:#da3633}.status-on{background:#3fb950}.status-wait{background:#d29922}
+.colonies{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.colony-panel{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:12px}
+.colony-panel h3{font-size:13px;margin-bottom:8px}
+.colony-panel .local{border-color:#58a6ff;border-left:3px solid #58a6ff}
+.colony-panel .remote{border-color:#da3633;border-left:3px solid #da3633}
+.res-row{display:flex;justify-content:space-between;font-size:11px;padding:2px 0}
+.msg-box{max-height:200px;overflow-y:auto;background:#0d1117;border:1px solid #21262d;border-radius:4px;padding:8px;margin:8px 0;font-size:11px}
+.msg{padding:2px 0;border-bottom:1px solid #161b22}
+.msg-local{color:#58a6ff}.msg-remote{color:#ef4444}.msg-system{color:#d29922}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <span class="brand">MARS BARN OPUS</span>
+  <a href="index.html">Dashboard</a>
+  <a href="viewer.html">3D Viewer</a>
+  <a href="splitscreen.html">Earth↔Mars</a>
+  <a href="timelapse.html">Timelapse</a>
+  <a href="multiplayer.html" class="active">Multiplayer</a>
+</div>
+
+<div class="container">
+  <h1>Multiplayer Colony Network</h1>
+  <p class="sub">Two colonies on Mars. Trade resources. Send messages with light delay. Peer-to-peer — no server.</p>
+
+  <!-- Connection -->
+  <div class="card">
+    <h2><span class="status status-off" id="conn-status"></span>Connection</h2>
+    <p style="font-size:11px;color:#484f58;margin-bottom:8px">
+      WebRTC peer-to-peer. One player creates an offer, the other accepts. No server needed.
+    </p>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <button class="btn btn-go" onclick="createOffer()">Create Game (Host)</button>
+      <button class="btn" onclick="joinGame()">Join Game</button>
+    </div>
+    <div id="conn-ui" style="display:none">
+      <p style="font-size:11px;margin-bottom:4px" id="conn-label">Copy this offer and send to the other player:</p>
+      <textarea id="conn-text" rows="3" onclick="this.select()"></textarea>
+      <button class="btn" onclick="processAnswer()" id="answer-btn" style="display:none">Accept Answer</button>
+    </div>
+    <div id="conn-msg" style="font-size:11px;color:#d29922;margin-top:4px"></div>
+  </div>
+
+  <!-- Two colonies side by side -->
+  <div class="colonies">
+    <div class="colony-panel local">
+      <h3 style="color:#58a6ff">Your Colony</h3>
+      <div class="res-row"><span>Sol</span><span id="local-sol">0</span></div>
+      <div class="res-row"><span>Crew</span><span id="local-crew">4/4</span></div>
+      <div class="res-row"><span>O₂</span><span id="local-o2">30d</span></div>
+      <div class="res-row"><span>H₂O</span><span id="local-h2o">30d</span></div>
+      <div class="res-row"><span>Food</span><span id="local-food">30d</span></div>
+      <div class="res-row"><span>Power</span><span id="local-power">500 kWh</span></div>
+      <div class="res-row"><span>Status</span><span id="local-status" style="color:#3fb950">ALIVE</span></div>
+      <button class="btn" onclick="offerTrade()" style="margin-top:8px;width:100%">Offer Trade</button>
+    </div>
+    <div class="colony-panel remote">
+      <h3 style="color:#ef4444">Remote Colony</h3>
+      <div class="res-row"><span>Sol</span><span id="remote-sol">—</span></div>
+      <div class="res-row"><span>Crew</span><span id="remote-crew">—</span></div>
+      <div class="res-row"><span>O₂</span><span id="remote-o2">—</span></div>
+      <div class="res-row"><span>H₂O</span><span id="remote-h2o">—</span></div>
+      <div class="res-row"><span>Food</span><span id="remote-food">—</span></div>
+      <div class="res-row"><span>Power</span><span id="remote-power">—</span></div>
+      <div class="res-row"><span>Status</span><span id="remote-status">WAITING</span></div>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="card">
+    <h2>Comms (with light delay)</h2>
+    <div class="msg-box" id="msg-box">
+      <div class="msg msg-system">Awaiting connection...</div>
+    </div>
+    <div style="display:flex;gap:4px">
+      <input type="text" id="msg-input" placeholder="Send message to other colony..."
+        style="flex:1;background:#0d1117;border:1px solid #30363d;color:#c9d1d9;padding:6px;border-radius:4px;font-family:inherit;font-size:12px"
+        onkeypress="if(event.key==='Enter')sendMessage()">
+      <button class="btn" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div style="display:flex;gap:8px;margin-top:12px">
+    <button class="btn btn-go" onclick="toggleSim()" id="mp-btn">▶ START</button>
+    <button class="btn" onclick="stepOnce()">⏭ STEP</button>
+    <span style="font-size:11px;color:#484f58;padding:8px">Both colonies sim simultaneously. Trade with light delay.</span>
+  </div>
+</div>
+
+<script>
+// Minimal sim engine for multiplayer
+const O2_PP=0.84,H2O_PP=2.5,FOOD_PP=2500;
+function rng32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t^=t+Math.imul(t^t>>>7,61|t);return((t^t>>>14)>>>0)/4294967296}}
+let R=rng32(Date.now());
+
+let localState={sol:0,alive:true,o2:4*O2_PP*30,h2o:4*H2O_PP*30,food:4*FOOD_PP*30,power:500,crew:4,morale:0.85};
+let remoteState=null;
+let running=false,simInt=null;
+let pc=null,dc=null;// WebRTC peer connection + data channel
+let isHost=false;
+let msgQueue=[];// Messages in transit (delayed)
+
+function stepLocal(){
+  if(!localState.alive)return;
+  localState.sol++;const s=localState,n=s.crew;
+  // Simplified production
+  const irr=400*(1+(Math.random()-0.5)*0.3);
+  s.power+=irr*200*0.22*24.66/1000;
+  if(s.power>25){s.o2+=5*Math.min(1.5,0.8);s.h2o+=12*Math.min(1.5,0.8)}
+  if(s.power>25&&s.h2o>5)s.food+=15000*Math.min(1.5,0.7);
+  s.o2=Math.max(0,s.o2-n*O2_PP);s.h2o=Math.max(0,s.h2o-n*H2O_PP);
+  s.food=Math.max(0,s.food-n*FOOD_PP);s.power=Math.max(0,s.power-30);
+  if(s.o2<=0||s.food<=0){s.alive=false}
+  // Process delayed messages
+  msgQueue=msgQueue.filter(m=>{
+    if(localState.sol>=m.arrive){
+      addMsg(m.text,m.from==='local'?'msg-local':'msg-remote');
+      return false;
+    }return true;
+  });
+  // Send state to peer
+  if(dc&&dc.readyState==='open'){
+    dc.send(JSON.stringify({type:'state',state:localState}));
+  }
+  updateMP();
+}
+
+function updateMP(){
+  const s=localState,n=Math.max(1,s.crew);
+  document.getElementById('local-sol').textContent=s.sol;
+  document.getElementById('local-crew').textContent=`${s.crew}/4`;
+  document.getElementById('local-o2').textContent=`${(s.o2/(O2_PP*n)).toFixed(0)}d`;
+  document.getElementById('local-h2o').textContent=`${(s.h2o/(H2O_PP*n)).toFixed(0)}d`;
+  document.getElementById('local-food').textContent=`${(s.food/(FOOD_PP*n)).toFixed(0)}d`;
+  document.getElementById('local-power').textContent=`${s.power.toFixed(0)} kWh`;
+  document.getElementById('local-status').textContent=s.alive?'ALIVE':'DEAD';
+  document.getElementById('local-status').style.color=s.alive?'#3fb950':'#da3633';
+
+  if(remoteState){
+    const r=remoteState,rn=Math.max(1,r.crew);
+    document.getElementById('remote-sol').textContent=r.sol;
+    document.getElementById('remote-crew').textContent=`${r.crew}/4`;
+    document.getElementById('remote-o2').textContent=`${(r.o2/(O2_PP*rn)).toFixed(0)}d`;
+    document.getElementById('remote-h2o').textContent=`${(r.h2o/(H2O_PP*rn)).toFixed(0)}d`;
+    document.getElementById('remote-food').textContent=`${(r.food/(FOOD_PP*rn)).toFixed(0)}d`;
+    document.getElementById('remote-power').textContent=`${r.power.toFixed(0)} kWh`;
+    document.getElementById('remote-status').textContent=r.alive?'ALIVE':'DEAD';
+    document.getElementById('remote-status').style.color=r.alive?'#3fb950':'#da3633';
+  }
+}
+
+function addMsg(text,cls){
+  const box=document.getElementById('msg-box');
+  box.innerHTML+=`<div class="msg ${cls}">${text}</div>`;
+  box.scrollTop=box.scrollHeight;
+}
+
+function sendMessage(){
+  const input=document.getElementById('msg-input');
+  const text=input.value.trim();if(!text)return;
+  input.value='';
+  const delay=Math.ceil(0.5+Math.random()*1);// 1-2 sol delay
+  addMsg(`[You → Remote, delay ${delay}s]: ${text}`,'msg-local');
+  if(dc&&dc.readyState==='open'){
+    dc.send(JSON.stringify({type:'msg',text,delay}));
+  }
+  msgQueue.push({text:`[Remote → You]: ${text}`,from:'remote',arrive:localState.sol+delay});
+}
+
+function offerTrade(){
+  const o2=parseInt(prompt('O2 to send (kg):','10'))||0;
+  const h2o=parseInt(prompt('H2O to send (L):','20'))||0;
+  if(o2<=0&&h2o<=0)return;
+  if(localState.o2<o2||localState.h2o<h2o){addMsg('Not enough resources!','msg-system');return}
+  localState.o2-=o2;localState.h2o-=h2o;
+  const delay=2;
+  addMsg(`[Trade sent: ${o2}kg O2 + ${h2o}L H2O, ETA ${delay} sols]`,'msg-local');
+  if(dc&&dc.readyState==='open'){
+    dc.send(JSON.stringify({type:'trade',o2,h2o,delay}));
+  }
+  updateMP();
+}
+
+// WebRTC
+const config={iceServers:[{urls:'stun:stun.l.google.com:19302'}]};
+
+async function createOffer(){
+  isHost=true;
+  pc=new RTCPeerConnection(config);
+  dc=pc.createDataChannel('mars');
+  setupDC();
+  pc.onicecandidate=e=>{
+    if(!e.candidate){
+      document.getElementById('conn-text').value=btoa(JSON.stringify(pc.localDescription));
+      document.getElementById('conn-label').textContent='Copy this offer and send to the other player:';
+      document.getElementById('answer-btn').style.display='inline-block';
+    }
+  };
+  const offer=await pc.createOffer();
+  await pc.setLocalDescription(offer);
+  document.getElementById('conn-ui').style.display='block';
+  document.getElementById('conn-msg').textContent='Waiting for other player to accept...';
+}
+
+async function joinGame(){
+  const offerB64=prompt('Paste the offer from the host:');
+  if(!offerB64)return;
+  pc=new RTCPeerConnection(config);
+  pc.ondatachannel=e=>{dc=e.channel;setupDC()};
+  pc.onicecandidate=e=>{
+    if(!e.candidate){
+      document.getElementById('conn-text').value=btoa(JSON.stringify(pc.localDescription));
+      document.getElementById('conn-label').textContent='Copy this answer and send back to the host:';
+      document.getElementById('conn-ui').style.display='block';
+    }
+  };
+  const offer=JSON.parse(atob(offerB64));
+  await pc.setRemoteDescription(offer);
+  const answer=await pc.createAnswer();
+  await pc.setLocalDescription(answer);
+  document.getElementById('conn-msg').textContent='Answer generated. Send it back to the host.';
+}
+
+async function processAnswer(){
+  const answerB64=document.getElementById('conn-text').value;
+  if(!answerB64)return;
+  try{
+    const answer=JSON.parse(atob(answerB64));
+    await pc.setRemoteDescription(answer);
+    document.getElementById('conn-msg').textContent='Connecting...';
+  }catch(e){document.getElementById('conn-msg').textContent='Invalid answer: '+e.message}
+}
+
+function setupDC(){
+  dc.onopen=()=>{
+    document.getElementById('conn-status').className='status status-on';
+    document.getElementById('conn-msg').textContent='Connected! Both colonies are live.';
+    addMsg('Connection established. Two colonies on Mars.','msg-system');
+  };
+  dc.onclose=()=>{
+    document.getElementById('conn-status').className='status status-off';
+    addMsg('Connection lost.','msg-system');
+  };
+  dc.onmessage=e=>{
+    const data=JSON.parse(e.data);
+    if(data.type==='state')remoteState=data.state;
+    if(data.type==='msg'){
+      const delay=data.delay||1;
+      msgQueue.push({text:`[Remote → You]: ${data.text}`,from:'remote',arrive:localState.sol+delay});
+      addMsg(`[Incoming message, ETA ${delay} sols...]`,'msg-system');
+    }
+    if(data.type==='trade'){
+      const delay=data.delay||2;
+      setTimeout(()=>{
+        localState.o2+=data.o2;localState.h2o+=data.h2o;
+        addMsg(`[Trade received: +${data.o2}kg O2, +${data.h2o}L H2O]`,'msg-remote');
+        updateMP();
+      },delay*500);
+    }
+    updateMP();
+  };
+}
+
+function toggleSim(){
+  if(running){running=false;clearInterval(simInt);document.getElementById('mp-btn').textContent='▶ RESUME';return}
+  running=true;document.getElementById('mp-btn').textContent='⏸ PAUSE';
+  simInt=setInterval(()=>{stepLocal();if(!localState.alive){running=false;clearInterval(simInt);
+    document.getElementById('mp-btn').textContent='LOST'}},500);
+}
+function stepOnce(){stepLocal()}
+updateMP();
+</script>
+</body>
+</html>
