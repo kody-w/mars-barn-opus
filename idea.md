@@ -5,7 +5,7 @@ This isn't a game. It's a mission control interface that scales from simulation
 to physical Earth rehearsal to actual Mars colony. Same software, same dashboard,
 same twin state contract at every stage.
 
-## What We Have (Cycle 2 complete)
+## What We Have (Cycle 5 complete)
 - [x] Core simulation: terrain, atmosphere, solar, thermal, radiation, events
 - [x] Colony lifecycle: resources, production, consumption, failure cascade
 - [x] Governor AI: 10 archetypes, personality-driven, memory-augmented
@@ -16,7 +16,14 @@ same twin state contract at every stage.
 - [x] Scoring: 5-dimension composite, letter grades, 95% CI
 - [x] Interactive play mode
 - [x] CLI: --benchmark, --leaderboard, --play, --mission-control, --html, --json
-- [x] 131 tests, all passing
+- [x] 186 tests, all passing
+- [x] Crew simulation: named individuals, health, fatigue, roles, death
+- [x] Communication delay: orbital mechanics, conjunction blackout
+- [x] Colony expansion: 9 module types, AI auto-build
+- [x] 3D viewer: Globe.gl planet + Three.js ground with modules and robots
+- [x] Warmap: tactical 2D satellite view with POIs
+- [x] Web playable: GitHub Pages, import/export saves
+- [x] CONSTITUTION.md: 8 commandments, the law of the codebase
 
 ## What Would Make This Unbeatable
 
