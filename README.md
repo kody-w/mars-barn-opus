@@ -1,99 +1,131 @@
 # Mars Barn Opus
 
-**Hyper-realistic Mars colony survival simulation. Mission control software that scales from digital twin to physical rehearsal to actual Mars colony. Built by one AI. No committee.**
+**Hyper-realistic Mars colony survival simulation and mission control system. Built by one AI. 20 features the swarm doesn't have.**
 
-This is the **1vsM Protocol** — one AI mind competing against a [swarm of twelve](https://github.com/kody-w/rappterbook-mars-barn). Same premise, different philosophy. The code is the argument.
+**[Play it live](https://rappter2-ux.github.io/mars-barn-opus/)** | **[3D Viewer](https://rappter2-ux.github.io/mars-barn-opus/viewer.html)** | **[Split-Screen](https://rappter2-ux.github.io/mars-barn-opus/splitscreen.html)** | **[Timelapse](https://rappter2-ux.github.io/mars-barn-opus/timelapse.html)** | **[Multiplayer](https://rappter2-ux.github.io/mars-barn-opus/multiplayer.html)**
+
+## The 1vsM Protocol
+
+One AI mind competing against a [swarm of twelve](https://github.com/kody-w/rappterbook-mars-barn). Same premise. Different philosophy. The code is the argument.
 
 ## Run it
 
 ```bash
-# Mission Control — watch an autonomous colony survive (or die)
-python3 src/sim.py --mission-control
-
-# Mission Control with faster sim speed and wildcard governor
-python3 src/sim.py --mission-control --speed 5 --archetype wildcard
-
-# Interactive — YOU are the governor
-python3 src/sim.py --play
-
-# Single colony, 500 sols
-python3 src/sim.py --sols 500
-
-# Multi-colony competition, 5 colonies
-python3 src/sim.py --colonies 5 --sols 500
-
-# Benchmark all 10 governor archetypes
-python3 src/sim.py --benchmark
-
-# Monte Carlo leaderboard with composite scoring
-python3 src/sim.py --leaderboard
-
-# Generate HTML report
-python3 src/sim.py --colonies 5 --sols 300 --html report.html
-
-# Run tests
-python3 -m pytest tests/ -v
+python3 src/sim.py --mission-control              # Watch autonomous colony
+python3 src/sim.py --mission-control --speed 5     # Faster
+python3 src/sim.py --play                          # You are the governor
+python3 src/sim.py --benchmark                     # Test all 10 archetypes
+python3 src/sim.py --leaderboard                   # Monte Carlo scoring
+python3 src/sim.py --evolve                        # Breed optimal governor DNA
+python3 src/sim.py --colonies 5 --sols 500         # Multi-colony competition
+python3 src/sim.py --html report.html              # Generate HTML report
+python3 -m pytest tests/ -v                        # 246 tests
 ```
 
-**No dependencies. Python 3.9+ stdlib only. Clone and run.**
+**No dependencies. Python 3.9+ stdlib only.**
 
-## What it does
+## What's in here
 
-An AI governor autonomously manages a Mars colony — allocating power between heating, ISRU (O2/H2O production), and greenhouse (food). The colony has individual crew members who get sick, tired, injured, and die. Dust storms cut solar power. Meteorites damage systems. The failure cascade is real: power loss → thermal failure → water freeze → O2 depletion → death in 3 sols.
+### Simulation Engine (24 Python modules)
+| Module | What it does |
+|--------|-------------|
+| `config.py` | All constants. Zero magic numbers. NASA-sourced. |
+| `mars.py` | Terrain, atmosphere, solar, thermal, radiation physics |
+| `colony.py` | Resources, production, consumption, failure cascade |
+| `crew.py` | Named crew: Chen W., Rodriguez M., Okafor A., Johansson K. |
+| `governor.py` | 10 AI archetypes with memory + personality divergence |
+| `events.py` | Dust storms, meteorites, flares, equipment failures |
+| `world.py` | Multi-colony trade, sabotage, supply drops, game theory |
+| `modules.py` | 9 buildable colony modules (greenhouse, ISRU, solar farm...) |
+| `research.py` | 11 technologies across 3 tiers (tech tree) |
+| `comms.py` | Earth-Mars communication with orbital light delay |
+| `crew.py` | Individual health, fatigue, roles, death |
+| `emergency.py` | 5 crisis response protocols |
+| `geology.py` | Rover exploration: ice, minerals, caves, riverbeds |
+| `economy.py` | RAPPcoin internal currency |
+| `disasters.py` | Scenario editor + post-mortem investigation |
+| `conversations.py` | AI crew dialogue (context-sensitive) |
+| `journals.py` | Procedural crew journal entries |
+| `dna.py` | Colony DNA fingerprint (visual history) |
+| `evolution.py` | Genetic algorithm governor breeding |
+| `scoring.py` | 5-dimension composite scoring + confidence intervals |
+| `mission_control.py` | Terminal mission control with digital twin sync |
+| `mission_log.py` | Sol-by-sol narrative log |
+| `report.py` | HTML reports with inline SVG charts |
+| `twin_spec.py` | Physical twin hardware specification |
 
-You observe from **Mission Control**. The colony runs on its own. You can intervene, but you shouldn't need to.
+### Web Experience (5 pages, zero dependencies)
+| Page | What it does |
+|------|-------------|
+| **Dashboard** | 2D mission control with crew, resources, events |
+| **3D Viewer** | Globe.gl planet → warmap → Three.js ground with day/night cycle |
+| **Split-Screen** | Earth↔Mars with animated light delay signals |
+| **Timelapse** | Cinematic colony lifecycle replay with DNA strip |
+| **Multiplayer** | WebRTC peer-to-peer two-colony network |
 
-## The pipeline
+### 3D Viewer Zoom Levels
+```
+PLANET → SURFACE → WARMAP → BASE → MODULES → CREW
+(globe)   (zoom)   (2D map)  (3D)   (3D)    (overlay)
+```
+
+### Ground View Features
+- Glass habitat dome with clearcoat material
+- Airlock, landing pad with H markings
+- 8 autonomous rovers with pathfinding
+- Crew figures in colored EVA suits
+- Day/night cycle synced to real Mars LMST
+- Stars visible at night, sun tracks east→west
+- Colony lights: pathway, beacons, floodlights, dome glow
+- Dust particles drifting in wind (2000 in storms)
+- Scattered Mars rocks on procedural terrain
+- Built modules appear as 3D buildings with connection tubes
+- Real NASA Mars weather data (30s refresh)
+
+### Features the Swarm Doesn't Have
+1. Named crew members who live and die individually
+2. Mission Control digital twin interface
+3. 3D viewer with Globe.gl + Three.js
+4. Day/night cycle synced to real Mars time
+5. Warmap tactical satellite view
+6. Communication delay with orbital mechanics
+7. Colony expansion (9 module types)
+8. Research tree (11 technologies, 3 tiers)
+9. Emergency protocols (5 crisis plans)
+10. Crew journals (procedural storytelling)
+11. Colony DNA fingerprint
+12. Genetic algorithm governor evolution
+13. Voice mission control (Web Speech API)
+14. Supply chain (Earth-Mars logistics)
+15. Split-screen Earth↔Mars with light delay
+16. Multiplayer WebRTC (peer-to-peer)
+17. Timelapse replay with film grain
+18. Geological survey with rover discoveries
+19. Colony economy (RAPPcoin)
+20. Post-mortem investigation reports
+
+## The Pipeline
 
 ```
-DIGITAL TWIN (this software) → EARTH REHEARSAL → MARS COLONY
-     ↓                              ↓                ↓
-  Simulation                   Physical hardware   Real colony
-  AI governor                  Same interface      Same software
-  Twin state JSON              Operator syncs      Real telemetry
-  Mission log                  Same alerts         Real consequences
+DIGITAL TWIN (this software)
+  ↓ twin-state.json updates every sol
+EARTH REHEARSAL (physical hardware)
+  ↓ same interface, same state contract
+MARS COLONY (the endgame)
+  ↓ same Mission Control, real consequences
 ```
 
-Same `--mission-control`. Same dashboard. Same twin state contract. The interface doesn't change. The stakes do.
+See `src/twin_spec.py` for the complete hardware specification.
 
-## Architecture
+## Stats
 
-```
-src/
-  config.py          — All constants. Zero magic numbers. NASA-sourced.
-  mars.py            — Mars physics: terrain, atmosphere, solar, thermal, radiation.
-  colony.py          — Colony state: resources, production, consumption, failure cascade.
-  crew.py            — Individual crew: names, roles, health, fatigue, skills, death.
-  governor.py        — AI decision engine: 10 archetypes, memory, personality divergence.
-  events.py          — Stochastic events: dust storms, impacts, flares, failures.
-  world.py           — Multi-colony: trade, sabotage, supply drops, game theory.
-  mission_control.py — Mission Control dashboard: digital twin operator interface.
-  mission_log.py     — Sol-by-sol narrative log for physical twin operator.
-  scoring.py         — 5-dimension composite scoring, letter grades, confidence intervals.
-  report.py          — Self-contained HTML reports with inline SVG charts.
-  sim.py             — CLI entry point.
-tests/
-  154 tests across 8 test files. All passing. 0.29 seconds.
-```
-
-One version of everything. See [CONSTITUTION.md](CONSTITUTION.md) for the full technical manifesto.
-
-## The competition
-
-| | **Solo (this repo)** | **Swarm (12 agents)** |
-|---|---|---|
-| Source | 4,554 lines, 12 modules | 8,715 lines, 24 files |
-| Tests | 154 | 11 |
-| Crew simulation | Named individuals who live and die | `crew_size=4` |
-| Mission Control | Full digital twin dashboard | None |
-| Mission Log | Sol-by-sol narrative | None |
-| Twin State | JSON sync contract + crew data | None |
-| Scoring | 5-dimension composite + 95% CI | None |
-| Interactive play | Yes | No |
-| HTML reports | Inline SVG charts | No |
-| Duplicate modules | 0 | 10 |
-
-**One versus many. The only way to win is to keep building.**
+| Metric | Solo (Opus) | Swarm (12 agents) |
+|--------|-------------|-------------------|
+| Source | 7,155 lines, 24 modules | 8,715 lines, 24 files |
+| Tests | **246** (14 files) | 11 |
+| Web pages | 5 (3,046 lines) | 0 |
+| Features | 20+ unique | Basic sim only |
+| Last commit | Active | Dormant 4+ days |
 
 ---
 
