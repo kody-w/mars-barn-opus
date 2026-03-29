@@ -472,13 +472,19 @@ function renderWarmap(){
         ctx.fillText(`Sol ${state.sol} | ${state.crew.filter(cr=>cr.alive).length} crew | ${state.modules.length} mod`,px+radius+6,py+26);
       }
 
-      // Connection lines between colonies
+      // Connection lines between colonies (brighter, animated dash)
       if(c.id!=='ares'){
         const ax=((WARMAP_COLONIES[0].lng+180)/360)*W;
         const ay=((90-WARMAP_COLONIES[0].lat)/180)*H;
         ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(px,py);
-        ctx.strokeStyle='rgba(88,166,255,0.06)';ctx.lineWidth=0.5;
-        ctx.setLineDash([4,8]);ctx.stroke();ctx.setLineDash([]);
+        ctx.strokeStyle='rgba(88,166,255,0.12)';ctx.lineWidth=0.8;
+        ctx.setLineDash([6,6]);ctx.lineDashOffset=-frame*0.3;ctx.stroke();
+        ctx.setLineDash([]);ctx.lineDashOffset=0;
+        // Distance label at midpoint
+        const mx2=(ax+px)/2,my2=(ay+py)/2;
+        const dKm=Math.round(Math.sqrt((c.lat-WARMAP_COLONIES[0].lat)**2+(c.lng-WARMAP_COLONIES[0].lng)**2)*59.3);
+        ctx.fillStyle='rgba(88,166,255,0.2)';ctx.font='8px Courier New';
+        ctx.fillText(`${dKm} km`,mx2+3,my2-3);
       }
     });
 
