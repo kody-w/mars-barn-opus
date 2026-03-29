@@ -95,6 +95,7 @@ padding:8px;margin:4px 0;cursor:pointer;transition:all 0.2s}
       <option value="merchant">MERCHANT</option><option value="hermit">HERMIT</option>
     </select>
   </div>
+  <button class="zoom-btn" onclick="voiceCommand()" id="voice-btn" title="Voice command (Web Speech API)">MIC</button>
   <div class="status"><span class="pulsing"></span><span id="status-text">READY</span></div>
 </div>
 
@@ -158,8 +159,12 @@ padding:8px;margin:4px 0;cursor:pointer;transition:all 0.2s}
   <div id="crew-roster">Awaiting telemetry...</div>
   <h3>Event Feed</h3>
   <div id="event-feed"></div>
+  <h3>Crew Journal</h3>
+  <div id="crew-journal" style="max-height:180px;overflow-y:auto;font-size:10px;line-height:1.5;color:var(--text);font-style:italic;padding:4px;background:rgba(0,0,0,0.3);border-radius:4px">Awaiting first sol...</div>
+  <h3>Colony DNA</h3>
+  <div id="colony-dna" style="overflow-x:auto"></div>
   <h3>Mission Log</h3>
-  <div id="mini-log" style="max-height:200px;overflow-y:auto;font-size:10px;color:var(--dim)"></div>
+  <div id="mini-log" style="max-height:150px;overflow-y:auto;font-size:10px;color:var(--dim)"></div>
 </div>
 
 <script>
@@ -1054,6 +1059,8 @@ function stepSim(){
     state.building=null;
   }}
 
+  // Supply chain
+  tickSupplyChain(s);
   // Auto-research (tier 1 → 2 → 3)
   let researchEvent=null;
   const RTREE={improved_solar:{name:'Improved Solar',sols:12,tier:1,cost_pwr:100,eff:'solar+15%'},
@@ -1157,6 +1164,59 @@ function applyEchoVisuals(echo){
 }
 
 // ── UI Updates ──
+// ── Journal Generator (browser port) ──
+const MOODS={high:['Feeling good today.','Morale is high.','Good day.'],
+  med:['Another sol. We keep going.','Routine is becoming comfortable.','Missing Earth today.'],
+  low:['Hard to stay positive.','Counting the sols.','We need a win.'],
+  crit:["I don't know how much longer.","Nobody's talking at meals.","Wrote a letter home. Didn't send it."]};
+const ROLE_OBS={CMDR:['Reviewed crew status. ','Made allocation decisions. ','Leadership weighs heavy today.'],
+  ENGR:['Ran system diagnostics. ','Fixed a pressure seal. ','Power readings look '],
+  SCI:['Research progressing. ','Greenhouse yields are ','Data tells the story.'],
+  MED:['Crew health check done. ','Monitoring radiation. ','The body adapts.']};
+function genJournal(crew,state,sol){
+  const rng=rng32(sol*1000);const alive=crew.filter(c=>c.alive);if(!alive.length)return'';
+  const c=alive[sol%alive.length];// Rotate who writes
+  const mood=c.mor>80?MOODS.high:c.mor>50?MOODS.med:c.mor>20?MOODS.low:MOODS.crit;
+  const obs=(ROLE_OBS[c.role]||ROLE_OBS.ENGR);
+  let entry=`<strong>Sol ${sol} — ${c.name}</strong><br>`;
+  entry+=mood[Math.floor(rng()*mood.length)]+'<br>';
+  entry+=obs[Math.floor(rng()*obs.length)];
+  if(state.events.length)entry+=`The ${state.events[0].type.replace(/_/g,' ')} keeps everyone on edge. `;
+  const others=alive.filter(x=>x.name!==c.name);
+  if(others.length&&rng()>0.5)entry+=`<br>Checked in on ${others[Math.floor(rng()*others.length)].name}. `;
+  if(rng()>0.7)entry+='<br><em>One more sol. That\'s all we ever need.</em>';
+  return entry;
+}
+
+// ── Colony DNA (browser port) ──
+let dnaHistory=[];
+function updateDNA(state){
+  const n=Math.max(1,state.crew.filter(c=>c.alive).length);
+  dnaHistory.push({
+    o2d:state.o2/(0.84*n),fd:state.food/(2500*n),
+    pwr:state.power,mor:state.morale,
+    ev:state.events.length>0,crew:state.crew.filter(c=>c.alive).length
+  });
+  if(dnaHistory.length>500)dnaHistory.shift();
+  // Render as inline pixel strip
+  const el=document.getElementById('colony-dna');if(!el)return;
+  const w=Math.min(dnaHistory.length,280);const h=12;
+  let svg=`<svg width="${w}" height="${h}" style="border-radius:3px">`;
+  const start=Math.max(0,dnaHistory.length-w);
+  for(let i=start;i<dnaHistory.length;i++){
+    const d=dnaHistory[i];const x=i-start;
+    const health=Math.min(1,Math.min(d.o2d,d.fd)/30);
+    const crisis=Math.max(0,1-health);
+    const r=Math.min(255,Math.floor(crisis*200+(d.ev?55:20)));
+    const g=Math.min(255,Math.floor(health*200+30));
+    const b=Math.min(255,Math.floor(Math.min(1,d.pwr/800)*150+40));
+    const bright=0.4+d.mor*0.6;
+    svg+=`<rect x="${x}" y="0" width="1" height="${h}" fill="rgb(${Math.floor(r*bright)},${Math.floor(g*bright)},${Math.floor(b*bright)})"/>`;
+  }
+  svg+='</svg>';
+  el.innerHTML=svg;
+}
+
 function updateAllUI(){
   const s=state,ac=s.crew.filter(c=>c.alive),n=Math.max(1,ac.length);
   // Status
@@ -1212,6 +1272,13 @@ function updateAllUI(){
     `<div>${l}</div>`
   ).join('');
   document.getElementById('mini-log').scrollTop=9999;
+  // Journal
+  if(s.sol>0){
+    const jEl=document.getElementById('crew-journal');
+    if(jEl)jEl.innerHTML=genJournal(s.crew,s,s.sol);
+  }
+  // DNA
+  updateDNA(s);
   // Globe colony marker
   if(globe){
     const hp=s.alive?Math.max(10,Math.min(100,80-s.sol*0.1)):0;
@@ -1272,6 +1339,76 @@ function resetState(){
     events:[],log:[],modules:[],building:null,research:[],researching:null,alloc:{h:.25,i:.4,g:.35,r:1},lat:18.38,lng:77.58};
   document.getElementById('sim-btn').textContent='▶ START SIM';
   updateAllUI();
+}
+
+// Init
+// ── Voice Mission Control (Web Speech API) ──
+function voiceCommand(){
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
+    alert('Voice not supported in this browser');return;
+  }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const rec=new SR();rec.lang='en-US';rec.continuous=false;
+  document.getElementById('voice-btn').textContent='...';
+  document.getElementById('voice-btn').style.color='var(--red)';
+  rec.onresult=(e)=>{
+    const cmd=e.results[0][0].transcript.toLowerCase();
+    console.log('Voice:',cmd);
+    let response='';
+    const ac=state.crew.filter(c=>c.alive);
+    const n=Math.max(1,ac.length);
+    if(cmd.includes('status')||cmd.includes('report')){
+      response=`Sol ${state.sol}. ${ac.length} crew alive. O2 at ${(state.o2/(0.84*n)).toFixed(0)} days. Food at ${(state.food/(2500*n)).toFixed(0)} days. ${state.alive?'Colony nominal.':'Colony lost.'}`;
+    }else if(cmd.includes('start')||cmd.includes('go')){
+      if(!running)toggleSim();response='Simulation started.';
+    }else if(cmd.includes('pause')||cmd.includes('stop')){
+      if(running)toggleSim();response='Simulation paused.';
+    }else if(cmd.includes('emergency')||cmd.includes('shelter')){
+      state.alloc={h:0.6,i:0.25,g:0.15,r:0.5};response='Emergency shelter protocol activated.';
+    }else if(cmd.includes('chen')||cmd.includes('commander')){
+      const c=state.crew.find(m=>m.role==='CMDR');
+      response=c?`${c.name}: health ${c.hp.toFixed(0)}, morale ${c.mor.toFixed(0)}, status ${c.st}.`:'Commander not found.';
+    }else if(cmd.includes('weather')||cmd.includes('temperature')){
+      response=`Mars surface: ${marsWeather.tempC} degrees celsius. Wind ${marsWeather.windMs} meters per second. Season: ${marsWeather.season}.`;
+    }else{
+      response=`Command not recognized: ${cmd}`;
+    }
+    // Speak response
+    if('speechSynthesis' in window){
+      const utter=new SpeechSynthesisUtterance(response);
+      utter.rate=0.9;utter.pitch=0.8;
+      speechSynthesis.speak(utter);
+    }
+    state.log.push(`🎤 Voice: "${cmd}" → ${response}`);
+    updateAllUI();
+  };
+  rec.onerror=()=>{document.getElementById('voice-btn').textContent='MIC';
+    document.getElementById('voice-btn').style.color=''};
+  rec.onend=()=>{document.getElementById('voice-btn').textContent='MIC';
+    document.getElementById('voice-btn').style.color=''};
+  rec.start();
+}
+
+// ── Supply Chain (Earth-Mars logistics) ──
+// Rockets launch every ~760 sols (synodic period). Transit time ~180 sols.
+let supplyChain={nextLaunchWindow:100,inTransit:[],delivered:0};
+function tickSupplyChain(sol){
+  // Check for launch window
+  if(sol>=supplyChain.nextLaunchWindow&&state.alive){
+    supplyChain.inTransit.push({launched:sol,arrives:sol+180,
+      cargo:{o2:50,h2o:100,food:50000,power:200}});
+    state.log.push(`🚀 Supply rocket launched from Earth! Arrives sol ${sol+180}`);
+    supplyChain.nextLaunchWindow=sol+760;
+  }
+  // Check for arrivals
+  const arrived=supplyChain.inTransit.filter(r=>sol>=r.arrives);
+  supplyChain.inTransit=supplyChain.inTransit.filter(r=>sol<r.arrives);
+  arrived.forEach(r=>{
+    state.o2+=r.cargo.o2;state.h2o+=r.cargo.h2o;
+    state.food+=r.cargo.food;state.power+=r.cargo.power;
+    supplyChain.delivered++;
+    state.log.push(`📦 Supply delivery! +${r.cargo.o2}kg O2, +${r.cargo.h2o}L H2O, +${r.cargo.food} kcal`);
+  });
 }
 
 // Init
