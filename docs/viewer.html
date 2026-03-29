@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Mars Barn Opus — 3D Colony Viewer</title>
+<script src="https://unpkg.com/globe.gl"></script>
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<style>
+:root{--bg:#0a0e14;--panel:rgba(10,14,20,0.92);--border:rgba(88,166,255,0.15);
+--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--cyan:#79c0ff;
+--text:#c9d1d9;--dim:#484f58;--font:'Courier New',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:var(--text);font-family:var(--font);overflow:hidden;height:100vh}
+
+/* Header */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--panel);
+border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;gap:16px}
+.hdr h1{font-size:14px;color:var(--cyan);letter-spacing:2px}
+.zoom-bar{display:flex;gap:2px}
+.zoom-btn{padding:4px 10px;background:rgba(88,166,255,0.1);border:1px solid var(--border);
+color:var(--dim);cursor:pointer;font-family:var(--font);font-size:11px;transition:all 0.2s}
+.zoom-btn:hover{background:rgba(88,166,255,0.2);color:var(--text)}
+.zoom-btn.active{background:rgba(88,166,255,0.3);color:var(--cyan);border-color:var(--cyan)}
+.status{margin-left:auto;font-size:11px;color:var(--green)}
+.pulsing{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);
+animation:pulse 2s infinite;margin-right:6px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* Globe container */
+#globe-container{position:fixed;top:36px;left:0;right:0;bottom:0}
+#globeViz{width:100%;height:100%}
+
+/* Ground view overlay */
+#ground-view{position:fixed;top:36px;left:0;right:0;bottom:0;z-index:50;display:none}
+#ground-canvas{width:100%;height:100%}
+.ground-hud{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);
+padding:12px 20px;z-index:60;display:flex;gap:24px;align-items:center}
+.hud-stat{text-align:center}.hud-val{font-size:18px;font-weight:700;color:var(--cyan)}.hud-label{font-size:9px;color:var(--dim);text-transform:uppercase}
+.ground-header{position:fixed;top:36px;left:0;right:0;background:var(--panel);border-bottom:1px solid var(--border);
+padding:8px 20px;z-index:60;display:flex;align-items:center;justify-content:space-between}
+.ground-header h2{font-size:13px;color:var(--cyan)}
+.back-btn{background:rgba(218,54,51,0.2);border:1px solid var(--red);color:var(--red);padding:4px 12px;
+cursor:pointer;font-family:var(--font);font-size:11px}
+.back-btn:hover{background:rgba(218,54,51,0.4)}
+
+/* Side panels */
+.side-panel{position:fixed;top:36px;width:280px;bottom:0;z-index:40;background:var(--panel);
+border-right:1px solid var(--border);overflow-y:auto;padding:12px;font-size:11px}
+.side-panel.left{left:0}.side-panel.right{right:0;border-right:none;border-left:1px solid var(--border)}
+.side-panel h3{color:var(--cyan);font-size:10px;letter-spacing:1.5px;margin:12px 0 6px;text-transform:uppercase}
+.colony-card{background:rgba(88,166,255,0.05);border:1px solid var(--border);border-radius:4px;
+padding:8px;margin:4px 0;cursor:pointer;transition:all 0.2s}
+.colony-card:hover{background:rgba(88,166,255,0.1);border-color:var(--cyan)}
+.colony-card .name{font-weight:700;color:var(--text)}.colony-card .hp{float:right}
+.hp-bar{height:3px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:4px}
+.hp-fill{height:100%;border-radius:2px;transition:width 0.5s}
+.crew-row{padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;gap:6px;align-items:center}
+.event-item{padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:10px;color:var(--dim)}
+.event-item .tag{color:var(--red);font-weight:700}
+.module-item{padding:3px 0;display:flex;justify-content:space-between}
+.module-item .status{color:var(--green);font-size:10px}
+.res-bar{display:flex;align-items:center;gap:6px;margin:3px 0}
+.res-label{width:35px;color:var(--dim);font-size:10px}
+.res-track{flex:1;height:8px;background:rgba(255,255,255,0.05);border-radius:2px}
+.res-fill{height:100%;border-radius:2px;transition:width 0.3s}
+.res-val{width:60px;text-align:right;font-size:10px}
+</style>
+</head>
+<body>
+
+<!-- Header with zoom levels -->
+<div class="hdr">
+  <h1>MARS BARN OPUS</h1>
+  <div class="zoom-bar">
+    <button class="zoom-btn active" onclick="setZoom('planet')" id="z-planet">PLANET</button>
+    <button class="zoom-btn" onclick="setZoom('surface')" id="z-surface">SURFACE</button>
+    <button class="zoom-btn" onclick="setZoom('base')" id="z-base">BASE</button>
+    <button class="zoom-btn" onclick="setZoom('module')" id="z-module">MODULES</button>
+    <button class="zoom-btn" onclick="setZoom('crew')" id="z-crew">CREW</button>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="zoom-btn" onclick="toggleSim()" id="sim-btn">▶ START SIM</button>
+    <select id="gov-sel" style="background:#0a0e14;border:1px solid var(--border);color:var(--text);padding:3px;font-family:var(--font);font-size:11px">
+      <option value="engineer">ENGINEER</option><option value="contrarian">CONTRARIAN</option>
+      <option value="wildcard">WILDCARD</option><option value="philosopher">PHILOSOPHER</option>
+      <option value="survivalist">SURVIVALIST</option><option value="commander">COMMANDER</option>
+      <option value="scientist">SCIENTIST</option><option value="diplomat">DIPLOMAT</option>
+      <option value="merchant">MERCHANT</option><option value="hermit">HERMIT</option>
+    </select>
+  </div>
+  <div class="status"><span class="pulsing"></span><span id="status-text">READY</span></div>
+</div>
+
+<!-- Globe (planet + surface zoom) -->
+<div id="globe-container"><div id="globeViz"></div></div>
+
+<!-- Ground view (base + module + crew zoom) -->
+<div id="ground-view">
+  <div class="ground-header">
+    <h2 id="ground-title">ARES COLONY — GROUND VIEW</h2>
+    <button class="back-btn" onclick="exitGround()">↑ RETURN TO ORBIT</button>
+  </div>
+  <div id="ground-canvas"></div>
+  <div class="ground-hud" id="ground-hud"></div>
+</div>
+
+<!-- Left panel: colony status -->
+<div class="side-panel left" id="left-panel">
+  <h3>Colony Status</h3>
+  <div id="colony-info">Initializing...</div>
+  <h3>Resources</h3>
+  <div id="resources"></div>
+  <h3>Systems</h3>
+  <div id="systems"></div>
+  <h3>Base Modules</h3>
+  <div id="modules-list">No modules built</div>
+</div>
+
+<!-- Right panel: crew + events -->
+<div class="side-panel right" id="right-panel">
+  <h3>Crew Roster</h3>
+  <div id="crew-roster">Awaiting telemetry...</div>
+  <h3>Event Feed</h3>
+  <div id="event-feed"></div>
+  <h3>Mission Log</h3>
+  <div id="mini-log" style="max-height:200px;overflow-y:auto;font-size:10px;color:var(--dim)"></div>
+</div>
+
+<script>
+// ============================================================
+// MARS BARN OPUS — 3D Colony Viewer
+// Globe.gl for planet view, Three.js for ground view
+// Same sim engine as index.html
+// ============================================================
+
+const MARS_TEX = 'https://unpkg.com/three-globe/example/img/earth-topology.png';
+// Use a Mars-like texture (reddish topology)
+const BG = 'https://unpkg.com/three-globe/example/img/night-sky.png';
+
+// Sim state (reuse from index.html engine)
+const O2_PP=0.84,H2O_PP=2.5,FOOD_PP=2500,PWR_BASE=30,ISRU_O2=5,ISRU_H2O=12,GH_KCAL=15000,PANEL=200,EFF=0.22,SOL_H=24.66,PCRIT=50;
+function rng32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t^=t+Math.imul(t^t>>>7,61|t);return((t^t>>>14)>>>0)/4294967296}}
+let R=rng32(42);
+
+let state={sol:0,alive:true,cause:null,arch:'engineer',
+  o2:4*O2_PP*30,h2o:4*H2O_PP*30,food:4*FOOD_PP*30,power:500,
+  s_eff:1,i_eff:1,g_eff:1,h_eff:1,cascade:'NOM',int_temp:293.15,morale:0.85,rad:0,
+  crew:[
+    {name:'Chen W.',role:'CMDR',hp:97,fat:0,mor:82,rad:0,alive:true,st:'Nominal'},
+    {name:'Rodriguez M.',role:'ENGR',hp:96,fat:0,mor:85,rad:0,alive:true,st:'Nominal'},
+    {name:'Okafor A.',role:'SCI',hp:98,fat:0,mor:78,rad:0,alive:true,st:'Nominal'},
+    {name:'Johansson K.',role:'MED',hp:95,fat:0,mor:88,rad:0,alive:true,st:'Nominal'}
+  ],
+  events:[],log:[],modules:[],building:null,
+  alloc:{h:.25,i:.4,g:.35,r:1},lat:18.38,lng:77.58
+};
+
+let globe=null, running=false, simInterval=null;
+let currentZoom='planet';
+let groundScene=null,groundCamera=null,groundRenderer=null,groundAnimId=null;
+
+// ── Globe Setup ──
+function initGlobe(){
+  globe=Globe()(document.getElementById('globeViz'))
+    .backgroundColor('rgba(0,0,0,0)')
+    .showAtmosphere(true)
+    .atmosphereColor('#ef4444')
+    .atmosphereAltitude(0.15)
+    .globeImageUrl(MARS_TEX)
+    .backgroundImageUrl(BG);
+
+  globe.htmlElementsData([{id:'ares',name:'Ares Colony',lat:state.lat,lng:state.lng,health:100}])
+    .htmlElement(d=>{
+      const el=document.createElement('div');
+      el.style.cursor='pointer';
+      el.style.pointerEvents='auto';
+      el.innerHTML=`<div style="text-align:center">
+        <div style="width:10px;height:10px;background:${d.health>60?'#3fb950':d.health>30?'#d29922':'#da3633'};
+        border-radius:50%;box-shadow:0 0 10px ${d.health>60?'#3fb950':'#da3633'};border:1px solid #fff;
+        margin:0 auto;animation:pulse 2s infinite"></div>
+        <div style="background:rgba(0,0,0,0.85);color:#fff;padding:2px 6px;border-radius:3px;
+        font-size:10px;margin-top:4px;border:1px solid rgba(255,255,255,0.2);white-space:nowrap">
+        ${d.name}<br>HP: ${d.health}%</div></div>`;
+      el.onclick=(e)=>{e.stopPropagation();enterGround()};
+      return el;
+    });
+
+  globe.controls().autoRotate=true;
+  globe.controls().autoRotateSpeed=0.3;
+  globe.pointOfView({altitude:2.5});
+  // Tint the globe reddish for Mars
+  globe.globeMaterial().color.setHex(0xffccaa);
+}
+
+// ── Zoom Levels ──
+function setZoom(level){
+  currentZoom=level;
+  document.querySelectorAll('.zoom-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('z-'+level)?.classList.add('active');
+
+  if(level==='planet'||level==='surface'){
+    exitGround();
+    if(level==='planet')globe.pointOfView({altitude:2.5},1000);
+    else globe.pointOfView({lat:state.lat,lng:state.lng,altitude:0.15},1000);
+  } else {
+    enterGround();
+  }
+}
+
+// ── Ground View (Three.js) ──
+function enterGround(){
+  document.getElementById('ground-view').style.display='block';
+  document.getElementById('globe-container').style.display='none';
+  if(!groundScene)buildGroundScene();
+}
+function exitGround(){
+  document.getElementById('ground-view').style.display='none';
+  document.getElementById('globe-container').style.display='block';
+  if(groundAnimId)cancelAnimationFrame(groundAnimId);
+  if(groundRenderer){groundRenderer.dispose();document.getElementById('ground-canvas').innerHTML=''}
+  groundScene=null;groundCamera=null;groundRenderer=null;
+}
+
+function buildGroundScene(){
+  const c=document.getElementById('ground-canvas');
+  c.innerHTML='';
+  const T=window.THREE;if(!T)return;
+  const w=c.clientWidth,h=c.clientHeight;
+
+  groundScene=new T.Scene();
+  groundScene.background=new T.Color(0x331a0d);
+  groundScene.fog=new T.FogExp2(0x331a0d,0.008);
+
+  groundCamera=new T.PerspectiveCamera(60,w/h,0.1,1000);
+  groundCamera.position.set(0,12,35);
+  groundCamera.lookAt(0,2,0);
+
+  groundRenderer=new T.WebGLRenderer({antialias:true});
+  groundRenderer.setSize(w,h);
+  groundRenderer.setPixelRatio(window.devicePixelRatio);
+  groundRenderer.shadowMap.enabled=true;
+  c.appendChild(groundRenderer.domElement);
+
+  // Mars sky gradient
+  groundScene.add(new T.AmbientLight(0x553322,0.5));
+  const sun=new T.DirectionalLight(0xffeedd,1.0);
+  sun.position.set(30,40,20);sun.castShadow=true;
+  groundScene.add(sun);
+
+  // Mars ground
+  const gGeo=new T.PlaneGeometry(300,300,80,80);
+  const verts=gGeo.attributes.position;
+  for(let i=0;i<verts.count;i++)verts.setZ(i,(Math.random()-0.5)*2.5);
+  gGeo.computeVertexNormals();
+  const gMat=new T.MeshStandardMaterial({color:0x8b4513,roughness:0.95,metalness:0.05,flatShading:true});
+  const gnd=new T.Mesh(gGeo,gMat);
+  gnd.rotation.x=-Math.PI/2;gnd.receiveShadow=true;
+  groundScene.add(gnd);
+
+  // Central habitat dome
+  const domeG=new T.SphereGeometry(5,20,14,0,Math.PI*2,0,Math.PI/2);
+  const domeM=new T.MeshStandardMaterial({color:0x88bbdd,roughness:0.2,metalness:0.5,transparent:true,opacity:0.35});
+  groundScene.add(new T.Mesh(domeG,domeM));
+
+  // Built modules as distinct buildings
+  const moduleShapes={
+    greenhouse_dome:{color:0x22aa44,shape:'dome',scale:3},
+    isru_plant:{color:0x6688cc,shape:'box',scale:4},
+    repair_bay:{color:0xccaa44,shape:'box',scale:3},
+    radiation_shelter:{color:0x888888,shape:'bunker',scale:3},
+    solar_farm:{color:0x4488ff,shape:'flat',scale:5},
+    water_extractor:{color:0x44aacc,shape:'tower',scale:2},
+    comms_array:{color:0xcccccc,shape:'tower',scale:1},
+    storage_depot:{color:0xaa8844,shape:'box',scale:3},
+  };
+  const angleStep=Math.PI*2/Math.max(1,state.modules.length+4);
+  state.modules.forEach((mod,i)=>{
+    const cfg=moduleShapes[mod.type]||{color:0x666666,shape:'box',scale:2};
+    const angle=angleStep*(i+1);
+    const dist=12+i*2;
+    let mesh;
+    if(cfg.shape==='dome'){
+      const g=new T.SphereGeometry(cfg.scale,12,8,0,Math.PI*2,0,Math.PI/2);
+      mesh=new T.Mesh(g,new T.MeshStandardMaterial({color:cfg.color,transparent:true,opacity:0.5,roughness:0.3}));
+    }else if(cfg.shape==='tower'){
+      const g=new T.CylinderGeometry(0.3,0.5,cfg.scale*4,8);
+      mesh=new T.Mesh(g,new T.MeshStandardMaterial({color:cfg.color,metalness:0.7}));
+      mesh.position.y=cfg.scale*2;
+    }else if(cfg.shape==='flat'){
+      const g=new T.BoxGeometry(cfg.scale*2,0.3,cfg.scale*2);
+      mesh=new T.Mesh(g,new T.MeshStandardMaterial({color:cfg.color,metalness:0.5}));
+      mesh.position.y=1.5;
+    }else{
+      const g=new T.BoxGeometry(cfg.scale,cfg.scale*1.5,cfg.scale);
+      mesh=new T.Mesh(g,new T.MeshStandardMaterial({color:cfg.color,roughness:0.6}));
+      mesh.position.y=cfg.scale*0.75;
+    }
+    mesh.position.x=Math.cos(angle)*dist;
+    mesh.position.z=Math.sin(angle)*dist;
+    mesh.castShadow=true;
+    groundScene.add(mesh);
+
+    // Connection tube to central dome
+    const tubeG=new T.CylinderGeometry(0.15,0.15,dist-5,6);
+    const tubeM=new T.Mesh(tubeG,new T.MeshStandardMaterial({color:0x555555,metalness:0.6}));
+    tubeM.rotation.z=Math.PI/2;
+    tubeM.rotation.y=-angle;
+    tubeM.position.set(Math.cos(angle)*(5+dist)/2,0.5,Math.sin(angle)*(5+dist)/2);
+    groundScene.add(tubeM);
+
+    // Label
+    const label=new T.Mesh(new T.PlaneGeometry(4,0.8),new T.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0.7}));
+    label.position.set(mesh.position.x,cfg.scale*2+2,mesh.position.z);
+    label.lookAt(groundCamera.position);
+    groundScene.add(label);
+  });
+
+  // Autonomous robots (small moving cubes)
+  const robots=[];
+  for(let i=0;i<6;i++){
+    const rg=new T.BoxGeometry(0.5,0.3,0.7);
+    const rm=new T.Mesh(rg,new T.MeshStandardMaterial({color:0x44ff44,emissive:0x114411}));
+    rm.position.set((Math.random()-0.5)*30,0.2,(Math.random()-0.5)*30);
+    rm.castShadow=true;
+    groundScene.add(rm);
+    robots.push({mesh:rm,vx:(Math.random()-0.5)*0.05,vz:(Math.random()-0.5)*0.05,timer:Math.random()*200});
+  }
+
+  // Antenna with blinking light
+  const aGeo=new T.CylinderGeometry(0.1,0.15,15,6);
+  const antenna=new T.Mesh(aGeo,new T.MeshStandardMaterial({color:0xaaaaaa,metalness:0.8}));
+  antenna.position.set(-10,7.5,-8);
+  groundScene.add(antenna);
+  const blink=new T.Mesh(new T.SphereGeometry(0.25,6,6),new T.MeshBasicMaterial({color:0xff0000}));
+  blink.position.set(-10,15,-8);
+  groundScene.add(blink);
+
+  // Animate
+  let frame=0;
+  function animate(){
+    groundAnimId=requestAnimationFrame(animate);
+    frame++;
+    // Rotate camera slowly
+    const camAngle=frame*0.002;
+    groundCamera.position.x=35*Math.sin(camAngle);
+    groundCamera.position.z=35*Math.cos(camAngle);
+    groundCamera.lookAt(0,3,0);
+    // Robot movement
+    robots.forEach(r=>{
+      r.timer--;
+      if(r.timer<=0){r.vx=(Math.random()-0.5)*0.05;r.vz=(Math.random()-0.5)*0.05;r.timer=100+Math.random()*200}
+      r.mesh.position.x+=r.vx;r.mesh.position.z+=r.vz;
+      r.mesh.rotation.y=Math.atan2(r.vx,r.vz);
+      if(Math.abs(r.mesh.position.x)>40)r.vx*=-1;
+      if(Math.abs(r.mesh.position.z)>40)r.vz*=-1;
+    });
+    // Blink
+    blink.material.color.setHex(Math.floor(frame/30)%2?0xff0000:0x330000);
+    groundRenderer.render(groundScene,groundCamera);
+  }
+  animate();
+}
+
+// ── Sim Engine (same as index.html, minimal) ──
+function solIrr(sol){
+  const sy=sol%669,oa=2*Math.PI*(sy-445)/669,of=1+0.09*Math.cos(oa);
+  const sc=589*of,ls=2*Math.PI*sy/669,el=Math.max(0.3,Math.cos(ls)*0.5+0.5);
+  const dust=state.events.some(e=>e.type==='dust_storm')?0.25:1;
+  return sc*el*dust*0.7;
+}
+function stepSim(){
+  if(!state.alive)return;
+  state.sol++;const s=state.sol;
+  const ac=state.crew.filter(c=>c.alive);
+  if(!ac.length){state.alive=false;state.cause='all crew lost';return}
+  // Events
+  state.events=state.events.filter(e=>{e.remaining--;return e.remaining>0});
+  const probs={dust_storm:0.12,solar_flare:0.04,meteorite:0.003,equipment_failure:0.02};
+  const newEv=[];const types=state.events.map(e=>e.type);
+  for(const[t,p]of Object.entries(probs)){
+    if(types.includes(t))continue;
+    if(R()<p){const sv=0.2+R()*0.8,dur=t==='dust_storm'?Math.floor(5+R()*25):Math.floor(1+R()*5);
+      const ev={type:t,severity:sv,remaining:dur,duration:dur};state.events.push(ev);newEv.push(ev);
+      if(t==='meteorite'){state.s_eff*=(1-0.15*sv);state.g_eff*=(1-0.2*sv)}
+      if(t==='equipment_failure'){state.i_eff*=(1-0.15*sv);state.power-=20*sv}
+    }
+  }
+  // Production
+  const irr=solIrr(s);
+  const a=state.alloc;
+  state.power+=irr*PANEL*EFF*SOL_H/1000*state.s_eff*(1+state.modules.filter(m=>m.type==='solar_farm').length*0.4);
+  if(state.power>PCRIT*0.3){
+    const is=Math.min(1.5,a.i*2),ib=1+state.modules.filter(m=>m.type==='isru_plant').length*0.4;
+    state.o2+=ISRU_O2*state.i_eff*is*ib;state.h2o+=ISRU_H2O*state.i_eff*is*ib;
+  }
+  state.h2o+=state.modules.filter(m=>m.type==='water_extractor').length*3;
+  if(state.power>PCRIT*0.3&&state.h2o>5){
+    const gs=Math.min(1.5,a.g*2),gb=1+state.modules.filter(m=>m.type==='greenhouse_dome').length*0.5;
+    state.food+=GH_KCAL*state.g_eff*gs*gb;
+  }
+  // Consumption
+  const n=ac.length;
+  state.o2=Math.max(0,state.o2-n*O2_PP);state.h2o=Math.max(0,state.h2o-n*H2O_PP);
+  state.food=Math.max(0,state.food-n*FOOD_PP*a.r);state.power=Math.max(0,state.power-PWR_BASE);
+  // Thermal
+  state.int_temp=Math.max(200,Math.min(310,state.int_temp+(state.power>PCRIT?0.5:-2)));
+  state.rad+=0.335;
+  // Crew
+  ac.forEach(m=>{
+    m.rad+=0.335;
+    if(state.food/(n*FOOD_PP)<0.3){m.hp-=3;m.mor-=5;m.st='STARVING'}
+    else if(state.h2o/(n*H2O_PP)<0.3){m.hp-=5;m.mor-=3;m.st='DEHYDRATED'}
+    else if(state.int_temp<263){m.hp-=4;m.st='HYPOTHERMIC'}
+    else{m.hp=Math.min(100,m.hp+0.5);m.st='Nominal'}
+    m.mor=Math.max(0,Math.min(100,m.mor));
+    if(m.hp<=0){m.alive=false;m.st='DECEASED'}
+  });
+  state.morale=ac.reduce((s,m)=>s+m.mor,0)/Math.max(1,ac.length)/100;
+  if(state.o2<=0){state.alive=false;state.cause='O2 depletion'}
+  if(state.food<=0){state.alive=false;state.cause='starvation'}
+  // Governor
+  const o2d=state.o2/(O2_PP*n),h2od=state.h2o/(H2O_PP*n),fd=state.food/(FOOD_PP*n);
+  if(o2d<5||h2od<5){a.h=0.15;a.i=0.70;a.g=0.15;a.r=fd<5?0.5:0.75}
+  else if(fd<10){a.h=0.15;a.i=0.30;a.g=0.55;a.r=0.75}
+  // Auto-build
+  if(!state.building&&state.sol>15&&o2d>10&&fd>10){
+    const opts=['greenhouse_dome','isru_plant','solar_farm','water_extractor','repair_bay','radiation_shelter','comms_array','storage_depot'];
+    const built=new Set(state.modules.map(m=>m.type));
+    const need=opts.find(o=>!built.has(o)||(o==='solar_farm'&&state.modules.filter(m=>m.type==='solar_farm').length<3));
+    if(need){state.building={type:need,remaining:Math.floor(8+R()*12)};}
+  }
+  if(state.building){state.building.remaining--;if(state.building.remaining<=0){
+    state.modules.push({type:state.building.type,built:s});
+    state.log.push(`Sol ${s}: ${state.building.type.replace(/_/g,' ')} COMPLETED`);
+    state.building=null;
+  }}
+  // Log
+  state.log.push(`Sol ${s}: ${(state.int_temp-273.15).toFixed(0)}°C int, ${ac.length} crew, ${(state.o2/(O2_PP*n)).toFixed(0)}d O2`);
+  if(newEv.length)state.log.push(`  ⚠ ${newEv.map(e=>e.type.replace(/_/g,' ')).join(', ')}`);
+  if(!state.alive)state.log.push(`COLONY LOST: ${state.cause}`);
+  updateAllUI();
+}
+
+// ── UI Updates ──
+function updateAllUI(){
+  const s=state,ac=s.crew.filter(c=>c.alive),n=Math.max(1,ac.length);
+  // Status
+  document.getElementById('status-text').textContent=s.alive?`SOL ${s.sol} | ${s.arch.toUpperCase()} | ${ac.length} CREW`:'COLONY LOST — '+s.cause;
+  // Colony info
+  document.getElementById('colony-info').innerHTML=`
+    <div class="colony-card"><span class="name">Ares Colony</span><span class="hp" style="color:${s.alive?'var(--green)':'var(--red)'}">${s.alive?'ACTIVE':'DEAD'}</span>
+    <div style="margin-top:4px;font-size:10px">Sol ${s.sol} | Morale ${(s.morale*100).toFixed(0)}% | Rad ${s.rad.toFixed(0)} mSv</div>
+    <div class="hp-bar"><div class="hp-fill" style="width:${Math.max(0,Math.min(100,s.alive?80:0))}%;background:${s.alive?'var(--green)':'var(--red)'}"></div></div></div>`;
+  // Resources
+  const res=[['O₂',s.o2,n*O2_PP*60,s.o2/(n*O2_PP),'--blue'],['H₂O',s.h2o,n*H2O_PP*60,s.h2o/(n*H2O_PP),'--blue'],
+    ['Food',s.food,n*FOOD_PP*60,s.food/(n*FOOD_PP),'--yellow'],['Power',s.power,1000,s.power/PWR_BASE,'--purple']];
+  document.getElementById('resources').innerHTML=res.map(([l,v,mx,d,c])=>{
+    const pct=Math.min(100,v/mx*100);const col=pct>50?'var(--green)':pct>20?'var(--yellow)':'var(--red)';
+    return`<div class="res-bar"><span class="res-label">${l}</span><div class="res-track"><div class="res-fill" style="width:${pct}%;background:${col}"></div></div><span class="res-val">${d.toFixed(0)}d</span></div>`;
+  }).join('');
+  // Systems
+  const sys=[['Solar',s.s_eff],['ISRU',s.i_eff],['GreenH',s.g_eff],['Heat',s.h_eff]];
+  document.getElementById('systems').innerHTML=sys.map(([l,v])=>{
+    const pct=v*100;const col=pct>70?'var(--green)':pct>30?'var(--yellow)':'var(--red)';
+    return`<div class="res-bar"><span class="res-label">${l}</span><div class="res-track"><div class="res-fill" style="width:${pct}%;background:${col}"></div></div><span class="res-val">${pct.toFixed(0)}%</span></div>`;
+  }).join('');
+  // Modules
+  document.getElementById('modules-list').innerHTML=s.modules.length?
+    s.modules.map(m=>`<div class="module-item"><span>${m.type.replace(/_/g,' ')}</span><span class="status">✓ Sol ${m.built}</span></div>`).join('')
+    +(s.building?`<div class="module-item" style="color:var(--yellow)"><span>${s.building.type.replace(/_/g,' ')}</span><span>${s.building.remaining} sols</span></div>`:'')
+    :'Landing habitat only'+(s.building?`<div style="color:var(--yellow);margin-top:4px">Building: ${s.building.type.replace(/_/g,' ')} (${s.building.remaining} sols)</div>`:'');
+  // Crew
+  document.getElementById('crew-roster').innerHTML=s.crew.map(m=>{
+    const col=!m.alive?'var(--red)':m.hp>70?'var(--green)':m.hp>30?'var(--yellow)':'var(--red)';
+    return`<div class="crew-row"><span style="color:${col};width:8px">●</span><span style="width:100px">${m.name}</span><span style="width:40px;color:var(--dim)">${m.role}</span><span style="width:35px;text-align:right;color:${col}">${m.alive?m.hp.toFixed(0):'--'}</span><span style="flex:1;text-align:right;font-size:10px;color:var(--dim)">${m.st}</span></div>`;
+  }).join('');
+  // Events
+  const recent=s.events.slice(-5);
+  document.getElementById('event-feed').innerHTML=recent.length?recent.map(e=>
+    `<div class="event-item"><span class="tag">${e.type.replace(/_/g,' ').toUpperCase()}</span> sev ${e.severity.toFixed(1)} (${e.remaining} sols)</div>`
+  ).join(''):'<div class="event-item">No active events</div>';
+  // Log
+  document.getElementById('mini-log').innerHTML=s.log.slice(-20).map(l=>
+    l.includes('COLONY LOST')?`<div style="color:var(--red)">${l}</div>`:
+    l.includes('⚠')?`<div style="color:var(--yellow)">${l}</div>`:
+    l.includes('COMPLETED')?`<div style="color:var(--green)">${l}</div>`:
+    `<div>${l}</div>`
+  ).join('');
+  document.getElementById('mini-log').scrollTop=9999;
+  // Globe colony marker
+  if(globe){
+    const hp=s.alive?Math.max(10,Math.min(100,80-s.sol*0.1)):0;
+    globe.htmlElementsData([{id:'ares',name:`Ares Colony (Sol ${s.sol})`,lat:s.lat,lng:s.lng,health:hp}]);
+  }
+  // Ground HUD
+  document.getElementById('ground-hud').innerHTML=`
+    <div class="hud-stat"><div class="hud-val">${s.sol}</div><div class="hud-label">Sol</div></div>
+    <div class="hud-stat"><div class="hud-val">${ac.length}/4</div><div class="hud-label">Crew</div></div>
+    <div class="hud-stat"><div class="hud-val">${(s.o2/(n*O2_PP)).toFixed(0)}d</div><div class="hud-label">O₂</div></div>
+    <div class="hud-stat"><div class="hud-val">${(s.h2o/(n*H2O_PP)).toFixed(0)}d</div><div class="hud-label">H₂O</div></div>
+    <div class="hud-stat"><div class="hud-val">${(s.food/(n*FOOD_PP)).toFixed(0)}d</div><div class="hud-label">Food</div></div>
+    <div class="hud-stat"><div class="hud-val">${s.power.toFixed(0)}</div><div class="hud-label">kWh</div></div>
+    <div class="hud-stat"><div class="hud-val">${s.modules.length}</div><div class="hud-label">Modules</div></div>
+    <div class="hud-stat"><div class="hud-val" style="color:${s.alive?'var(--green)':'var(--red)'}">${s.alive?'ALIVE':'DEAD'}</div><div class="hud-label">Status</div></div>
+  `;
+}
+
+function toggleSim(){
+  if(running){running=false;clearInterval(simInterval);document.getElementById('sim-btn').textContent='▶ RESUME';return}
+  running=true;document.getElementById('sim-btn').textContent='⏸ PAUSE';
+  simInterval=setInterval(()=>{
+    stepSim();
+    if(!state.alive){running=false;clearInterval(simInterval);document.getElementById('sim-btn').textContent='COLONY LOST'}
+  },500);
+}
+
+function resetState(){
+  const seed=Math.floor(Math.random()*99999);R=rng32(seed);
+  const arch=document.getElementById('gov-sel').value;
+  state={sol:0,alive:true,cause:null,arch,o2:4*O2_PP*30,h2o:4*H2O_PP*30,food:4*FOOD_PP*30,power:500,
+    s_eff:1,i_eff:1,g_eff:1,h_eff:1,cascade:'NOM',int_temp:293.15,morale:0.85,rad:0,
+    crew:[{name:'Chen W.',role:'CMDR',hp:97,fat:0,mor:82,rad:0,alive:true,st:'Nominal'},
+      {name:'Rodriguez M.',role:'ENGR',hp:96,fat:0,mor:85,rad:0,alive:true,st:'Nominal'},
+      {name:'Okafor A.',role:'SCI',hp:98,fat:0,mor:78,rad:0,alive:true,st:'Nominal'},
+      {name:'Johansson K.',role:'MED',hp:95,fat:0,mor:88,rad:0,alive:true,st:'Nominal'}],
+    events:[],log:[],modules:[],building:null,alloc:{h:.25,i:.4,g:.35,r:1},lat:18.38,lng:77.58};
+  document.getElementById('sim-btn').textContent='▶ START SIM';
+  updateAllUI();
+}
+
+// Init
+initGlobe();
+resetState();
+</script>
+</body>
+</html>
