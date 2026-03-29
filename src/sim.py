@@ -24,6 +24,7 @@ from mars import (
     radiation_dose, render_terrain_ascii,
 )
 from world import World, create_world, run_world
+from report import generate_report
 
 
 def run_single(sols: int = DEFAULT_SOLS, seed: int = DEFAULT_SEED,
@@ -263,6 +264,8 @@ def main() -> None:
                         help="Output results as JSON")
     parser.add_argument("--json-file", type=str,
                         help="Write JSON results to file")
+    parser.add_argument("--html", type=str,
+                        help="Write HTML report to file")
 
     args = parser.parse_args()
 
@@ -291,6 +294,12 @@ def main() -> None:
         with open(args.json_file, "w") as f:
             json.dump(result, f, indent=2)
         print(f"  Results written to {args.json_file}")
+
+    if args.html:
+        html = generate_report(result)
+        with open(args.html, "w") as f:
+            f.write(html)
+        print(f"  HTML report written to {args.html}")
 
     print(f"  Elapsed: {elapsed:.2f}s")
 
