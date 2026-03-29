@@ -75,6 +75,7 @@ padding:8px;margin:4px 0;cursor:pointer;transition:all 0.2s}
   <div class="zoom-bar">
     <button class="zoom-btn active" onclick="setZoom('planet')" id="z-planet">PLANET</button>
     <button class="zoom-btn" onclick="setZoom('surface')" id="z-surface">SURFACE</button>
+    <button class="zoom-btn" onclick="setZoom('warmap')" id="z-warmap">WARMAP</button>
     <button class="zoom-btn" onclick="setZoom('base')" id="z-base">BASE</button>
     <button class="zoom-btn" onclick="setZoom('module')" id="z-module">MODULES</button>
     <button class="zoom-btn" onclick="setZoom('crew')" id="z-crew">CREW</button>
@@ -94,6 +95,18 @@ padding:8px;margin:4px 0;cursor:pointer;transition:all 0.2s}
 
 <!-- Globe (planet + surface zoom) -->
 <div id="globe-container"><div id="globeViz"></div></div>
+
+<!-- Warmap view (satellite tactical map between orbit and ground) -->
+<div id="warmap-view" style="position:fixed;top:36px;left:0;right:0;bottom:0;z-index:45;display:none;background:#0a0e14">
+  <div style="position:absolute;top:0;left:0;right:0;padding:8px 20px;background:var(--panel);border-bottom:1px solid var(--border);z-index:46;display:flex;align-items:center;justify-content:space-between">
+    <h2 style="font-size:13px;color:var(--cyan);letter-spacing:1px">TACTICAL WARMAP — MARS SURFACE</h2>
+    <div style="font-size:11px;color:var(--dim)">
+      <span id="wm-count">0</span> colonies · <span id="wm-sol">Sol 0</span>
+    </div>
+  </div>
+  <canvas id="warmap-canvas" style="width:100%;height:100%;cursor:crosshair"></canvas>
+  <div id="warmap-tooltip" style="display:none;position:absolute;background:var(--panel);border:1px solid var(--cyan);border-radius:4px;padding:8px 12px;font-size:11px;pointer-events:none;z-index:47;min-width:160px"></div>
+</div>
 
 <!-- Ground view (base + module + crew zoom) -->
 <div id="ground-view">
@@ -199,25 +212,198 @@ function setZoom(level){
   document.querySelectorAll('.zoom-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('z-'+level)?.classList.add('active');
 
+  // Hide all views first
+  document.getElementById('warmap-view').style.display='none';
+  document.getElementById('ground-view').style.display='none';
+  document.getElementById('globe-container').style.display='none';
+
   if(level==='planet'||level==='surface'){
     exitGround();
+    document.getElementById('globe-container').style.display='block';
     if(level==='planet')globe.pointOfView({altitude:2.5},1000);
     else globe.pointOfView({lat:state.lat,lng:state.lng,altitude:0.15},1000);
+  } else if(level==='warmap'){
+    exitGround();
+    document.getElementById('warmap-view').style.display='block';
+    renderWarmap();
   } else {
     enterGround();
   }
 }
 
+// ── Warmap View (2D tactical satellite map) ──
+const WARMAP_COLONIES = [
+  {id:'ares',name:'Ares Colony',lat:18.38,lng:77.58,type:'primary'},
+  {id:'olympus',name:'Olympus Outpost',lat:18.65,lng:-133.8,type:'outpost'},
+  {id:'hellas',name:'Hellas Basin Camp',lat:-42.4,lng:70.5,type:'camp'},
+  {id:'valles',name:'Valles Station',lat:-13.9,lng:-59.2,type:'station'},
+  {id:'polar',name:'North Polar Base',lat:80.0,lng:0.0,type:'research'},
+];
+
+let warmapCtx=null;
+let warmapAnim=null;
+
+function renderWarmap(){
+  const canvas=document.getElementById('warmap-canvas');
+  const rect=canvas.parentElement.getBoundingClientRect();
+  canvas.width=rect.width;
+  canvas.height=rect.height-36;
+  canvas.style.marginTop='36px';
+  warmapCtx=canvas.getContext('2d');
+  if(warmapAnim)cancelAnimationFrame(warmapAnim);
+
+  document.getElementById('wm-count').textContent=WARMAP_COLONIES.length;
+  document.getElementById('wm-sol').textContent='Sol '+state.sol;
+
+  // Mouse hover for tooltips
+  canvas.onmousemove=(e)=>{
+    const r=canvas.getBoundingClientRect();
+    const mx=e.clientX-r.left,my=e.clientY-r.top;
+    let hit=null;
+    WARMAP_COLONIES.forEach(c=>{
+      const px=((c.lng+180)/360)*canvas.width;
+      const py=((90-c.lat)/180)*canvas.height;
+      if(Math.abs(mx-px)<15&&Math.abs(my-py)<15)hit=c;
+    });
+    const tip=document.getElementById('warmap-tooltip');
+    if(hit){
+      const isAres=hit.id==='ares';
+      const hp=isAres?(state.alive?Math.max(10,80-state.sol*0.1):0):Math.floor(30+Math.random()*60);
+      tip.style.display='block';
+      tip.style.left=(e.clientX+12)+'px';
+      tip.style.top=(e.clientY-40)+'px';
+      tip.innerHTML=`<div style="color:var(--cyan);font-weight:700;margin-bottom:4px">${hit.name}</div>
+        <div>Type: ${hit.type.toUpperCase()}</div>
+        <div>Lat: ${hit.lat.toFixed(1)}° Lng: ${hit.lng.toFixed(1)}°</div>
+        <div>Health: <span style="color:${hp>60?'var(--green)':hp>30?'var(--yellow)':'var(--red)'}">${hp}%</span></div>
+        ${isAres?`<div>Sol: ${state.sol} | Crew: ${state.crew.filter(c=>c.alive).length}/4</div>
+        <div>Modules: ${state.modules.length}</div>`:'<div style="color:var(--dim)">Simulated outpost</div>'}
+        <div style="margin-top:4px;color:var(--cyan);font-size:10px">Click for ground view →</div>`;
+    } else {
+      tip.style.display='none';
+    }
+  };
+
+  canvas.onclick=(e)=>{
+    const r=canvas.getBoundingClientRect();
+    const mx=e.clientX-r.left,my=e.clientY-r.top;
+    WARMAP_COLONIES.forEach(c=>{
+      const px=((c.lng+180)/360)*canvas.width;
+      const py=((90-c.lat)/180)*canvas.height;
+      if(Math.abs(mx-px)<15&&Math.abs(my-py)<15){
+        if(c.id==='ares')setZoom('base');
+        // Other colonies would open their ground views
+      }
+    });
+  };
+
+  let frame=0;
+  function drawWarmap(){
+    warmapAnim=requestAnimationFrame(drawWarmap);
+    frame++;
+    const ctx=warmapCtx;
+    const W=canvas.width,H=canvas.height;
+
+    // Dark Mars surface background
+    ctx.fillStyle='#1a0f0a';
+    ctx.fillRect(0,0,W,H);
+
+    // Grid lines (lat/lng)
+    ctx.strokeStyle='rgba(88,166,255,0.08)';
+    ctx.lineWidth=0.5;
+    for(let lat=-60;lat<=90;lat+=30){
+      const y=((90-lat)/180)*H;
+      ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+      ctx.fillStyle='rgba(88,166,255,0.15)';ctx.font='9px Courier New';
+      ctx.fillText(lat+'°',4,y-3);
+    }
+    for(let lng=-180;lng<=180;lng+=60){
+      const x=((lng+180)/360)*W;
+      ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();
+      ctx.fillText(lng+'°',x+3,H-5);
+    }
+
+    // Mars surface features (simplified outlines)
+    ctx.strokeStyle='rgba(180,100,50,0.15)';
+    ctx.lineWidth=1;
+    // Olympus Mons circle
+    const omx=((226.2+180)/360)*W,omy=((90-18.65)/180)*H;
+    ctx.beginPath();ctx.arc(omx,omy,20,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle='rgba(180,100,50,0.06)';ctx.fill();
+    ctx.fillStyle='rgba(180,100,50,0.2)';ctx.font='8px Courier New';
+    ctx.fillText('Olympus Mons',omx-30,omy+28);
+    // Hellas Basin
+    const hx=((70.5+180)/360)*W,hy=((90+42.4)/180)*H;
+    ctx.beginPath();ctx.arc(hx,hy,30,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle='rgba(100,60,30,0.06)';ctx.fill();
+    ctx.fillStyle='rgba(180,100,50,0.2)';
+    ctx.fillText('Hellas Planitia',hx-35,hy+38);
+    // Valles Marineris line
+    const vx1=((-100+180)/360)*W,vx2=((-20+180)/360)*W,vy=((90+10)/180)*H;
+    ctx.beginPath();ctx.moveTo(vx1,vy);ctx.lineTo(vx2,vy);ctx.stroke();
+    ctx.fillText('Valles Marineris',vx1,vy-8);
+
+    // Colony markers
+    WARMAP_COLONIES.forEach(c=>{
+      const px=((c.lng+180)/360)*W;
+      const py=((90-c.lat)/180)*H;
+      const isAres=c.id==='ares';
+      const hp=isAres?(state.alive?Math.max(10,80-state.sol*0.1):0):50;
+      const color=hp>60?'#3fb950':hp>30?'#d29922':'#da3633';
+      const radius=isAres?8:5;
+
+      // Pulse ring
+      const pulseR=radius+4+Math.sin(frame*0.05)*3;
+      ctx.beginPath();ctx.arc(px,py,pulseR,0,Math.PI*2);
+      ctx.strokeStyle=color+'44';ctx.lineWidth=1;ctx.stroke();
+
+      // Marker dot
+      ctx.beginPath();ctx.arc(px,py,radius,0,Math.PI*2);
+      ctx.fillStyle=color;ctx.fill();
+      ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+
+      // Glow
+      const grad=ctx.createRadialGradient(px,py,0,px,py,radius*3);
+      grad.addColorStop(0,color+'33');grad.addColorStop(1,'transparent');
+      ctx.fillStyle=grad;ctx.beginPath();ctx.arc(px,py,radius*3,0,Math.PI*2);ctx.fill();
+
+      // Label
+      ctx.fillStyle='#fff';ctx.font=isAres?'bold 11px Courier New':'10px Courier New';
+      ctx.fillText(c.name,px+radius+6,py+4);
+      ctx.fillStyle=color;ctx.font='9px Courier New';
+      ctx.fillText(`HP:${hp}%`,px+radius+6,py+15);
+      if(isAres){
+        ctx.fillStyle='var(--dim)';
+        ctx.fillText(`Sol ${state.sol} | ${state.crew.filter(cr=>cr.alive).length} crew | ${state.modules.length} mod`,px+radius+6,py+26);
+      }
+
+      // Connection lines between colonies
+      if(c.id!=='ares'){
+        const ax=((WARMAP_COLONIES[0].lng+180)/360)*W;
+        const ay=((90-WARMAP_COLONIES[0].lat)/180)*H;
+        ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(px,py);
+        ctx.strokeStyle='rgba(88,166,255,0.06)';ctx.lineWidth=0.5;
+        ctx.setLineDash([4,8]);ctx.stroke();ctx.setLineDash([]);
+      }
+    });
+
+    // Scan line effect
+    const scanY=(frame*0.5)%H;
+    ctx.strokeStyle='rgba(88,166,255,0.03)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(0,scanY);ctx.lineTo(W,scanY);ctx.stroke();
+  }
+  drawWarmap();
+}
+
 // ── Ground View (Three.js) ──
 function enterGround(){
   document.getElementById('ground-view').style.display='block';
-  document.getElementById('globe-container').style.display='none';
   if(!groundScene)buildGroundScene();
 }
 function exitGround(){
   document.getElementById('ground-view').style.display='none';
-  document.getElementById('globe-container').style.display='block';
   if(groundAnimId)cancelAnimationFrame(groundAnimId);
+  if(warmapAnim)cancelAnimationFrame(warmapAnim);
   if(groundRenderer){groundRenderer.dispose();document.getElementById('ground-canvas').innerHTML=''}
   groundScene=null;groundCamera=null;groundRenderer=null;
 }
