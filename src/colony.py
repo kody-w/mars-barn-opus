@@ -141,6 +141,8 @@ class Colony:
     crew: Optional[Any] = None  # crew.Crew instance when enabled
     # Base modules (optional — None = no expansion system)
     base: Optional[Any] = None  # modules.ColonyBase instance when enabled
+    # Research lab (optional — None = no research system)
+    research: Optional[Any] = None  # research.ResearchLab instance when enabled
 
     # Tracking
     peak_resources: Optional[Dict[str, float]] = None
@@ -196,10 +198,19 @@ def produce(colony: Colony, solar_irradiance_w_m2: float,
     factors = RESOURCE_FACTOR_RANGES.get(colony.resource_type,
                                           RESOURCE_FACTOR_RANGES["balanced"])
 
+    # Research bonuses (if research is enabled)
+    research_solar = 0.0
+    research_isru = 0.0
+    research_food = 0.0
+    if colony.research is not None:
+        research_solar = colony.research.get_effect("solar_efficiency_bonus")
+        research_isru = colony.research.get_effect("isru_production_bonus")
+        research_food = colony.research.get_effect("food_production_bonus")
+
     # Module bonuses (if base expansion is enabled)
-    solar_bonus = 1.0
-    isru_bonus = 1.0
-    gh_bonus = 1.0
+    solar_bonus = 1.0 + research_solar
+    isru_bonus = 1.0 + research_isru
+    gh_bonus = 1.0 + research_food
     repair_bonus = 0.0
     passive_h2o = 0.0
     if colony.base is not None:
@@ -418,6 +429,30 @@ def step(colony: Colony, solar_irradiance_w_m2: float,
                 colony.base.start_construction(
                     build_choice, colony.resources, colony.sol)
 
+    # Research (if enabled)
+    if colony.research is not None:
+        research_events = colony.research.tick(colony.sol)
+        if colony.research.active is None:
+            from research import governor_research_decision
+            crisis = 0.0
+            if colony.cascade_state != CascadeState.NOMINAL:
+                crisis = 0.7
+            lowest_r, days_r = colony.resources.lowest_resource_days()
+            if days_r < 10:
+                crisis = max(crisis, 0.6)
+            choice = governor_research_decision(
+                colony.research, colony.resources, colony.sol, crisis)
+            if choice:
+                scientist_bonus = 0.0
+                if colony.crew:
+                    from crew import Role
+                    scientists = [m for m in colony.crew.alive_members
+                                  if m.role == Role.SCIENTIST]
+                    if scientists:
+                        scientist_bonus = scientists[0].effectiveness
+                colony.research.start_research(
+                    choice, colony.resources, scientist_bonus)
+
     # Cascade
     advance_cascade(colony)
 
@@ -492,4 +527,5 @@ def serialize(colony: Colony) -> dict:
         "peak_resources": colony.peak_resources,
         "crew": colony.crew.serialize() if colony.crew else None,
         "base": colony.base.serialize() if colony.base else None,
+        "research": colony.research.serialize() if colony.research else None,
     }
