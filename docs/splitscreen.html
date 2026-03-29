@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Mars Barn Opus — Split Screen (Earth ↔ Mars)</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#c9d1d9;font-family:'Courier New',monospace;overflow:hidden;height:100vh}
+.split{display:flex;height:100vh}
+.panel{flex:1;position:relative;overflow:hidden}
+.earth-panel{background:#0a0e14;border-right:1px solid #1a2030}
+.mars-panel{background:#1a0f0a}
+.panel-header{position:absolute;top:0;left:0;right:0;padding:12px 20px;z-index:10;
+  background:linear-gradient(180deg,rgba(0,0,0,0.8) 0%,transparent 100%)}
+.panel-header h2{font-size:14px;letter-spacing:2px}
+.earth-panel .panel-header h2{color:#58a6ff}
+.mars-panel .panel-header h2{color:#ef4444}
+
+/* Light delay center strip */
+.delay-strip{width:80px;background:#050508;position:relative;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;border-left:1px solid #1a2030;border-right:1px solid #1a1510}
+.delay-label{color:#484f58;font-size:9px;text-transform:uppercase;letter-spacing:1px;writing-mode:vertical-lr;
+  text-orientation:mixed;position:absolute;top:50%;transform:translateY(-50%) rotate(180deg)}
+.signal{position:absolute;width:6px;height:6px;border-radius:50%;filter:blur(2px)}
+.signal-earth{background:#58a6ff;box-shadow:0 0 8px #58a6ff}
+.signal-mars{background:#ef4444;box-shadow:0 0 8px #ef4444}
+
+/* Dashboard cards */
+.dash{padding:60px 16px 16px;overflow-y:auto;height:100%}
+.card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px;margin:8px 0}
+.card h3{font-size:10px;color:#484f58;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.stat-row{display:flex;justify-content:space-between;padding:2px 0;font-size:12px}
+.stat-val{font-weight:700}
+.bar{height:6px;background:rgba(255,255,255,0.05);border-radius:3px;margin:4px 0}
+.bar-fill{height:100%;border-radius:3px;transition:width 0.5s}
+.crew-line{padding:3px 0;font-size:11px;display:flex;gap:6px}
+.log-line{font-size:10px;color:#484f58;padding:1px 0;border-bottom:1px solid rgba(255,255,255,0.02)}
+.log-line.event{color:#d29922}.log-line.death{color:#da3633}.log-line.build{color:#3fb950}
+
+/* Controls */
+.controls{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.9);border-top:1px solid #1a2030;
+  padding:8px 20px;display:flex;align-items:center;gap:12px;z-index:20;font-size:12px}
+.btn{padding:6px 14px;border-radius:4px;border:1px solid #30363d;background:#21262d;color:#c9d1d9;
+  cursor:pointer;font-family:'Courier New',monospace;font-size:12px}
+.btn:hover{background:#30363d}.btn-go{background:#1f6feb;border-color:#1f6feb;color:#fff}
+.btn-go:hover{background:#388bfd}
+</style>
+</head>
+<body>
+
+<div class="split">
+  <!-- Earth Side -->
+  <div class="panel earth-panel">
+    <div class="panel-header">
+      <h2>EARTH — MISSION CONTROL</h2>
+      <div style="font-size:10px;color:#484f58;margin-top:4px">Houston, TX | <span id="earth-time"></span></div>
+    </div>
+    <div class="dash" id="earth-dash">
+      <div class="card">
+        <h3>Last Telemetry Received</h3>
+        <div class="stat-row"><span>Sol</span><span class="stat-val" id="e-sol">0</span></div>
+        <div class="stat-row"><span>Delay</span><span class="stat-val" id="e-delay">—</span></div>
+        <div class="stat-row"><span>Signal</span><span class="stat-val" id="e-signal" style="color:#3fb950">NOMINAL</span></div>
+      </div>
+      <div class="card">
+        <h3>Colony Status (delayed)</h3>
+        <div class="stat-row"><span>Crew</span><span class="stat-val" id="e-crew">4/4</span></div>
+        <div class="stat-row"><span>O₂</span><span class="stat-val" id="e-o2">30d</span></div>
+        <div class="stat-row"><span>H₂O</span><span class="stat-val" id="e-h2o">30d</span></div>
+        <div class="stat-row"><span>Food</span><span class="stat-val" id="e-food">30d</span></div>
+        <div class="stat-row"><span>Power</span><span class="stat-val" id="e-power">500 kWh</span></div>
+      </div>
+      <div class="card">
+        <h3>Command Queue</h3>
+        <div id="e-commands" style="font-size:10px;color:#484f58">No commands queued</div>
+      </div>
+      <div class="card">
+        <h3>Mission Log (Earth view)</h3>
+        <div id="e-log" style="max-height:200px;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Light Delay Strip -->
+  <div class="delay-strip" id="delay-strip">
+    <span class="delay-label">LIGHT DELAY</span>
+    <div style="color:#484f58;font-size:18px;font-weight:700" id="delay-time">0.5s</div>
+    <div style="color:#484f58;font-size:8px;margin-top:4px">ONE WAY</div>
+  </div>
+
+  <!-- Mars Side -->
+  <div class="panel mars-panel">
+    <div class="panel-header">
+      <h2>MARS — ARES COLONY</h2>
+      <div style="font-size:10px;color:#484f58;margin-top:4px">Jezero Crater | LMST <span id="mars-lmst"></span></div>
+    </div>
+    <div class="dash" id="mars-dash">
+      <div class="card">
+        <h3>Live Colony State</h3>
+        <div class="stat-row"><span>Sol</span><span class="stat-val" id="m-sol">0</span></div>
+        <div class="stat-row"><span>Status</span><span class="stat-val" id="m-status" style="color:#3fb950">ALIVE</span></div>
+        <div class="stat-row"><span>Governor</span><span class="stat-val" id="m-gov">engineer</span></div>
+      </div>
+      <div class="card">
+        <h3>Resources (real-time)</h3>
+        <div>O₂: <span id="m-o2">100.8</span> kg<div class="bar"><div class="bar-fill" id="m-o2-bar" style="width:80%;background:#3fb950"></div></div></div>
+        <div>H₂O: <span id="m-h2o">300</span> L<div class="bar"><div class="bar-fill" id="m-h2o-bar" style="width:80%;background:#58a6ff"></div></div></div>
+        <div>Food: <span id="m-food">300k</span> kcal<div class="bar"><div class="bar-fill" id="m-food-bar" style="width:80%;background:#d29922"></div></div></div>
+        <div>Power: <span id="m-power">500</span> kWh<div class="bar"><div class="bar-fill" id="m-power-bar" style="width:50%;background:#a371f7"></div></div></div>
+      </div>
+      <div class="card">
+        <h3>Crew</h3>
+        <div id="m-crew"></div>
+      </div>
+      <div class="card">
+        <h3>Environment</h3>
+        <div class="stat-row"><span>Temp</span><span class="stat-val" id="m-temp">-52°C</span></div>
+        <div class="stat-row"><span>Season</span><span class="stat-val" id="m-season">—</span></div>
+        <div class="stat-row"><span>Events</span><span class="stat-val" id="m-events">0</span></div>
+      </div>
+      <div class="card">
+        <h3>Colony Log (real-time)</h3>
+        <div id="m-log" style="max-height:200px;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="btn btn-go" onclick="toggleSim()" id="ss-btn">▶ START</button>
+  <button class="btn" onclick="stepOnce()">⏭ STEP</button>
+  <span style="color:#484f58">Speed:</span>
+  <input type="number" id="ss-speed" value="2" min="0.5" max="50" step="0.5"
+    style="width:50px;background:#21262d;border:1px solid #30363d;color:#c9d1d9;padding:3px;border-radius:3px;font-size:12px">
+  <span style="color:#484f58">sols/s</span>
+  <a href="viewer.html" style="color:#58a6ff;text-decoration:none;margin-left:auto;font-size:11px">← 3D Viewer</a>
+  <a href="index.html" style="color:#58a6ff;text-decoration:none;font-size:11px">Dashboard</a>
+  <span style="color:#da3633;font-size:10px;border:1px solid #da3633;padding:1px 5px;border-radius:8px">1vsM</span>
+</div>
+
+<script>
+// Reuse sim engine constants
+const O2_PP=0.84,H2O_PP=2.5,FOOD_PP=2500,PWR_BASE=30,ISRU_O2=5,ISRU_H2O=12,GH_KCAL=15000,PANEL=200,EFF=0.22,SOL_H=24.66,PCRIT=50;
+function rng32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t^=t+Math.imul(t^t>>>7,61|t);return((t^t>>>14)>>>0)/4294967296}}
+let R=rng32(42);
+
+let state={sol:0,alive:true,cause:null,arch:'engineer',
+  o2:4*O2_PP*30,h2o:4*H2O_PP*30,food:4*FOOD_PP*30,power:500,
+  s_eff:1,i_eff:1,g_eff:1,h_eff:1,int_temp:293.15,morale:0.85,rad:0,
+  crew:[{name:'Chen W.',role:'CMDR',hp:97,mor:82,alive:true,st:'Nominal',rad:0},
+    {name:'Rodriguez M.',role:'ENGR',hp:96,mor:85,alive:true,st:'Nominal',rad:0},
+    {name:'Okafor A.',role:'SCI',hp:98,mor:78,alive:true,st:'Nominal',rad:0},
+    {name:'Johansson K.',role:'MED',hp:95,mor:88,alive:true,st:'Nominal',rad:0}],
+  events:[],log:[],alloc:{h:.25,i:.4,g:.35,r:1}};
+
+// Earth sees delayed state
+let earthState=JSON.parse(JSON.stringify(state));
+let earthLog=[];
+let commDelay=0.5;// sols
+let delayBuffer=[];// {sol, state_snapshot}
+let signals=[];// animated signals in the delay strip
+
+let running=false,interval=null;
+
+function stepSim(){
+  if(!state.alive)return;
+  state.sol++;const s=state.sol;
+  const ac=state.crew.filter(c=>c.alive);const n=Math.max(1,ac.length);
+  if(!n){state.alive=false;state.cause='all crew lost';return}
+  // Events
+  state.events=state.events.filter(e=>{e.remaining--;return e.remaining>0});
+  const probs={dust_storm:0.12,solar_flare:0.04,meteorite:0.003,equipment_failure:0.02};
+  const newEv=[];const types=state.events.map(e=>e.type);
+  for(const[t,p]of Object.entries(probs)){
+    if(types.includes(t))continue;
+    if(R()<p){const sv=0.2+R()*0.8,dur=t==='dust_storm'?5+Math.floor(R()*20):1+Math.floor(R()*4);
+      state.events.push({type:t,severity:sv,remaining:dur});newEv.push(t);
+      if(t==='meteorite'){state.s_eff*=(1-0.15*sv);state.g_eff*=(1-0.2*sv)}
+      if(t==='equipment_failure'){state.i_eff*=(1-0.15*sv)}
+    }
+  }
+  // Production
+  const dust=state.events.some(e=>e.type==='dust_storm')?0.25:1;
+  const irr=589*(1+0.09*Math.cos(2*Math.PI*(s%669-445)/669))*Math.max(0.3,Math.cos(2*Math.PI*s/669)*0.5+0.5)*dust*0.7;
+  const a=state.alloc;
+  state.power+=irr*PANEL*EFF*SOL_H/1000*state.s_eff;
+  if(state.power>PCRIT*0.3){state.o2+=ISRU_O2*state.i_eff*Math.min(1.5,a.i*2);state.h2o+=ISRU_H2O*state.i_eff*Math.min(1.5,a.i*2)}
+  if(state.power>PCRIT*0.3&&state.h2o>5)state.food+=GH_KCAL*state.g_eff*Math.min(1.5,a.g*2);
+  state.o2=Math.max(0,state.o2-n*O2_PP);state.h2o=Math.max(0,state.h2o-n*H2O_PP);
+  state.food=Math.max(0,state.food-n*FOOD_PP*a.r);state.power=Math.max(0,state.power-PWR_BASE);
+  state.int_temp=Math.max(200,Math.min(310,state.int_temp+(state.power>PCRIT?0.5:-2)));
+  state.rad+=0.335;
+  ac.forEach(m=>{m.rad+=0.335;
+    if(state.food/(n*FOOD_PP)<0.3){m.hp-=3;m.mor-=5;m.st='STARVING'}
+    else if(state.h2o/(n*H2O_PP)<0.3){m.hp-=5;m.mor-=3;m.st='DEHYDRATED'}
+    else{m.hp=Math.min(100,m.hp+0.5);m.st='Nominal'}
+    m.mor=Math.max(0,Math.min(100,m.mor));
+    if(m.hp<=0){m.alive=false;m.st='DECEASED'}
+  });
+  state.morale=ac.filter(c=>c.alive).reduce((s,m)=>s+m.mor,0)/Math.max(1,ac.filter(c=>c.alive).length)/100;
+  if(state.o2<=0){state.alive=false;state.cause='O2 depletion'}
+  if(state.food<=0){state.alive=false;state.cause='starvation'}
+  // Governor
+  const o2d=state.o2/(O2_PP*n),fd=state.food/(FOOD_PP*n);
+  if(o2d<5){a.h=0.15;a.i=0.7;a.g=0.15;a.r=fd<5?0.5:0.75}
+  else if(fd<10){a.h=0.15;a.i=0.3;a.g=0.55;a.r=0.75}
+  // Log
+  let line=`Sol ${s}: ${ac.filter(c=>c.alive).length} crew, ${o2d.toFixed(0)}d O2`;
+  if(newEv.length)line+=` | ${newEv.join(', ')}`;
+  state.log.push(line);
+  if(!state.alive)state.log.push(`COLONY LOST: ${state.cause}`);
+
+  // Buffer state for delayed Earth view
+  commDelay=Math.max(0.2,0.9+0.6*Math.cos(2*Math.PI*s/760));
+  delayBuffer.push({sol:s,snapshot:JSON.parse(JSON.stringify(state)),delay:Math.ceil(commDelay)});
+
+  // Deliver delayed state to Earth
+  const arrivals=delayBuffer.filter(b=>s>=b.sol+b.delay);
+  delayBuffer=delayBuffer.filter(b=>s<b.sol+b.delay);
+  if(arrivals.length){
+    earthState=arrivals[arrivals.length-1].snapshot;
+    earthLog=earthState.log.slice();
+    // Add signal animation
+    signals.push({y:100,dir:-1,color:'#ef4444',t:0});// Mars→Earth (telemetry)
+  }
+
+  // Signal from Earth→Mars when command sent (simulated)
+  if(s%50===0&&state.alive){
+    signals.push({y:0,dir:1,color:'#58a6ff',t:0});
+    state.log.push('📡 Received guidance update from Earth');
+  }
+
+  updateSplitUI();
+}
+
+function updateSplitUI(){
+  const s=state,es=earthState;
+  const ac=s.crew.filter(c=>c.alive),n=Math.max(1,ac.length);
+  const eac=es.crew?es.crew.filter(c=>c.alive):[];const en=Math.max(1,eac.length);
+
+  // Earth side (delayed)
+  document.getElementById('e-sol').textContent=es.sol||0;
+  document.getElementById('e-delay').textContent=`${commDelay.toFixed(1)} sols`;
+  document.getElementById('e-signal').textContent=s.alive?'NOMINAL':'SIGNAL LOST';
+  document.getElementById('e-signal').style.color=s.alive?'#3fb950':'#da3633';
+  document.getElementById('e-crew').textContent=`${eac.length}/4`;
+  document.getElementById('e-o2').textContent=`${(es.o2/(O2_PP*en)).toFixed(0)}d`;
+  document.getElementById('e-h2o').textContent=`${(es.h2o/(H2O_PP*en)).toFixed(0)}d`;
+  document.getElementById('e-food').textContent=`${(es.food/(FOOD_PP*en)).toFixed(0)}d`;
+  document.getElementById('e-power').textContent=`${es.power?.toFixed(0)||0} kWh`;
+  document.getElementById('e-log').innerHTML=(earthLog||[]).slice(-15).map(l=>
+    `<div class="log-line${l.includes('LOST')?' death':l.includes('⚠')?' event':''}">${l}</div>`).join('');
+
+  // Mars side (real-time)
+  document.getElementById('m-sol').textContent=s.sol;
+  document.getElementById('m-status').textContent=s.alive?'ALIVE':'DEAD — '+s.cause;
+  document.getElementById('m-status').style.color=s.alive?'#3fb950':'#da3633';
+  document.getElementById('m-gov').textContent=s.arch;
+  document.getElementById('m-o2').textContent=s.o2.toFixed(1);
+  document.getElementById('m-h2o').textContent=s.h2o.toFixed(1);
+  document.getElementById('m-food').textContent=s.food>=1000?(s.food/1000).toFixed(1)+'k':s.food.toFixed(0);
+  document.getElementById('m-power').textContent=s.power.toFixed(0);
+  const caps={o2:n*O2_PP*60,h2o:n*H2O_PP*60,food:n*FOOD_PP*60};
+  function setBar(id,v,mx){const p=Math.min(100,v/mx*100);const el=document.getElementById(id);
+    el.style.width=p+'%';el.style.background=p>50?'#3fb950':p>20?'#d29922':'#da3633'}
+  setBar('m-o2-bar',s.o2,caps.o2);setBar('m-h2o-bar',s.h2o,caps.h2o);
+  setBar('m-food-bar',s.food,caps.food);setBar('m-power-bar',s.power,1000);
+  document.getElementById('m-crew').innerHTML=s.crew.map(m=>{
+    const c=!m.alive?'#da3633':m.hp>70?'#3fb950':m.hp>30?'#d29922':'#da3633';
+    return`<div class="crew-line"><span style="color:${c}">●</span>${m.name} <span style="color:#484f58">${m.role}</span> <span style="color:${c}">${m.alive?m.hp.toFixed(0):'--'}</span></div>`;
+  }).join('');
+  document.getElementById('m-temp').textContent=`${(s.int_temp-273.15).toFixed(0)}°C`;
+  document.getElementById('m-events').textContent=s.events.length;
+  document.getElementById('m-log').innerHTML=s.log.slice(-15).map(l=>
+    `<div class="log-line${l.includes('LOST')?' death':l.includes('⚠')||l.includes('|')?' event':l.includes('🔨')||l.includes('📦')?' build':''}">${l}</div>`).join('');
+
+  // Delay indicator
+  document.getElementById('delay-time').textContent=`${commDelay.toFixed(1)}s`;
+
+  // Time displays
+  document.getElementById('earth-time').textContent=new Date().toLocaleTimeString();
+  const md={lmst:((Date.now()/86400000+2440587.5-2451545.0-4.5)/1.0274912517*24+44796*24+77.58/15)%24};
+  document.getElementById('mars-lmst').textContent=`${Math.floor(md.lmst)}:${String(Math.floor((md.lmst%1)*60)).padStart(2,'0')}`;
+  document.getElementById('m-season').textContent='Sol '+(state.sol%669);
+}
+
+// Animate signals in the delay strip
+function animateSignals(){
+  const strip=document.getElementById('delay-strip');
+  // Remove old signal elements
+  strip.querySelectorAll('.signal').forEach(el=>el.remove());
+  signals=signals.filter(s=>{
+    s.t++;s.y+=s.dir*2;
+    if(s.y<-10||s.y>110)return false;
+    const el=document.createElement('div');
+    el.className=`signal ${s.dir>0?'signal-earth':'signal-mars'}`;
+    el.style.top=s.y+'%';el.style.left='50%';el.style.transform='translateX(-50%)';
+    strip.appendChild(el);
+    return true;
+  });
+  requestAnimationFrame(animateSignals);
+}
+animateSignals();
+
+function toggleSim(){
+  if(running){running=false;clearInterval(interval);document.getElementById('ss-btn').textContent='▶ START';return}
+  running=true;document.getElementById('ss-btn').textContent='⏸ PAUSE';
+  const spd=parseFloat(document.getElementById('ss-speed').value)||2;
+  interval=setInterval(()=>{stepSim();if(!state.alive){running=false;clearInterval(interval);
+    document.getElementById('ss-btn').textContent='LOST'}},1000/spd);
+}
+function stepOnce(){stepSim()}
+updateSplitUI();
+</script>
+</body>
+</html>
