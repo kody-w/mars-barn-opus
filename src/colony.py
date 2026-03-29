@@ -137,6 +137,9 @@ class Colony:
     morale: float = 1.0
     cumulative_radiation_msv: float = 0.0
 
+    # Crew (optional — None = legacy mode with just crew_size)
+    crew: Optional[Any] = None  # crew.Crew instance when enabled
+
     # Tracking
     peak_resources: Optional[Dict[str, float]] = None
     sols_on_rations: int = 0
@@ -350,6 +353,36 @@ def step(colony: Colony, solar_irradiance_w_m2: float,
     # Radiation
     colony.cumulative_radiation_msv += radiation_msv
 
+    # Crew simulation (if enabled)
+    if colony.crew is not None:
+        from crew import tick_crew
+        r = colony.resources
+        crew_count = colony.crew.alive_count
+        if crew_count > 0:
+            resources_per_person = {
+                "o2_per_person": r.o2_kg / crew_count,
+                "h2o_per_person": r.h2o_liters / crew_count,
+                "food_per_person": r.food_kcal / crew_count,
+            }
+        else:
+            resources_per_person = {"o2_per_person": 0, "h2o_per_person": 0,
+                                    "food_per_person": 0}
+
+        crew_events = tick_crew(
+            colony.crew, colony.sol, resources_per_person,
+            colony.interior_temp_k, radiation_msv,
+        )
+
+        # Sync crew count back to resources
+        colony.resources.crew_size = colony.crew.alive_count
+        colony.morale = colony.crew.avg_morale / 100.0
+
+        # All crew dead = colony dead
+        if colony.crew.alive_count == 0:
+            colony.alive = False
+            colony.cause_of_death = "all crew lost"
+            colony.cascade_state = CascadeState.DEAD
+
     # Cascade
     advance_cascade(colony)
 
@@ -422,4 +455,5 @@ def serialize(colony: Colony) -> dict:
             "comms": round(colony.systems.comms_efficiency, 3),
         },
         "peak_resources": colony.peak_resources,
+        "crew": colony.crew.serialize() if colony.crew else None,
     }

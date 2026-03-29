@@ -30,6 +30,8 @@ from mars import (
     radiation_dose, render_terrain_ascii,
 )
 from scoring import score_run
+from crew import generate_crew, tick_crew
+from mission_log import MissionLog
 
 
 # ANSI color codes
@@ -105,6 +107,7 @@ def save_twin_state(colony: Colony, sol: int, events: list,
              "remaining": e.remaining_sols, "description": e.description}
             for e in events
         ],
+        "crew": colony.crew.serialize() if colony.crew else None,
         "sync_instructions": {
             "note": "Physical twin should match these values",
             "heating_kw": env.get("heating_kw", 0),
@@ -112,6 +115,8 @@ def save_twin_state(colony: Colony, sol: int, events: list,
             "isru_active": colony.resources.power_kwh > 50,
             "greenhouse_active": colony.resources.h2o_liters > 5,
             "alert_level": _alert_level(colony),
+            "crew_alive": colony.crew.alive_count if colony.crew else 0,
+            "crew_health_avg": round(colony.crew.avg_health, 1) if colony.crew else 0,
         },
     }
     with open(path, "w") as f:
@@ -232,6 +237,37 @@ def render_mission_control(colony: Colony, sol: int, events: EventEngine,
           f"  {C.BLUE}╚═══════════════════════════╝{C.RESET}")
     print()
 
+    # Crew roster (if crew simulation is enabled)
+    if colony.crew is not None:
+        alive_crew = colony.crew.alive_members
+        dead_crew = [m for m in colony.crew.members if not m.alive]
+        print(f"  {C.WHITE}╔═══ CREW ROSTER ═══════════════════════════════════════════════╗{C.RESET}")
+        for m in alive_crew:
+            health_bar = _pct_bar(m.health / 100.0)
+            role_tag = m.role.value[:4].upper()
+            status = m.status_line
+            if "STARVING" in status or "DEHYDRATED" in status:
+                status_color = C.RED
+            elif "EXHAUSTED" in status or "INJURED" in status:
+                status_color = C.YELLOW
+            else:
+                status_color = C.GREEN
+            print(f"  {C.WHITE}║{C.RESET}  {m.name:<14} [{role_tag}] "
+                  f"HP[{health_bar}]{m.health:>4.0f}  "
+                  f"Eff:{m.effectiveness:>4.0%}  "
+                  f"{status_color}{status:<16}{C.RESET}"
+                  f" {C.WHITE}║{C.RESET}")
+        for m in dead_crew:
+            print(f"  {C.WHITE}║{C.RESET}  {C.RED}{m.name:<14} [DEAD] "
+                  f"{m.cause_of_death}{C.RESET}"
+                  f"                             {C.WHITE}║{C.RESET}")
+        print(f"  {C.WHITE}║{C.RESET}  {C.DIM}Avg Health: {colony.crew.avg_health:.0f}  "
+              f"Avg Morale: {colony.crew.avg_morale:.0f}  "
+              f"Effectiveness: {colony.crew.avg_effectiveness:.0%}{C.RESET}"
+              f"       {C.WHITE}║{C.RESET}")
+        print(f"  {C.WHITE}╚═══════════════════════════════════════════════════════════════╝{C.RESET}")
+        print()
+
     # Event feed
     if new_events or events.active_events:
         print(f"  {C.YELLOW}╔═══ EVENT FEED ════════════════════════════════════════════════╗{C.RESET}")
@@ -262,11 +298,13 @@ def run_mission_control(seed: int = DEFAULT_SEED, max_sols: int = DEFAULT_SOLS,
     """
     terrain = generate_terrain(size=32, seed=seed)
     colony = create_colony("Ares Colony", location_x=16, location_y=16)
+    colony.crew = generate_crew(size=4, seed=seed)
     governor = create_governor(f"AI-{archetype}", archetype)
     event_engine = EventEngine()
     event_engine.set_seed(seed)
 
     override_allocation: Optional[Allocation] = None
+    log = MissionLog(path=twin_path.replace(".json", "-log.txt"))
 
     # Startup screen
     print(C.CLEAR)
@@ -350,6 +388,19 @@ def run_mission_control(seed: int = DEFAULT_SEED, max_sols: int = DEFAULT_SOLS,
         save_twin_state(colony, sol, event_engine.active_events, env,
                        governor.archetype, twin_path)
 
+        # Mission log
+        env_desc = (f"{ext_temp - 273.15:.0f}C exterior, "
+                    f"{irradiance:.0f} W/m2 solar"
+                    f"{', DUST STORM' if dust_factor > 1.5 else ''}")
+        alloc_desc = (f"H:{allocation.heating_fraction:.0%} "
+                      f"I:{allocation.isru_fraction:.0%} "
+                      f"G:{allocation.greenhouse_fraction:.0%} "
+                      f"Ration:{allocation.food_ration:.0%}"
+                      f"{' [OVERRIDE]' if override_allocation else ''}")
+        event_descs = [e.description for e in new_events]
+        crew_events = []  # Crew events are logged by tick_crew
+        log.log_sol(colony, event_descs, crew_events, alloc_desc, env_desc)
+
         # Render
         render_mission_control(colony, sol, event_engine, ext_temp,
                               irradiance, allocation, governor,
@@ -387,7 +438,12 @@ def run_mission_control(seed: int = DEFAULT_SEED, max_sols: int = DEFAULT_SOLS,
         except (EOFError, KeyboardInterrupt):
             break
 
-    # Mission end
+    # Mission end — log and display
+    if colony.alive:
+        log.log_survival(colony, max_sols)
+    else:
+        log.log_death(colony)
+
     print(f"\n  {C.RED}{C.BOLD}{'═' * 60}{C.RESET}")
     if colony.alive:
         print(f"  {C.GREEN}{C.BOLD}MISSION COMPLETE — Colony survived {colony.sol} sols{C.RESET}")
