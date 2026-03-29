@@ -221,6 +221,13 @@ function getMarsWeather(){
 }
 let marsWeather=getMarsWeather();
 setInterval(()=>{marsWeather=getMarsWeather()},30000);
+
+function lerpColor(a,b,t){
+  const ar=(a>>16)&0xff,ag=(a>>8)&0xff,ab=a&0xff;
+  const br=(b>>16)&0xff,bg=(b>>8)&0xff,bb=b&0xff;
+  const r=Math.round(ar+(br-ar)*t),g=Math.round(ag+(bg-ag)*t),bl=Math.round(ab+(bb-ab)*t);
+  return(r<<16)|(g<<8)|bl;
+}
 // ── End Mars Climate Engine ──────────────────────────────────────
 
 // Sim state (reuse from index.html engine)
@@ -503,12 +510,35 @@ function buildGroundScene(){
   const w=c.clientWidth,h=c.clientHeight;
 
   groundScene=new T.Scene();
-  // Mars sky — butterscotch/salmon gradient at horizon
+  // Day/night cycle based on real Mars Local Mean Solar Time
   const isDustStorm=state.events.some(e=>e.type==='dust_storm');
-  const skyColor=isDustStorm?0x553311:0x331a0d;
-  const fogDensity=isDustStorm?0.025:0.006;
+  const marsHour=marsWeather.lmst; // 0-24 Mars hours
+  const isNight=marsHour<5.5||marsHour>19.5;
+  const isDawn=marsHour>=5.5&&marsHour<7.5;
+  const isDusk=marsHour>=17.5&&marsHour<19.5;
+  const isDay=!isNight&&!isDawn&&!isDusk;
+
+  // Sky color shifts with time of day
+  let skyColor,fogColor,sunIntensity,ambientIntensity,exposure;
+  if(isNight){
+    skyColor=0x050208;fogColor=0x050208;sunIntensity=0;ambientIntensity=0.08;exposure=0.3;
+  }else if(isDawn){
+    const t=(marsHour-5.5)/2;// 0→1
+    skyColor=lerpColor(0x1a0510,0x6b3020,t);fogColor=skyColor;
+    sunIntensity=t*0.8;ambientIntensity=0.15+t*0.3;exposure=0.4+t*0.4;
+  }else if(isDusk){
+    const t=(marsHour-17.5)/2;// 0→1
+    skyColor=lerpColor(0x6b3020,0x1a0510,t);fogColor=skyColor;
+    sunIntensity=(1-t)*0.8;ambientIntensity=0.4-t*0.25;exposure=0.8-t*0.4;
+  }else{// Day
+    skyColor=isDustStorm?0x553311:0x331a0d;
+    fogColor=skyColor;sunIntensity=isDustStorm?0.5:1.2;
+    ambientIntensity=isDustStorm?0.3:0.5;exposure=isDustStorm?0.6:0.9;
+  }
+
+  const fogDensity=isDustStorm?0.025:isNight?0.012:0.006;
   groundScene.background=new T.Color(skyColor);
-  groundScene.fog=new T.FogExp2(skyColor,fogDensity);
+  groundScene.fog=new T.FogExp2(fogColor,fogDensity);
 
   groundCamera=new T.PerspectiveCamera(55,w/h,0.1,2000);
   groundCamera.position.set(0,15,40);
@@ -520,21 +550,41 @@ function buildGroundScene(){
   groundRenderer.shadowMap.enabled=true;
   groundRenderer.shadowMap.type=T.PCFSoftShadowMap;
   groundRenderer.toneMapping=T.ACESFilmicToneMapping;
-  groundRenderer.toneMappingExposure=isDustStorm?0.6:0.9;
+  groundRenderer.toneMappingExposure=exposure;
   c.appendChild(groundRenderer.domElement);
 
-  // Lighting — warm Mars sunlight
-  const ambient=new T.AmbientLight(isDustStorm?0x442211:0x553322,isDustStorm?0.3:0.5);
+  // Sun position moves with Mars time (east → west arc)
+  const sunAngle=(marsHour/24)*Math.PI*2-Math.PI/2;
+  const sunHeight=Math.max(0,Math.sin(sunAngle))*80;
+  const sunX=Math.cos(sunAngle)*60;
+
+  const ambient=new T.AmbientLight(isNight?0x111122:isDustStorm?0x442211:0x553322,ambientIntensity);
   groundScene.add(ambient);
-  const sun=new T.DirectionalLight(0xffeedd,isDustStorm?0.5:1.2);
-  sun.position.set(50,60,30);sun.castShadow=true;
+  const sun=new T.DirectionalLight(isDawn||isDusk?0xff8844:0xffeedd,sunIntensity);
+  sun.position.set(sunX,sunHeight,30);sun.castShadow=!isNight;
   sun.shadow.mapSize.width=2048;sun.shadow.mapSize.height=2048;
   sun.shadow.camera.left=-60;sun.shadow.camera.right=60;
   sun.shadow.camera.top=60;sun.shadow.camera.bottom=-60;
   groundScene.add(sun);
-  // Warm fill light from ground (Mars regolith reflection)
-  const fillLight=new T.HemisphereLight(0xffa060,0x8b4513,0.3);
+  // Warm fill from regolith (dims at night)
+  const fillLight=new T.HemisphereLight(isNight?0x111133:0xffa060,0x8b4513,isNight?0.05:0.3);
   groundScene.add(fillLight);
+
+  // Stars visible at night
+  if(isNight||isDusk||isDawn){
+    const starsGeo=new T.BufferGeometry();
+    const starsPos=new Float32Array(600*3);
+    for(let i=0;i<600*3;i+=3){
+      const theta=Math.random()*Math.PI*2,phi=Math.random()*Math.PI*0.5;
+      const r2=200+Math.random()*100;
+      starsPos[i]=r2*Math.sin(phi)*Math.cos(theta);
+      starsPos[i+1]=r2*Math.cos(phi);
+      starsPos[i+2]=r2*Math.sin(phi)*Math.sin(theta);
+    }
+    starsGeo.setAttribute('position',new T.BufferAttribute(starsPos,3));
+    const starsMat=new T.PointsMaterial({color:0xffffff,size:isNight?0.8:0.3,transparent:true,opacity:isNight?0.9:0.3});
+    groundScene.add(new T.Points(starsGeo,starsMat));
+  }
 
   // Mars terrain — multi-layer for depth
   const gGeo=new T.PlaneGeometry(400,400,120,120);
@@ -595,10 +645,16 @@ function buildGroundScene(){
   const ring=new T.Mesh(ringG,ringM);
   ring.rotation.x=Math.PI/2;ring.position.y=0.1;
   groundScene.add(ring);
-  // Interior light glow inside dome
-  const glowLight=new T.PointLight(0xffeebb,0.6,15);
+  // Interior light glow inside dome (brighter at night)
+  const glowLight=new T.PointLight(0xffeebb,isNight?1.5:0.6,isNight?25:15);
   glowLight.position.set(0,3,0);
   groundScene.add(glowLight);
+  // Dome emissive at night (warm glow from inside)
+  if(isNight||isDusk){
+    const innerGlowG=new T.SphereGeometry(4.5,16,10,0,Math.PI*2,0,Math.PI/2);
+    const innerGlowM=new T.MeshBasicMaterial({color:0xffeebb,transparent:true,opacity:0.08,side:T.BackSide});
+    groundScene.add(new T.Mesh(innerGlowG,innerGlowM));
+  }
   // Airlock cylinder
   const airlockG=new T.CylinderGeometry(1.2,1.2,2.5,12);
   const airlockM=new T.MeshStandardMaterial({color:0x667788,metalness:0.6,roughness:0.3});
@@ -825,8 +881,10 @@ function buildGroundScene(){
     // Blink
     blink.material.color.setHex(Math.floor(frame/40)%2?0xff0000:0x220000);
 
-    // Interior dome light flicker (subtle)
-    glowLight.intensity=0.5+Math.sin(frame*0.02)*0.1;
+    // Interior dome light flicker (stronger at night)
+    const baseGlow=isNight?1.4:0.5;
+    const flickerAmp=isNight?0.2:0.1;
+    glowLight.intensity=baseGlow+Math.sin(frame*0.02)*flickerAmp;
 
     groundRenderer.render(groundScene,groundCamera);
   }
