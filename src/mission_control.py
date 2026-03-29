@@ -32,6 +32,7 @@ from mars import (
 from scoring import score_run
 from crew import generate_crew, tick_crew
 from mission_log import MissionLog
+from comms import CommChannel, apply_command
 
 
 # ANSI color codes
@@ -90,7 +91,8 @@ def _days_label(days: float) -> str:
 
 def save_twin_state(colony: Colony, sol: int, events: list,
                     env: Dict, governor_name: str,
-                    path: str = "/tmp/mars-twin-state.json") -> None:
+                    path: str = "/tmp/mars-twin-state.json",
+                    comms: Optional['CommChannel'] = None) -> None:
     """Persist digital twin state for physical twin sync."""
     state = {
         "_meta": {
@@ -108,6 +110,7 @@ def save_twin_state(colony: Colony, sol: int, events: list,
             for e in events
         ],
         "crew": colony.crew.serialize() if colony.crew else None,
+        "comms": comms.serialize() if comms and hasattr(comms, 'serialize') else None,
         "sync_instructions": {
             "note": "Physical twin should match these values",
             "heating_kw": env.get("heating_kw", 0),
@@ -140,7 +143,8 @@ def _alert_level(colony: Colony) -> str:
 def render_mission_control(colony: Colony, sol: int, events: EventEngine,
                            ext_temp_k: float, irradiance: float,
                            allocation: Allocation, governor: Governor,
-                           new_events: list, speed: float) -> None:
+                           new_events: list, speed: float,
+                           comms: Optional[CommChannel] = None) -> None:
     """Render the full Mission Control display."""
     r = colony.resources
     s = colony.systems
@@ -268,6 +272,20 @@ def render_mission_control(colony: Colony, sol: int, events: EventEngine,
         print(f"  {C.WHITE}╚═══════════════════════════════════════════════════════════════╝{C.RESET}")
         print()
 
+    # Comms status
+    if comms:
+        delay_str = f"{comms.current_delay_sols:.1f} sols"
+        if comms.blackout:
+            comms_status = f"{C.RED}██ SOLAR CONJUNCTION BLACKOUT ({comms.blackout_remaining_sols} sols) ██{C.RESET}"
+        elif comms.pending_count() > 0:
+            comms_status = f"{C.YELLOW}{comms.pending_count()} commands in transit{C.RESET} | Delay: {delay_str}"
+        else:
+            comms_status = f"{C.GREEN}Link nominal{C.RESET} | Delay: {delay_str}"
+        print(f"  {C.CYAN}COMMS:{C.RESET} {comms_status}"
+              f"  {C.DIM}Sent:{comms.commands_sent} Delivered:{comms.commands_delivered}"
+              f" Lost:{comms.commands_lost}{C.RESET}")
+        print()
+
     # Event feed
     if new_events or events.active_events:
         print(f"  {C.YELLOW}╔═══ EVENT FEED ════════════════════════════════════════════════╗{C.RESET}")
@@ -284,8 +302,8 @@ def render_mission_control(colony: Colony, sol: int, events: EventEngine,
         print()
 
     # Controls
-    print(f"  {C.DIM}Controls: [Enter] advance  [o] override allocation  "
-          f"[s] change speed  [q] abort mission{C.RESET}")
+    print(f"  {C.DIM}Controls: [Enter] advance  [o] override (delayed)  "
+          f"[e] emergency  [s] speed  [q] abort{C.RESET}")
 
 
 def run_mission_control(seed: int = DEFAULT_SEED, max_sols: int = DEFAULT_SOLS,
@@ -304,6 +322,7 @@ def run_mission_control(seed: int = DEFAULT_SEED, max_sols: int = DEFAULT_SOLS,
     event_engine.set_seed(seed)
 
     override_allocation: Optional[Allocation] = None
+    comms = CommChannel()
     log = MissionLog(path=twin_path.replace(".json", "-log.txt"))
 
     # Startup screen
@@ -358,6 +377,39 @@ def run_mission_control(seed: int = DEFAULT_SEED, max_sols: int = DEFAULT_SOLS,
                           for e in event_engine.active_events),
         )
 
+        # Process arriving commands (delayed from previous sols)
+        comms.delay_at_sol(sol)
+        arrived_commands = comms.receive_commands(sol)
+        for cmd in arrived_commands:
+            effect = apply_command(colony, cmd)
+            new_events_desc = [e.description for e in new_events]
+            new_events_desc.append(f"COMMS: {effect}")
+            if cmd.command_type == "override_allocation":
+                p = cmd.payload
+                total = p.get("heating", 25) + p.get("isru", 40) + p.get("greenhouse", 35)
+                if total > 0:
+                    override_allocation = Allocation(
+                        heating_fraction=p.get("heating", 25) / total,
+                        isru_fraction=p.get("isru", 40) / total,
+                        greenhouse_fraction=p.get("greenhouse", 35) / total,
+                        food_ration=p.get("ration", 100) / 100.0,
+                    )
+            elif cmd.command_type == "emergency":
+                protocol = cmd.payload.get("protocol", "")
+                if protocol == "shelter_in_place":
+                    override_allocation = Allocation(
+                        heating_fraction=0.60, isru_fraction=0.25,
+                        greenhouse_fraction=0.15, food_ration=0.50)
+                elif protocol == "emergency_isru":
+                    override_allocation = Allocation(
+                        heating_fraction=0.10, isru_fraction=0.80,
+                        greenhouse_fraction=0.10, food_ration=0.50)
+                elif protocol == "reduce_rations":
+                    level = cmd.payload.get("level", 50)
+                    # Keep current allocation but change rations
+                    if override_allocation:
+                        override_allocation.food_ration = level / 100.0
+
         # Governor decides (or use override)
         if override_allocation:
             allocation = override_allocation
@@ -386,7 +438,7 @@ def run_mission_control(seed: int = DEFAULT_SEED, max_sols: int = DEFAULT_SOLS,
             "solar_kwh": round(irradiance * 200 * 0.22 * MARS_SOL_HOURS / 1000, 2),
         }
         save_twin_state(colony, sol, event_engine.active_events, env,
-                       governor.archetype, twin_path)
+                       governor.archetype, twin_path, comms)
 
         # Mission log
         env_desc = (f"{ext_temp - 273.15:.0f}C exterior, "
@@ -404,7 +456,7 @@ def run_mission_control(seed: int = DEFAULT_SEED, max_sols: int = DEFAULT_SOLS,
         # Render
         render_mission_control(colony, sol, event_engine, ext_temp,
                               irradiance, allocation, governor,
-                              new_events, speed)
+                              new_events, speed, comms)
 
         # Pace based on speed (0 = instant, 1 = 1sec/sol, etc.)
         if speed > 0:
@@ -424,13 +476,52 @@ def run_mission_control(seed: int = DEFAULT_SEED, max_sols: int = DEFAULT_SOLS,
                     if cmd == 'q':
                         break
                     elif cmd == 'o':
-                        override_allocation = _get_override()
+                        alloc = _get_override()
+                        if alloc:
+                            queued = comms.send_command(
+                                "override_allocation",
+                                {"heating": int(alloc.heating_fraction * 100),
+                                 "isru": int(alloc.isru_fraction * 100),
+                                 "greenhouse": int(alloc.greenhouse_fraction * 100),
+                                 "ration": int(alloc.food_ration * 100)},
+                                sol, "Allocation override from Earth")
+                            if queued:
+                                print(f"  {C.CYAN}Command queued — arrives sol "
+                                      f"{queued.arrival_sol} "
+                                      f"(delay: {comms.current_delay_sols:.1f} sols)"
+                                      f"{C.RESET}")
+                            else:
+                                print(f"  {C.RED}BLACKOUT — command lost!{C.RESET}")
+                            time.sleep(1.0)
+                    elif cmd == 'e':
+                        print(f"\n  {C.RED}EMERGENCY PROTOCOLS:{C.RESET}")
+                        print(f"  [1] Shelter in place  [2] Emergency ISRU  "
+                              f"[3] Reduce rations  [4] Cancel")
+                        try:
+                            choice = input(f"  > ").strip()
+                        except (EOFError, KeyboardInterrupt):
+                            choice = "4"
+                        protocols = {"1": "shelter_in_place", "2": "emergency_isru",
+                                     "3": "reduce_rations"}
+                        if choice in protocols:
+                            payload = {"protocol": protocols[choice]}
+                            if choice == "3":
+                                payload["level"] = 50
+                            queued = comms.send_command(
+                                "emergency", payload, sol,
+                                f"EMERGENCY: {protocols[choice]}")
+                            if queued:
+                                print(f"  {C.YELLOW}Emergency command queued — "
+                                      f"arrives sol {queued.arrival_sol}{C.RESET}")
+                            else:
+                                print(f"  {C.RED}BLACKOUT — emergency lost!{C.RESET}")
+                            time.sleep(1.0)
                     elif cmd == 's':
                         speed = _get_speed(speed)
                     elif cmd == '':
                         pass  # Just advance
                     elif cmd == 'r':
-                        override_allocation = None  # Release override
+                        override_allocation = None
                         print(f"  {C.GREEN}Override released — governor in control{C.RESET}")
                         time.sleep(0.5)
             else:

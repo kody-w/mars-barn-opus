@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Mars Barn Opus — Mission Control</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#484f58;
+--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--purple:#a371f7;
+--cyan:#79c0ff;--white:#e0e0e0;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
+.header{background:linear-gradient(135deg,#0d1117 0%,#161b22 100%);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:18px;color:#fff}
+.header .alert{padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600}
+.alert-green{background:#1a3a1a;color:var(--green)}.alert-yellow{background:#3a3a1a;color:var(--yellow)}.alert-red{background:#3a1a1a;color:var(--red)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px;max-width:1200px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px}
+.card h2{font-size:14px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.full{grid-column:1/-1}
+.stat{display:inline-block;margin:0 16px 8px 0}.stat-val{font-size:24px;font-weight:700;color:var(--blue)}.stat-label{font-size:11px;color:var(--dim);text-transform:uppercase}
+.bar-wrap{margin:6px 0;display:flex;align-items:center;gap:8px}
+.bar-label{width:60px;font-size:12px;color:var(--dim);text-align:right}
+.bar-track{flex:1;height:14px;background:#21262d;border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width 0.3s}
+.bar-val{width:80px;font-size:12px;text-align:right}
+.bar-days{width:40px;font-size:11px;color:var(--dim)}
+.crew-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border)}
+.crew-row:last-child{border-bottom:none}
+.crew-name{width:120px;font-weight:600;font-size:13px}.crew-role{width:80px;font-size:11px;color:var(--dim);text-transform:uppercase}
+.crew-hp{width:50px;font-size:12px;text-align:right}.crew-status{flex:1;font-size:11px}
+.event-item{padding:4px 0;font-size:12px;border-bottom:1px solid #1a1f25}.event-item:last-child{border-bottom:none}
+.event-tag{display:inline-block;padding:1px 6px;border-radius:8px;font-size:10px;margin-right:4px}
+.tag-new{background:#3a1a1a;color:var(--red)}.tag-active{background:#1a2a3a;color:var(--blue)}
+.controls{background:var(--card);border-top:1px solid var(--border);padding:12px 24px;display:flex;gap:8px;align-items:center;position:sticky;bottom:0}
+.btn{padding:8px 16px;border-radius:6px;border:1px solid var(--border);background:#21262d;color:var(--text);cursor:pointer;font-size:13px;font-family:var(--font)}
+.btn:hover{background:#30363d}.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue)}.btn-primary:hover{background:#388bfd}
+.btn-danger{background:var(--red);color:#fff;border-color:var(--red)}
+.speed-ctrl{display:flex;align-items:center;gap:4px;margin-left:auto}
+.speed-ctrl label{font-size:12px;color:var(--dim)}
+.speed-ctrl input{width:60px;background:#21262d;border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:4px;font-size:13px}
+.comms-bar{font-size:12px;padding:8px 24px;background:#0a0e14;border-bottom:1px solid var(--border);display:flex;gap:16px;align-items:center}
+.io-btns{display:flex;gap:6px}
+.log{max-height:200px;overflow-y:auto;font-family:'SFMono-Regular',Consolas,monospace;font-size:11px;line-height:1.6;color:var(--dim)}
+.log .sol-line{color:var(--white)}.log .event-line{color:var(--yellow)}.log .death-line{color:var(--red)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>MARS BARN — MISSION CONTROL</h1>
+  <div>
+    <span id="sol-display" style="color:var(--white);font-weight:700">Sol 0</span>
+    <span id="alert-badge" class="alert alert-green">GREEN</span>
+  </div>
+</div>
+
+<div class="comms-bar">
+  <span>COMMS: <span id="comms-status" style="color:var(--green)">Link nominal</span></span>
+  <span style="color:var(--dim)">Delay: <span id="comms-delay">0.5</span> sols</span>
+  <span style="color:var(--dim)">In transit: <span id="comms-queue">0</span></span>
+  <div class="io-btns" style="margin-left:auto">
+    <button class="btn" onclick="exportState()" title="Export save">Export</button>
+    <button class="btn" onclick="document.getElementById('import-file').click()" title="Import save">Import</button>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importState(event)">
+  </div>
+</div>
+
+<div class="grid">
+  <!-- Environment -->
+  <div class="card">
+    <h2>Environment</h2>
+    <div>
+      <span class="stat"><span class="stat-val" id="ext-temp">-63</span><span style="font-size:14px">°C</span><br><span class="stat-label">Exterior</span></span>
+      <span class="stat"><span class="stat-val" id="int-temp">20</span><span style="font-size:14px">°C</span><br><span class="stat-label">Interior</span></span>
+      <span class="stat"><span class="stat-val" id="solar-irr">300</span><br><span class="stat-label">Solar W/m²</span></span>
+    </div>
+    <div style="margin-top:8px;font-size:12px;color:var(--dim)">
+      Morale: <span id="morale">100%</span> | Radiation: <span id="radiation">0</span> mSv | Cascade: <span id="cascade">NOMINAL</span>
+    </div>
+  </div>
+
+  <!-- Governor -->
+  <div class="card">
+    <h2>Governor Allocation</h2>
+    <div class="bar-wrap"><span class="bar-label">Heating</span><div class="bar-track"><div class="bar-fill" id="alloc-heat" style="width:25%;background:var(--red)"></div></div><span class="bar-val" id="alloc-heat-pct">25%</span></div>
+    <div class="bar-wrap"><span class="bar-label">ISRU</span><div class="bar-track"><div class="bar-fill" id="alloc-isru" style="width:40%;background:var(--blue)"></div></div><span class="bar-val" id="alloc-isru-pct">40%</span></div>
+    <div class="bar-wrap"><span class="bar-label">Greenhouse</span><div class="bar-track"><div class="bar-fill" id="alloc-gh" style="width:35%;background:var(--green)"></div></div><span class="bar-val" id="alloc-gh-pct">35%</span></div>
+    <div style="margin-top:8px;font-size:12px;color:var(--dim)">Ration: <span id="ration-pct">100%</span> | Governor: <span id="gov-type">engineer</span></div>
+  </div>
+
+  <!-- Resources -->
+  <div class="card">
+    <h2>Resources</h2>
+    <div class="bar-wrap"><span class="bar-label">O₂</span><div class="bar-track"><div class="bar-fill" id="res-o2" style="width:80%;background:var(--green)"></div></div><span class="bar-val" id="res-o2-val">100.8 kg</span><span class="bar-days" id="res-o2-days">30d</span></div>
+    <div class="bar-wrap"><span class="bar-label">H₂O</span><div class="bar-track"><div class="bar-fill" id="res-h2o" style="width:80%;background:var(--blue)"></div></div><span class="bar-val" id="res-h2o-val">300.0 L</span><span class="bar-days" id="res-h2o-days">30d</span></div>
+    <div class="bar-wrap"><span class="bar-label">Food</span><div class="bar-track"><div class="bar-fill" id="res-food" style="width:80%;background:var(--yellow)"></div></div><span class="bar-val" id="res-food-val">300000 kcal</span><span class="bar-days" id="res-food-days">30d</span></div>
+    <div class="bar-wrap"><span class="bar-label">Power</span><div class="bar-track"><div class="bar-fill" id="res-power" style="width:50%;background:var(--purple)"></div></div><span class="bar-val" id="res-power-val">500 kWh</span><span class="bar-days" id="res-power-days">16d</span></div>
+  </div>
+
+  <!-- Systems -->
+  <div class="card">
+    <h2>Systems</h2>
+    <div class="bar-wrap"><span class="bar-label">Solar</span><div class="bar-track"><div class="bar-fill" id="sys-solar" style="width:100%;background:var(--green)"></div></div><span class="bar-val" id="sys-solar-pct">100%</span></div>
+    <div class="bar-wrap"><span class="bar-label">ISRU</span><div class="bar-track"><div class="bar-fill" id="sys-isru" style="width:100%;background:var(--green)"></div></div><span class="bar-val" id="sys-isru-pct">100%</span></div>
+    <div class="bar-wrap"><span class="bar-label">Greenhouse</span><div class="bar-track"><div class="bar-fill" id="sys-gh" style="width:100%;background:var(--green)"></div></div><span class="bar-val" id="sys-gh-pct">100%</span></div>
+    <div class="bar-wrap"><span class="bar-label">Heating</span><div class="bar-track"><div class="bar-fill" id="sys-heat" style="width:100%;background:var(--green)"></div></div><span class="bar-val" id="sys-heat-pct">100%</span></div>
+  </div>
+
+  <!-- Crew -->
+  <div class="card">
+    <h2>Crew Roster</h2>
+    <div id="crew-list">
+      <div class="crew-row"><span class="crew-name">Initializing...</span></div>
+    </div>
+  </div>
+
+  <!-- Events -->
+  <div class="card">
+    <h2>Event Feed</h2>
+    <div id="event-feed" style="max-height:180px;overflow-y:auto">
+      <div class="event-item" style="color:var(--dim)">Awaiting telemetry...</div>
+    </div>
+  </div>
+
+  <!-- Mission Log -->
+  <div class="card full">
+    <h2>Mission Log</h2>
+    <div class="log" id="mission-log">Uplink establishing...</div>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="btn btn-primary" id="btn-run" onclick="toggleRun()">▶ Start</button>
+  <button class="btn" onclick="stepOnce()">⏭ Step</button>
+  <button class="btn btn-danger" id="btn-reset" onclick="resetSim()">↺ Reset</button>
+  <div class="speed-ctrl">
+    <label>Speed:</label>
+    <input type="number" id="speed" value="2" min="0.1" max="100" step="0.5">
+    <label>sols/s</label>
+  </div>
+  <div class="speed-ctrl">
+    <label>Governor:</label>
+    <select id="gov-select" style="background:#21262d;border:1px solid var(--border);color:var(--text);padding:4px;border-radius:4px;font-size:13px">
+      <option value="engineer">Engineer</option>
+      <option value="philosopher">Philosopher</option>
+      <option value="contrarian">Contrarian</option>
+      <option value="survivalist">Survivalist</option>
+      <option value="diplomat">Diplomat</option>
+      <option value="wildcard">Wildcard</option>
+      <option value="commander">Commander</option>
+      <option value="scientist">Scientist</option>
+      <option value="merchant">Merchant</option>
+      <option value="hermit">Hermit</option>
+    </select>
+  </div>
+  <div class="speed-ctrl">
+    <label>Seed:</label>
+    <input type="number" id="seed" value="42" min="1" max="99999" style="width:70px;background:#21262d;border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:4px;font-size:13px">
+  </div>
+</div>
+
+<script>
+// Mars Barn Opus — Browser Mission Control
+// Pure JS, zero dependencies, local-first
+
+// ============================================================
+// MARS PHYSICS (ported from Python)
+// ============================================================
+const MARS_SURFACE_PRESSURE = 610;
+const MARS_SCALE_HEIGHT = 11.1;
+const MARS_SURFACE_TEMP = 210;
+const MARS_DIURNAL_SWING = 40;
+const MARS_LAT_GRADIENT = 40;
+const MARS_SOLAR_CONSTANT = 589;
+const MARS_AXIAL_TILT = 25.19;
+const MARS_SOL_HOURS = 24.66;
+const MARS_YEAR_SOLS = 668.6;
+const O2_PER_PERSON = 0.84;
+const H2O_PER_PERSON = 2.5;
+const FOOD_PER_PERSON = 2500;
+const POWER_BASE = 30;
+const ISRU_O2 = 5.0;
+const ISRU_H2O = 12.0;
+const GH_KCAL = 15000;
+const PANEL_AREA = 200;
+const PANEL_EFF = 0.22;
+const POWER_CRIT = 50;
+
+// Simple seeded RNG
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t^=t+Math.imul(t^t>>>7,61|t);return((t^t>>>14)>>>0)/4294967296}}
+
+let state = null;
+let running = false;
+let interval = null;
+let rng = null;
+
+function initState(seed, archetype) {
+  rng = mulberry32(seed);
+  const crew = [
+    {name:"Chen W.",role:"CMDR",health:97,fatigue:0,morale:82,radiation:0,alive:true,status:"Nominal"},
+    {name:"Rodriguez M.",role:"ENGR",health:96,fatigue:0,morale:85,radiation:0,alive:true,status:"Nominal"},
+    {name:"Okafor A.",role:"SCI",health:98,fatigue:0,morale:78,radiation:0,alive:true,status:"Nominal"},
+    {name:"Johansson K.",role:"MED",health:95,fatigue:0,morale:88,radiation:0,alive:true,status:"Nominal"},
+  ];
+  state = {
+    sol: 0, alive: true, cause: null, archetype,
+    o2: crew.length * O2_PER_PERSON * 30,
+    h2o: crew.length * H2O_PER_PERSON * 30,
+    food: crew.length * FOOD_PER_PERSON * 30,
+    power: 500,
+    solar_eff: 1, isru_eff: 1, gh_eff: 1, heat_eff: 1,
+    cascade: "NOMINAL", cascade_counter: 0,
+    interior_temp: 293.15, morale: 0.85, radiation: 0,
+    crew, events: [], log: [],
+    alloc: {heat: 0.25, isru: 0.40, gh: 0.35, ration: 1.0},
+    comms: {delay: 0.5, blackout: false, sent: 0, delivered: 0, lost: 0, queue: []},
+  };
+}
+
+function solarIrradiance(sol) {
+  const solOfYear = sol % 669;
+  const orbitAngle = 2*Math.PI*(solOfYear-445)/MARS_YEAR_SOLS;
+  const orbital = 1 + 0.09*Math.cos(orbitAngle);
+  const sc = MARS_SOLAR_CONSTANT * orbital;
+  const ls = 2*Math.PI*solOfYear/MARS_YEAR_SOLS;
+  const decl = (MARS_AXIAL_TILT*Math.PI/180)*Math.sin(ls);
+  const sinElev = Math.sin(decl);  // equatorial noon simplified
+  const elevation = Math.max(0.3, Math.cos(ls)*0.5+0.5);
+  const dust = state.events.some(e=>e.type==='dust_storm') ? 0.25 : 1.0;
+  return sc * elevation * dust * 0.7;  // Atmospheric + geometry
+}
+
+function extTemp(sol) {
+  const solOfYear = sol % 669;
+  const season = 15*Math.cos(2*Math.PI*solOfYear/MARS_YEAR_SOLS);
+  const base = MARS_SURFACE_TEMP + season;
+  const storm = state.events.some(e=>e.type==='dust_storm') ? -10 : 0;
+  return base + storm;
+}
+
+function tickEvents(sol) {
+  // Age existing
+  state.events = state.events.filter(e => { e.remaining--; return e.remaining > 0; });
+  // Generate new
+  const newEvents = [];
+  const types = state.events.map(e=>e.type);
+  const probs = {dust_storm:0.12,dust_devil:0.15,solar_flare:0.04,meteorite:0.003,equipment_failure:0.02};
+  for (const [type,prob] of Object.entries(probs)) {
+    if (types.includes(type)) continue;
+    if (rng() < prob) {
+      const severity = 0.2 + rng()*0.8;
+      const dur = type==='dust_storm' ? Math.floor(5+rng()*25) : Math.floor(1+rng()*5);
+      const descs = {dust_storm:"Dust storm approaching",dust_devil:"Dust devil near habitat",solar_flare:"Solar particle event",meteorite:"Meteorite impact nearby",equipment_failure:"Equipment malfunction"};
+      const ev = {type, severity, remaining: dur, duration: dur, desc: descs[type]||type};
+      state.events.push(ev);
+      newEvents.push(ev);
+      // Apply damage
+      if (type==='meteorite'){state.solar_eff*=(1-0.15*severity);state.gh_eff*=(1-0.2*severity);state.o2-=5*severity}
+      if (type==='equipment_failure'){state.isru_eff*=(1-0.15*severity);state.power-=20*severity}
+      if (type==='solar_flare'){state.radiation+=50*severity}
+    }
+  }
+  return newEvents;
+}
+
+function governorDecide() {
+  const a = state.alloc;
+  const o2d = state.o2/(O2_PER_PERSON*state.crew.filter(c=>c.alive).length||1);
+  const h2od = state.h2o/(H2O_PER_PERSON*state.crew.filter(c=>c.alive).length||1);
+  const foodd = state.food/(FOOD_PER_PERSON*state.crew.filter(c=>c.alive).length||1);
+  // Crisis check
+  if (o2d<5||h2od<5){a.heat=0.15;a.isru=0.70;a.gh=0.15;a.ration=foodd<5?0.5:0.75;return}
+  if (foodd<10){a.heat=0.15;a.isru=0.30;a.gh=0.55;a.ration=0.75;return}
+  // Personality
+  const traits={engineer:{r:0.3,e:0.9,t:0.6,a:0.5},philosopher:{r:0.5,e:0.4,t:0.8,a:0.2},contrarian:{r:0.8,e:0.5,t:0.2,a:0.8},survivalist:{r:0.1,e:0.7,t:0.3,a:0.7},diplomat:{r:0.4,e:0.5,t:0.9,a:0.1},wildcard:{r:0.9,e:0.3,t:0.5,a:0.6},commander:{r:0.4,e:0.8,t:0.5,a:0.9},scientist:{r:0.6,e:0.6,t:0.7,a:0.3},merchant:{r:0.5,e:0.7,t:0.4,a:0.4},hermit:{r:0.2,e:0.8,t:0.1,a:0.3}};
+  const t = traits[state.archetype]||traits.engineer;
+  a.heat = 0.30-0.20*t.r;
+  a.isru = 0.30+0.15*(1-t.t)+0.10*t.a;
+  a.gh = 0.40+0.15*t.t-0.10*t.a;
+  // Innovation cycle
+  if (t.e<0.5){const phase=Math.sin(2*Math.PI*state.sol/20);a.isru+=0.1*phase;a.gh-=0.1*phase}
+  // Normalize
+  const tot=a.heat+a.isru+a.gh;a.heat/=tot;a.isru/=tot;a.gh/=tot;
+  a.ration = foodd<20?0.75+0.25*t.t:1.0;
+}
+
+function stepSim() {
+  if (!state.alive) return;
+  state.sol++;
+  const sol = state.sol;
+  const aliveCrew = state.crew.filter(c=>c.alive);
+  if (aliveCrew.length===0){state.alive=false;state.cause="all crew lost";return}
+
+  // Events
+  const newEv = tickEvents(sol);
+  // Environment
+  const irr = solarIrradiance(sol);
+  const ext = extTemp(sol);
+  // Governor
+  governorDecide();
+  const a = state.alloc;
+  // Production
+  const solarKwh = irr*PANEL_AREA*PANEL_EFF*MARS_SOL_HOURS/1000*state.solar_eff;
+  state.power += solarKwh;
+  if (state.power>POWER_CRIT*0.3){
+    const isruScale = Math.min(1.5, a.isru*2);
+    state.o2 += ISRU_O2*state.isru_eff*isruScale;
+    state.h2o += ISRU_H2O*state.isru_eff*isruScale;
+  }
+  if (state.power>POWER_CRIT*0.3 && state.h2o>5){
+    const ghScale = Math.min(1.5, a.gh*2);
+    state.food += GH_KCAL*state.gh_eff*ghScale;
+  }
+  // Consumption
+  const n = aliveCrew.length;
+  state.o2 = Math.max(0, state.o2 - n*O2_PER_PERSON);
+  state.h2o = Math.max(0, state.h2o - n*H2O_PER_PERSON);
+  state.food = Math.max(0, state.food - n*FOOD_PER_PERSON*a.ration);
+  state.power = Math.max(0, state.power - POWER_BASE);
+  // Heating (RTG + electrical)
+  const rtg = 40*state.heat_eff;
+  const needed = Math.max(0, (293.15-ext)*200/5/1000);  // Simplified
+  const elecHeat = Math.min(needed-rtg, state.power*a.heat*0.5);
+  state.power = Math.max(0, state.power - Math.max(0,elecHeat));
+  // Thermal
+  const netHeat = rtg+Math.max(0,elecHeat)+irr*200*0.1/1000 - needed;
+  const dt = Math.max(-20, Math.min(20, netHeat*MARS_SOL_HOURS*3600/(2000*1000)));
+  state.interior_temp = Math.max(100, Math.min(350, state.interior_temp+dt));
+  // Radiation
+  const flare = state.events.some(e=>e.type==='solar_flare');
+  state.radiation += 0.67*0.5 + (flare?50*0.4:0);
+  // Crew tick
+  for (const m of aliveCrew) {
+    m.radiation += 0.67*0.5;
+    if (state.food/(n*FOOD_PER_PERSON)<0.3){m.health-=3;m.morale-=5;m.status="STARVING"}
+    else if (state.h2o/(n*H2O_PER_PERSON)<0.3){m.health-=5;m.morale-=3;m.status="DEHYDRATED"}
+    else if (state.interior_temp<263){m.health-=4;m.morale-=3;m.status="HYPOTHERMIC"}
+    else{m.health=Math.min(100,m.health+0.5);m.status="Nominal"}
+    m.morale=Math.max(0,Math.min(100,m.morale));
+    if(m.health<=0){m.alive=false;m.status="DECEASED";m.cause=m.status}
+  }
+  state.morale = aliveCrew.reduce((s,m)=>s+m.morale,0)/Math.max(1,aliveCrew.length)/100;
+  // Cascade
+  if(state.o2<=0){state.alive=false;state.cause="O2 depletion"}
+  if(state.food<=0){state.alive=false;state.cause="starvation"}
+  if(state.power<=0&&state.cascade==="NOMINAL"){state.cascade="POWER CRITICAL";state.cascade_counter=0}
+  if(state.cascade!=="NOMINAL"&&state.power>POWER_CRIT){state.cascade="NOMINAL";state.cascade_counter=0}
+  // Comms
+  const synodic=760;const phase=2*Math.PI*sol/synodic;
+  state.comms.delay = Math.max(0.2, 0.9+0.6*Math.cos(phase));
+  state.comms.blackout = Math.abs(Math.sin(phase))<0.05;
+  // Log
+  const logLine = `Sol ${sol}: ${ext-273.15|0}°C, ${irr|0} W/m², ${aliveCrew.length} crew alive` + (newEv.length?` | ${newEv.map(e=>e.desc).join(', ')}`:'');
+  state.log.push(logLine);
+  if(!state.alive) state.log.push(`COLONY LOST: ${state.cause}`);
+  return newEv;
+}
+
+// ============================================================
+// UI UPDATE
+// ============================================================
+function updateUI(newEvents) {
+  if (!state) return;
+  const s = state;
+  const aliveCrew = s.crew.filter(c=>c.alive);
+  const n = Math.max(1, aliveCrew.length);
+
+  document.getElementById('sol-display').textContent = `Sol ${s.sol}`;
+  // Alert
+  const badge = document.getElementById('alert-badge');
+  const o2d = s.o2/(O2_PER_PERSON*n);
+  if (!s.alive){badge.className='alert alert-red';badge.textContent='BLACK'}
+  else if(s.cascade!=='NOMINAL'||o2d<5){badge.className='alert alert-red';badge.textContent='RED'}
+  else if(o2d<15){badge.className='alert alert-yellow';badge.textContent='YELLOW'}
+  else{badge.className='alert alert-green';badge.textContent='GREEN'}
+
+  // Environment
+  document.getElementById('ext-temp').textContent = (extTemp(s.sol)-273.15).toFixed(0);
+  document.getElementById('int-temp').textContent = (s.interior_temp-273.15).toFixed(0);
+  document.getElementById('solar-irr').textContent = solarIrradiance(s.sol).toFixed(0);
+  document.getElementById('morale').textContent = (s.morale*100).toFixed(0)+'%';
+  document.getElementById('radiation').textContent = s.radiation.toFixed(0);
+  document.getElementById('cascade').textContent = s.cascade;
+
+  // Resources
+  const caps = {o2:n*O2_PER_PERSON*60, h2o:n*H2O_PER_PERSON*60, food:n*FOOD_PER_PERSON*60, power:1000};
+  function setBar(id, val, cap, perDay, unit) {
+    const pct = Math.min(100, Math.max(0, val/cap*100));
+    const el = document.getElementById(id);
+    el.style.width = pct+'%';
+    el.style.background = pct>50?'var(--green)':pct>20?'var(--yellow)':'var(--red)';
+    document.getElementById(id+'-val').textContent = val>=1000?(val/1000).toFixed(1)+'k '+unit:val.toFixed(1)+' '+unit;
+    document.getElementById(id+'-days').textContent = perDay>0?(val/perDay).toFixed(0)+'d':'∞';
+  }
+  setBar('res-o2', s.o2, caps.o2, n*O2_PER_PERSON, 'kg');
+  setBar('res-h2o', s.h2o, caps.h2o, n*H2O_PER_PERSON, 'L');
+  setBar('res-food', s.food, caps.food, n*FOOD_PER_PERSON, 'kcal');
+  setBar('res-power', s.power, caps.power, POWER_BASE, 'kWh');
+
+  // Systems
+  function setSys(id, val) {
+    const pct = val*100;
+    document.getElementById(id).style.width = pct+'%';
+    document.getElementById(id).style.background = pct>70?'var(--green)':pct>30?'var(--yellow)':'var(--red)';
+    document.getElementById(id+'-pct').textContent = pct.toFixed(0)+'%';
+  }
+  setSys('sys-solar', s.solar_eff);
+  setSys('sys-isru', s.isru_eff);
+  setSys('sys-gh', s.gh_eff);
+  setSys('sys-heat', s.heat_eff);
+
+  // Allocation
+  document.getElementById('alloc-heat').style.width = (s.alloc.heat*100)+'%';
+  document.getElementById('alloc-heat-pct').textContent = (s.alloc.heat*100).toFixed(0)+'%';
+  document.getElementById('alloc-isru').style.width = (s.alloc.isru*100)+'%';
+  document.getElementById('alloc-isru-pct').textContent = (s.alloc.isru*100).toFixed(0)+'%';
+  document.getElementById('alloc-gh').style.width = (s.alloc.gh*100)+'%';
+  document.getElementById('alloc-gh-pct').textContent = (s.alloc.gh*100).toFixed(0)+'%';
+  document.getElementById('ration-pct').textContent = (s.alloc.ration*100).toFixed(0)+'%';
+  document.getElementById('gov-type').textContent = s.archetype;
+
+  // Crew
+  const crewDiv = document.getElementById('crew-list');
+  crewDiv.innerHTML = s.crew.map(m => {
+    const color = !m.alive?'var(--red)':m.health>70?'var(--green)':m.health>30?'var(--yellow)':'var(--red)';
+    return `<div class="crew-row"><span class="crew-name">${m.name}</span><span class="crew-role">${m.role}</span><span class="crew-hp" style="color:${color}">${m.alive?m.health.toFixed(0):'--'}</span><span class="crew-status" style="color:${!m.alive?'var(--red)':'var(--dim)'}">${m.status}</span></div>`;
+  }).join('');
+
+  // Events
+  if (newEvents && newEvents.length) {
+    const feed = document.getElementById('event-feed');
+    for (const e of newEvents) {
+      feed.innerHTML = `<div class="event-item"><span class="event-tag tag-new">NEW</span> ${e.desc} (sev: ${e.severity.toFixed(1)}, ${e.duration} sols)</div>` + feed.innerHTML;
+    }
+  }
+
+  // Comms
+  document.getElementById('comms-delay').textContent = s.comms.delay.toFixed(1);
+  document.getElementById('comms-queue').textContent = s.comms.queue.length;
+  const cs = document.getElementById('comms-status');
+  if(s.comms.blackout){cs.textContent='BLACKOUT';cs.style.color='var(--red)'}
+  else{cs.textContent='Link nominal';cs.style.color='var(--green)'}
+
+  // Log (last 50 lines)
+  const logDiv = document.getElementById('mission-log');
+  logDiv.innerHTML = s.log.slice(-50).map(l => {
+    if(l.includes('COLONY LOST'))return`<div class="death-line">${l}</div>`;
+    if(l.includes('|'))return`<div class="event-line">${l}</div>`;
+    return`<div class="sol-line">${l}</div>`;
+  }).join('');
+  logDiv.scrollTop = logDiv.scrollHeight;
+
+  // Game over
+  if (!s.alive) {
+    stopRun();
+    document.getElementById('btn-run').textContent = 'COLONY LOST';
+    document.getElementById('btn-run').disabled = true;
+  }
+}
+
+// ============================================================
+// CONTROLS
+// ============================================================
+function toggleRun() {
+  if (running) { stopRun(); return; }
+  if (!state) resetSim();
+  running = true;
+  document.getElementById('btn-run').textContent = '⏸ Pause';
+  const speed = parseFloat(document.getElementById('speed').value) || 2;
+  interval = setInterval(() => {
+    const ev = stepSim();
+    updateUI(ev);
+  }, 1000/speed);
+}
+function stopRun() {
+  running = false;
+  if(interval){clearInterval(interval);interval=null}
+  document.getElementById('btn-run').textContent = '▶ Resume';
+}
+function stepOnce() {
+  if (!state) resetSim();
+  const ev = stepSim();
+  updateUI(ev);
+}
+function resetSim() {
+  stopRun();
+  const seed = parseInt(document.getElementById('seed').value)||42;
+  const arch = document.getElementById('gov-select').value;
+  initState(seed, arch);
+  document.getElementById('event-feed').innerHTML = '<div class="event-item" style="color:var(--dim)">Colony initialized. Awaiting first sol...</div>';
+  document.getElementById('btn-run').textContent = '▶ Start';
+  document.getElementById('btn-run').disabled = false;
+  updateUI([]);
+}
+
+// ============================================================
+// IMPORT / EXPORT (local-first)
+// ============================================================
+function exportState() {
+  if (!state) return;
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `mars-barn-sol-${state.sol}-${state.archetype}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function importState(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (imported.sol !== undefined && imported.crew) {
+        state = imported;
+        rng = mulberry32(imported.sol);  // Re-seed from current sol
+        updateUI([]);
+        state.log.push(`--- State imported at sol ${state.sol} ---`);
+        document.getElementById('btn-run').textContent = '▶ Resume';
+        document.getElementById('btn-run').disabled = !state.alive;
+      } else {
+        alert('Invalid save file');
+      }
+    } catch(err) { alert('Failed to parse save file: ' + err.message); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// Init
+resetSim();
+</script>
+</body>
+</html>
