@@ -159,12 +159,18 @@ padding:8px;margin:4px 0;cursor:pointer;transition:all 0.2s}
   <div id="crew-roster">Awaiting telemetry...</div>
   <h3>Event Feed</h3>
   <div id="event-feed"></div>
+  <h3>Crew Dialogue</h3>
+  <div id="crew-convo" style="max-height:100px;overflow-y:auto;font-size:10px;padding:4px;background:rgba(0,0,0,0.3);border-radius:4px;line-height:1.6;color:var(--text)"></div>
+  <h3>Discoveries</h3>
+  <div id="discoveries" style="font-size:10px;color:var(--dim)">No surveys yet</div>
+  <h3>Economy</h3>
+  <div id="economy-display" style="font-size:11px"><span style="color:var(--cyan)">10,000</span> <span style="color:var(--dim)">RAPPcoin</span></div>
   <h3>Crew Journal</h3>
-  <div id="crew-journal" style="max-height:180px;overflow-y:auto;font-size:10px;line-height:1.5;color:var(--text);font-style:italic;padding:4px;background:rgba(0,0,0,0.3);border-radius:4px">Awaiting first sol...</div>
+  <div id="crew-journal" style="max-height:100px;overflow-y:auto;font-size:10px;line-height:1.5;color:var(--text);font-style:italic;padding:4px;background:rgba(0,0,0,0.3);border-radius:4px">Awaiting first sol...</div>
   <h3>Colony DNA</h3>
   <div id="colony-dna" style="overflow-x:auto"></div>
   <h3>Mission Log</h3>
-  <div id="mini-log" style="max-height:150px;overflow-y:auto;font-size:10px;color:var(--dim)"></div>
+  <div id="mini-log" style="max-height:120px;overflow-y:auto;font-size:10px;color:var(--dim)"></div>
 </div>
 
 <script>
@@ -252,6 +258,7 @@ let state={sol:0,alive:true,cause:null,arch:'engineer',
     {name:'Johansson K.',role:'MED',hp:95,fat:0,mor:88,rad:0,alive:true,st:'Nominal'}
   ],
   events:[],log:[],modules:[],building:null,research:[],researching:null,
+    discoveries:[],economy:10000,conversations:[],postMortem:null,
   alloc:{h:.25,i:.4,g:.35,r:1},lat:18.38,lng:77.58
 };
 
@@ -1069,6 +1076,40 @@ function stepSim(){
 
   // Supply chain
   tickSupplyChain(s);
+  // Geology — rover discoveries
+  if(R()<0.03*Math.max(1,state.modules.filter(m=>m.type==='repair_bay').length+1)){
+    const dtypes=[{t:'ice_deposit',n:'Frost Vein',b:'H2O +2/sol'},{t:'mineral_deposit',n:'Iron Seam',b:'Build -15%'},
+      {t:'cave_entrance',n:'Lava Tube',b:'Rad -50%'},{t:'ancient_riverbed',n:'Paleolake',b:'Food +20%'},
+      {t:'geothermal_vent',n:'Thermal Vent',b:'Power +5/sol'}];
+    const d=dtypes[Math.floor(R()*dtypes.length)];
+    if(!state.discoveries.some(x=>x.type===d.t)){
+      state.discoveries.push({type:d.t,name:d.n,sol:s});
+      state.log.push(`  🔭 DISCOVERY: ${d.n} — ${d.b}`);
+    }
+  }
+  // Economy — RAPPcoin
+  const eIncome=100+state.research.length*25+state.modules.length*10;
+  const eExpense=ac.length*30+state.modules.length*15;
+  state.economy+=eIncome-eExpense;
+  if(state.economy<0)state.log.push(`  💰 BUDGET DEFICIT: ${state.economy.toFixed(0)} RC`);
+  // Conversation — crew dialogue
+  if(ac.length>=2&&R()<0.4){
+    const a2=ac[Math.floor(R()*ac.length)],b2=ac[Math.floor(R()*ac.length)];
+    if(a2.name!==b2.name){
+      const an=a2.name.split(' ')[0],bn=b2.name.split(' ')[0];
+      const topics=state.morale>0.6?
+        [`${an}: "How are the systems looking?" ${bn}: "Nominal. For once."`,
+         `${an}: "Miss anything from Earth?" ${bn}: "Traffic. Never thought I'd say that."`,
+         `${an}: "Dinner experiment tonight." ${bn}: "As long as it's not regolith."`,
+         `${an}: "The sunset was different today." ${bn}: "Dust scattering. Beautiful though."`]:
+        [`${an}: "We need to talk about resources." ${bn}: "I know. The numbers aren't good."`,
+         `${an}: "Did you sleep?" ${bn}: "Define sleep." ${an}: "That's what I thought."`,
+         `${an}: "Everyone's on edge." ${bn}: "Three bad sols will do that."`,
+         `${an}: "If this doesn't work out..." ${bn}: "Stop. Focus. We're getting through this."`];
+      state.conversations.push(topics[Math.floor(R()*topics.length)]);
+      if(state.conversations.length>20)state.conversations.shift();
+    }
+  }
   // Auto-research (tier 1 → 2 → 3)
   let researchEvent=null;
   const RTREE={improved_solar:{name:'Improved Solar',sols:12,tier:1,cost_pwr:100,eff:'solar+15%'},
@@ -1128,7 +1169,21 @@ function stepSim(){
   crewEvents.forEach(ce=>state.log.push(`  💀 ${ce.name} (${ce.type==='crew_death'?'DECEASED':'CRITICAL'})`));
   if(buildEvent)state.log.push(`  🔨 ${buildEvent.module.replace(/_/g,' ')} ${buildEvent.type==='construction_complete'?'COMPLETED':'started'}`);
   if(researchEvent)state.log.push(`  🔬 ${researchEvent.name} ${researchEvent.type==='research_complete'?'BREAKTHROUGH':'started'}`);
-  if(!state.alive)state.log.push(`☠ COLONY LOST: ${state.cause}`);
+  if(!state.alive){
+    state.log.push(`☠ COLONY LOST: ${state.cause}`);
+    // Generate post-mortem
+    const critSol=Math.max(1,state.sol-15);
+    const mistakes=[];const recs=[];
+    if(state.cause==='O2 depletion'){mistakes.push('Insufficient ISRU allocation');recs.push('Shift to 70%+ ISRU when O2 < 10 days')}
+    else if(state.cause==='starvation'){mistakes.push('Food production never matched consumption');recs.push('Build greenhouse dome earlier')}
+    else{mistakes.push('Power reserves depleted');recs.push('Build solar farms, maintain 100 kWh reserve')}
+    if(state.discoveries.length===0)recs.push('Deploy more rovers for geological surveys — discoveries provide permanent bonuses');
+    if(state.research.length<2)recs.push('Prioritize research — each tech permanently improves survival odds');
+    state.postMortem={critSol,mistakes,recs};
+    state.log.push(`📋 POST-MORTEM: Point of no return was Sol ${critSol}`);
+    mistakes.forEach(m=>state.log.push(`  ❌ ${m}`));
+    recs.forEach(r=>state.log.push(`  ✅ ${r}`));
+  }
 
   updateAllUI();
   applyEchoVisuals(echo);
@@ -1280,6 +1335,25 @@ function updateAllUI(){
     `<div>${l}</div>`
   ).join('');
   document.getElementById('mini-log').scrollTop=9999;
+  // Conversations
+  const convoEl=document.getElementById('crew-convo');
+  if(convoEl&&s.conversations.length){
+    convoEl.innerHTML=s.conversations.slice(-3).map(c=>
+      `<div style="padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.03)">${c}</div>`).join('');
+  }
+  // Discoveries
+  const discEl=document.getElementById('discoveries');
+  if(discEl){
+    discEl.innerHTML=s.discoveries.length?
+      s.discoveries.map(d=>`<div style="color:var(--green)">🔭 ${d.name} <span style="color:var(--dim)">(Sol ${d.sol})</span></div>`).join('')
+      :'<div style="color:var(--dim)">Rovers surveying...</div>';
+  }
+  // Economy
+  const econEl=document.getElementById('economy-display');
+  if(econEl){
+    const color=s.economy>0?'var(--cyan)':'var(--red)';
+    econEl.innerHTML=`<span style="color:${color}">${s.economy.toFixed(0)}</span> <span style="color:var(--dim)">RAPPcoin</span>`;
+  }
   // Journal
   if(s.sol>0){
     const jEl=document.getElementById('crew-journal');
@@ -1344,7 +1418,8 @@ function resetState(){
       {name:'Rodriguez M.',role:'ENGR',hp:96,fat:0,mor:85,rad:0,alive:true,st:'Nominal'},
       {name:'Okafor A.',role:'SCI',hp:98,fat:0,mor:78,rad:0,alive:true,st:'Nominal'},
       {name:'Johansson K.',role:'MED',hp:95,fat:0,mor:88,rad:0,alive:true,st:'Nominal'}],
-    events:[],log:[],modules:[],building:null,research:[],researching:null,alloc:{h:.25,i:.4,g:.35,r:1},lat:18.38,lng:77.58};
+    events:[],log:[],modules:[],building:null,research:[],researching:null,
+    discoveries:[],economy:10000,conversations:[],postMortem:null,alloc:{h:.25,i:.4,g:.35,r:1},lat:18.38,lng:77.58};
   document.getElementById('sim-btn').textContent='▶ START SIM';
   updateAllUI();
 }
