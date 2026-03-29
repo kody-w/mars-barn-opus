@@ -26,6 +26,7 @@ from mars import (
 from world import World, create_world, run_world
 from report import generate_report
 from scoring import score_run, build_leaderboard, display_leaderboard
+from mission_control import run_mission_control
 
 
 def run_single(sols: int = DEFAULT_SOLS, seed: int = DEFAULT_SEED,
@@ -507,12 +508,23 @@ def main() -> None:
                         help="Run benchmark with composite scoring and leaderboard")
     parser.add_argument("--play", action="store_true",
                         help="Interactive survival mode — you are the governor")
+    parser.add_argument("--mission-control", action="store_true",
+                        help="Mission Control digital twin — observe autonomous colony")
+    parser.add_argument("--speed", type=float, default=1.0,
+                        help="Simulation speed for mission control (sols/sec, 0=instant)")
+    parser.add_argument("--twin-path", type=str, default="/tmp/mars-twin-state.json",
+                        help="Path for digital twin state file")
 
     args = parser.parse_args()
 
     start = time.time()
 
-    if args.play:
+    if args.mission_control:
+        run_mission_control(seed=args.seed, max_sols=args.sols,
+                           archetype=args.archetype, speed=args.speed,
+                           twin_path=args.twin_path)
+        return
+    elif args.play:
         run_interactive(args.seed)
         return
     elif args.leaderboard:
