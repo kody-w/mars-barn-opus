@@ -28,6 +28,7 @@ from report import generate_report
 from scoring import score_run, build_leaderboard, display_leaderboard
 from mission_control import run_mission_control
 from evolution import evolve, display_evolution_results
+from lispy import LispyVM, CONTROL_PROGRAMS
 
 
 def run_single(sols: int = DEFAULT_SOLS, seed: int = DEFAULT_SEED,
@@ -245,6 +246,116 @@ def display_benchmark(result: Dict) -> None:
 # =============================================================================
 # CLI
 # =============================================================================
+
+def run_lispy_colony(program_name: str, sols: int = DEFAULT_SOLS,
+                     seed: int = DEFAULT_SEED) -> Dict:
+    """Run a colony with a LisPy program as the governor."""
+    # Load program
+    if program_name in CONTROL_PROGRAMS:
+        program = CONTROL_PROGRAMS[program_name]
+    else:
+        try:
+            with open(program_name) as f:
+                program = f.read()
+        except FileNotFoundError:
+            print(f"  Error: '{program_name}' not found (not a built-in or file)")
+            print(f"  Built-in programs: {', '.join(CONTROL_PROGRAMS.keys())}")
+            return {"mode": "single", "survived_sols": 0, "alive": False,
+                    "cause_of_death": "program not found", "final_state": {},
+                    "archetype": "lispy", "seed": seed, "event_log": []}
+
+    terrain = generate_terrain(size=32, seed=seed)
+    colony = create_colony("LisPy Colony", location_x=16, location_y=16)
+    vm = LispyVM()
+    events_engine = EventEngine()
+    events_engine.set_seed(seed)
+
+    print(f"\n  Running colony with LisPy governor: {program_name}")
+    print(f"  Program: {len(program.strip().splitlines())} lines")
+
+    for sol in range(sols):
+        if not colony.alive:
+            break
+
+        new_events = events_engine.tick(sol + 1)
+        agg = events_engine.aggregate_effects()
+
+        sol_of_year = (sol + 1) % 669
+        dust_factor = agg.get("dust_factor", 1.0)
+        solar_mult = agg.get("solar_multiplier", 1.0)
+
+        irradiance = daily_mean_irradiance(0.0, sol_of_year, dust_factor) * solar_mult
+        atm = atmosphere_at(0.0, 0.0, sol_of_year, dust_factor=dust_factor)
+        ext_temp = atm.temperature_k
+        rad = radiation_dose(sol_count=1, in_habitat=True,
+            solar_flare=any(e.event_type == "solar_flare"
+                           for e in events_engine.active_events))
+
+        # Load colony state into VM
+        r = colony.resources
+        crew_count = r.crew_size
+        vm.load_colony_state({
+            "sol": colony.sol,
+            "o2_days": r.days_of("o2"),
+            "h2o_days": r.days_of("h2o"),
+            "food_days": r.days_of("food"),
+            "power_kwh": r.power_kwh,
+            "o2_kg": r.o2_kg,
+            "h2o_liters": r.h2o_liters,
+            "food_kcal": r.food_kcal,
+            "interior_temp_k": colony.interior_temp_k,
+            "exterior_temp_k": ext_temp,
+            "irradiance": irradiance,
+            "crew_count": crew_count,
+            "morale": colony.morale,
+            "cascade": colony.cascade_state.value,
+            "events_active": len(events_engine.active_events),
+        })
+
+        # Set default allocations
+        vm.set_env("heating_alloc", 0.25)
+        vm.set_env("isru_alloc", 0.40)
+        vm.set_env("greenhouse_alloc", 0.35)
+        vm.set_env("food_ration", 1.0)
+
+        # Run LisPy program to set allocations
+        try:
+            vm.run_program(program)
+        except Exception as e:
+            print(f"  LisPy error at sol {sol + 1}: {e}")
+
+        # Get allocation from VM
+        alloc_data = vm.get_allocation()
+        total = alloc_data["heating"] + alloc_data["isru"] + alloc_data["greenhouse"]
+        if total > 0:
+            allocation = Allocation(
+                heating_fraction=alloc_data["heating"] / total,
+                isru_fraction=alloc_data["isru"] / total,
+                greenhouse_fraction=alloc_data["greenhouse"] / total,
+                food_ration=max(0.3, min(1.0, alloc_data["ration"])),
+            )
+        else:
+            allocation = Allocation()
+
+        step(colony, irradiance, ext_temp, allocation,
+             active_events=events_engine.active_event_dicts(),
+             radiation_msv=rad)
+
+        # Print VM output if any
+        for line in vm.output:
+            print(f"  [LisPy sol {colony.sol}] {line}")
+
+    return {
+        "mode": "single",
+        "archetype": f"lispy:{program_name}",
+        "seed": seed,
+        "survived_sols": colony.sol,
+        "alive": colony.alive,
+        "cause_of_death": colony.cause_of_death,
+        "final_state": serialize(colony),
+        "event_log": events_engine.event_log,
+    }
+
 
 def _resource_bar(label: str, current: float, max_val: float,
                   width: int = 20) -> str:
@@ -517,12 +628,33 @@ def main() -> None:
                         help="Path for digital twin state file")
     parser.add_argument("--evolve", action="store_true",
                         help="Run genetic algorithm to evolve optimal governor")
+    parser.add_argument("--lispy", type=str, default=None,
+                        help="Run colony with LisPy governor program (built-in name or file path)")
+    parser.add_argument("--lispy-list", action="store_true",
+                        help="List available built-in LisPy control programs")
 
     args = parser.parse_args()
 
     start = time.time()
 
-    if args.evolve:
+    if args.lispy_list:
+        print("\n  Available LisPy control programs:")
+        for name, code in CONTROL_PROGRAMS.items():
+            lines = [l.strip() for l in code.strip().split('\n') if l.strip()]
+            print(f"    {name:20} ({len(lines)} lines)")
+        print(f"\n  Usage: python src/sim.py --lispy basic_governor")
+        print(f"  Or:    python src/sim.py --lispy my_program.lisp")
+        return
+    elif args.lispy:
+        result = run_lispy_colony(args.lispy, args.sols, args.seed)
+        if not args.json:
+            display_single(result)
+        if args.json:
+            print(json.dumps(result, indent=2))
+        elapsed = time.time() - start
+        print(f"  Elapsed: {elapsed:.2f}s")
+        return
+    elif args.evolve:
         print("\n  Running governor evolution...")
         population = evolve(population_size=30, generations=15,
                            max_sols=200, verbose=True)
