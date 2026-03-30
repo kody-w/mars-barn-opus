@@ -1,6 +1,8 @@
-# Mars Barn Opus
+# First Principles to Mars
 
-**An Oregon Trail for Mars. Hyper-realistic colony survival simulation where AI keeps humans alive — or doesn't. Pick a mission. Watch your colony. Learn from the post-mortem. Try again.**
+*Formerly Mars Barn Opus — the 1vsM Protocol*
+
+**An Oregon Trail for Mars. Hyper-realistic colony survival simulation where AI keeps humans (and robots) alive — or doesn't. Pick a mission. Watch your colony. Learn from the post-mortem. Write a better AI. Try again.**
 
 **For classrooms, robotics clubs, and anyone who wants to go to Mars.**
 

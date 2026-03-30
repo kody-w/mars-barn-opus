@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Mars Barn Opus — Mission Control</title>
+<title>First Principles to Mars — Mission Control</title>
 <style>
 :root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#484f58;
 --blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--purple:#a371f7;
@@ -65,10 +65,58 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 </div>
 
 <div class="header">
-  <h1>MARS BARN — MISSION CONTROL</h1>
+  <h1>FIRST PRINCIPLES TO MARS</h1>
   <div>
     <span id="sol-display" style="color:var(--white);font-weight:700">Sol 0</span>
     <span id="alert-badge" class="alert alert-green">GREEN</span>
+  </div>
+</div>
+
+<!-- Mission Selector (shown before sim starts) -->
+<div id="mission-select" class="grid" style="max-width:1200px;margin:0 auto;padding:16px">
+  <div class="card full" style="text-align:center;padding:24px">
+    <h2 style="color:var(--white);font-size:20px;margin-bottom:4px">Choose Your Mission</h2>
+    <p style="color:var(--dim);font-size:13px;margin-bottom:16px">An Oregon Trail for Mars. Pick your crew. Pick your strategy. Survive.</p>
+  </div>
+  <div class="card" style="cursor:pointer;border-left:3px solid var(--blue)" onclick="selectMission('optimus')">
+    <h2 style="color:var(--blue)">Optimus Pathfinder</h2>
+    <p style="font-size:12px">4 Tesla bots. No humans. Pure robot autonomy. Build the first base.</p>
+    <p style="font-size:11px;color:var(--dim);margin-top:4px">Difficulty: Medium | Crew: Robot</p>
+  </div>
+  <div class="card" style="cursor:pointer;border-left:3px solid var(--green)" onclick="selectMission('ares')">
+    <h2 style="color:var(--green)">Ares I: First Landing</h2>
+    <p style="font-size:12px">4 humans, 30 sols of reserves. The classic Mars mission.</p>
+    <p style="font-size:11px;color:var(--dim);margin-top:4px">Difficulty: Medium | Crew: Human</p>
+  </div>
+  <div class="card" style="cursor:pointer;border-left:3px solid var(--yellow)" onclick="selectMission('skeleton')">
+    <h2 style="color:var(--yellow)">Skeleton Crew</h2>
+    <p style="font-size:12px">2 humans, minimal supplies. Every gram counts.</p>
+    <p style="font-size:11px;color:var(--dim);margin-top:4px">Difficulty: Hard | Crew: Human</p>
+  </div>
+  <div class="card" style="cursor:pointer;border-left:3px solid var(--green)" onclick="selectMission('garden')">
+    <h2 style="color:var(--green)">Garden of Mars</h2>
+    <p style="font-size:12px">6 crew, double reserves. Easy mode — but can you sustain it?</p>
+    <p style="font-size:11px;color:var(--dim);margin-top:4px">Difficulty: Easy | Crew: Human</p>
+  </div>
+  <div class="card" style="cursor:pointer;border-left:3px solid var(--red)" onclick="selectMission('dustbowl')">
+    <h2 style="color:var(--red)">Dust Bowl</h2>
+    <p style="font-size:12px">Land during peak dust season. Solar panels are a luxury.</p>
+    <p style="font-size:11px;color:var(--dim);margin-top:4px">Difficulty: Extreme | Crew: Human</p>
+  </div>
+  <div class="card" style="cursor:pointer;border-left:3px solid var(--red)" onclick="selectMission('noisru')">
+    <h2 style="color:var(--red)">ISRU Down</h2>
+    <p style="font-size:12px">ISRU failed on landing. No local O2/H2O. Live on reserves.</p>
+    <p style="font-size:11px;color:var(--dim);margin-top:4px">Difficulty: Extreme | Crew: Human</p>
+  </div>
+  <div class="card" style="cursor:pointer;border-left:3px solid var(--purple)" onclick="selectMission('hybrid')">
+    <h2 style="color:var(--purple)">Hybrid Colony</h2>
+    <p style="font-size:12px">2 humans + 4 robots. The future of Mars colonization.</p>
+    <p style="font-size:11px;color:var(--dim);margin-top:4px">Difficulty: Medium | Crew: Mixed</p>
+  </div>
+  <div class="card" style="cursor:pointer;border-left:3px solid var(--cyan)" onclick="selectMission('lunar')">
+    <h2 style="color:var(--cyan)">Lunar Testbed</h2>
+    <p style="font-size:12px">2 bots on the Moon. 14-day night. Prove it before Mars.</p>
+    <p style="font-size:11px;color:var(--dim);margin-top:4px">Difficulty: Hard | Crew: Robot</p>
   </div>
 </div>
 
@@ -547,7 +595,47 @@ function importState(event) {
   event.target.value = '';
 }
 
-// Init
+// ============================================================
+// MISSION SELECTION
+// ============================================================
+const MISSION_CONFIGS = {
+  optimus: {arch:'engineer',crew:4,o2:0,h2o:200,food:0,power:800,name:'Optimus Pathfinder'},
+  ares: {arch:'engineer',crew:4,o2:100.8,h2o:300,food:300000,power:500,name:'Ares I'},
+  skeleton: {arch:'survivalist',crew:2,o2:25,h2o:75,food:75000,power:300,name:'Skeleton Crew'},
+  garden: {arch:'diplomat',crew:6,o2:300,h2o:900,food:900000,power:1000,name:'Garden of Mars'},
+  dustbowl: {arch:'commander',crew:4,o2:80,h2o:200,food:200000,power:300,name:'Dust Bowl'},
+  noisru: {arch:'scientist',crew:4,o2:200,h2o:500,food:400000,power:500,name:'ISRU Down'},
+  hybrid: {arch:'scientist',crew:6,o2:50,h2o:200,food:150000,power:800,name:'Hybrid Colony'},
+  lunar: {arch:'survivalist',crew:2,o2:0,h2o:50,food:0,power:400,name:'Lunar Testbed'},
+};
+
+function selectMission(key) {
+  const m = MISSION_CONFIGS[key];
+  if (!m) return;
+  // Hide mission selector
+  document.getElementById('mission-select').style.display = 'none';
+  // Configure sim
+  document.getElementById('gov-select').value = m.arch;
+  stopRun();
+  const seed = parseInt(document.getElementById('seed').value)||42;
+  initState(seed, m.arch);
+  // Override starting resources
+  state.o2 = m.o2;
+  state.h2o = m.h2o;
+  state.food = m.food;
+  state.power = m.power;
+  // Adjust crew size
+  while (state.crew.length > m.crew) state.crew.pop();
+  if (m.crew > 4) {
+    const extras = [{name:'Kim J.',role:'SCI',hp:96,fat:0,mor:80,rad:0,alive:true,st:'Nominal'},
+                    {name:'Volkov D.',role:'ENGR',hp:97,fat:0,mor:82,rad:0,alive:true,st:'Nominal'}];
+    for (let i = 4; i < m.crew && i-4 < extras.length; i++) state.crew.push(extras[i-4]);
+  }
+  document.getElementById('btn-run').textContent = '▶ Start ' + m.name;
+  updateUI([]);
+}
+
+// Init — show mission selector, don't auto-start
 resetSim();
 </script>
 </body>
