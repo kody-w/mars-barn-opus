@@ -1364,13 +1364,6 @@ function generateTask(){
     }
   }
 }
-      state.log.push(`  📋 TASK: ${task.title} — awaiting mission control`);
-      updateTaskBadge();
-      if(!activeTask)showNextTask();
-      return;
-    }
-  }
-}
 
 function showNextTask(){
   if(!taskQueue.length){
