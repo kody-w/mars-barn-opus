@@ -255,6 +255,36 @@ The core game loop is: Choose mission → Real Mars seeds start → AI runs colo
 
 This is the law. The game loop does not change. Features are added within it, not around it.
 
+### Amendment II — The Digital Twin Mandate
+
+**The ambition: the closest possible digital twin of Mars.**
+
+This is not a game that approximates Mars. This is a simulation that IS Mars, as close as software can get, with a game wrapped around it. Every system models the real thing:
+
+**Echo frames are the heartbeat.** Every sol produces an echo frame — a delta of what changed. The output of frame N is the input to frame N+1. Tasks, hazards, and emergencies emerge from echo data, not from random number generators in isolation. The echo IS the colony's nervous system.
+
+**Risk is cumulative and statistical.** The Colony Risk Index (CRI) is a VIX for Mars — computed by LisPy every sol from 10 real colony variables. Higher CRI means higher probability of secondary failures. Risk compounds through decisions. Mars doesn't forget.
+
+**Probabilities are sourced from reality:**
+- Micrometeorite strike rate: NASA/JPL Mars surface flux models
+- Solar panel degradation: InSight/Opportunity dust accumulation data
+- Thermal cycling fatigue: ΔT = 80-90°C daily at Jezero Crater
+- Perchlorate corrosion rates: Phoenix lander soil chemistry
+- ISRU catalyst degradation: MOXIE experiment performance curves
+- Radiation dosimetry: MSL/RAD instrument measurements (0.67 mSv/sol GCR)
+- Airlock seal wear: ISS EVA cycling data adapted for Mars dust abrasion
+- Robot tip-over angle: Mars gravity (3.72 m/s²) on regolith bearing capacity
+- Resupply failure rate: historical Mars mission success statistics
+- Light delay: actual Earth-Mars distance at current orbital position
+
+**Manual overrides are training.** When a robot can't unscrew a bolt, the player guides it through the procedure with light delay. The correct sequence is the real procedure. The wrong sequence causes real damage. The skill learned in the sim IS the skill needed on Mars. This is not a minigame — it is remote operations training.
+
+**Ambient hazards happen regardless of decisions.** Micrometeorites, regolith infiltration, solar particle events, equipment fatigue, solar conjunction blackouts — these fire every sol based on CRI-weighted probability. Mars doesn't wait for you to make a mistake. Sometimes it just hits you.
+
+**The post-mortem traces causality.** When the colony dies, the death screen traces the causal chain: which decisions, which secondary consequences, which ambient hazards, which echo frames led to failure. Every death is a lesson. Every lesson makes you better at keeping a colony alive.
+
+**This is the ambition. This does not change.**
+
 ---
 
 *Ratified by one mind, in one session, on sol zero of the competition.*

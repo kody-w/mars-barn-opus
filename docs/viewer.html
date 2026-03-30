@@ -792,8 +792,10 @@ const ROBOT_PLEAS = [
 const TASK_TEMPLATES = [
   // ── RESOURCE CRISES ──
   // O₂ low — reroute power to ISRU or let food production continue
-  {trigger: s=>{ const n=Math.max(1,s.crew.filter(c=>c.alive).length);
-    return s.o2/(O2_PP*n)<8 && s.o2/(O2_PP*n)>2 && R()<0.3},
+  // ── O₂ REROUTE — triggered by echo showing O₂ dropping ──
+  {trigger: (s,echo)=>{ const n=Math.max(1,s.crew.filter(c=>c.alive).length);
+    const dropping=echo&&echo.delta&&echo.delta.o2<-0.5;
+    return s.o2/(O2_PP*n)<8 && s.o2/(O2_PP*n)>2 && (dropping||R()<0.1)},
    gen: s=>{ const n=Math.max(1,s.crew.filter(c=>c.alive).length); const d=(s.o2/(O2_PP*n)).toFixed(1);
     const fd=(s.food/(FOOD_PP*n)).toFixed(0);
     return {id:'o2_reroute',urgency:'urgent',from:s.crew.find(c=>c.role==='ENGR'&&c.alive)||s.crew[0],
@@ -815,8 +817,10 @@ const TASK_TEMPLATES = [
       timeout:15, defaultChoice:'approve'}}},
 
   // Water crisis — sacrifice greenhouse or dehydrate
-  {trigger: s=>{ const n=Math.max(1,s.crew.filter(c=>c.alive).length);
-    return s.h2o/(H2O_PP*n)<6 && s.h2o/(H2O_PP*n)>1 && R()<0.25},
+  // ── WATER CRISIS — triggered by echo showing H₂O dropping ──
+  {trigger: (s,echo)=>{ const n=Math.max(1,s.crew.filter(c=>c.alive).length);
+    const dropping=echo&&echo.delta&&echo.delta.h2o<-1;
+    return s.h2o/(H2O_PP*n)<6 && s.h2o/(H2O_PP*n)>1 && (dropping||R()<0.08)},
    gen: s=>{ const n=Math.max(1,s.crew.filter(c=>c.alive).length);
     const wd=(s.h2o/(H2O_PP*n)).toFixed(1);
     return {id:'h2o_crisis',urgency:'urgent',from:s.crew.find(c=>c.role==='SCI'&&c.alive)||s.crew[0],
@@ -835,7 +839,10 @@ const TASK_TEMPLATES = [
       timeout:12, defaultChoice:'approve'}}},
 
   // ── CREW MEDICAL — the hardest decisions ──
-  {trigger: s=>s.crew.some(c=>c.alive&&c.hp<50&&c.hp>10) && R()<0.4,
+  // ── MEDICAL — triggered by echo showing crew health event ──
+  {trigger: (s,echo)=>{
+    const hasCrewEvent=echo&&echo.crew_events&&echo.crew_events.some(e=>e.type==='crew_critical');
+    return (s.crew.some(c=>c.alive&&c.hp<50&&c.hp>10) && (hasCrewEvent||R()<0.15))},
    gen: s=>{const sick=s.crew.find(c=>c.alive&&c.hp<50);const medic=s.crew.find(c=>c.role==='MED'&&c.alive);
     const n=Math.max(1,s.crew.filter(c=>c.alive).length);
     const isLastEngineer=sick.role==='ENGR'&&s.crew.filter(c=>c.alive&&c.role==='ENGR').length===1;
@@ -857,7 +864,10 @@ const TASK_TEMPLATES = [
       timeout:12, defaultChoice:'deny'}}},
 
   // ── HABITAT PRESSURE ANOMALY — real ops: pressure differential detected ──
-  {trigger: s=>s.sol>15 && s.int_temp>260 && R()<0.08,
+  // ── HABITAT PRESSURE — echo shows thermal cycling stress + risk probability ──
+  {trigger: (s,echo)=>{
+    const tempSwing=echo&&echo.visual&&echo.visual.night; // thermal cycling worse at night transitions
+    return s.sol>15 && s.int_temp>260 && riskRoll(tempSwing?0.06:0.03)},
    gen: s=>{const pressureDrop=(0.3+R()*0.7).toFixed(2); // kPa lost
     const leakRate=(0.01+R()*0.04).toFixed(3); // kPa/hr
     return {id:'pressure_leak',urgency:'urgent',from:s.crew.find(c=>c.role==='ENGR'&&c.alive)||s.crew[0],
@@ -888,8 +898,10 @@ const TASK_TEMPLATES = [
       timeout:12, defaultChoice:'approve'}}},
 
   // ── WATER SYSTEM DRAIN — pipe burst, real fluid dynamics ──
-  {trigger: s=>{const n=Math.max(1,s.crew.filter(c=>c.alive).length);
-    return s.h2o/(H2O_PP*n)>5 && s.sol>10 && R()<0.06},
+  // ── PIPE BURST — echo shows H₂O delta + thermal cycling risk ──
+  {trigger: (s,echo)=>{const n=Math.max(1,s.crew.filter(c=>c.alive).length);
+    const tempStress=echo&&echo.visual&&echo.visual.night; // pipes crack more during thermal transitions
+    return s.h2o/(H2O_PP*n)>5 && s.sol>10 && riskRoll(tempStress?0.05:0.02)},
    gen: s=>{const n=Math.max(1,s.crew.filter(c=>c.alive).length);
     const lostPct=15+Math.floor(R()*25); // 15-40% of water supply
     const lostL=Math.floor(s.h2o*lostPct/100);
@@ -915,7 +927,10 @@ const TASK_TEMPLATES = [
       timeout:8, defaultChoice:'approve'}}},
 
   // ── ISRU CATALYST DEGRADATION — chemistry problem ──
-  {trigger: s=>s.i_eff>0.5 && s.sol>25 && R()<0.07,
+  // ── ISRU CATALYST — echo shows ISRU load + degradation risk ──
+  {trigger: (s,echo)=>{
+    const highLoad=echo&&echo.delta&&echo.delta.o2>3; // ISRU running hard
+    return s.i_eff>0.5 && s.sol>25 && riskRoll(highLoad?0.06:0.025)},
    gen: s=>{const currentEff=(s.i_eff*100).toFixed(0);
     const co2Throughput=(5*s.i_eff).toFixed(1);
     return {id:'isru_catalyst',urgency:'request',from:s.crew.find(c=>c.role==='SCI'&&c.alive)||s.crew[0],
@@ -933,7 +948,10 @@ const TASK_TEMPLATES = [
       timeout:20, defaultChoice:'approve'}}},
 
   // ── SOLAR ARRAY TRACKING — mechanical alignment ──
-  {trigger: s=>s.s_eff>0.4 && s.sol>20 && R()<0.06,
+  // ── SOLAR TRACKING — echo dust events increase misalignment risk ──
+  {trigger: (s,echo)=>{
+    const dustActive=echo&&echo.visual&&echo.visual.dust_storm;
+    return s.s_eff>0.4 && s.sol>20 && riskRoll(dustActive?0.08:0.02)},
    gen: s=>{const misalign=(2+R()*8).toFixed(1); // degrees off
     const powerLoss=Math.floor(parseFloat(misalign)*2.5); // % power loss from misalignment
     return {id:'solar_tracking',urgency:'request',from:s.crew.find(c=>(c.role==='ENGR'||c.name.startsWith('OPT'))&&c.alive)||s.crew[0],
@@ -958,7 +976,10 @@ const TASK_TEMPLATES = [
       timeout:18, defaultChoice:'approve'}}},
 
   // ── CO₂ SCRUBBER SATURATION — atmosphere management ──
-  {trigger: s=>s.sol>30 && s.crew.filter(c=>c.alive&&!c.name.startsWith('OPT')).length>=2 && R()<0.05,
+  // ── CO₂ SCRUBBER — more humans + high activity = faster saturation ──
+  {trigger: (s,echo)=>{
+    const highActivity=echo&&echo.delta&&(echo.delta.food<-3000); // crew consuming hard
+    return s.sol>30 && s.crew.filter(c=>c.alive&&!c.name.startsWith('OPT')).length>=2 && riskRoll(highActivity?0.04:0.015)},
    gen: s=>{const humans=s.crew.filter(c=>c.alive&&!c.name.startsWith('OPT')).length;
     const scrubberLoad=(humans*1.0).toFixed(1); // kg CO₂/sol
     const capacity=(humans*1.2).toFixed(1);
@@ -977,7 +998,10 @@ const TASK_TEMPLATES = [
       timeout:10, defaultChoice:'approve'}}},
 
   // ── THERMAL CYCLING CRACK — structural integrity ──
-  {trigger: s=>s.sol>40 && s.modules.length>0 && R()<0.04,
+  // ── THERMAL CRACK — more modules + more thermal cycles = higher risk ──
+  {trigger: (s,echo)=>{
+    const nightTransition=echo&&echo.visual&&echo.visual.night;
+    return s.sol>40 && s.modules.length>0 && riskRoll(nightTransition?0.035:0.012)},
    gen: s=>{const mod=s.modules[Math.floor(R()*s.modules.length)];
     const modName=(mod.type||'module').replace(/_/g,' ');
     const crackLen=(0.5+R()*3).toFixed(1); // mm
@@ -1002,8 +1026,10 @@ const TASK_TEMPLATES = [
       timeout:20, defaultChoice:'approve'}}},
 
   // ── RADIATION DOSIMETRY — cumulative exposure decision ──
-  {trigger: s=>{const maxRad=Math.max(...s.crew.filter(c=>c.alive).map(c=>c.rad));
-    return maxRad>200 && R()<0.1},
+  // ── RADIATION — echo solar flare events spike exposure ──
+  {trigger: (s,echo)=>{const maxRad=Math.max(...s.crew.filter(c=>c.alive).map(c=>c.rad));
+    const flareActive=echo&&echo.events&&echo.events.some(e=>e.type==='solar_flare');
+    return maxRad>200 && (flareActive||riskRoll(0.03))},
    gen: s=>{const exposed=s.crew.filter(c=>c.alive).sort((a,b)=>b.rad-a.rad)[0];
     const annualLimit=500; // NASA career limit reference
     return {id:'rad_dosimetry',urgency:'urgent',from:s.crew.find(c=>c.role==='MED'&&c.alive)||s.crew[0],
@@ -1029,7 +1055,10 @@ const TASK_TEMPLATES = [
   // ══════════════════════════════════════════════════════════════
 
   // ── STUCK BOLT — robot can't unscrew a panel fastener ──
-  {trigger: s=>s.crew.some(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive) && s.sol>15 && R()<0.06,
+  // ── STUCK BOLT — dust storms accelerate perchlorate corrosion ──
+  {trigger: (s,echo)=>{
+    const dustActive=echo&&echo.visual&&echo.visual.dust_storm;
+    return s.crew.some(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive) && s.sol>15 && riskRoll(dustActive?0.05:0.02)},
    gen: s=>{const bot=s.crew.find(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive);
     if(!bot)return null;
     const torque=Math.floor(20+R()*30);
@@ -1061,7 +1090,10 @@ const TASK_TEMPLATES = [
       timeout:30, defaultChoice:'deny'}}},
 
   // ── SOLAR PANEL CLEANING — dust removal sequence ──
-  {trigger: s=>s.s_eff<0.85 && s.crew.some(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive) && R()<0.08,
+  // ── PANEL CLEANING — dust accumulation drives this (echo dust_tau) ──
+  {trigger: (s,echo)=>{
+    const dusty=marsWeather.dustTau>0.4;
+    return s.s_eff<0.85 && s.crew.some(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive) && riskRoll(dusty?0.06:0.02)},
    gen: s=>{const bot=s.crew.find(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive);
     if(!bot)return null;
     const dustMm=(0.5+R()*2).toFixed(1);
@@ -1092,7 +1124,11 @@ const TASK_TEMPLATES = [
       timeout:25, defaultChoice:'deny'}}},
 
   // ── ANTENNA REALIGNMENT — comms dish pointing ──
-  {trigger: s=>s.sol>30 && s.sol%50<3 && R()<0.10,
+  // ── ANTENNA REALIGN — wind events cause dish drift ──
+  {trigger: (s,echo)=>{
+    const highWind=marsWeather.windMs>6;
+    const dustActive=echo&&echo.visual&&echo.visual.dust_storm;
+    return s.sol>30 && s.sol%50<3 && riskRoll(highWind?0.08:(dustActive?0.06:0.02))},
    gen: s=>{const bot=s.crew.find(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive)||
       s.crew.find(c=>c.role==='ENGR'&&c.alive)||s.crew[0];
     const azErr=(2+R()*6).toFixed(1);const elErr=(1+R()*4).toFixed(1);
@@ -1121,7 +1157,10 @@ const TASK_TEMPLATES = [
       timeout:35, defaultChoice:'deny'}}},
 
   // ── AIRLOCK SEAL REPLACEMENT — EVA prep ──
-  {trigger: s=>s.sol>20 && R()<0.04,
+  // ── AIRLOCK SEAL — wear rate from EVA cycling + dust abrasion ──
+  {trigger: (s,echo)=>{
+    const dusty=marsWeather.dustTau>0.3;
+    return s.sol>20 && riskRoll(dusty?0.035:0.012)},
    gen: s=>{const bot=s.crew.find(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive)||
       s.crew.find(c=>c.role==='ENGR'&&c.alive)||s.crew[0];
     const wearPct=Math.floor(60+R()*30);
@@ -1159,8 +1198,10 @@ const TASK_TEMPLATES = [
   // ══════════════════════════════════════════════════════════════
 
   // ── ROBOT TIPPED OVER — dispatch rescue robot ──
-  {trigger: s=>{const bots=s.crew.filter(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive);
-    return bots.length>=2 && s.sol>10 && R()<0.05},
+  // ── ROBOT TIPPED — terrain risk + echo movement data ──
+  {trigger: (s,echo)=>{const bots=s.crew.filter(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive);
+    const dustActive=echo&&echo.visual&&echo.visual.dust_storm;
+    return bots.length>=2 && s.sol>10 && riskRoll(dustActive?0.04:0.015)},
    gen: s=>{const bots=s.crew.filter(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive);
     const fallen=bots[Math.floor(R()*bots.length)];
     const rescuer=bots.find(b=>b.name!==fallen.name)||bots[0];
@@ -1196,8 +1237,10 @@ const TASK_TEMPLATES = [
       timeout:35, defaultChoice:'deny'}}},
 
   // ── ROBOT WHEEL JAMMED — regolith packed in drivetrain ──
-  {trigger: s=>{const bots=s.crew.filter(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive);
-    return bots.length>=2 && s.sol>20 && R()<0.04},
+  // ── WHEEL JAM — regolith conditions from echo ──
+  {trigger: (s,echo)=>{const bots=s.crew.filter(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive);
+    const dusty=marsWeather.dustTau>0.3;
+    return bots.length>=2 && s.sol>20 && riskRoll(dusty?0.035:0.012)},
    gen: s=>{const bots=s.crew.filter(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive);
     const stuck=bots[Math.floor(R()*bots.length)];
     const helper=bots.find(b=>b.name!==stuck.name)||bots[0];
@@ -1229,8 +1272,10 @@ const TASK_TEMPLATES = [
       timeout:30, defaultChoice:'deny'}}},
 
   // ── ROBOT SOLAR PANEL DEPLOY FAILURE — panel stuck half-open ──
-  {trigger: s=>{const bots=s.crew.filter(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive);
-    return bots.length>=1 && s.sol>5 && s.s_eff<0.8 && R()<0.04},
+  // ── PANEL DEPLOY FAILURE — cold temps cause actuator stiffness ──
+  {trigger: (s,echo)=>{const bots=s.crew.filter(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive);
+    const cold=marsWeather.tempC<-60;
+    return bots.length>=1 && s.sol>5 && s.s_eff<0.8 && riskRoll(cold?0.04:0.012)},
    gen: s=>{const bot=s.crew.find(c=>(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.alive);
     if(!bot)return null;
     const deployAngle=Math.floor(30+R()*40); // stuck at partial deployment
@@ -1263,18 +1308,62 @@ const TASK_TEMPLATES = [
 ];
 
 function generateTask(){
-  if(taskQueue.length>=3)return; // max 3 pending
-  if(!state.alive)return;
-  for(const tmpl of TASK_TEMPLATES){
-    if(tmpl.trigger(state)){
-      const task=tmpl.gen(state);
-      if(!task)continue;
-      // Don't duplicate same task type
-      if(taskQueue.some(t=>t.id===task.id)||activeTask?.id===task.id)continue;
-      if(taskHistory.slice(-5).some(t=>t.id===task.id))continue;
-      task.createdSol=state.sol;
-      task.timerLeft=task.timeout;
-      taskQueue.push(task);
+  if(taskQueue.length>=3||!state.alive)return;
+  const echo=lastEcho;
+
+  // ── ECHO-DRIVEN TASK GENERATION ──
+  // Tasks emerge from what the sim actually produced this sol.
+  // The echo frame IS the source of truth. No arbitrary random rolls.
+  // If the echo shows O₂ dropping, that's when O₂ tasks fire.
+  // If the echo shows a dust storm, that's when storm tasks fire.
+  // Data sloshing: output of frame N drives the tasks of frame N+1.
+
+  if(echo){
+    const n=Math.max(1,state.crew.filter(c=>c.alive).length);
+    const o2d=state.o2/(O2_PP*n);
+    const h2od=state.h2o/(H2O_PP*n);
+    const fd=state.food/(FOOD_PP*n);
+
+    // Inject echo-derived context into triggers — each template
+    // can now see the delta, the visual state, the events
+    for(const tmpl of TASK_TEMPLATES){
+      // Pass the echo to trigger so it can use deltas
+      if(tmpl.trigger(state, echo)){
+        const task=tmpl.gen(state, echo);
+        if(!task)continue;
+        if(taskQueue.some(t=>t.id===task.id)||activeTask?.id===task.id)continue;
+        if(taskHistory.slice(-5).some(t=>t.id===task.id))continue;
+        task.createdSol=state.sol;
+        task.timerLeft=task.timeout;
+        // Tag the task with the echo frame that spawned it
+        task.sourceEcho=echo.frame;
+        task.cri=colonyRiskIndex;
+        taskQueue.push(task);
+        state.log.push(`  📋 TASK: ${task.title} [CRI:${colonyRiskIndex} Echo:${echo.frame}]`);
+        updateTaskBadge();
+        if(!activeTask)showNextTask();
+        return;
+      }
+    }
+  } else {
+    // Fallback for first few sols before echo exists
+    for(const tmpl of TASK_TEMPLATES){
+      if(tmpl.trigger(state, null)){
+        const task=tmpl.gen(state, null);
+        if(!task)continue;
+        if(taskQueue.some(t=>t.id===task.id)||activeTask?.id===task.id)continue;
+        if(taskHistory.slice(-5).some(t=>t.id===task.id))continue;
+        task.createdSol=state.sol;
+        task.timerLeft=task.timeout;
+        taskQueue.push(task);
+        state.log.push(`  📋 TASK: ${task.title}`);
+        updateTaskBadge();
+        if(!activeTask)showNextTask();
+        return;
+      }
+    }
+  }
+}
       state.log.push(`  📋 TASK: ${task.title} — awaiting mission control`);
       updateTaskBadge();
       if(!activeTask)showNextTask();
