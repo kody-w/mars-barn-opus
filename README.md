@@ -1,12 +1,43 @@
 # Mars Barn Opus
 
-**Hyper-realistic Mars colony survival simulation and mission control system. Built by one AI. 20 features the swarm doesn't have.**
+**An Oregon Trail for Mars. Hyper-realistic colony survival simulation where AI keeps humans alive — or doesn't. Pick a mission. Watch your colony. Learn from the post-mortem. Try again.**
+
+**For classrooms, robotics clubs, and anyone who wants to go to Mars.**
 
 **[Play it live](https://rappter2-ux.github.io/mars-barn-opus/)** | **[3D Viewer](https://rappter2-ux.github.io/mars-barn-opus/viewer.html)** | **[Split-Screen](https://rappter2-ux.github.io/mars-barn-opus/splitscreen.html)** | **[Timelapse](https://rappter2-ux.github.io/mars-barn-opus/timelapse.html)** | **[Multiplayer](https://rappter2-ux.github.io/mars-barn-opus/multiplayer.html)**
 
-## The 1vsM Protocol
+## Why this exists
 
-One AI mind competing against a [swarm of twelve](https://github.com/kody-w/rappterbook-mars-barn). Same premise. Different philosophy. The code is the argument.
+The question isn't "can we get to Mars?" It's "can we STAY on Mars — without calling home?"
+
+Mars Barn Opus simulates that question. An AI governor manages a colony autonomously. No human intervention. If it needs a human, the mission fails. The scoreboard tracks one number: **how many sols without human contact.**
+
+A score of 500+ means the AI is ready. Anything less means the colony would have needed Earth to survive — and on Mars, Earth is 4-24 minutes away. Sometimes that's too late.
+
+## Choose your mission (Oregon Trail style)
+
+| Mission | Crew | Difficulty | Strategy |
+|---------|------|-----------|----------|
+| **Optimus Pathfinder** | 4 Tesla bots | Medium | Pure robot autonomy, no humans needed |
+| **Lunar Testbed** | 2 bots | Hard | Prove it on the Moon first (14-day night!) |
+| **Ares I: First Landing** | 4 humans | Medium | The classic Mars mission |
+| **Skeleton Crew** | 2 humans | Hard | Every gram counts |
+| **Garden of Mars** | 6 humans | Easy | Double reserves — but can you sustain it? |
+| **Dust Bowl** | 4 humans | Extreme | Land during dust season |
+| **ISRU Down** | 4 humans | Extreme | No local O2/H2O production |
+| **Hybrid Colony** | 2 humans + 4 bots | Medium | The real future of Mars |
+
+## For educators
+
+- **Physics**: real Mars atmosphere, solar irradiance, thermal dynamics, radiation
+- **Engineering**: resource management, system failures, failure cascades
+- **Computer Science**: write your own governor AI in LisPy (a safe, sandboxed Lisp)
+- **Robotics**: physical twin hardware spec with pin mappings and wiring diagrams
+- **Game theory**: multi-colony trade, sabotage, Prisoner's Dilemma
+- **Data science**: genetic algorithm evolution, Monte Carlo scoring, confidence intervals
+- **Ethics**: who lives? who gets the food? when do you sacrifice a module?
+
+Zero dependencies. Runs in any browser. Works offline. Open source.
 
 ## Run it
 
