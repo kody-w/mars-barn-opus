@@ -71,6 +71,10 @@ def tokenize(source: str) -> List[str]:
         c = s[i]
         if c in ' \t\n\r':
             i += 1
+        elif c == ';':
+            # Comment: skip to end of line
+            while i < len(s) and s[i] != '\n':
+                i += 1
         elif c == '(':
             tokens.append('(')
             i += 1
