@@ -1,9 +1,9 @@
-# Copilot Instructions — Mars Barn Opus
+# Copilot Instructions — First Principles to Mars
 
 ## Build & Test
 
 ```bash
-# Run all tests (246 tests, no dependencies to install)
+# Run all tests (299 tests, no dependencies to install)
 python3 -m pytest tests/ -v
 
 # Run a single test file
@@ -15,13 +15,14 @@ python3 -m pytest tests/test_colony.py::TestResources::test_create_with_defaults
 # Run simulation
 python3 src/sim.py --mission-control
 python3 src/sim.py --benchmark
+python3 src/sim.py --autonomy --sols 500
 ```
 
-No build step. No linter configured. Python 3.9+ stdlib only — **no pip dependencies, ever**. This is a constitutional constraint (see CONSTITUTION.md Article IV §1). The code must be self-contained enough to run on Mars.
+No build step. No linter configured. Python 3.9+ stdlib only — **no pip dependencies, ever**. This is a constitutional constraint (CONSTITUTION.md Article IV §1).
 
 ## Architecture
 
-Mars colony survival simulation with a unidirectional data flow that ticks once per sol:
+Mars colony survival sim + Oregon Trail-style game with a unidirectional data flow that ticks once per sol:
 
 ```
 mars.py (physics) → events.py (stochastic) → governor.py (AI decisions)
@@ -29,24 +30,31 @@ mars.py (physics) → events.py (stochastic) → governor.py (AI decisions)
     → mission_control.py (render) → twin state JSON (physical sync)
 ```
 
-No circular dependencies. Each module reads from upstream and writes downstream.
+**Core game loop** (CONSTITUTION Article V):
+```
+Choose mission → Real Mars weather seeds start → AI + LisPy runs colony
+  → Papers Please tasks emerge from echo frames → Player decides
+    → Consequences cascade → Colony lives or dies → Post-mortem → Repeat
+```
 
-**Entry point**: `src/sim.py` — CLI with modes: `--mission-control`, `--play`, `--benchmark`, `--leaderboard`, `--evolve`, `--colonies N`.
+**Echo frames**: Every sol produces a delta frame. Output of frame N drives frame N+1. Tasks, hazards, and visuals all react to echo data. This is the colony's nervous system.
 
-**Twin state** (`/tmp/mars-twin-state.json`): The sacred contract between the digital simulation and a future physical Mars colony. Schema changes are breaking changes. Every field must be populated — no nulls.
+**Colony Risk Index (CRI)**: LisPy-computed VIX for Mars. 10 variables, range 0-100. Higher CRI = higher probability of failures. `riskRoll(baseProb)` applies the CRI multiplier.
 
-**Web layer** (`docs/`): 5 standalone HTML pages (dashboard, 3D viewer, split-screen, timelapse, multiplayer). Zero dependencies — vanilla JS with Three.js/Globe.gl loaded from CDN.
+**Entry point**: `src/sim.py` — CLI. `docs/viewer.html` — browser game (the main experience).
+
+**Web layer** (`docs/`): `viewer.html` IS the game. index.html redirects to it. Zero server dependencies.
 
 ## Key Conventions
 
-**Constants**: Every numeric constant lives in `config.py` with a comment citing its source (NASA data, physics derivation, or design decision). Zero magic numbers anywhere else.
+**Constants**: Every numeric constant lives in `config.py` with a NASA-sourced comment. Zero magic numbers.
 
-**Data modeling**: Dataclasses for all state (`Colony`, `Resources`, `Governor`, `CrewMember`, etc.). Free functions for operations (`step()`, `produce()`, `consume()`). No class methods that mutate — prefer functional style.
+**Data modeling**: Dataclasses + free functions. `step()`, `produce()`, `consume()`.
 
-**Imports**: Every module starts with `from __future__ import annotations`. Import constants explicitly from config (`from config import MARS_GRAVITY_M_S2`), not as `config.MARS_GRAVITY_M_S2`.
+**Imports**: `from __future__ import annotations` on every module. Explicit imports from config.
 
-**Tests**: Test files use a `sys.path.insert` pattern to find `src/`. Tests are organized as classes (e.g., `TestResources`, `TestCascade`) grouping related assertions. Tests are the specification — if a behavior isn't tested, it doesn't exist.
+**Tests**: `sys.path.insert` pattern. Classes grouping assertions. Tests are the specification.
 
-**No duplicates**: One implementation per concept. No `_v2`/`_v3` files. Git handles versioning.
+**No duplicates**: One implementation per concept. Git handles versioning.
 
-**Module docstrings**: Every module has a docstring explaining what it does and its design philosophy. Maintain this when adding modules.
+**Two remotes**: `kody` → `kody-w/mars-barn-opus` (primary), `origin` → `rappter2-ux/mars-barn-opus`. Push to both.
