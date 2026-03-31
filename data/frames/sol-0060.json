@@ -1,0 +1,55 @@
+{
+  "sol": 60,
+  "utc": "2025-09-08T15:36:00Z",
+  "mars": {
+    "ls": 158.4,
+    "season": "Northern Summer",
+    "temp_k": 230.3,
+    "temp_c": -42.8,
+    "pressure_pa": 751,
+    "solar_wm2": 439,
+    "dust_tau": 0.159,
+    "wind_ms": 4.6,
+    "lmst": 15.6
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.68,
+      "duration_sols": 12,
+      "desc": "Regional dust storm approaching from the north"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0065
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 9.0,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.86,
+    "water_ice_depth_m": 0.9,
+    "surface_radiation_usv": 0.86
+  },
+  "challenge": {
+    "id": "sol60_solar_tracking_fault",
+    "type": "solar_tracking_fault",
+    "params": {
+      "misalignment_deg": 13.9,
+      "dust_factor": 1.7
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 59,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 4.6,
+    "dust_delta": -0.023
+  },
+  "_hash": "aac3b263eea16d4c"
+}

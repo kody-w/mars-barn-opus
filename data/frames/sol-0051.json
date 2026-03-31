@@ -1,0 +1,53 @@
+{
+  "sol": 51,
+  "utc": "2025-08-30T09:39:36Z",
+  "mars": {
+    "ls": 153.7,
+    "season": "Northern Summer",
+    "temp_k": 230.5,
+    "temp_c": -42.6,
+    "pressure_pa": 753,
+    "solar_wm2": 479,
+    "dust_tau": 0.16,
+    "wind_ms": 7.3,
+    "lmst": 21.4
+  },
+  "events": [
+    {
+      "type": "solar_flare",
+      "severity": 0.78,
+      "duration_sols": 2,
+      "desc": "Solar particle event detected \u2014 elevated radiation"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0164
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "antenna",
+      "degradation": 0.0072
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 8.3,
+    "window_open": false,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.87,
+    "water_ice_depth_m": 1.1,
+    "surface_radiation_usv": 0.71
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 50,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -3.6,
+    "dust_delta": 0.039
+  },
+  "_hash": "b18168e5d2933558"
+}

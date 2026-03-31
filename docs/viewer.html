@@ -174,9 +174,76 @@ padding:8px;margin:4px 0;cursor:pointer;transition:all 0.2s}
   color:#fff;width:32px;height:32px;border-radius:50%;display:none;align-items:center;
   justify-content:center;font-size:14px;font-weight:700;cursor:pointer;
   box-shadow:0 2px 12px rgba(218,54,51,0.5);animation:pulse 1.5s infinite}
+
+/* ── Cartridge System ── */
+.cartridge-bar{position:fixed;top:2px;right:16px;z-index:210;display:flex;gap:4px;align-items:center}
+.cartridge-btn{padding:3px 10px;background:rgba(88,166,255,0.08);border:1px solid var(--border);
+  color:var(--dim);cursor:pointer;font-family:var(--font);font-size:10px;border-radius:4px;
+  transition:all 0.2s;letter-spacing:0.5px}
+.cartridge-btn:hover{background:rgba(88,166,255,0.2);color:var(--cyan);border-color:var(--cyan)}
+.cartridge-btn.saving{color:var(--green);border-color:var(--green)}
+.cartridge-tag{font-size:9px;color:var(--dim);padding:2px 6px;background:rgba(0,0,0,0.4);
+  border-radius:3px;font-family:monospace}
+.autosave-dot{width:6px;height:6px;border-radius:50%;background:var(--dim);transition:all 0.3s}
+.autosave-dot.active{background:var(--green);box-shadow:0 0 6px var(--green)}
+
+/* ── Score Display ── */
+.score-breakdown{display:grid;grid-template-columns:1fr auto;gap:2px 12px;font-size:11px;
+  max-width:360px;margin:0 auto 16px;text-align:left}
+.score-breakdown .label{color:var(--dim)}.score-breakdown .val{color:var(--cyan);text-align:right;font-weight:700}
+.score-breakdown .total{color:var(--green);font-size:14px;border-top:1px solid var(--border);padding-top:4px;margin-top:4px}
+.score-grade{font-size:48px;font-weight:700;letter-spacing:4px;margin:8px 0;
+  text-shadow:0 0 30px currentColor}
+.score-grade.grade-s{color:#ffd700}.score-grade.grade-a{color:var(--green)}
+.score-grade.grade-b{color:var(--cyan)}.score-grade.grade-c{color:var(--yellow)}
+.score-grade.grade-d{color:#ff9944}.score-grade.grade-f{color:var(--red)}
+
+/* ── Load Cartridge on Mission Screen ── */
+.load-cartridge-zone{margin-top:24px;padding:16px;border:2px dashed var(--border);border-radius:10px;
+  text-align:center;cursor:pointer;transition:all 0.3s;max-width:400px}
+.load-cartridge-zone:hover{border-color:var(--cyan);background:rgba(88,166,255,0.05)}
+.load-cartridge-zone.dragover{border-color:var(--green);background:rgba(63,185,80,0.1)}
+.load-cartridge-zone input[type="file"]{display:none}
+
+/* ── Cinematic Mode (from Levi) ── */
+.cinematic-letterbox{position:fixed;left:0;right:0;height:0;background:#000;z-index:9999;
+  transition:height 0.8s cubic-bezier(0.4,0,0.2,1);pointer-events:none}
+.cinematic-letterbox-top{top:0}.cinematic-letterbox-bottom{bottom:0}
+body.cinematic-active .cinematic-letterbox{height:10%}
+.cinematic-vignette{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:9998;
+  opacity:0;transition:opacity 0.8s ease-out;
+  background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.5) 100%)}
+body.cinematic-active .cinematic-vignette{opacity:1}
+.cinematic-grain{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:9997;
+  opacity:0;transition:opacity 0.8s ease-out;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+body.cinematic-active .cinematic-grain{opacity:0.03}
+body.cinematic-active.cursor-hidden{cursor:none!important}
+body.cinematic-active.cursor-hidden *{cursor:none!important}
+body.cinematic-active .hdr,body.cinematic-active .side-panel,
+body.cinematic-active .ground-header,body.cinematic-active .ground-hud,
+body.cinematic-active #weather-hud,body.cinematic-active #top-nav,
+body.cinematic-active .cartridge-bar,body.cinematic-active #task-panel{
+  opacity:0!important;pointer-events:none!important;transition:opacity 0.8s!important}
 </style>
 </head>
 <body>
+
+<!-- ══ CINEMATIC MODE OVERLAYS (Levi pattern) ══ -->
+<div class="cinematic-letterbox cinematic-letterbox-top"></div>
+<div class="cinematic-letterbox cinematic-letterbox-bottom"></div>
+<div class="cinematic-vignette"></div>
+<div class="cinematic-grain"></div>
+
+<!-- ══ CARTRIDGE BAR (top-right, always visible during game) ══ -->
+<div class="cartridge-bar game-hidden" id="cartridge-bar">
+  <div class="autosave-dot" id="autosave-dot" title="Auto-save indicator"></div>
+  <span class="cartridge-tag" id="cartridge-id"></span>
+  <button class="cartridge-btn" onclick="exportCartridge()" title="Download .cartridge.json">💾 EXPORT</button>
+  <button class="cartridge-btn" onclick="document.getElementById('cartridge-import-game').click()" title="Load a .cartridge.json">📂 LOAD</button>
+  <button class="cartridge-btn" onclick="toggleCinematic()" title="Cinematic mode (C)">🎬</button>
+  <input type="file" id="cartridge-import-game" accept=".json,.cartridge.json" onchange="importCartridgeFile(event)" style="display:none">
+</div>
 
 <!-- ══ MISSION SELECTOR (Oregon Trail: Choose Your Party) ══ -->
 <div id="mission-overlay">
@@ -225,6 +292,30 @@ padding:8px;margin:4px 0;cursor:pointer;transition:all 0.2s}
       <h3 style="color:var(--cyan)">Lunar Testbed</h3>
       <div class="desc">2 bots on the Moon. 14-day night.</div>
     </div>
+  </div>
+
+  <!-- Load Cartridge Drop Zone -->
+  <div class="load-cartridge-zone" id="cartridge-drop" onclick="document.getElementById('cartridge-import-menu').click()"
+    ondragover="event.preventDefault();this.classList.add('dragover')"
+    ondragleave="this.classList.remove('dragover')"
+    ondrop="event.preventDefault();this.classList.remove('dragover');importCartridgeFile({target:{files:event.dataTransfer.files}})">
+    <div style="font-size:24px;margin-bottom:6px">💾</div>
+    <div style="color:var(--cyan);font-size:13px;font-weight:700;letter-spacing:1px">LOAD CARTRIDGE</div>
+    <div style="color:var(--dim);font-size:10px;margin-top:4px">Drop a .cartridge.json or click to browse</div>
+    <div style="color:var(--dim);font-size:10px;margin-top:2px">Resume exactly where you left off</div>
+    <input type="file" id="cartridge-import-menu" accept=".json,.cartridge.json" onchange="importCartridgeFile(event)" style="display:none">
+  </div>
+
+  <!-- Auto-save Recovery -->
+  <div id="autosave-recovery" style="display:none;margin-top:12px;padding:12px 16px;background:rgba(63,185,80,0.1);
+    border:1px solid var(--green);border-radius:8px;max-width:400px;text-align:center">
+    <div style="color:var(--green);font-size:12px;font-weight:700;margin-bottom:4px">⟳ AUTO-SAVE FOUND</div>
+    <div id="autosave-info" style="color:var(--dim);font-size:10px;margin-bottom:8px"></div>
+    <button onclick="loadAutoSave()" style="padding:6px 16px;border-radius:6px;border:1px solid var(--green);
+      background:rgba(63,185,80,0.2);color:var(--green);cursor:pointer;font-family:var(--font);font-size:11px;
+      margin-right:8px">RESUME</button>
+    <button onclick="clearAutoSave()" style="padding:6px 16px;border-radius:6px;border:1px solid var(--border);
+      background:rgba(255,255,255,0.05);color:var(--dim);cursor:pointer;font-family:var(--font);font-size:11px">NEW GAME</button>
   </div>
 
   <!-- Phase 2: Configure mission (RTS setup) -->
@@ -329,19 +420,23 @@ padding:8px;margin:4px 0;cursor:pointer;transition:all 0.2s}
   <div class="cause" id="death-cause"></div>
   <div class="stats-row" id="death-stats"></div>
   <div class="post-mortem" id="death-postmortem"></div>
-  <button class="btn-retry" onclick="restartGame()">↻ TRY ANOTHER MISSION</button>
+  <div id="death-score"></div>
+  <div style="display:flex;gap:12px;align-items:center">
+    <button class="btn-retry" onclick="restartGame()">↻ TRY ANOTHER MISSION</button>
+    <button class="btn-retry" onclick="exportCartridge()" style="border-color:var(--yellow);color:var(--yellow)">💾 SAVE CARTRIDGE</button>
+  </div>
 </div>
 
 <!-- Header with zoom levels -->
 <div class="hdr game-hidden" id="game-hdr">
   <h1 style="font-size:13px">FIRST PRINCIPLES TO MARS</h1>
   <div class="zoom-bar">
-    <button class="zoom-btn active" onclick="setZoom('planet')" id="z-planet">PLANET</button>
-    <button class="zoom-btn" onclick="setZoom('surface')" id="z-surface">SURFACE</button>
-    <button class="zoom-btn" onclick="setZoom('warmap')" id="z-warmap">WARMAP</button>
-    <button class="zoom-btn" onclick="setZoom('base')" id="z-base">BASE</button>
-    <button class="zoom-btn" onclick="setZoom('module')" id="z-module">MODULES</button>
-    <button class="zoom-btn" onclick="setZoom('crew')" id="z-crew">CREW</button>
+    <button class="zoom-btn active" onclick="setZoom('planet')" id="z-planet">🌍 PLANET</button>
+    <button class="zoom-btn" onclick="setZoom('surface')" id="z-surface">🔭 ORBIT</button>
+    <button class="zoom-btn" onclick="setZoom('warmap')" id="z-warmap">🗺️ MAP</button>
+    <button class="zoom-btn" onclick="setZoom('base')" id="z-base">🏗️ BASE</button>
+    <button class="zoom-btn" onclick="setZoom('module')" id="z-module">🔍 CLOSE</button>
+    <button class="zoom-btn" onclick="setZoom('crew')" id="z-crew">👁️ FPS</button>
   </div>
   <div style="display:flex;gap:4px;align-items:center">
     <button class="zoom-btn" onclick="toggleSim()" id="sim-btn">▶ START SIM</button>
@@ -370,10 +465,11 @@ padding:8px;margin:4px 0;cursor:pointer;transition:all 0.2s}
 <!-- Nav -->
 <div id="top-nav" class="game-hidden" style="position:fixed;top:0;left:0;right:0;z-index:200;background:#080b10;border-bottom:1px solid var(--border);padding:4px 16px;display:flex;align-items:center;gap:12px;font-size:11px;font-family:var(--font)">
   <span style="color:var(--cyan);font-weight:700;font-size:12px;letter-spacing:1px;margin-right:6px">FIRST PRINCIPLES TO MARS</span>
+  <a href="simhub.html" style="color:var(--cyan);text-decoration:none;padding:3px 8px;border-radius:3px;border:1px solid var(--border)">🏆 SimHub</a>
   <a href="splitscreen.html" style="color:var(--dim);text-decoration:none;padding:3px 8px;border-radius:3px">Earth↔Mars</a>
   <a href="timelapse.html" style="color:var(--dim);text-decoration:none;padding:3px 8px;border-radius:3px">Timelapse</a>
   <a href="multiplayer.html" style="color:var(--dim);text-decoration:none;padding:3px 8px;border-radius:3px">Multiplayer</a>
-  <a href="https://github.com/rappter2-ux/mars-barn-opus" target="_blank" style="color:var(--dim);text-decoration:none;padding:3px 8px">GitHub</a>
+  <a href="https://github.com/kody-w/mars-barn-opus" target="_blank" style="color:var(--dim);text-decoration:none;padding:3px 8px">GitHub</a>
 </div>
 
 <!-- Globe (planet + surface zoom) -->
@@ -517,6 +613,116 @@ function getMarsWeather(){
 }
 let marsWeather=getMarsWeather();
 setInterval(()=>{marsWeather=getMarsWeather()},30000);
+
+// ── Public Frame System (Competitive Play) ──
+// Fetches frames from the public ledger. When available, frames override
+// internal weather generation so all players face the same Mars.
+const FRAME_BASE = 'https://raw.githubusercontent.com/kody-w/mars-barn-opus/main/data/frames';
+let publicFrames = {};  // sol -> frame data
+let frameManifest = null;
+let latestPublicSol = 0;
+let frameMode = 'local'; // 'local' (internal weather) or 'public' (frame ledger)
+let waitingForFrame = false;
+
+async function loadPublicFrames(){
+  try{
+    const mRes = await fetch(FRAME_BASE+'/manifest.json');
+    if(!mRes.ok) return;
+    frameManifest = await mRes.json();
+    latestPublicSol = frameManifest.last_sol || 0;
+    frameMode = 'public';
+    console.log(`[FRAMES] Public ledger: ${frameManifest.total_frames} frames available (Sol 1-${latestPublicSol})`);
+    
+    // Pre-load first 20 frames for immediate play
+    const preload = Math.min(20, frameManifest.total_frames);
+    const promises = [];
+    for(let s=1; s<=preload; s++){
+      promises.push(loadFrame(s));
+    }
+    await Promise.all(promises);
+    console.log(`[FRAMES] Pre-loaded ${preload} frames`);
+  }catch(e){
+    console.log('[FRAMES] No public frames available — using local weather');
+    frameMode = 'local';
+  }
+}
+
+async function loadFrame(sol){
+  if(publicFrames[sol]) return publicFrames[sol];
+  try{
+    const res = await fetch(FRAME_BASE+`/sol-${String(sol).padStart(4,'0')}.json`);
+    if(!res.ok) return null;
+    const frame = await res.json();
+    publicFrames[sol] = frame;
+    return frame;
+  }catch(e){ return null; }
+}
+
+function applyPublicFrame(sol){
+  const frame = publicFrames[sol];
+  if(!frame) return false;
+  
+  // Override Mars weather with frame data
+  const m = frame.mars;
+  marsWeather = {
+    ...marsWeather,
+    tempC: m.temp_c, tempK: m.temp_k,
+    pressurePa: m.pressure_pa,
+    solarWm2: m.solar_wm2,
+    dustTau: m.dust_tau,
+    windMs: m.wind_ms,
+    lmst: m.lmst,
+    ls: m.ls,
+    season: m.season,
+  };
+  
+  // Inject frame events into state
+  if(frame.events && frame.events.length){
+    frame.events.forEach(ev=>{
+      if(!state.events.find(e=>e.type===ev.type)){
+        state.events.push({
+          type: ev.type,
+          severity: ev.severity || 0.5,
+          remaining: ev.duration_sols || 3,
+          duration: ev.duration_sols || 3,
+          desc: ev.desc || ev.type.replace(/_/g,' ')
+        });
+      }
+    });
+  }
+  
+  // Apply hazards
+  if(frame.hazards){
+    frame.hazards.forEach(hz=>{
+      if(hz.type==='equipment_fatigue' && hz.target==='solar_array'){
+        state.s_eff = Math.max(0.1, state.s_eff - (hz.degradation||0.005));
+      }
+      if(hz.type==='dust_accumulation'){
+        state.s_eff = Math.max(0.1, state.s_eff - (hz.degradation||0.01));
+      }
+    });
+  }
+  
+  // Frame challenge → inject task trigger
+  if(frame.challenge){
+    state._pendingChallenge = frame.challenge;
+  }
+  
+  return true;
+}
+
+// Pre-fetch next batch when approaching the end of loaded frames
+function ensureFramesAhead(currentSol){
+  if(frameMode !== 'public' || !frameManifest) return;
+  const ahead = 10;
+  const loadTo = Math.min(currentSol + ahead, latestPublicSol);
+  for(let s = currentSol + 1; s <= loadTo; s++){
+    if(!publicFrames[s]) loadFrame(s); // fire-and-forget
+  }
+}
+
+// Try to load public frames on startup
+loadPublicFrames();
 
 function lerpColor(a,b,t){
   const ar=(a>>16)&0xff,ag=(a>>8)&0xff,ab=a&0xff;
@@ -2535,24 +2741,55 @@ function buildGroundScene(){
     groundAnimId=requestAnimationFrame(animate);
     frame++;
 
-    // Camera: POV lock (task) or orbit
+    // ── CAMERA SYSTEM: multiple views into the sim ──
+    // planet/surface = globe.gl (handled by setZoom)
+    // base = birds eye orbit around colony
+    // module = closer orbit, lower angle, focused on buildings
+    // crew = FPS from a crew member or robot's perspective
     if(cameraPOV && cameraPOV.target){
+      // Task POV lock — override everything
       const t=cameraPOV.target;
-      // Position behind and above the robot/crew, looking at colony center
       const tx=t.position.x, tz=t.position.z;
       const dist=3.5;
       const angle=Math.atan2(tx,tz);
       const targetX=tx-Math.sin(angle)*dist;
       const targetZ=tz-Math.cos(angle)*dist;
-      // Smooth lerp to POV
       groundCamera.position.x+=(targetX-groundCamera.position.x)*0.05;
       groundCamera.position.z+=(targetZ-groundCamera.position.z)*0.05;
       groundCamera.position.y+=(3-groundCamera.position.y)*0.05;
-      groundCamera.lookAt(0,2,0);
-      // Pulse the robot's light red while task is active
+      groundCamera.lookAt(t.position.x,1.5,t.position.z);
       if(cameraPOV.light) cameraPOV.light.material.color.setHex(frame%20<10?0xff4444:0xff0000);
+    } else if(currentZoom==='crew'){
+      // FPS VIEW — ride on a robot or crew member's shoulder
+      const target=groundRobots.length?groundRobots[Math.floor(frame*0.001)%groundRobots.length]:
+        groundCrew.length?groundCrew[0]:null;
+      if(target){
+        const m=target.mesh;
+        // Position camera at head height, slightly behind
+        const fwd=target.vx!==undefined?Math.atan2(target.vx||0,target.vz||0):m.rotation.y;
+        const eyeHeight=target.vx!==undefined?1.2:1.8; // robots shorter than humans
+        const behindDist=1.5;
+        const targetX=m.position.x-Math.sin(fwd)*behindDist;
+        const targetZ=m.position.z-Math.cos(fwd)*behindDist;
+        groundCamera.position.x+=(targetX-groundCamera.position.x)*0.03;
+        groundCamera.position.z+=(targetZ-groundCamera.position.z)*0.03;
+        groundCamera.position.y+=(eyeHeight-groundCamera.position.y)*0.05;
+        // Look in the direction of movement, slightly toward colony center
+        const lookX=m.position.x+Math.sin(fwd)*5;
+        const lookZ=m.position.z+Math.cos(fwd)*5;
+        groundCamera.lookAt(lookX,1,lookZ);
+      }
+    } else if(currentZoom==='module'){
+      // LOW ORBIT — closer, lower angle, focused on buildings and activity
+      const camAngle=frame*0.001;
+      const camDist=18+Math.sin(frame*0.0008)*3;
+      const camHeight=6+Math.sin(frame*0.0015)*1.5;
+      groundCamera.position.x=camDist*Math.sin(camAngle);
+      groundCamera.position.z=camDist*Math.cos(camAngle);
+      groundCamera.position.y=camHeight;
+      groundCamera.lookAt(0,1.5,0);
     } else {
-      // Normal slow orbiting camera with gentle bob
+      // BASE VIEW — standard birds-eye orbit
       const camAngle=frame*0.0015;
       const camDist=40+Math.sin(frame*0.001)*5;
       const camHeight=15+Math.sin(frame*0.002)*3;
@@ -3029,6 +3266,24 @@ function stepSim(){
   state.sol++;const s=state.sol;
   const ac=state.crew.filter(c=>c.alive);
   if(!ac.length){state.alive=false;state.cause='all crew lost';return{type:'death',cause:'all crew lost'}}
+
+  // ── PUBLIC FRAME CONSUMPTION ──
+  // If public frames are available, apply them to override weather + inject events.
+  // When caught up to latest frame, the organism breathes on its own (echo inertia).
+  if(frameMode === 'public'){
+    const applied = applyPublicFrame(s);
+    if(applied){
+      waitingForFrame = false;
+      ensureFramesAhead(s);
+    } else if(s > latestPublicSol && latestPublicSol > 0){
+      // Caught up to latest public frame — organism breathes on its own
+      if(!waitingForFrame){
+        state.log.push(`📡 Caught up to public frame ledger (Sol ${latestPublicSol}). Colony on autopilot until next frame.`);
+        waitingForFrame = true;
+      }
+      // Still tick — the nervous system keeps the colony alive between frames
+    }
+  }
 
   // Snapshot pre-state for delta
   const pre={o2:state.o2,h2o:state.h2o,food:state.food,power:state.power,
@@ -4036,6 +4291,8 @@ function launchMission(key, customConfig){
     document.getElementById('right-panel').classList.add('game-visible');
     document.getElementById('top-nav').classList.remove('game-hidden');
     document.getElementById('top-nav').classList.add('game-visible');
+    document.getElementById('cartridge-bar').classList.remove('game-hidden');
+    document.getElementById('cartridge-bar').classList.add('game-visible');
 
     // Enter ground view
     setZoom('base');
@@ -4053,9 +4310,14 @@ function launchMission(key, customConfig){
     setTimeout(()=>{
       simSpeed = 1; // reset speed for new game
       running = true;
+      cartridgeId = generateCartridgeId();
+      state.startConfig = {o2:state.o2,h2o:state.h2o,food:state.food,power:state.power};
+      state.startSeed = seed;
+      updateCartridgeDisplay();
       document.getElementById('sim-btn').textContent = '⏸ PAUSE';
       simInterval = setInterval(()=>{
         stepSim();
+        autoSaveCheck();
         // Rebuild ground scene periodically to reflect state changes (crew deaths, modules built, lighting)
         if(state.sol % 25 === 0 && groundScene){ exitGround(); enterGround(); }
         if(!state.alive){
@@ -4155,6 +4417,8 @@ function showDeathScreen(){
     else analysis += '<br><em>500+ sols. MARS-READY. The AI can keep humans alive without calling home.</em>';
 
     document.getElementById('death-postmortem').innerHTML = analysis;
+    renderDeathScore();
+    autoSave(); // final save with death state
   }, 1500);
 }
 
@@ -4180,6 +4444,8 @@ function restartGame(){
   document.getElementById('right-panel').classList.remove('game-visible');
   document.getElementById('top-nav').classList.add('game-hidden');
   document.getElementById('top-nav').classList.remove('game-visible');
+  document.getElementById('cartridge-bar').classList.add('game-hidden');
+  document.getElementById('cartridge-bar').classList.remove('game-visible');
 
   // Exit ground view
   exitGround();
@@ -4199,6 +4465,459 @@ function restartGame(){
 // Init — show globe spinning behind mission selector, wait for player to choose
 initGlobe();
 resetState();
+
+// ══════════════════════════════════════════════════════════════
+// SIM CARTRIDGE SYSTEM
+// Export/Import colony state as a flat .json — like a Datasette
+// cartridge you eject, carry, and plug back in anywhere.
+// ══════════════════════════════════════════════════════════════
+
+const CARTRIDGE_VERSION = 1;
+const AUTOSAVE_KEY = 'mars-barn-autosave';
+const AUTOSAVE_INTERVAL = 10; // auto-save every N sols
+let cartridgeId = null;
+
+function generateCartridgeId(){
+  const ts = Date.now().toString(36);
+  const rnd = Math.random().toString(36).substr(2,4);
+  return `MBC-${ts}-${rnd}`.toUpperCase();
+}
+
+function computeScore(){
+  const ac = state.crew.filter(c=>c.alive);
+  const startTotal = (state.startWeather ? 1 : 0) ? 
+    ((state.startConfig?.o2||100) + (state.startConfig?.h2o||300) + (state.startConfig?.food||300000)/1000 + (state.startConfig?.power||500)) : 1000;
+  
+  const survival = state.sol * 100;
+  const crewBonus = ac.length * 500;
+  const resourceBonus = Math.min(1000, Math.round(
+    ((state.o2 + state.h2o + state.food/1000 + state.power) / Math.max(1,startTotal)) * 1000
+  ));
+  const criPenalty = Math.round(colonyRiskIndex * -10);
+  const decisionBonus = tasksResolved * 50;
+  const overrideBonus = taskHistory.filter(t=>t.type==='override'&&t.choice==='success').length * 200;
+  const researchBonus = (state.research||[]).length * 300;
+  const moduleBonus = (state.modules||[]).length * 150;
+  
+  const total = survival + crewBonus + resourceBonus + criPenalty + decisionBonus + overrideBonus + researchBonus + moduleBonus;
+  
+  let grade, gradeClass;
+  if(total >= 50000){ grade='S+'; gradeClass='grade-s'; }
+  else if(total >= 30000){ grade='S'; gradeClass='grade-s'; }
+  else if(total >= 20000){ grade='A'; gradeClass='grade-a'; }
+  else if(total >= 10000){ grade='B'; gradeClass='grade-b'; }
+  else if(total >= 5000){ grade='C'; gradeClass='grade-c'; }
+  else if(total >= 1000){ grade='D'; gradeClass='grade-d'; }
+  else{ grade='F'; gradeClass='grade-f'; }
+  
+  return {
+    survival, crewBonus, resourceBonus, criPenalty, decisionBonus,
+    overrideBonus, researchBonus, moduleBonus, total, grade, gradeClass,
+    breakdown: [
+      ['Survival (sols × 100)', survival],
+      ['Crew alive bonus', crewBonus],
+      ['Resource efficiency', resourceBonus],
+      ['CRI penalty', criPenalty],
+      ['Decisions made', decisionBonus],
+      ['Override successes', overrideBonus],
+      ['Research completed', researchBonus],
+      ['Modules built', moduleBonus],
+    ]
+  };
+}
+
+function serializeCartridge(){
+  if(!cartridgeId) cartridgeId = generateCartridgeId();
+  const score = computeScore();
+  
+  return {
+    _format: 'mars-barn-cartridge',
+    version: CARTRIDGE_VERSION,
+    id: cartridgeId,
+    created: new Date().toISOString(),
+    mission: activeMission || 'custom',
+    
+    // Configuration snapshot (what the player chose)
+    config: {
+      arch: state.arch,
+      lispy: activeLispy,
+      lispyCode: lispyCode,
+      lispyEnabled: lispyEnabled,
+      simSpeed: simSpeed,
+      seed: state.startSeed || null,
+      o2: state.startConfig?.o2,
+      h2o: state.startConfig?.h2o,
+      food: state.startConfig?.food,
+      power: state.startConfig?.power,
+    },
+    
+    // Full colony state (the organism)
+    state: JSON.parse(JSON.stringify(state)),
+    
+    // Nervous system memory
+    echoHistory: echoHistory.slice(-100), // last 100 frames (keep cartridge lean)
+    echoInertia: {...echoInertia},
+    dnaHistory: dnaHistory.slice(-500),
+    
+    // Player decisions
+    taskHistory: taskHistory,
+    tasksResolved: tasksResolved,
+    tasksIgnored: tasksIgnored,
+    
+    // Reflex arc memory
+    reflexHistory: reflexHistory.slice(-50),
+    activeReflexes: activeReflexes.map(r=>({id:r.id,action:r.action,condition:r.condition,intensity:r.intensity})),
+    
+    // Colony Risk Index
+    cri: colonyRiskIndex,
+    criGrade: riskGrade,
+    
+    // Supply chain
+    supplyChain: JSON.parse(JSON.stringify(supplyChain)),
+    
+    // Mars weather at save time
+    marsWeatherSnapshot: {...marsWeather},
+    
+    // Score
+    score: score,
+    
+    // Meta
+    alive: state.alive,
+    sol: state.sol,
+    runtime: { 
+      userAgent: navigator.userAgent.substr(0,80),
+      savedAt: new Date().toISOString(),
+    }
+  };
+}
+
+function deserializeCartridge(cartridge){
+  if(!cartridge._format || cartridge._format !== 'mars-barn-cartridge'){
+    alert('Not a valid Mars Barn cartridge file.');
+    return false;
+  }
+  
+  // Restore state
+  state = cartridge.state;
+  cartridgeId = cartridge.id;
+  activeMission = cartridge.mission;
+  
+  // Restore nervous system
+  echoHistory = cartridge.echoHistory || [];
+  if(cartridge.echoInertia) Object.assign(echoInertia, cartridge.echoInertia);
+  dnaHistory = cartridge.dnaHistory || [];
+  
+  // Restore decisions
+  taskHistory = cartridge.taskHistory || [];
+  tasksResolved = cartridge.tasksResolved || 0;
+  tasksIgnored = cartridge.tasksIgnored || 0;
+  
+  // Restore reflexes
+  reflexHistory = cartridge.reflexHistory || [];
+  // activeReflexes will be recomputed on next frame
+  
+  // Restore CRI
+  colonyRiskIndex = cartridge.cri || 0;
+  riskGrade = cartridge.criGrade || 'LOW';
+  
+  // Restore supply chain
+  if(cartridge.supplyChain) supplyChain = cartridge.supplyChain;
+  
+  // Restore config
+  if(cartridge.config){
+    activeLispy = cartridge.config.lispy || 'adaptive_governor';
+    lispyCode = cartridge.config.lispyCode || LISPY_PROGRAMS.adaptive_governor;
+    lispyEnabled = cartridge.config.lispyEnabled !== false;
+    if(cartridge.config.simSpeed) simSpeed = cartridge.config.simSpeed;
+    document.getElementById('gov-sel').value = state.arch;
+    const ed = document.getElementById('lispy-editor');
+    if(ed) ed.value = lispyCode;
+    const sel = document.getElementById('lispy-select');
+    if(sel) sel.value = activeLispy;
+  }
+  
+  // Update cartridge ID display
+  updateCartridgeDisplay();
+  
+  return true;
+}
+
+function exportCartridge(){
+  const cartridge = serializeCartridge();
+  const json = JSON.stringify(cartridge, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const mission = activeMission || 'colony';
+  a.href = url;
+  a.download = `${mission}-sol${state.sol}.cartridge.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  // Flash the export button
+  const btn = document.querySelector('.cartridge-btn');
+  if(btn){
+    btn.classList.add('saving');
+    btn.textContent = '✓ SAVED';
+    setTimeout(()=>{ btn.classList.remove('saving'); btn.textContent='💾 EXPORT'; }, 1500);
+  }
+  
+  state.log.push(`💾 Cartridge exported: ${a.download} (${(json.length/1024).toFixed(1)} KB)`);
+}
+
+function importCartridgeFile(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    try{
+      const cartridge = JSON.parse(e.target.result);
+      if(!deserializeCartridge(cartridge)) return;
+      
+      // Resume the game
+      resumeFromCartridge(cartridge);
+    }catch(err){
+      alert('Failed to load cartridge: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  // Reset file input so same file can be loaded again
+  event.target.value = '';
+}
+
+function resumeFromCartridge(cartridge){
+  // Hide mission overlay
+  const overlay = document.getElementById('mission-overlay');
+  overlay.classList.add('fade-out');
+  setTimeout(()=>{ overlay.style.display='none'; }, 500);
+  
+  // Show game UI
+  ['game-hdr','left-panel','right-panel','top-nav','cartridge-bar'].forEach(id=>{
+    document.getElementById(id).classList.remove('game-hidden');
+    document.getElementById(id).classList.add('game-visible');
+  });
+  
+  // Enter ground view
+  setZoom('base');
+  updateAllUI();
+  
+  state.log.push(`💾 Cartridge loaded: ${cartridge.id}`);
+  state.log.push(`⟳ Resuming from Sol ${state.sol} · ${state.crew.filter(c=>c.alive).length} crew alive`);
+  if(cartridge.score) state.log.push(`📊 Current score: ${cartridge.score.total} (${cartridge.score.grade})`);
+  
+  // If colony is still alive, start the sim
+  if(state.alive){
+    setTimeout(()=>{
+      running = true;
+      document.getElementById('sim-btn').textContent = '⏸ PAUSE';
+      simInterval = setInterval(()=>{
+        stepSim();
+        autoSaveCheck();
+        if(state.sol % 25 === 0 && groundScene){ exitGround(); enterGround(); }
+        if(!state.alive){
+          running = false;
+          clearInterval(simInterval);
+          document.getElementById('sim-btn').textContent = 'COLONY LOST';
+          showDeathScreen();
+        }
+      }, Math.max(50, 500/simSpeed));
+    }, 300);
+  } else {
+    // Colony was dead in the cartridge — show death screen
+    document.getElementById('sim-btn').textContent = 'COLONY LOST';
+    showDeathScreen();
+  }
+}
+
+// ── Auto-Save (localStorage) ──
+function autoSaveCheck(){
+  if(state.sol > 0 && state.sol % AUTOSAVE_INTERVAL === 0 && state.alive){
+    autoSave();
+  }
+}
+
+function autoSave(){
+  try{
+    const cartridge = serializeCartridge();
+    // Trim to keep localStorage lean
+    cartridge.echoHistory = cartridge.echoHistory.slice(-30);
+    cartridge.dnaHistory = cartridge.dnaHistory.slice(-200);
+    cartridge.reflexHistory = cartridge.reflexHistory.slice(-20);
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(cartridge));
+    
+    // Flash the dot
+    const dot = document.getElementById('autosave-dot');
+    if(dot){
+      dot.classList.add('active');
+      setTimeout(()=>dot.classList.remove('active'), 1000);
+    }
+  }catch(e){
+    // localStorage full or unavailable — silent fail
+    console.warn('Autosave failed:', e.message);
+  }
+}
+
+function checkAutoSave(){
+  try{
+    const saved = localStorage.getItem(AUTOSAVE_KEY);
+    if(!saved) return;
+    const cartridge = JSON.parse(saved);
+    if(!cartridge._format || cartridge._format !== 'mars-barn-cartridge') return;
+    if(!cartridge.alive) { localStorage.removeItem(AUTOSAVE_KEY); return; }
+    
+    // Show recovery UI
+    const el = document.getElementById('autosave-recovery');
+    const info = document.getElementById('autosave-info');
+    if(el && info){
+      const ago = Math.round((Date.now() - new Date(cartridge.created).getTime()) / 60000);
+      const agoStr = ago < 60 ? `${ago} min ago` : `${Math.round(ago/60)}h ago`;
+      info.textContent = `${cartridge.mission || 'Colony'} · Sol ${cartridge.sol} · ${cartridge.state.crew.filter(c=>c.alive).length} crew · ${agoStr}`;
+      el.style.display = 'block';
+    }
+  }catch(e){
+    // Corrupted save — clear it
+    localStorage.removeItem(AUTOSAVE_KEY);
+  }
+}
+
+function loadAutoSave(){
+  try{
+    const saved = localStorage.getItem(AUTOSAVE_KEY);
+    if(!saved) return;
+    const cartridge = JSON.parse(saved);
+    if(!deserializeCartridge(cartridge)) return;
+    resumeFromCartridge(cartridge);
+  }catch(e){
+    alert('Auto-save corrupted. Starting fresh.');
+    localStorage.removeItem(AUTOSAVE_KEY);
+  }
+}
+
+function clearAutoSave(){
+  localStorage.removeItem(AUTOSAVE_KEY);
+  document.getElementById('autosave-recovery').style.display = 'none';
+}
+
+function updateCartridgeDisplay(){
+  const tag = document.getElementById('cartridge-id');
+  if(tag && cartridgeId) tag.textContent = cartridgeId;
+}
+
+// ── Cinematic Mode (from Levi) ──
+let cinematicActive = false;
+let cinematicCursorTimeout = null;
+
+function toggleCinematic(){
+  cinematicActive = !cinematicActive;
+  if(cinematicActive){
+    document.body.classList.add('cinematic-active');
+    startCursorHideTimer();
+    state.log.push('🎬 Cinematic mode ON — press C to exit');
+  } else {
+    document.body.classList.remove('cinematic-active','cursor-hidden');
+    if(cinematicCursorTimeout) clearTimeout(cinematicCursorTimeout);
+  }
+}
+
+function startCursorHideTimer(){
+  if(cinematicCursorTimeout) clearTimeout(cinematicCursorTimeout);
+  cinematicCursorTimeout = setTimeout(()=>{
+    if(cinematicActive) document.body.classList.add('cursor-hidden');
+  }, 3000);
+}
+
+document.addEventListener('mousemove', ()=>{
+  if(cinematicActive){
+    document.body.classList.remove('cursor-hidden');
+    startCursorHideTimer();
+  }
+});
+
+// ── Score Display in Death Screen ──
+// Called from showDeathScreen — adds score breakdown
+function renderDeathScore(){
+  const score = computeScore();
+  const el = document.getElementById('death-score');
+  if(!el) return;
+  
+  let html = `<div class="score-grade ${score.gradeClass}">${score.grade}</div>`;
+  html += '<div class="score-breakdown">';
+  score.breakdown.forEach(([label, val])=>{
+    const color = val < 0 ? 'var(--red)' : val > 0 ? 'var(--cyan)' : 'var(--dim)';
+    html += `<div class="label">${label}</div><div class="val" style="color:${color}">${val >= 0 ? '+' : ''}${val.toLocaleString()}</div>`;
+  });
+  html += `<div class="label total">TOTAL SCORE</div><div class="val total">${score.total.toLocaleString()}</div>`;
+  html += '</div>';
+  
+  // Save to localStorage high scores
+  saveHighScore(score);
+  
+  el.innerHTML = html;
+}
+
+function saveHighScore(score){
+  try{
+    const key = 'mars-barn-highscores';
+    const scores = JSON.parse(localStorage.getItem(key) || '[]');
+    scores.push({
+      id: cartridgeId,
+      mission: activeMission,
+      sol: state.sol,
+      score: score.total,
+      grade: score.grade,
+      crew: state.crew.filter(c=>c.alive).length + '/' + state.crew.length,
+      date: new Date().toISOString(),
+      cause: state.cause,
+    });
+    // Keep top 50
+    scores.sort((a,b)=>b.score-a.score);
+    scores.length = Math.min(scores.length, 50);
+    localStorage.setItem(key, JSON.stringify(scores));
+  }catch(e){}
+}
+
+// ── Hook into stepSim for auto-save + cartridge init ──
+// Patch the sim interval in launchMission to include auto-save
+const _origLaunchMission = launchMission;
+
+// Store start config on launch for scoring
+const _origLaunchMission2 = launchMission;
+(function patchLaunch(){
+  const origFn = launchMission;
+  // We can't reassign launchMission (it's used as onclick), so we patch inline below
+})();
+
+// ── Check for auto-save on page load ──
+checkAutoSave();
+
+// ── Keyboard shortcuts ──
+// 1-6: switch camera views (TV remote style)
+// Space: pause/resume
+// +/-: speed up/down
+// C: cinematic mode
+document.addEventListener('keydown', e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
+  const views=['planet','surface','warmap','base','module','crew'];
+  if(e.key>='1'&&e.key<='6'){setZoom(views[parseInt(e.key)-1]);e.preventDefault()}
+  if(e.key===' '&&running!==undefined){toggleSim();e.preventDefault()}
+  if(e.key==='='||e.key==='+'){
+    const speeds=[1,2,5,10];const idx=speeds.indexOf(simSpeed);
+    if(idx<speeds.length-1)setSpeed(speeds[idx+1]);e.preventDefault();
+  }
+  if(e.key==='-'){
+    const speeds=[1,2,5,10];const idx=speeds.indexOf(simSpeed);
+    if(idx>0)setSpeed(speeds[idx-1]);e.preventDefault();
+  }
+  if(e.key==='c'||e.key==='C'){toggleCinematic();e.preventDefault()}
+  if(e.key==='s'&&(e.ctrlKey||e.metaKey)){exportCartridge();e.preventDefault()}
+  // Tab: cycle through crew/robot FPS perspectives
+  if(e.key==='Tab'&&currentZoom==='crew'){
+    e.preventDefault();
+  }
+});
 </script>
 </body>
 </html>

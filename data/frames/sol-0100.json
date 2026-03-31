@@ -1,0 +1,60 @@
+{
+  "sol": 100,
+  "utc": "2025-10-19T18:00:00Z",
+  "mars": {
+    "ls": 179.4,
+    "season": "Northern Summer",
+    "temp_k": 228.2,
+    "temp_c": -45.0,
+    "pressure_pa": 740,
+    "solar_wm2": 482,
+    "dust_tau": 0.133,
+    "wind_ms": 1.4,
+    "lmst": 14.0
+  },
+  "events": [
+    {
+      "type": "solar_flare",
+      "severity": 0.79,
+      "duration_sols": 2,
+      "desc": "Solar particle event detected \u2014 elevated radiation"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0149
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "antenna",
+      "degradation": 0.0079
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 11.7,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.72,
+    "water_ice_depth_m": 2.0,
+    "surface_radiation_usv": 0.42
+  },
+  "challenge": {
+    "id": "sol100_water_recycler_fault",
+    "type": "water_recycler_fault",
+    "params": {
+      "efficiency_drop": 0.14,
+      "filter_age_sols": 120
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 99,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -2.3,
+    "dust_delta": -0.017
+  },
+  "_hash": "665dc598276c3f37"
+}

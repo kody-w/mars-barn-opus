@@ -1,0 +1,41 @@
+{
+  "sol": 24,
+  "utc": "2025-08-02T15:50:24Z",
+  "mars": {
+    "ls": 139.6,
+    "season": "Northern Summer",
+    "temp_k": 226.4,
+    "temp_c": -46.8,
+    "pressure_pa": 759,
+    "solar_wm2": 519,
+    "dust_tau": 0.152,
+    "wind_ms": 5.8,
+    "lmst": 14.6
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0092
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 6.1,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.66,
+    "water_ice_depth_m": 2.3,
+    "surface_radiation_usv": 0.68
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 23,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -11.0,
+    "dust_delta": 0.059
+  },
+  "_hash": "274d8f614ef5a3b1"
+}

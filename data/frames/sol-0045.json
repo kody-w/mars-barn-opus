@@ -1,0 +1,55 @@
+{
+  "sol": 45,
+  "utc": "2025-08-24T05:42:00Z",
+  "mars": {
+    "ls": 150.6,
+    "season": "Northern Summer",
+    "temp_k": 230.6,
+    "temp_c": -42.6,
+    "pressure_pa": 755,
+    "solar_wm2": 494,
+    "dust_tau": 0.162,
+    "wind_ms": 6.2,
+    "lmst": 1.2
+  },
+  "events": [
+    {
+      "type": "dust_devil",
+      "severity": 0.26,
+      "duration_sols": 1,
+      "desc": "Dust devil spotted near habitat perimeter"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0133
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 7.8,
+    "window_open": false,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.7,
+    "water_ice_depth_m": 2.1,
+    "surface_radiation_usv": 0.7
+  },
+  "challenge": {
+    "id": "sol45_pressure_anomaly",
+    "type": "pressure_anomaly",
+    "params": {
+      "section": "airlock",
+      "drop_pa": 45
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 44,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 0.8,
+    "dust_delta": 0.012
+  },
+  "_hash": "6ce54818817a8a4d"
+}

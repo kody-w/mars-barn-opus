@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SimHub — Mars Barn Leaderboard</title>
+<style>
+:root{--bg:#0a0e14;--panel:rgba(10,14,20,0.95);--border:rgba(88,166,255,0.15);
+--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--cyan:#79c0ff;
+--text:#c9d1d9;--dim:#484f58;--gold:#ffd700;--font:'Courier New',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
+
+/* Header */
+.hub-header{background:rgba(0,0,0,0.6);border-bottom:1px solid var(--border);padding:16px 24px;
+  display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.hub-header h1{font-size:18px;color:var(--cyan);letter-spacing:3px;flex:1}
+.hub-header .live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);
+  animation:pulse 2s infinite;display:inline-block;margin-right:4px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.hub-header .frame-info{font-size:11px;color:var(--dim)}
+.hub-header .frame-info .val{color:var(--cyan);font-weight:700}
+.nav-link{color:var(--dim);text-decoration:none;padding:4px 10px;font-size:11px;border-radius:4px;
+  transition:all 0.2s;border:1px solid transparent}
+.nav-link:hover{color:var(--cyan);border-color:var(--border)}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;padding:0 24px;margin-top:16px}
+.tab{padding:8px 20px;background:rgba(88,166,255,0.05);border:1px solid var(--border);
+  border-bottom:none;border-radius:8px 8px 0 0;color:var(--dim);cursor:pointer;font-family:var(--font);
+  font-size:12px;letter-spacing:1px;transition:all 0.2s}
+.tab:hover{color:var(--text);background:rgba(88,166,255,0.1)}
+.tab.active{color:var(--cyan);background:var(--panel);border-color:var(--cyan)}
+
+/* Content area */
+.content{max-width:1100px;margin:0 auto;padding:20px 24px}
+
+/* Live Frame Ticker */
+.frame-ticker{background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:10px;
+  padding:16px 20px;margin-bottom:20px;display:flex;gap:24px;align-items:center}
+.frame-ticker .sol-display{font-size:36px;font-weight:700;color:var(--cyan);min-width:120px}
+.frame-ticker .sol-label{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+.frame-conditions{display:flex;gap:16px;flex:1;flex-wrap:wrap}
+.cond{text-align:center;min-width:70px}
+.cond .val{font-size:16px;font-weight:700;color:var(--text)}
+.cond .lbl{font-size:9px;color:var(--dim);text-transform:uppercase}
+.frame-events{display:flex;gap:6px;flex-wrap:wrap}
+.event-tag{padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:0.5px}
+.event-tag.storm{background:rgba(210,153,34,0.2);color:var(--yellow);border:1px solid var(--yellow)}
+.event-tag.flare{background:rgba(218,54,51,0.2);color:var(--red);border:1px solid var(--red)}
+.event-tag.devil{background:rgba(88,166,255,0.15);color:var(--blue);border:1px solid var(--blue)}
+
+/* Leaderboard */
+.leaderboard{width:100%}
+.lb-row{display:grid;grid-template-columns:50px 2fr 100px 80px 80px 80px 100px 60px;
+  padding:10px 16px;border:1px solid var(--border);margin-bottom:2px;border-radius:6px;
+  align-items:center;font-size:12px;transition:all 0.2s;cursor:pointer}
+.lb-row:hover{background:rgba(88,166,255,0.08);border-color:var(--cyan)}
+.lb-row.header{background:rgba(0,0,0,0.4);font-weight:700;color:var(--dim);font-size:10px;
+  text-transform:uppercase;letter-spacing:1px;cursor:default}
+.lb-row.header:hover{background:rgba(0,0,0,0.4)}
+.lb-row .rank{font-size:16px;font-weight:700;text-align:center}
+.rank-1{color:var(--gold)}.rank-2{color:#c0c0c0}.rank-3{color:#cd7f32}
+.lb-row .name{font-weight:700;color:var(--text)}
+.lb-row .mission{color:var(--dim);font-size:10px}
+.lb-row .score{color:var(--cyan);font-weight:700;text-align:right}
+.lb-row .sol{text-align:center}
+.lb-row .crew{text-align:center}
+.lb-row .cri{text-align:center}
+.lb-row .status{text-align:center}
+.lb-row .grade{text-align:center;font-size:16px;font-weight:700}
+.status-live{color:var(--green);animation:pulse 2s infinite}
+.status-dead{color:var(--red)}
+.grade-s{color:var(--gold)}.grade-a{color:var(--green)}.grade-b{color:var(--cyan)}
+.grade-c{color:var(--yellow)}.grade-d{color:#ff9944}.grade-f{color:var(--red)}
+
+/* Upload Zone */
+.upload-zone{border:2px dashed var(--border);border-radius:12px;padding:32px;text-align:center;
+  margin:20px 0;cursor:pointer;transition:all 0.3s}
+.upload-zone:hover{border-color:var(--cyan);background:rgba(88,166,255,0.03)}
+.upload-zone.dragover{border-color:var(--green);background:rgba(63,185,80,0.08)}
+.upload-zone h3{color:var(--cyan);font-size:14px;margin-bottom:8px;letter-spacing:1px}
+.upload-zone p{color:var(--dim);font-size:11px;line-height:1.8}
+
+/* Stats Cards */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:20px 0}
+.stat-card{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.stat-card .big{font-size:28px;font-weight:700;color:var(--cyan)}
+.stat-card .label{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+
+/* Frame Timeline */
+.timeline{display:flex;gap:1px;height:40px;align-items:flex-end;margin:20px 0;
+  border-bottom:1px solid var(--border);padding-bottom:4px}
+.timeline-bar{flex:1;min-width:2px;background:var(--blue);border-radius:2px 2px 0 0;
+  transition:height 0.3s,background 0.3s;cursor:pointer;position:relative}
+.timeline-bar:hover{background:var(--cyan)}
+.timeline-bar.storm{background:var(--yellow)}
+.timeline-bar.flare{background:var(--red)}
+.timeline-bar.calm{background:var(--green)}
+.timeline-label{display:flex;justify-content:space-between;font-size:9px;color:var(--dim);margin-top:4px}
+
+/* Live Runs Panel */
+.live-run{background:rgba(63,185,80,0.05);border:1px solid rgba(63,185,80,0.3);border-radius:8px;
+  padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.live-run .pulse{width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+.live-run .info{flex:1}
+.live-run .colony-name{font-weight:700;color:var(--text);font-size:13px}
+.live-run .meta{font-size:10px;color:var(--dim)}
+.live-run .score{font-size:18px;font-weight:700;color:var(--cyan)}
+
+/* Cartridge Details Modal */
+.modal-backdrop{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);
+  z-index:9000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-backdrop.show{display:flex}
+.modal{background:var(--bg);border:1px solid var(--cyan);border-radius:12px;padding:24px;
+  max-width:600px;width:90%;max-height:85vh;overflow-y:auto}
+.modal h2{color:var(--cyan);font-size:16px;letter-spacing:2px;margin-bottom:16px}
+.modal .close{float:right;cursor:pointer;color:var(--dim);font-size:18px;padding:4px 8px}
+.modal .close:hover{color:var(--red)}
+.modal .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.modal .detail-item{background:rgba(0,0,0,0.3);padding:8px;border-radius:6px}
+.modal .detail-item .lbl{font-size:9px;color:var(--dim);text-transform:uppercase}
+.modal .detail-item .val{font-size:14px;color:var(--text);font-weight:700}
+
+/* Footer */
+.hub-footer{text-align:center;padding:32px;color:var(--dim);font-size:10px;border-top:1px solid var(--border);margin-top:40px}
+.hub-footer a{color:var(--cyan);text-decoration:none}
+.hub-footer a:hover{text-decoration:underline}
+
+@media(max-width:800px){
+  .lb-row{grid-template-columns:40px 1.5fr 80px 60px 60px;font-size:11px}
+  .lb-row .cri,.lb-row .crew,.lb-row .status{display:none}
+  .frame-ticker{flex-direction:column;text-align:center}
+  .hub-header{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="hub-header">
+  <h1>🔴 SIMHUB</h1>
+  <div class="frame-info">
+    <span class="live-dot"></span>
+    FRAME <span class="val" id="latest-sol">—</span> ·
+    PLAYERS <span class="val" id="player-count">0</span> ·
+    LIVE <span class="val" id="live-count">0</span>
+  </div>
+  <a class="nav-link" href="viewer.html">▶ PLAY</a>
+  <a class="nav-link" href="playbook.html">📖 PLAYBOOK</a>
+  <a class="nav-link" href="slides.html">📊 SLIDES</a>
+  <a class="nav-link" href="https://github.com/kody-w/mars-barn-opus" target="_blank">⌂ REPO</a>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('leaderboard')">🏆 LEADERBOARD</div>
+  <div class="tab" onclick="switchTab('live')">🟢 LIVE RUNS</div>
+  <div class="tab" onclick="switchTab('frames')">📡 FRAME FEED</div>
+  <div class="tab" onclick="switchTab('upload')">📤 UPLOAD</div>
+  <div class="tab" onclick="switchTab('your-runs')">📋 YOUR RUNS</div>
+</div>
+
+<div class="content">
+
+<!-- ═══ TAB: LEADERBOARD ═══ -->
+<div id="tab-leaderboard">
+  <div class="stats-grid" id="hub-stats"></div>
+
+  <div class="leaderboard">
+    <div class="lb-row header">
+      <div>#</div>
+      <div>COLONY</div>
+      <div style="text-align:right">SCORE</div>
+      <div style="text-align:center">SOLS</div>
+      <div style="text-align:center">CREW</div>
+      <div style="text-align:center">CRI</div>
+      <div style="text-align:center">STATUS</div>
+      <div style="text-align:center">GRADE</div>
+    </div>
+    <div id="leaderboard-rows"></div>
+  </div>
+</div>
+
+<!-- ═══ TAB: LIVE RUNS ═══ -->
+<div id="tab-live" style="display:none">
+  <h2 style="color:var(--cyan);font-size:14px;letter-spacing:2px;margin-bottom:16px">
+    <span class="live-dot"></span> COLONIES STILL BREATHING
+  </h2>
+  <p style="color:var(--dim);font-size:11px;margin-bottom:16px">
+    These colonies are alive at the latest frame. They're consuming public frames in real-time.
+    When the next frame drops, they react — or they die.
+  </p>
+  <div id="live-runs-list"></div>
+  <div id="no-live" style="display:none;text-align:center;padding:40px;color:var(--dim)">
+    <div style="font-size:32px;margin-bottom:8px">💀</div>
+    No colonies alive at the latest frame.<br>Be the first to survive.
+  </div>
+</div>
+
+<!-- ═══ TAB: FRAME FEED ═══ -->
+<div id="tab-frames" style="display:none">
+  <h2 style="color:var(--cyan);font-size:14px;letter-spacing:2px;margin-bottom:16px">📡 PUBLIC FRAME LEDGER</h2>
+  <p style="color:var(--dim);font-size:11px;margin-bottom:16px">
+    Every frame is a sol of Mars conditions from the Rappter engine. All players face the same planet.
+  </p>
+
+  <!-- Frame Ticker: Latest -->
+  <div class="frame-ticker" id="frame-ticker">
+    <div>
+      <div class="sol-display" id="ticker-sol">—</div>
+      <div class="sol-label">CURRENT SOL</div>
+    </div>
+    <div class="frame-conditions" id="ticker-conditions"></div>
+    <div class="frame-events" id="ticker-events"></div>
+  </div>
+
+  <!-- Timeline visualization -->
+  <div style="color:var(--dim);font-size:10px;margin-bottom:4px">DUST OPTICAL DEPTH OVER TIME</div>
+  <div class="timeline" id="frame-timeline"></div>
+  <div class="timeline-label">
+    <span>Sol 1</span>
+    <span id="timeline-end">Sol 100</span>
+  </div>
+
+  <!-- Frame list -->
+  <div id="frame-list" style="margin-top:20px"></div>
+</div>
+
+<!-- ═══ TAB: UPLOAD ═══ -->
+<div id="tab-upload" style="display:none">
+  <h2 style="color:var(--cyan);font-size:14px;letter-spacing:2px;margin-bottom:16px">📤 SUBMIT YOUR RUN</h2>
+  <p style="color:var(--dim);font-size:11px;margin-bottom:8px;line-height:1.8">
+    Export your cartridge from the game (💾 button or Ctrl+S) and drop it here to post your score.
+    Your cartridge is validated against the public frame ledger — same frames, your decisions.
+  </p>
+  <p style="color:var(--dim);font-size:11px;margin-bottom:20px;line-height:1.8">
+    <strong style="color:var(--yellow)">Anti-cheat:</strong> Frame hashes in your cartridge are checked against
+    the public ledger. Modified frames = disqualified. Your decision log is hashed for replay validation.
+  </p>
+
+  <div class="upload-zone" id="upload-drop"
+    onclick="document.getElementById('upload-input').click()"
+    ondragover="event.preventDefault();this.classList.add('dragover')"
+    ondragleave="this.classList.remove('dragover')"
+    ondrop="event.preventDefault();this.classList.remove('dragover');handleUpload(event.dataTransfer.files[0])">
+    <h3>💾 DROP CARTRIDGE HERE</h3>
+    <p>or click to browse for a .cartridge.json file<br>
+    Your colony name, score, and survival stats will be posted to the leaderboard</p>
+    <input type="file" id="upload-input" accept=".json,.cartridge.json" onchange="handleUpload(this.files[0])" style="display:none">
+  </div>
+
+  <div id="upload-result" style="display:none;margin-top:16px;padding:16px;border-radius:8px;text-align:center"></div>
+
+  <!-- Colony Name for submission -->
+  <div id="submit-form" style="display:none;margin-top:16px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:10px;padding:20px">
+    <div style="margin-bottom:12px">
+      <label style="font-size:11px;color:var(--dim);display:block;margin-bottom:4px">COLONY NAME (for leaderboard)</label>
+      <input type="text" id="colony-name" placeholder="e.g. Ares Alpha" maxlength="30"
+        style="width:100%;background:#080b10;border:1px solid var(--border);color:var(--text);
+        padding:8px 12px;font-family:var(--font);font-size:13px;border-radius:6px">
+    </div>
+    <div id="submit-preview" style="margin-bottom:12px"></div>
+    <button onclick="submitToLeaderboard()" style="padding:10px 32px;border-radius:8px;border:1px solid var(--green);
+      background:rgba(63,185,80,0.2);color:var(--green);cursor:pointer;font-family:var(--font);
+      font-size:13px;letter-spacing:1px;font-weight:700;width:100%">📡 SUBMIT TO SIMHUB</button>
+  </div>
+</div>
+
+<!-- ═══ TAB: YOUR RUNS ═══ -->
+<div id="tab-your-runs" style="display:none">
+  <h2 style="color:var(--cyan);font-size:14px;letter-spacing:2px;margin-bottom:16px">📋 YOUR RUN HISTORY</h2>
+  <p style="color:var(--dim);font-size:11px;margin-bottom:16px">
+    Scores from your browser (localStorage). Export a cartridge to back up any run permanently.
+  </p>
+  <div id="your-runs-list"></div>
+  <div id="no-runs" style="display:none;text-align:center;padding:40px;color:var(--dim)">
+    <div style="font-size:32px;margin-bottom:8px">🚀</div>
+    No runs yet. <a href="viewer.html" style="color:var(--cyan)">Play your first mission</a>.
+  </div>
+</div>
+
+</div>
+
+<!-- Cartridge Detail Modal -->
+<div class="modal-backdrop" id="detail-modal">
+  <div class="modal">
+    <span class="close" onclick="closeModal()">✕</span>
+    <h2 id="modal-title">Colony Details</h2>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="hub-footer">
+  SIMHUB · <a href="https://github.com/kody-w/mars-barn-opus">Mars Barn Opus</a> ·
+  Frame data from the Rappter Engine ·
+  Same Mars, different management, competing scores<br>
+  <span style="margin-top:4px;display:inline-block">Built with 🔴 First Principles</span>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// SIMHUB — Mars Barn Competitive Leaderboard
+// Xbox Live for Mars colony survival runs
+// ══════════════════════════════════════════════════════════════
+
+const REPO_BASE = 'https://raw.githubusercontent.com/kody-w/mars-barn-opus/main/data';
+const LEADERBOARD_KEY = 'mars-barn-leaderboard';
+const HIGHSCORES_KEY = 'mars-barn-highscores';
+let latestFrame = null;
+let allFrames = [];
+let leaderboard = [];
+let pendingCartridge = null;
+
+// ── Tab Switching ──
+function switchTab(tab){
+  document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('[id^="tab-"]').forEach(t=>t.style.display='none');
+  document.getElementById('tab-'+tab).style.display='block';
+  document.querySelector(`.tab[onclick*="${tab}"]`).classList.add('active');
+
+  if(tab==='your-runs') renderYourRuns();
+  if(tab==='live') renderLiveRuns();
+  if(tab==='frames') renderFrameFeed();
+}
+
+// ── Load Frame Data ──
+async function loadFrameData(){
+  try{
+    // Load manifest
+    const mRes = await fetch(REPO_BASE+'/frames/manifest.json');
+    if(!mRes.ok) throw new Error('No manifest');
+    const manifest = await mRes.json();
+
+    // Load latest
+    const lRes = await fetch(REPO_BASE+'/frames/latest.json');
+    if(lRes.ok){
+      const latest = await lRes.json();
+      document.getElementById('latest-sol').textContent = latest.sol;
+    }
+
+    // Load last 10 frames for display
+    const loadCount = Math.min(10, manifest.total_frames);
+    const startSol = manifest.last_sol - loadCount + 1;
+    const promises = [];
+    for(let s = startSol; s <= manifest.last_sol; s++){
+      promises.push(
+        fetch(REPO_BASE+`/frames/sol-${String(s).padStart(4,'0')}.json`)
+          .then(r=>r.ok?r.json():null)
+          .catch(()=>null)
+      );
+    }
+    const frames = (await Promise.all(promises)).filter(Boolean);
+    allFrames = frames;
+
+    if(frames.length){
+      latestFrame = frames[frames.length-1];
+      renderFrameTicker(latestFrame);
+      renderTimeline(manifest);
+    }
+
+    // Load ALL frames for timeline (just sol + dust_tau)
+    if(manifest.total_frames > 10){
+      const allPromises = [];
+      for(let s = 1; s <= manifest.last_sol; s++){
+        allPromises.push(
+          fetch(REPO_BASE+`/frames/sol-${String(s).padStart(4,'0')}.json`)
+            .then(r=>r.ok?r.json():null)
+            .catch(()=>null)
+        );
+      }
+      const allF = (await Promise.all(allPromises)).filter(Boolean);
+      if(allF.length) { allFrames = allF; renderTimeline(manifest); }
+    }
+  }catch(e){
+    console.log('Frame loading failed (offline mode):', e.message);
+    document.getElementById('latest-sol').textContent = 'OFFLINE';
+  }
+}
+
+function renderFrameTicker(frame){
+  document.getElementById('ticker-sol').textContent = 'SOL ' + frame.sol;
+
+  const m = frame.mars;
+  const conds = document.getElementById('ticker-conditions');
+  conds.innerHTML = `
+    <div class="cond"><div class="val">${m.temp_c}°C</div><div class="lbl">Temp</div></div>
+    <div class="cond"><div class="val">${m.dust_tau}</div><div class="lbl">Dust τ</div></div>
+    <div class="cond"><div class="val">${m.solar_wm2}</div><div class="lbl">Solar W/m²</div></div>
+    <div class="cond"><div class="val">${m.wind_ms}</div><div class="lbl">Wind m/s</div></div>
+    <div class="cond"><div class="val">${m.pressure_pa}</div><div class="lbl">Pa</div></div>
+    <div class="cond"><div class="val">${m.season.split(' ')[1]}</div><div class="lbl">${m.season.split(' ')[0]}</div></div>
+  `;
+
+  const evts = document.getElementById('ticker-events');
+  evts.innerHTML = frame.events.map(e=>{
+    const cls = e.type.includes('storm')?'storm':e.type.includes('flare')?'flare':'devil';
+    return `<span class="event-tag ${cls}">${e.type.replace(/_/g,' ').toUpperCase()} · ${(e.severity*100).toFixed(0)}%</span>`;
+  }).join('') || '<span style="color:var(--green);font-size:10px">☀️ Clear conditions</span>';
+}
+
+function renderTimeline(manifest){
+  const el = document.getElementById('frame-timeline');
+  if(!allFrames.length) return;
+
+  const maxDust = Math.max(...allFrames.map(f=>f.mars.dust_tau), 0.5);
+  el.innerHTML = allFrames.map(f=>{
+    const h = Math.max(4, (f.mars.dust_tau / maxDust) * 36);
+    const cls = f.events.some(e=>e.type==='solar_flare')?'flare':
+                f.events.some(e=>e.type.includes('storm'))?'storm':
+                f.mars.dust_tau < 0.1 ? 'calm' : '';
+    return `<div class="timeline-bar ${cls}" style="height:${h}px" title="Sol ${f.sol}: τ=${f.mars.dust_tau}"></div>`;
+  }).join('');
+  document.getElementById('timeline-end').textContent = 'Sol ' + allFrames[allFrames.length-1].sol;
+}
+
+function renderFrameFeed(){
+  const el = document.getElementById('frame-list');
+  if(!allFrames.length){
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--dim)">Loading frames...</div>';
+    return;
+  }
+  el.innerHTML = allFrames.slice().reverse().slice(0,20).map(f=>{
+    const m = f.mars;
+    const evts = f.events.map(e=>e.type.replace(/_/g,' ')).join(', ') || 'clear';
+    const challenge = f.challenge ? `🎯 ${f.challenge.type.replace(/_/g,' ')}` : '';
+    return `<div style="background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:4px;display:flex;gap:16px;align-items:center;font-size:11px">
+      <div style="font-size:16px;font-weight:700;color:var(--cyan);min-width:60px">Sol ${f.sol}</div>
+      <div style="flex:1;color:var(--dim)">${m.temp_c}°C · τ${m.dust_tau} · ${m.solar_wm2}W/m² · ${m.wind_ms}m/s</div>
+      <div style="color:var(--dim)">${evts}</div>
+      <div style="color:var(--yellow);font-size:10px">${challenge}</div>
+      <div style="font-size:9px;color:var(--dim);font-family:monospace">${f._hash||''}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Leaderboard ──
+function loadLeaderboard(){
+  try{
+    leaderboard = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]');
+  }catch(e){ leaderboard = []; }
+  renderLeaderboard();
+}
+
+function renderLeaderboard(){
+  leaderboard.sort((a,b)=>{
+    // Live runs first, then by score
+    if(a.alive && !b.alive) return -1;
+    if(!a.alive && b.alive) return 1;
+    return b.score - a.score;
+  });
+
+  const rows = document.getElementById('leaderboard-rows');
+  if(!leaderboard.length){
+    rows.innerHTML = `<div style="text-align:center;padding:40px;color:var(--dim)">
+      <div style="font-size:32px;margin-bottom:8px">🏆</div>
+      No scores yet. <a href="viewer.html" style="color:var(--cyan)">Play a mission</a> and upload your cartridge.
+    </div>`;
+    return;
+  }
+
+  rows.innerHTML = leaderboard.slice(0,100).map((entry,i)=>{
+    const rankClass = i<3 ? `rank-${i+1}` : '';
+    const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    const statusClass = entry.alive?'status-live':'status-dead';
+    const statusText = entry.alive?'● LIVE':'☠ DEAD';
+    const gradeClass = entry.grade==='S+'||entry.grade==='S'?'grade-s':
+                        entry.grade==='A'?'grade-a':entry.grade==='B'?'grade-b':
+                        entry.grade==='C'?'grade-c':entry.grade==='D'?'grade-d':'grade-f';
+
+    return `<div class="lb-row" onclick="showRunDetail(${i})">
+      <div class="rank ${rankClass}">${medal||i+1}</div>
+      <div><div class="name">${esc(entry.name||entry.id||'Unknown Colony')}</div><div class="mission">${esc(entry.mission||'custom')} · ${entry.id||''}</div></div>
+      <div class="score">${(entry.score||0).toLocaleString()}</div>
+      <div class="sol">${entry.sol||0}</div>
+      <div class="crew">${entry.crew||'?'}</div>
+      <div class="cri">${entry.cri!==undefined?entry.cri:'?'}</div>
+      <div class="status ${statusClass}">${statusText}</div>
+      <div class="grade ${gradeClass}">${entry.grade||'?'}</div>
+    </div>`;
+  }).join('');
+
+  // Stats
+  const total = leaderboard.length;
+  const alive = leaderboard.filter(e=>e.alive).length;
+  const bestScore = leaderboard.length ? Math.max(...leaderboard.map(e=>e.score||0)) : 0;
+  const avgSol = leaderboard.length ? Math.round(leaderboard.reduce((s,e)=>s+(e.sol||0),0)/total) : 0;
+
+  document.getElementById('hub-stats').innerHTML = `
+    <div class="stat-card"><div class="big">${total}</div><div class="label">Total Runs</div></div>
+    <div class="stat-card"><div class="big" style="color:var(--green)">${alive}</div><div class="label">Still Alive</div></div>
+    <div class="stat-card"><div class="big">${bestScore.toLocaleString()}</div><div class="label">High Score</div></div>
+    <div class="stat-card"><div class="big">${avgSol}</div><div class="label">Avg Sols</div></div>
+  `;
+
+  document.getElementById('player-count').textContent = total;
+  document.getElementById('live-count').textContent = alive;
+}
+
+// ── Upload Cartridge ──
+function handleUpload(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    try{
+      const cartridge = JSON.parse(e.target.result);
+      if(!cartridge._format || cartridge._format !== 'mars-barn-cartridge'){
+        showUploadResult('error', '❌ Not a valid Mars Barn cartridge file.');
+        return;
+      }
+      pendingCartridge = cartridge;
+      showUploadResult('success', `✅ Valid cartridge: ${cartridge.id}<br>
+        Sol ${cartridge.sol} · Score: ${(cartridge.score?.total||0).toLocaleString()} · Grade: ${cartridge.score?.grade||'?'}<br>
+        ${cartridge.alive?'🟢 COLONY ALIVE':'☠ COLONY DEAD'+(cartridge.state?.cause?' — '+cartridge.state.cause:'')}`);
+
+      // Show submit form
+      document.getElementById('submit-form').style.display = 'block';
+      document.getElementById('colony-name').value = cartridge.mission ? (cartridge.mission.charAt(0).toUpperCase()+cartridge.mission.slice(1)+' Colony') : 'My Colony';
+
+      // Preview
+      const preview = document.getElementById('submit-preview');
+      const sc = cartridge.score || {};
+      preview.innerHTML = `<div style="font-size:10px;color:var(--dim);line-height:1.8">
+        <strong>Mission:</strong> ${cartridge.mission||'custom'} · <strong>Governor:</strong> ${cartridge.config?.arch||'?'}<br>
+        <strong>Crew:</strong> ${cartridge.state?.crew?.filter(c=>c.alive).length||'?'}/${cartridge.state?.crew?.length||'?'} alive ·
+        <strong>Sols:</strong> ${cartridge.sol} · <strong>CRI:</strong> ${cartridge.cri||0}<br>
+        ${sc.breakdown ? sc.breakdown.map(([l,v])=>`${l}: ${v>=0?'+':''}${v}`).join(' · ') : ''}
+      </div>`;
+    }catch(err){
+      showUploadResult('error', '❌ Failed to parse: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function showUploadResult(type, html){
+  const el = document.getElementById('upload-result');
+  el.style.display = 'block';
+  el.style.background = type==='error'?'rgba(218,54,51,0.1)':'rgba(63,185,80,0.1)';
+  el.style.border = `1px solid ${type==='error'?'var(--red)':'var(--green)'}`;
+  el.innerHTML = `<div style="font-size:12px;color:${type==='error'?'var(--red)':'var(--green)'};">${html}</div>`;
+}
+
+function submitToLeaderboard(){
+  if(!pendingCartridge) return;
+  const name = document.getElementById('colony-name').value.trim() || 'Unknown Colony';
+  const c = pendingCartridge;
+  const sc = c.score || {};
+
+  const entry = {
+    id: c.id,
+    name: name,
+    mission: c.mission || 'custom',
+    score: sc.total || 0,
+    grade: sc.grade || '?',
+    sol: c.sol || 0,
+    crew: (c.state?.crew?.filter(x=>x.alive).length||0) + '/' + (c.state?.crew?.length||0),
+    cri: c.cri || 0,
+    alive: !!c.alive,
+    cause: c.state?.cause || null,
+    governor: c.config?.arch || 'unknown',
+    date: new Date().toISOString(),
+    frameHash: c.state?.startWeather ? 'verified' : 'local',
+    // Store full cartridge for detail view
+    _cartridge: c
+  };
+
+  // Check for duplicate
+  const existing = leaderboard.findIndex(e=>e.id === entry.id);
+  if(existing >= 0){
+    // Update existing entry (same cartridge, maybe more sols)
+    if(entry.sol >= leaderboard[existing].sol){
+      leaderboard[existing] = entry;
+    } else {
+      showUploadResult('error', '⚠️ A higher-scoring version of this cartridge already exists.');
+      return;
+    }
+  } else {
+    leaderboard.push(entry);
+  }
+
+  // Save
+  try{
+    // Don't persist full cartridge to localStorage (too big) — just the summary
+    const lean = leaderboard.map(e=>{
+      const copy = {...e};
+      delete copy._cartridge;
+      return copy;
+    });
+    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(lean));
+  }catch(e){
+    console.warn('Leaderboard save failed:', e.message);
+  }
+
+  renderLeaderboard();
+  switchTab('leaderboard');
+  showUploadResult('success', `🏆 ${name} posted to leaderboard! Score: ${(sc.total||0).toLocaleString()}`);
+  pendingCartridge = null;
+  document.getElementById('submit-form').style.display = 'none';
+}
+
+// ── Your Runs (local history) ──
+function renderYourRuns(){
+  try{
+    const scores = JSON.parse(localStorage.getItem(HIGHSCORES_KEY) || '[]');
+    const el = document.getElementById('your-runs-list');
+    const noEl = document.getElementById('no-runs');
+
+    if(!scores.length){
+      el.innerHTML = '';
+      noEl.style.display = 'block';
+      return;
+    }
+    noEl.style.display = 'none';
+    el.innerHTML = scores.map((s,i)=>{
+      const gradeClass = s.grade==='S+'||s.grade==='S'?'grade-s':
+                          s.grade==='A'?'grade-a':s.grade==='B'?'grade-b':
+                          s.grade==='C'?'grade-c':s.grade==='D'?'grade-d':'grade-f';
+      const date = s.date ? new Date(s.date).toLocaleDateString() : '?';
+      return `<div style="background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:6px;display:flex;align-items:center;gap:16px">
+        <div style="font-size:20px;font-weight:700;color:var(--dim);width:30px">${i+1}</div>
+        <div style="flex:1">
+          <div style="font-weight:700;color:var(--text)">${esc(s.mission||'Colony')} · Sol ${s.sol}</div>
+          <div style="font-size:10px;color:var(--dim)">${s.id||''} · ${s.crew||'?'} crew · ${date} · ${s.cause||'survived'}</div>
+        </div>
+        <div style="font-size:18px;font-weight:700;color:var(--cyan)">${(s.score||0).toLocaleString()}</div>
+        <div class="grade ${gradeClass}" style="font-size:20px;font-weight:700">${s.grade||'?'}</div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    document.getElementById('your-runs-list').innerHTML = '<div style="color:var(--red)">Error loading history</div>';
+  }
+}
+
+// ── Live Runs ──
+function renderLiveRuns(){
+  const alive = leaderboard.filter(e=>e.alive);
+  const el = document.getElementById('live-runs-list');
+  const noEl = document.getElementById('no-live');
+
+  if(!alive.length){
+    el.innerHTML = '';
+    noEl.style.display = 'block';
+    return;
+  }
+  noEl.style.display = 'none';
+  alive.sort((a,b)=>b.score-a.score);
+
+  el.innerHTML = alive.map(entry=>`
+    <div class="live-run">
+      <div class="pulse"></div>
+      <div class="info">
+        <div class="colony-name">${esc(entry.name||entry.id)}</div>
+        <div class="meta">${entry.mission||'custom'} · Sol ${entry.sol} · ${entry.crew||'?'} crew · CRI ${entry.cri||0} · ${entry.governor||'?'} governor</div>
+      </div>
+      <div class="score">${(entry.score||0).toLocaleString()}</div>
+    </div>
+  `).join('');
+}
+
+// ── Run Detail Modal ──
+function showRunDetail(idx){
+  const entry = leaderboard[idx];
+  if(!entry) return;
+
+  document.getElementById('modal-title').textContent = entry.name || entry.id || 'Colony Details';
+  document.getElementById('detail-modal').classList.add('show');
+
+  const body = document.getElementById('modal-body');
+  body.innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-item"><div class="lbl">Cartridge ID</div><div class="val" style="font-size:11px">${entry.id||'?'}</div></div>
+      <div class="detail-item"><div class="lbl">Mission</div><div class="val">${entry.mission||'custom'}</div></div>
+      <div class="detail-item"><div class="lbl">Score</div><div class="val" style="color:var(--cyan)">${(entry.score||0).toLocaleString()}</div></div>
+      <div class="detail-item"><div class="lbl">Grade</div><div class="val" style="font-size:24px;color:${entry.grade==='S'||entry.grade==='S+'?'var(--gold)':'var(--cyan)'}">${entry.grade||'?'}</div></div>
+      <div class="detail-item"><div class="lbl">Sols Survived</div><div class="val">${entry.sol||0}</div></div>
+      <div class="detail-item"><div class="lbl">Crew</div><div class="val">${entry.crew||'?'}</div></div>
+      <div class="detail-item"><div class="lbl">Final CRI</div><div class="val">${entry.cri||0}</div></div>
+      <div class="detail-item"><div class="lbl">Governor</div><div class="val">${entry.governor||'?'}</div></div>
+      <div class="detail-item"><div class="lbl">Status</div><div class="val" style="color:${entry.alive?'var(--green)':'var(--red)'}">${entry.alive?'● ALIVE':'☠ DEAD'}</div></div>
+      <div class="detail-item"><div class="lbl">Cause of Death</div><div class="val">${entry.cause||'—'}</div></div>
+      <div class="detail-item"><div class="lbl">Frame Verification</div><div class="val">${entry.frameHash||'unverified'}</div></div>
+      <div class="detail-item"><div class="lbl">Submitted</div><div class="val" style="font-size:10px">${entry.date?new Date(entry.date).toLocaleString():'?'}</div></div>
+    </div>
+  `;
+}
+
+function closeModal(){
+  document.getElementById('detail-modal').classList.remove('show');
+}
+
+// ── Utility ──
+function esc(s){
+  const d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+// ── Also import high scores from the game ──
+function importGameScores(){
+  try{
+    const scores = JSON.parse(localStorage.getItem(HIGHSCORES_KEY) || '[]');
+    scores.forEach(s=>{
+      if(!leaderboard.find(e=>e.id===s.id)){
+        leaderboard.push({
+          id: s.id||'local-'+Math.random().toString(36).substr(2,6),
+          name: (s.mission||'Colony') + ' (local)',
+          mission: s.mission||'custom',
+          score: s.score||0,
+          grade: s.grade||'?',
+          sol: s.sol||0,
+          crew: s.crew||'?',
+          cri: 0,
+          alive: false,
+          cause: s.cause||null,
+          date: s.date||new Date().toISOString(),
+          frameHash: 'local',
+        });
+      }
+    });
+    // Save merged leaderboard
+    const lean = leaderboard.map(e=>{const c={...e};delete c._cartridge;return c});
+    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(lean));
+  }catch(e){}
+}
+
+// ── Init ──
+loadLeaderboard();
+importGameScores();
+renderLeaderboard();
+loadFrameData();
+
+// Auto-refresh frame data every 5 minutes
+setInterval(loadFrameData, 300000);
+
+// Close modal on backdrop click
+document.getElementById('detail-modal').addEventListener('click', e=>{
+  if(e.target.classList.contains('modal-backdrop')) closeModal();
+});
+
+// Close modal on Escape
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape') closeModal();
+});
+</script>
+</body>
+</html>

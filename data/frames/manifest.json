@@ -1,0 +1,509 @@
+{
+  "version": 1,
+  "generated": "2026-03-31T18:59:13.729768Z",
+  "total_frames": 100,
+  "first_sol": 1,
+  "last_sol": 100,
+  "frames": [
+    {
+      "sol": 1,
+      "hash": "8603407d19123eb0",
+      "size": 692
+    },
+    {
+      "sol": 2,
+      "hash": "9f028d4feae6df1c",
+      "size": 731
+    },
+    {
+      "sol": 3,
+      "hash": "0429237acd7c9544",
+      "size": 947
+    },
+    {
+      "sol": 4,
+      "hash": "904c6068f4be74a5",
+      "size": 653
+    },
+    {
+      "sol": 5,
+      "hash": "7b6c128b2cfb3991",
+      "size": 886
+    },
+    {
+      "sol": 6,
+      "hash": "b2aa51d73c109848",
+      "size": 776
+    },
+    {
+      "sol": 7,
+      "hash": "e9ef445c887c6d65",
+      "size": 726
+    },
+    {
+      "sol": 8,
+      "hash": "d4d23c89d34dc965",
+      "size": 652
+    },
+    {
+      "sol": 9,
+      "hash": "80ea7ea074248eac",
+      "size": 758
+    },
+    {
+      "sol": 10,
+      "hash": "bdfabe03602598c0",
+      "size": 778
+    },
+    {
+      "sol": 11,
+      "hash": "8c942dbbd3e462f8",
+      "size": 857
+    },
+    {
+      "sol": 12,
+      "hash": "5f9e47b22b3abac8",
+      "size": 658
+    },
+    {
+      "sol": 13,
+      "hash": "ea7a092ac805f69e",
+      "size": 658
+    },
+    {
+      "sol": 14,
+      "hash": "42441094fee54f54",
+      "size": 740
+    },
+    {
+      "sol": 15,
+      "hash": "0ac509032d0e205c",
+      "size": 763
+    },
+    {
+      "sol": 16,
+      "hash": "85b4ac1572924f38",
+      "size": 771
+    },
+    {
+      "sol": 17,
+      "hash": "f07c8ddc90d86814",
+      "size": 736
+    },
+    {
+      "sol": 18,
+      "hash": "cf8975f95eb4932e",
+      "size": 938
+    },
+    {
+      "sol": 19,
+      "hash": "d3a76b237184af13",
+      "size": 655
+    },
+    {
+      "sol": 20,
+      "hash": "0e149ad700421254",
+      "size": 858
+    },
+    {
+      "sol": 21,
+      "hash": "7b11a50ebcb8212d",
+      "size": 658
+    },
+    {
+      "sol": 22,
+      "hash": "4b14a239f6b1395e",
+      "size": 659
+    },
+    {
+      "sol": 23,
+      "hash": "94aea36b103229f4",
+      "size": 739
+    },
+    {
+      "sol": 24,
+      "hash": "274d8f614ef5a3b1",
+      "size": 657
+    },
+    {
+      "sol": 25,
+      "hash": "d2de332ddf67841c",
+      "size": 775
+    },
+    {
+      "sol": 26,
+      "hash": "0b7e54c27243a47f",
+      "size": 657
+    },
+    {
+      "sol": 27,
+      "hash": "38724eb50575c810",
+      "size": 657
+    },
+    {
+      "sol": 28,
+      "hash": "447e5f6ac907fae6",
+      "size": 656
+    },
+    {
+      "sol": 29,
+      "hash": "1c7eb7424026b009",
+      "size": 739
+    },
+    {
+      "sol": 30,
+      "hash": "bee833a9272b3fbc",
+      "size": 760
+    },
+    {
+      "sol": 31,
+      "hash": "d1dd46163c057503",
+      "size": 655
+    },
+    {
+      "sol": 32,
+      "hash": "6d122dd435dfb679",
+      "size": 738
+    },
+    {
+      "sol": 33,
+      "hash": "ca433ccead333e92",
+      "size": 768
+    },
+    {
+      "sol": 34,
+      "hash": "0f2081b9167810f4",
+      "size": 655
+    },
+    {
+      "sol": 35,
+      "hash": "f5f4c988609034ee",
+      "size": 776
+    },
+    {
+      "sol": 36,
+      "hash": "a9cd7580c3588cbd",
+      "size": 655
+    },
+    {
+      "sol": 37,
+      "hash": "37a36d70ac9ec580",
+      "size": 849
+    },
+    {
+      "sol": 38,
+      "hash": "d96731c8e309c05f",
+      "size": 662
+    },
+    {
+      "sol": 39,
+      "hash": "113376db0dced58c",
+      "size": 655
+    },
+    {
+      "sol": 40,
+      "hash": "33c119d48128a9f5",
+      "size": 891
+    },
+    {
+      "sol": 41,
+      "hash": "eccc3942b0b4af6c",
+      "size": 656
+    },
+    {
+      "sol": 42,
+      "hash": "89769d8086439516",
+      "size": 731
+    },
+    {
+      "sol": 43,
+      "hash": "4d2323db0cad5b81",
+      "size": 655
+    },
+    {
+      "sol": 44,
+      "hash": "5e7ecb202c6f335a",
+      "size": 768
+    },
+    {
+      "sol": 45,
+      "hash": "6ce54818817a8a4d",
+      "size": 871
+    },
+    {
+      "sol": 46,
+      "hash": "975854b30631395a",
+      "size": 657
+    },
+    {
+      "sol": 47,
+      "hash": "44f6cb9f2962c14b",
+      "size": 659
+    },
+    {
+      "sol": 48,
+      "hash": "de13b1e5f40e3903",
+      "size": 736
+    },
+    {
+      "sol": 49,
+      "hash": "3fd4be118b35ec19",
+      "size": 734
+    },
+    {
+      "sol": 50,
+      "hash": "39b8e617d697325e",
+      "size": 778
+    },
+    {
+      "sol": 51,
+      "hash": "b18168e5d2933558",
+      "size": 859
+    },
+    {
+      "sol": 52,
+      "hash": "408c668913b5c62c",
+      "size": 739
+    },
+    {
+      "sol": 53,
+      "hash": "4a8f224cf5d17ab3",
+      "size": 655
+    },
+    {
+      "sol": 54,
+      "hash": "25381183e63650a4",
+      "size": 730
+    },
+    {
+      "sol": 55,
+      "hash": "43f35560a450656e",
+      "size": 789
+    },
+    {
+      "sol": 56,
+      "hash": "cf7bd507c4b5b633",
+      "size": 653
+    },
+    {
+      "sol": 57,
+      "hash": "b1cece4fa4e3120c",
+      "size": 742
+    },
+    {
+      "sol": 58,
+      "hash": "9a282bc0ccaa4c52",
+      "size": 771
+    },
+    {
+      "sol": 59,
+      "hash": "c5fe914e5dfb0958",
+      "size": 657
+    },
+    {
+      "sol": 60,
+      "hash": "aac3b263eea16d4c",
+      "size": 897
+    },
+    {
+      "sol": 61,
+      "hash": "9bb6e44b5f7bc44d",
+      "size": 653
+    },
+    {
+      "sol": 62,
+      "hash": "68c6024c6e464bd2",
+      "size": 655
+    },
+    {
+      "sol": 63,
+      "hash": "d7f2cf6bebb1f4e3",
+      "size": 737
+    },
+    {
+      "sol": 64,
+      "hash": "aa70c7dd44d242c2",
+      "size": 659
+    },
+    {
+      "sol": 65,
+      "hash": "c33d48da54ba5160",
+      "size": 846
+    },
+    {
+      "sol": 66,
+      "hash": "e12cea87d7e04cb3",
+      "size": 658
+    },
+    {
+      "sol": 67,
+      "hash": "f3d3bbff4eb5957b",
+      "size": 739
+    },
+    {
+      "sol": 68,
+      "hash": "65e0e6b55f6a060d",
+      "size": 850
+    },
+    {
+      "sol": 69,
+      "hash": "1bcbc21d5b9ef62b",
+      "size": 737
+    },
+    {
+      "sol": 70,
+      "hash": "7c8aae4c7f094295",
+      "size": 867
+    },
+    {
+      "sol": 71,
+      "hash": "169ec2f8d47083d7",
+      "size": 655
+    },
+    {
+      "sol": 72,
+      "hash": "11398c9bbfa918b4",
+      "size": 660
+    },
+    {
+      "sol": 73,
+      "hash": "58cc7e20c702f708",
+      "size": 654
+    },
+    {
+      "sol": 74,
+      "hash": "1f0cb6125c1196b2",
+      "size": 848
+    },
+    {
+      "sol": 75,
+      "hash": "14754f48eeef114b",
+      "size": 764
+    },
+    {
+      "sol": 76,
+      "hash": "b1f5b718544673fe",
+      "size": 740
+    },
+    {
+      "sol": 77,
+      "hash": "c6a38bdb7cd50f2f",
+      "size": 732
+    },
+    {
+      "sol": 78,
+      "hash": "341f7ffae5662bba",
+      "size": 657
+    },
+    {
+      "sol": 79,
+      "hash": "51c984536d6b4a13",
+      "size": 782
+    },
+    {
+      "sol": 80,
+      "hash": "0cd8a3126906a4fb",
+      "size": 774
+    },
+    {
+      "sol": 81,
+      "hash": "7851629b295571a4",
+      "size": 659
+    },
+    {
+      "sol": 82,
+      "hash": "9a6513209463a1a4",
+      "size": 662
+    },
+    {
+      "sol": 83,
+      "hash": "c437bffcf14a9564",
+      "size": 660
+    },
+    {
+      "sol": 84,
+      "hash": "cb914daec11210d8",
+      "size": 657
+    },
+    {
+      "sol": 85,
+      "hash": "ed3c48732180d33a",
+      "size": 851
+    },
+    {
+      "sol": 86,
+      "hash": "96205142d4685a3a",
+      "size": 656
+    },
+    {
+      "sol": 87,
+      "hash": "26bf1d05a6fb986a",
+      "size": 659
+    },
+    {
+      "sol": 88,
+      "hash": "f3ea3ce28443ea4f",
+      "size": 657
+    },
+    {
+      "sol": 89,
+      "hash": "598c46561e32c7be",
+      "size": 658
+    },
+    {
+      "sol": 90,
+      "hash": "98277ee1a0dff2c7",
+      "size": 860
+    },
+    {
+      "sol": 91,
+      "hash": "fe427d892874516e",
+      "size": 657
+    },
+    {
+      "sol": 92,
+      "hash": "992783148e7c777d",
+      "size": 658
+    },
+    {
+      "sol": 93,
+      "hash": "3aca4e7415d24295",
+      "size": 659
+    },
+    {
+      "sol": 94,
+      "hash": "baf0649439346d07",
+      "size": 657
+    },
+    {
+      "sol": 95,
+      "hash": "01dc3e6f4842cb12",
+      "size": 778
+    },
+    {
+      "sol": 96,
+      "hash": "69e8a046635590db",
+      "size": 776
+    },
+    {
+      "sol": 97,
+      "hash": "595b29f2bd502b73",
+      "size": 770
+    },
+    {
+      "sol": 98,
+      "hash": "ec4090b36a66ae71",
+      "size": 657
+    },
+    {
+      "sol": 99,
+      "hash": "fee7b82ff8ad7883",
+      "size": 859
+    },
+    {
+      "sol": 100,
+      "hash": "665dc598276c3f37",
+      "size": 988
+    }
+  ]
+}
