@@ -475,6 +475,7 @@ body.cinematic-active .cartridge-bar,body.cinematic-active #task-panel{
     <button class="zoom-btn" onclick="emergencyAction('isru')" title="Emergency ISRU: 80% to O₂/H₂O" style="font-size:10px">💨 O₂ BOOST</button>
     <button class="zoom-btn" onclick="emergencyAction('ration')" title="Half rations: extend food supply" style="font-size:10px">🍽️ RATION</button>
     <button class="zoom-btn" onclick="emergencyAction('normal')" title="Return to AI governor control" style="font-size:10px">🤖 AUTO</button>
+    <button class="zoom-btn" id="autopilot-btn" onclick="toggleAutopilot()" title="Autopilot: LisPy programs auto-resolve tasks" style="font-size:10px;border-color:var(--dim)">✈️ PILOT OFF</button>
   </div>
   <select id="gov-sel" style="background:#0a0e14;border:1px solid var(--border);color:var(--text);padding:3px;font-family:var(--font);font-size:10px;width:90px;display:none">
     <option value="engineer">ENGINEER</option><option value="contrarian">CONTRARIAN</option>
@@ -1011,6 +1012,155 @@ let activeTask = null;
 let taskHistory = [];
 let tasksResolved = 0;
 let tasksIgnored = 0;
+
+// ── TASK AUTOPILOT (LisPy Cartridge Programs) ──
+// These LisPy programs auto-resolve tasks when autopilot is enabled.
+// They read the task context + colony state and output a decision.
+// Users can swap them, write their own, or let agents evolve them.
+// Same VM, same language — autopilot programs ARE user programs.
+let autopilotEnabled = false;
+let autopilotDelaySols = 3; // think for N seconds before resolving
+let autopilotPrograms = {};
+
+// Default task autopilot cartridge — ships with the sim
+const DEFAULT_AUTOPILOT = {
+  // Decision tasks: evaluate colony state → pick approve/deny/alt
+  task_decision: `(begin
+    (define critical (> colony_risk_index 50))
+    (define resources_ok (and (> o2_days 10) (> h2o_days 10) (> food_days 10)))
+    (define power_ok (> power_kwh 100))
+    (cond
+      ;; Pressure / O₂ tasks: always approve if critical, resources permitting
+      ((and (= task_type "o2_reroute") critical) "approve")
+      ((and (= task_type "o2_reroute") (not resources_ok)) "approve")
+      ((= task_type "o2_reroute") "alt")
+      ;; Water tasks: approve if reserves low
+      ((and (= task_type "h2o_crisis") (< h2o_days 8)) "approve")
+      ((= task_type "h2o_crisis") "alt")
+      ;; Pressure anomaly: always approve (seal integrity is life-critical)
+      ((= task_type "pressure_anomaly") "approve")
+      ;; ISRU: approve if O₂ production needed
+      ((and (= task_type "isru_catalyst") (< o2_days 15)) "approve")
+      ((= task_type "isru_catalyst") "deny")
+      ;; Solar tracking: approve if power matters
+      ((and (= task_type "solar_tracking") (not power_ok)) "approve")
+      ((= task_type "solar_tracking") "alt")
+      ;; CO₂ scrubber: always approve (breathing is non-negotiable)
+      ((= task_type "co2_scrubber") "approve")
+      ;; Thermal: approve if cold, deny if warm
+      ((and (= task_type "thermal_crack") (< interior_temp_k 268)) "approve")
+      ((= task_type "thermal_crack") "deny")
+      ;; Radiation: approve if cumulative high
+      ((and (= task_type "radiation_dose") (> radiation_msv 200)) "approve")
+      ((= task_type "radiation_dose") "alt")
+      ;; Power rationing: approve if power critical
+      ((and (= task_type "power_ration") (< power_kwh 80)) "approve")
+      ((= task_type "power_ration") "deny")
+      ;; Default: approve urgent, alt for requests, deny info
+      ((= task_urgency "urgent") "approve")
+      ((= task_urgency "request") "alt")
+      (true "deny")))`,
+
+  // Override tasks: output the correct command sequence
+  task_override: `(begin
+    (cond
+      ((= task_type "stuck_bolt") "diagnostic inspect torque_release wiggle extract")
+      ((= task_type "panel_clean") "diagnostic brush_dust inspect verify")
+      ((= task_type "antenna_realign") "diagnostic scan_signal adjust_az adjust_el lock verify")
+      ((= task_type "airlock_seal") "depressurize remove_old inspect_groove apply_new pressurize verify")
+      ((= task_type "tip_rescue") "assess stabilize_base lift_frame check_joints reboot")
+      ((= task_type "wheel_jam") "diagnostic lock_wheel clear_debris release test_drive")
+      ((= task_type "panel_deploy") "diagnostic release_catch manual_extend lock_position verify")
+      (true "diagnostic inspect approve")))`
+};
+
+function runAutopilotOnTask(task){
+  if(!autopilotEnabled || !task) return null;
+  const vm = new LispyVM();
+  const n = Math.max(1, state.crew.filter(c=>c.alive).length);
+
+  // Feed colony state
+  vm.setEnv('sol', state.sol);
+  vm.setEnv('o2_days', state.o2/(O2_PP*n));
+  vm.setEnv('h2o_days', state.h2o/(H2O_PP*n));
+  vm.setEnv('food_days', state.food/(FOOD_PP*n));
+  vm.setEnv('power_kwh', state.power);
+  vm.setEnv('crew_alive', n);
+  vm.setEnv('morale', state.morale*100);
+  vm.setEnv('interior_temp_k', state.int_temp);
+  vm.setEnv('radiation_msv', state.rad);
+  vm.setEnv('solar_eff', state.s_eff);
+  vm.setEnv('colony_risk_index', colonyRiskIndex);
+  vm.setEnv('dust_tau', marsWeather.dustTau);
+
+  // Feed task context
+  vm.setEnv('task_type', task.id || 'unknown');
+  vm.setEnv('task_urgency', task.urgency || 'request');
+  vm.setEnv('task_timeout', task.timeout || 30);
+
+  const isOverride = !!task.override;
+  const program = isOverride
+    ? (autopilotPrograms.task_override || DEFAULT_AUTOPILOT.task_override)
+    : (autopilotPrograms.task_decision || DEFAULT_AUTOPILOT.task_decision);
+
+  const result = vm.run(program);
+  if(!result.ok) return null;
+
+  // The program returns a string: "approve", "deny", "alt", or a command sequence
+  const output = result.output.length ? result.output[result.output.length-1] : null;
+  // Also check the last expression result
+  const decision = (typeof result.result === 'string') ? result.result : output;
+  return decision;
+}
+
+function autopilotResolveTask(){
+  if(!activeTask || !autopilotEnabled) return;
+  const task = activeTask;
+  const decision = runAutopilotOnTask(task);
+  if(!decision) return;
+
+  if(task.override){
+    // For override tasks, the autopilot returns the command sequence as a string
+    // Simulate sending commands with delays
+    const cmds = decision.split(' ').map(s=>s.trim()).filter(Boolean);
+    let cmdIdx = 0;
+    function sendNextAutopilotCmd(){
+      if(cmdIdx >= cmds.length || !activeTask) return;
+      // Find the matching button
+      const cmdLabel = cmds[cmdIdx];
+      const buttons = task.override.commands;
+      const matchIdx = buttons.findIndex(b => 
+        b.label.toLowerCase().replace(/[^a-z]/g,'').includes(cmdLabel.toLowerCase().replace(/[^a-z]/g,''))
+      );
+      if(matchIdx >= 0) sendOverrideCmd(matchIdx);
+      cmdIdx++;
+      if(cmdIdx < cmds.length && activeTask){
+        setTimeout(sendNextAutopilotCmd, (task.override.delaySeconds||3)*1000 + 200);
+      }
+    }
+    sendNextAutopilotCmd();
+    state.log.push(`  🤖 AUTOPILOT: Executing override sequence for ${task.title}`);
+  } else {
+    // Decision task: approve/deny/alt
+    const validChoices = ['approve','deny','alt'];
+    const choice = validChoices.includes(decision) ? decision : 'approve';
+    state.log.push(`  🤖 AUTOPILOT: ${choice.toUpperCase()} on "${task.title}" (CRI:${colonyRiskIndex})`);
+    resolveTask(choice, false);
+  }
+}
+
+function toggleAutopilot(){
+  autopilotEnabled = !autopilotEnabled;
+  const btn = document.getElementById('autopilot-btn');
+  if(btn){
+    btn.textContent = autopilotEnabled ? '✈️ PILOT ON' : '✈️ PILOT OFF';
+    btn.style.borderColor = autopilotEnabled ? 'var(--green)' : 'var(--dim)';
+    btn.style.color = autopilotEnabled ? 'var(--green)' : 'var(--dim)';
+  }
+  state.log.push(autopilotEnabled
+    ? '✈️ AUTOPILOT ENGAGED — LisPy programs will auto-resolve tasks'
+    : '✈️ AUTOPILOT DISENGAGED — manual task resolution');
+}
 
 const ROBOT_PLEAS = [
   'is requesting human oversight.',
@@ -1703,10 +1853,24 @@ function renderTask(task){
     </div>`;
   }
 
+  // Autopilot indicator
+  if(autopilotEnabled){
+    const decision = runAutopilotOnTask(task);
+    const choiceLabel = task.override ? 'sequence ready' : (decision||'analyzing...');
+    html += `<div id="autopilot-indicator" style="margin-top:8px;padding:6px 10px;background:rgba(88,166,255,0.08);
+      border:1px solid var(--border);border-radius:6px;font-size:10px;display:flex;align-items:center;gap:8px">
+      <span style="color:var(--cyan)">🤖 AUTOPILOT:</span>
+      <span style="color:var(--text)" id="autopilot-decision">${choiceLabel.toUpperCase()}</span>
+      <span style="color:var(--dim);margin-left:auto">resolves in ${autopilotDelaySols}s</span>
+      <button onclick="autopilotEnabled=false;this.parentElement.style.display='none'" style="background:none;border:1px solid var(--red);color:var(--red);padding:2px 8px;border-radius:4px;cursor:pointer;font-family:var(--font);font-size:9px">TAKE OVER</button>
+    </div>`;
+  }
+
   document.getElementById('task-card-inner').innerHTML=html;
 
   // Start countdown
   clearInterval(activeTask._timer);
+  activeTask._autopilotFired = false;
   activeTask._timer=setInterval(()=>{
     if(!activeTask)return;
     activeTask.timerLeft--;
@@ -1715,10 +1879,16 @@ function renderTask(task){
       disp.textContent=activeTask.timerLeft+'s';
       if(activeTask.timerLeft<=5)disp.style.color='var(--red)';
     }
+    // Autopilot fires after delay (before timeout) — user can still click first
+    const elapsed = (activeTask.timeout||30) - activeTask.timerLeft;
+    if(autopilotEnabled && !activeTask._autopilotFired && elapsed >= autopilotDelaySols){
+      activeTask._autopilotFired = true;
+      autopilotResolveTask();
+      return;
+    }
     if(activeTask.timerLeft<=0){
       clearInterval(activeTask._timer);
       if(activeTask.override){
-        // Timeout on override = failure
         resolveOverride(false);
       }else{
         resolveTask(activeTask.defaultChoice||'deny', true);
@@ -4974,6 +5144,8 @@ function serializeCartridge(){
       lispy: activeLispy,
       lispyCode: lispyCode,
       lispyEnabled: lispyEnabled,
+      autopilotEnabled: autopilotEnabled,
+      autopilotPrograms: {...autopilotPrograms},
       simSpeed: simSpeed,
       seed: state.startSeed || null,
       o2: state.startConfig?.o2,
@@ -5059,6 +5231,8 @@ function deserializeCartridge(cartridge){
     activeLispy = cartridge.config.lispy || 'adaptive_governor';
     lispyCode = cartridge.config.lispyCode || LISPY_PROGRAMS.adaptive_governor;
     lispyEnabled = cartridge.config.lispyEnabled !== false;
+    autopilotEnabled = !!cartridge.config.autopilotEnabled;
+    if(cartridge.config.autopilotPrograms) autopilotPrograms = cartridge.config.autopilotPrograms;
     if(cartridge.config.simSpeed) simSpeed = cartridge.config.simSpeed;
     document.getElementById('gov-sel').value = state.arch;
     const ed = document.getElementById('lispy-editor');
