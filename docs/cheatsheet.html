@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>First Principles to Mars — Cheatsheet</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d1117;color:#c9d1d9;font-family:'SFMono-Regular',Consolas,monospace;
+max-width:900px;margin:0 auto;padding:24px;font-size:12px;line-height:1.5}
+h1{font-size:18px;color:#fff;letter-spacing:2px;text-align:center;margin-bottom:4px;font-family:-apple-system,sans-serif}
+.sub{text-align:center;color:#484f58;font-size:11px;margin-bottom:16px}
+h2{font-size:12px;color:#79c0ff;margin:16px 0 6px;text-transform:uppercase;letter-spacing:1px;
+border-bottom:1px solid #30363d;padding-bottom:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.box{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:10px}
+.box h3{font-size:11px;color:#3fb950;margin-bottom:4px}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{text-align:left;padding:3px 6px;color:#79c0ff;border-bottom:1px solid #30363d;font-size:10px}
+td{padding:3px 6px;border-bottom:1px solid #21262d}
+code{color:#79c0ff;background:rgba(88,166,255,0.1);padding:1px 4px;border-radius:2px}
+.red{color:#da3633}.green{color:#3fb950}.yellow{color:#d29922}.cyan{color:#79c0ff}.purple{color:#a371f7}
+.links{text-align:center;margin-top:16px;font-size:11px}
+.links a{color:#484f58;text-decoration:none;margin:0 8px}.links a:hover{color:#c9d1d9}
+</style>
+</head>
+<body>
+<h1>FIRST PRINCIPLES TO MARS — CHEATSHEET</h1>
+<p class="sub">Quick reference for everything in the sim</p>
+
+<div class="grid">
+<div>
+<h2>CLI Commands</h2>
+<div class="box">
+<table>
+<tr><td><code>python3 src/sim.py --mission-control</code></td><td>Watch colony live</td></tr>
+<tr><td><code>python3 src/sim.py --benchmark</code></td><td>All 10 archetypes</td></tr>
+<tr><td><code>python3 src/sim.py --autonomy --sols 500</code></td><td>Autonomy scoreboard</td></tr>
+<tr><td><code>python3 src/sim.py --evolve</code></td><td>Breed optimal governor</td></tr>
+<tr><td><code>python3 src/sim.py --play</code></td><td>Interactive mode</td></tr>
+<tr><td><code>python3 src/sim.py --lispy basic_governor</code></td><td>LisPy AI</td></tr>
+<tr><td><code>python3 -m pytest tests/ -v</code></td><td>299 tests</td></tr>
+</table>
+</div>
+
+<h2>Game Controls</h2>
+<div class="box">
+<table>
+<tr><td><strong>Speed</strong></td><td>1× 2× 5× 10× buttons in toolbar</td></tr>
+<tr><td><strong>Emergency</strong></td><td>🛡️ Shelter · 💨 O₂ Boost · 🍽️ Ration · 🤖 Auto</td></tr>
+<tr><td><strong>Zoom</strong></td><td>Planet → Surface → Warmap → Base → Modules → Crew</td></tr>
+<tr><td><strong>LisPy</strong></td><td>Expand console in right panel to edit live</td></tr>
+<tr><td><strong>Voice</strong></td><td>MIC button → "status report" / "start" / "pause"</td></tr>
+</table>
+</div>
+
+<h2>8 Missions</h2>
+<div class="box">
+<table>
+<tr><td class="green">Ares I</td><td>4 humans, medium</td><td>Classic Mars</td></tr>
+<tr><td class="cyan">Optimus</td><td>4 robots, medium</td><td>Pure autonomy</td></tr>
+<tr><td class="yellow">Skeleton</td><td>2 humans, hard</td><td>Every gram counts</td></tr>
+<tr><td class="green">Garden</td><td>6 humans, easy</td><td>Double reserves</td></tr>
+<tr><td class="red">Dust Bowl</td><td>4 humans, extreme</td><td>Peak dust season</td></tr>
+<tr><td class="red">ISRU Down</td><td>4 humans, extreme</td><td>No local production</td></tr>
+<tr><td class="purple">Hybrid</td><td>2+4 mixed, medium</td><td>Future of Mars</td></tr>
+<tr><td class="cyan">Lunar</td><td>2 robots, hard</td><td>14-day night</td></tr>
+</table>
+</div>
+</div>
+
+<div>
+<h2>10 Reflex Arcs</h2>
+<div class="box">
+<table>
+<tr><td>💨 O₂ trajectory</td><td>Auto-boost ISRU</td></tr>
+<tr><td>⚡ Power drain</td><td>Shed non-essential loads</td></tr>
+<tr><td>🏥 Crew declining</td><td>Auto-ration, micro-recovery</td></tr>
+<tr><td>🔄 System flip</td><td>Reallocate to reversed system</td></tr>
+<tr><td>📈 CRI rising</td><td>Shift to survival mode</td></tr>
+<tr><td>🌪️ Dust storm</td><td>Pause outdoor ops</td></tr>
+<tr><td>☢️ Solar flare</td><td>Auto-shelter crew</td></tr>
+<tr><td>🌙 Night + low power</td><td>Reduce greenhouse, conserve</td></tr>
+<tr><td>🌱 Food emergency</td><td>Emergency greenhouse boost</td></tr>
+<tr><td>🤖 Robot down</td><td>Others compensate (at wear)</td></tr>
+</table>
+</div>
+
+<h2>Colony Risk Index (CRI)</h2>
+<div class="box">
+<table>
+<tr><td class="green">0-15</td><td>LOW</td><td>Colony nominal</td></tr>
+<tr><td class="cyan">16-30</td><td>MODERATE</td><td>Watch trajectories</td></tr>
+<tr><td class="yellow">31-50</td><td>ELEVATED</td><td>Reflexes activating</td></tr>
+<tr><td class="red">51-70</td><td>HIGH</td><td>Cascading failures</td></tr>
+<tr><td class="red">71-100</td><td>CRITICAL</td><td>Survival mode</td></tr>
+</table>
+<p style="margin-top:6px;color:#484f58">CRI = base(10) + o2_risk + food_risk + h2o_risk + power_risk + crew_risk + morale_risk + dust_risk + solar_risk + event_risk</p>
+</div>
+
+<h2>Autonomy Grades</h2>
+<div class="box">
+<table>
+<tr><td class="red">F</td><td>&lt;50 sols</td><td>Colony barely began</td></tr>
+<tr><td class="yellow">D</td><td>50-99</td><td>Survived first weeks</td></tr>
+<tr><td class="cyan">C</td><td>100-199</td><td>Colony can exist</td></tr>
+<tr><td class="green">B</td><td>200-299</td><td>Approaching viability</td></tr>
+<tr><td class="green">A</td><td>300-499</td><td>Almost autonomous</td></tr>
+<tr><td style="color:#fff;font-weight:700">MARS-READY</td><td>500+</td><td>AI keeps them alive</td></tr>
+</table>
+</div>
+
+<h2>10 Governor Archetypes</h2>
+<div class="box">
+<div class="grid3">
+<span>Engineer</span><span>Scientist</span><span>Survivalist</span>
+<span>Commander</span><span>Diplomat</span><span>Philosopher</span>
+<span>Contrarian</span><span>Wildcard</span><span>Merchant</span>
+<span>Hermit</span>
+</div>
+</div>
+</div>
+</div>
+
+<h2>Architecture — Clock Speeds</h2>
+<div class="box">
+<table>
+<tr><th>Layer</th><th>Clock</th><th>What</th></tr>
+<tr><td>🧠 Cortex</td><td>1/sol (0.05-0.5s)</td><td>Full sim tick — production, consumption, events, AI</td></tr>
+<tr><td>🫀 Brainstem</td><td>1/sol (after cortex)</td><td>Echo frame, inertia, CRI, task generation</td></tr>
+<tr><td>⚡ Spinal Cord</td><td>1/sol (after brainstem)</td><td>Reflex arc computation + state effects</td></tr>
+<tr><td>🏃 Patrol</td><td>~20Hz</td><td>Visual effects from active reflexes</td></tr>
+<tr><td>👤 Player</td><td>Async</td><td>Decision tasks + manual overrides</td></tr>
+<tr><td>🎮 3D Scene</td><td>~60Hz</td><td>Render, camera, dust, crew movement</td></tr>
+</table>
+</div>
+
+<h2>LisPy Quick Reference</h2>
+<div class="box">
+<table>
+<tr><td><code>(define x 10)</code></td><td>Bind variable</td></tr>
+<tr><td><code>(set! x 20)</code></td><td>Update variable</td></tr>
+<tr><td><code>(if cond then else)</code></td><td>Conditional</td></tr>
+<tr><td><code>(cond (test1 body1) (test2 body2))</code></td><td>Multi-branch</td></tr>
+<tr><td><code>(begin expr1 expr2 ...)</code></td><td>Sequence</td></tr>
+<tr><td><code>(+ - * / < > = min max)</code></td><td>Math/comparison</td></tr>
+<tr><td><code>(and or not)</code></td><td>Logic</td></tr>
+<tr><td><code>o2_days h2o_days food_days power_kwh</code></td><td>Colony state vars</td></tr>
+<tr><td><code>heating_alloc isru_alloc greenhouse_alloc</code></td><td>Output allocations</td></tr>
+</table>
+</div>
+
+<div class="links">
+<a href="viewer.html">▶ Play</a>
+<a href="slides.html">📊 Slides</a>
+<a href="playbook.html">📖 Playbook</a>
+<a href="onepager.html">📄 One-Pager</a>
+<a href="https://github.com/kody-w/mars-barn-opus">💻 Source</a>
+</div>
+</body>
+</html>

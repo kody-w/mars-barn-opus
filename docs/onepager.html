@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>First Principles to Mars — One Pager</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d1117;color:#c9d1d9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+max-width:700px;margin:0 auto;padding:40px 24px 60px}
+h1{font-size:28px;color:#fff;letter-spacing:3px;text-align:center;margin-bottom:4px}
+.sub{text-align:center;color:#484f58;font-size:14px;margin-bottom:32px}
+h2{font-size:16px;color:#79c0ff;margin:28px 0 10px;text-transform:uppercase;letter-spacing:1px;
+border-bottom:1px solid #30363d;padding-bottom:6px}
+p{font-size:14px;line-height:1.7;margin:6px 0}
+strong{color:#fff}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:14px;font-size:13px}
+.card h3{font-size:13px;margin-bottom:4px}
+.cta{text-align:center;margin:32px 0;padding:20px;background:#161b22;border:1px solid #30363d;border-radius:10px}
+.cta a{color:#79c0ff;font-size:18px;font-weight:700;text-decoration:none;letter-spacing:1px}
+.cta a:hover{text-decoration:underline}
+.links{display:flex;justify-content:center;gap:20px;margin-top:12px;font-size:12px}
+.links a{color:#484f58;text-decoration:none}.links a:hover{color:#c9d1d9}
+.stat{display:inline-block;text-align:center;margin:0 16px}
+.stat .v{font-size:24px;font-weight:700;color:#79c0ff}.stat .l{font-size:10px;color:#484f58;text-transform:uppercase}
+</style>
+</head>
+<body>
+<h1>🔴 FIRST PRINCIPLES TO MARS</h1>
+<p class="sub">An Oregon Trail for Mars. Real physics. Real weather. Real decisions.</p>
+
+<h2>What is this?</h2>
+<p>A <strong>Mars colony survival simulator</strong> that runs on real Mars weather data and real physics. You're mission control. An AI governor runs the colony autonomously. When it can't handle something, it escalates to you — approve resource reroutes, guide robots through physical repairs with light delay, decide who gets the water when there isn't enough.</p>
+<p>Every session starts with <strong>today's actual Mars conditions</strong>. Play tomorrow and it's different.</p>
+
+<h2>How it works</h2>
+<p>Pick a mission → configure crew (humans, robots, or both) → AI + LisPy automation runs the colony sol by sol → <strong>Papers Please-style tasks</strong> arrive when things go wrong → your decisions have cascading consequences → colony lives or dies → post-mortem traces exactly what killed it → try again.</p>
+
+<h2>The Nervous System</h2>
+<p>The colony doesn't just tick once per sol and go blank. It has a <strong>nervous system</strong> — echo frames capture every heartbeat, inertia signals track trajectories (not just thresholds), and 10 reflex arcs fire between heartbeats to keep the colony alive. When O₂ is trending down, the colony auto-boosts ISRU before you even see the warning.</p>
+
+<h2>Key Features</h2>
+<div class="cards">
+<div class="card"><h3 style="color:#3fb950">🌡️ Real Mars Weather</h3><p>NASA data models. Current temperature, dust, solar, wind, season. Seeds every session.</p></div>
+<div class="card"><h3 style="color:#58a6ff">🤖 Manual Override</h3><p>Guide robots through physical tasks with light delay. Stuck bolt? Solar panel cleaning? Airlock seal? You send the commands.</p></div>
+<div class="card"><h3 style="color:#d29922">📊 Colony Risk Index</h3><p>A VIX for Mars. 0-100. Computed by LisPy every sol. Higher CRI = more things go wrong. Risk accumulates.</p></div>
+<div class="card"><h3 style="color:#da3633">💀 Post-Mortem</h3><p>Every death traces the full causal chain. Decision history, unintended consequences, what might have saved you.</p></div>
+<div class="card"><h3 style="color:#a371f7">🧠 LisPy VM</h3><p>Write your own governor AI in sandboxed Lisp. The same code runs in the browser and on the Python sim.</p></div>
+<div class="card"><h3 style="color:#79c0ff">🌐 3D Digital Twin</h3><p>Globe.gl planet → Three.js ground view. Crew/robots match your config. Lights go dark when rationing.</p></div>
+</div>
+
+<h2>By the numbers</h2>
+<div style="text-align:center;margin:16px 0">
+<div class="stat"><div class="v">29</div><div class="l">Python modules</div></div>
+<div class="stat"><div class="v">299</div><div class="l">Tests</div></div>
+<div class="stat"><div class="v">15k</div><div class="l">Lines of code</div></div>
+<div class="stat"><div class="v">0</div><div class="l">Dependencies</div></div>
+</div>
+
+<h2>For educators</h2>
+<p>Physics, engineering, CS (LisPy programming), robotics, game theory, data science, systems thinking, ethics. <strong>Zero setup.</strong> Runs in any browser. Works offline. Open source. Python 3.9+ stdlib only.</p>
+
+<div class="cta">
+<a href="viewer.html">▶ PLAY IT NOW</a>
+<div class="links">
+<a href="slides.html">📊 Slides</a>
+<a href="playbook.html">📖 Playbook</a>
+<a href="https://github.com/kody-w/mars-barn-opus">💻 Source</a>
+<a href="https://github.com/kody-w/mars-barn-opus/blob/main/CONSTITUTION.md">📜 Constitution</a>
+</div>
+</div>
+</body>
+</html>
