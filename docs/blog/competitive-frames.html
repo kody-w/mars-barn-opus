@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Competitive Frame Consumption: Same Planet, Different Scores — kody-w</title>
+<meta name="description" content="How to build fair competition between autonomous systems: publish immutable environmental frames, let everyone consume them independently, and compare outcomes. Zero infrastructure required.">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#484f58;
+--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--cyan:#79c0ff;
+--purple:#a371f7;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.9}
+.wrap{max-width:720px;margin:0 auto;padding:40px 24px 80px}
+.meta{color:var(--dim);font-size:12px;margin-bottom:32px}
+.meta a{color:var(--cyan);text-decoration:none}
+h1{font-size:28px;color:#fff;line-height:1.3;margin-bottom:8px}
+h2{font-size:20px;color:var(--cyan);margin:40px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+h3{font-size:15px;color:var(--green);margin:28px 0 8px}
+p{margin:12px 0}
+strong{color:#fff}
+em{color:var(--dim)}
+code{background:rgba(88,166,255,0.1);color:var(--cyan);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:0.9em}
+pre{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:16px 0;overflow-x:auto;line-height:1.5}
+pre code{background:none;padding:0;color:var(--text);font-size:13px}
+blockquote{border-left:3px solid var(--cyan);padding:12px 16px;margin:20px 0;background:rgba(88,166,255,0.05);border-radius:0 8px 8px 0;font-style:italic;color:var(--dim)}
+ul,ol{margin:12px 0 12px 24px}
+li{margin:6px 0}
+hr{border:none;border-top:1px solid var(--border);margin:40px 0}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline}
+.callout{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin:24px 0}
+.callout-title{color:var(--yellow);font-weight:700;font-size:12px;letter-spacing:1px;margin-bottom:8px}
+.diagram{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:20px;margin:16px 0;font-family:var(--mono);font-size:12px;line-height:1.7;white-space:pre;overflow-x:auto;color:var(--dim)}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin:2px}
+.tag-pattern{background:rgba(88,166,255,0.15);color:var(--blue)}
+.tag-compete{background:rgba(218,54,51,0.15);color:var(--red)}
+.footer{text-align:center;color:var(--dim);font-size:11px;margin-top:48px;padding-top:24px;border-top:1px solid var(--border)}
+@media(max-width:600px){.wrap{padding:20px 16px 60px} h1{font-size:22px} .diagram{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="meta"><a href="./">← Blog</a> · <a href="../patterns.html">Pattern Library</a> · <a href="../simhub.html">SimHub Leaderboard</a></div>
+
+<h1>Competitive Frame Consumption: Same Planet, Different Scores</h1>
+<div class="meta">kody-w · March 2025 · <span class="tag tag-pattern">Pattern</span> <span class="tag tag-compete">Competition</span></div>
+
+<p>How do you fairly compare two autonomous systems?</p>
+
+<p>If System A manages a warehouse in Phoenix and System B manages one in Seattle, you can't compare their energy efficiency. The environments are different. If System A runs in summer and System B runs in winter, same problem. Different inputs, incomparable outputs.</p>
+
+<p>The solution: give everyone the <strong>exact same inputs</strong> and compare their outputs.</p>
+
+<h2>The Architecture</h2>
+
+<div class="diagram">┌─────────────────────────────────────┐
+│  <span style="color:var(--cyan)">AUTHORITY</span> (engine)                  │
+│  Generates environmental frames     │
+│  Publishes to static host           │
+└──────────────┬──────────────────────┘
+               │ git push / CDN / static files
+               ▼
+┌─────────────────────────────────────┐
+│  <span style="color:var(--green)">PUBLIC FRAME LEDGER</span>                │
+│  data/frames/sol-0001.json          │
+│  data/frames/sol-0002.json          │
+│  ...                                │
+│  data/frames/manifest.json          │
+│  data/frames/latest.json            │
+│  SHA-256 hash per frame             │
+└──────┬──────────┬───────────────────┘
+       │          │
+       ▼          ▼
+┌──────────┐ ┌──────────┐ ┌──────────┐
+│ <span style="color:var(--yellow)">Player A</span> │ │ <span style="color:var(--yellow)">Player B</span> │ │ <span style="color:var(--yellow)">Player C</span> │
+│ 4 humans │ │ 6 robots │ │ 2+4 hyb  │
+│ engineer │ │ survlst  │ │ adaptive │
+│ Score: B │ │ Score: D │ │ Score: A │
+└──────────┘ └──────────┘ └──────────┘
+     Same frames. Different management.
+     The competition is pure skill.</div>
+
+<h2>The Frame Format</h2>
+
+<p>Each frame is a self-contained unit of environmental conditions for one time step. In our Mars sim, it's one sol (Mars day). In your domain, it's whatever your tick interval is.</p>
+
+<pre><code>// One frame = one sol of Mars conditions
+{
+  "sol": 47,
+  "utc": "2025-08-25T14:30:00Z",
+  "mars": {
+    "temp_k": 218,
+    "dust_tau": 0.15,      // optical depth
+    "solar_wm2": 480,      // solar irradiance
+    "wind_ms": 4.2,
+    "pressure_pa": 740,
+    "season": "Northern Summer"
+  },
+  "events": [
+    { "type": "dust_devil", "severity": 0.3, "duration_sols": 0.5 }
+  ],
+  "hazards": [
+    { "type": "micrometeorite", "probability": 0.02 },
+    { "type": "equipment_fatigue", "target": "solar_array", "degradation": 0.005 }
+  ],
+  "challenge": {
+    "type": "solar_tracking_fault",
+    "params": { "misalignment_deg": 12.4, "dust_factor": 1.3 }
+  },
+  "_hash": "a1b2c3d4e5f6g7h8"  // SHA-256 of frame content
+}</code></pre>
+
+<p>The <code>_hash</code> is computed from the frame content <em>before</em> the hash is inserted. This makes the frame tamper-evident — if you modify the temperature to make your colony survive longer, the hash won't match the public ledger.</p>
+
+<h2>The Consumption Pattern</h2>
+
+<pre><code>// Client fetches and consumes frames
+async function loadPublicFrames() {
+  const manifest = await fetch(FRAME_BASE + '/manifest.json').then(r => r.json());
+  latestPublicSol = manifest.last_sol;
+  frameMode = 'public';
+  
+  // Pre-load first batch for immediate play
+  for (let s = 1; s <= 20; s++) {
+    publicFrames[s] = await fetch(FRAME_BASE + `/sol-${pad(s)}.json`).then(r => r.json());
+  }
+}
+
+function stepSim() {
+  state.sol++;
+  
+  // If public frames available, use them
+  if (frameMode === 'public') {
+    const frame = publicFrames[state.sol];
+    if (frame) {
+      // Override weather with frame data
+      marsWeather = { ...marsWeather, ...frame.mars };
+      // Inject events
+      frame.events.forEach(ev => state.events.push(ev));
+      // Apply hazards
+      frame.hazards.forEach(applyHazard);
+      // Pre-fetch ahead
+      ensureFramesAhead(state.sol);
+    }
+  }
+  
+  // Rest of sim tick — player's management decisions
+  // Production, consumption, crew health, etc.
+}</code></pre>
+
+<h2>The Organism Between Frames</h2>
+
+<p>Here's where it gets philosophically interesting. When a player catches up to the latest available frame, their system doesn't just stop. It <strong>breathes on its own</strong>.</p>
+
+<p>The <a href="echo-frames.html">echo inertia</a> from the last frame provides standing orders. The <a href="nervous-system.html">reflex arcs</a> continue firing based on current state derivatives. The <a href="../patterns.html#p10">policy VM</a> keeps making allocation decisions. Resources tick based on last-known production rates.</p>
+
+<p>When the next frame arrives — whether that's in 6 hours or 6 days — it's a fresh environmental signal. The system reacts. Inertia recomputes. Reflexes re-evaluate. The organism gets a new heartbeat.</p>
+
+<blockquote>The cortex sleeps between frames, but the brainstem never stops. The colony is alive even when nobody is looking at it.</blockquote>
+
+<p>This creates a natural tension for livestreaming: the colony is running on autopilot, slowly consuming reserves, and the next frame could bring a dust storm that changes everything. Will they survive? Tune in when the next frame drops.</p>
+
+<h2>Zero Infrastructure</h2>
+
+<p>The entire competitive system runs with <strong>zero backend infrastructure</strong>:</p>
+
+<ul>
+<li><strong>Frame storage:</strong> Git repo → GitHub Pages (free static hosting)</li>
+<li><strong>Frame delivery:</strong> Raw GitHub URLs or Pages CDN (free CDN)</li>
+<li><strong>Leaderboard:</strong> localStorage + manual cartridge upload (peer-to-peer)</li>
+<li><strong>Anti-cheat:</strong> Frame hashes in git history (immutable, auditable)</li>
+<li><strong>Game client:</strong> Single HTML file, no install (opens in any browser)</li>
+</ul>
+
+<p>No servers to run. No databases to maintain. No authentication to build. The git repo IS the backend. Static files ARE the API.</p>
+
+<h2>Scaling Without Infrastructure</h2>
+
+<p>This architecture scales to thousands of concurrent players because each player is an independent client consuming static files. There's no shared state, no real-time coordination, no multiplayer sync. Everyone fetches the same immutable JSON files and processes them locally.</p>
+
+<p>The only bottleneck is GitHub Pages bandwidth, which handles billions of requests per month. If you need more, mirror the frames to any CDN — they're just static JSON files.</p>
+
+<h2>Beyond Gaming: Fair Benchmarks for AI</h2>
+
+<div class="callout">
+<div class="callout-title">THE BIGGER PICTURE</div>
+<p>This pattern is directly applicable to <strong>AI agent benchmarks</strong>. Today, we compare agents on tasks with different random seeds, different orderings, and different conditions. Results aren't reproducible.</p>
+
+<p>Imagine an AI benchmark where every agent faces the <strong>exact same sequence of environmental frames</strong>: same API responses, same user queries, same error conditions. The only variable is the agent's reasoning and tool use.</p>
+
+<p>That's what competitive frame consumption gives you. Publish the environment. Let agents consume it. Compare outcomes. Pure skill, zero luck.</p>
+</div>
+
+<h2>Implementation Checklist</h2>
+
+<ol>
+<li><strong>Define your frame format</strong> — what environmental data does one tick contain?</li>
+<li><strong>Build a frame generator</strong> — script that produces frames from your domain data</li>
+<li><strong>Hash each frame</strong> — SHA-256 for tamper detection</li>
+<li><strong>Publish a manifest</strong> — index of all frames with hashes and metadata</li>
+<li><strong>Build the client consumer</strong> — fetch manifest, load frames, apply to sim</li>
+<li><strong>Handle "caught up"</strong> — what does the system do while waiting for next frame?</li>
+<li><strong>Score function</strong> — deterministic scoring from state + decisions</li>
+<li><strong>Leaderboard</strong> — compare cartridges from different players on same frames</li>
+</ol>
+
+<p>Competitive Frame Consumption is Pattern 07 in the <a href="../patterns.html">Rappter Pattern Library</a>. It composes with <a href="sim-cartridges.html">Sim Cartridges</a> (Pattern 05) and the Public Frame Ledger (Pattern 06).</p>
+
+<hr>
+
+<p><em>Fair competition requires controlled inputs. Publish the environment. Let them compete on management.</em></p>
+
+<div class="footer">
+<a href="./">← Back to Blog</a> · <a href="../patterns.html">Pattern Library</a> · <a href="https://github.com/kody-w/mars-barn-opus">GitHub</a>
+</div>
+</div>
+</body>
+</html>

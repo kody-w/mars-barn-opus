@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>LisPy as In-Sim Tooling: When Agents Write Their Own Programs — kody-w</title>
+<meta name="description" content="The LisPy VM isn't just a user-provided governor. It's a virtual programming language that lives INSIDE the simulation. Agents can author, share, and evolve programs to survive. Emergent tooling for autonomous systems.">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#484f58;
+--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--cyan:#79c0ff;
+--purple:#a371f7;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.9}
+.wrap{max-width:720px;margin:0 auto;padding:40px 24px 80px}
+.meta{color:var(--dim);font-size:12px;margin-bottom:32px}
+.meta a{color:var(--cyan);text-decoration:none}
+h1{font-size:28px;color:#fff;line-height:1.3;margin-bottom:8px}
+h2{font-size:20px;color:var(--cyan);margin:40px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+h3{font-size:15px;color:var(--green);margin:28px 0 8px}
+p{margin:12px 0}
+strong{color:#fff}
+em{color:var(--dim)}
+code{background:rgba(88,166,255,0.1);color:var(--cyan);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:0.9em}
+pre{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:16px 0;overflow-x:auto;line-height:1.5}
+pre code{background:none;padding:0;color:var(--text);font-size:13px}
+blockquote{border-left:3px solid var(--cyan);padding:12px 16px;margin:20px 0;background:rgba(88,166,255,0.05);border-radius:0 8px 8px 0;font-style:italic;color:var(--dim)}
+ul,ol{margin:12px 0 12px 24px}
+li{margin:6px 0}
+hr{border:none;border-top:1px solid var(--border);margin:40px 0}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline}
+.callout{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin:24px 0}
+.callout-title{color:var(--yellow);font-weight:700;font-size:12px;letter-spacing:1px;margin-bottom:8px}
+.diagram{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:20px;margin:16px 0;font-family:var(--mono);font-size:12px;line-height:1.7;white-space:pre;overflow-x:auto;color:var(--dim)}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin:2px}
+.tag-pattern{background:rgba(88,166,255,0.15);color:var(--blue)}
+.tag-ai{background:rgba(255,215,0,0.15);color:#ffd700}
+.tag-emergent{background:rgba(163,113,247,0.15);color:var(--purple)}
+.footer{text-align:center;color:var(--dim);font-size:11px;margin-top:48px;padding-top:24px;border-top:1px solid var(--border)}
+@media(max-width:600px){.wrap{padding:20px 16px 60px} h1{font-size:22px} .diagram{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="meta"><a href="./">← Blog</a> · <a href="../patterns.html">Pattern Library</a> · <a href="../viewer.html">Play the Sim</a></div>
+
+<h1>LisPy as In-Sim Tooling: When Agents Write Their Own Programs</h1>
+<div class="meta">kody-w · March 2025 · <span class="tag tag-emergent">Emergent Tooling</span> <span class="tag tag-ai">AI</span> <span class="tag tag-pattern">Pattern</span></div>
+
+<p>Here's what everyone gets wrong about the LisPy VM in the Mars sim.</p>
+
+<p>They think it's a scripting layer. A way for users to write automation rules. A config file that happens to be executable.</p>
+
+<p>It's not. It's the <strong>first virtual programming language that lives inside the simulation.</strong></p>
+
+<p>The agents in the sim — the robots, the crew, the governor AI — don't just <em>execute</em> LisPy programs. They can <strong>author them</strong>. They can <strong>share them</strong> with each other. They can <strong>evolve them</strong> based on what's working and what isn't. The programs are data that lives in the same universe as the agents that write them.</p>
+
+<h2>Why Lisp?</h2>
+
+<p>Because Lisp is <strong>homoiconic</strong> — code and data are the same thing. An S-expression is both a program you can execute and a data structure you can manipulate, inspect, copy, and modify. This isn't an academic curiosity. It's architecturally essential.</p>
+
+<pre><code>;; This is a program
+(if (< o2_days 5)
+  (set! isru_alloc 0.80)
+  (set! isru_alloc 0.40))
+
+;; But it's ALSO data — a list of lists
+;; An agent can READ this program as a data structure,
+;; UNDERSTAND what it does by walking the tree,
+;; and WRITE a modified version:
+
+(if (< o2_days 3)           ;; tightened threshold
+  (begin
+    (set! isru_alloc 0.90)  ;; more aggressive
+    (set! heating_alloc 0.05))
+  (set! isru_alloc 0.45))   ;; slightly higher baseline</code></pre>
+
+<p>If your policy language were JSON config, YAML, or Python, agents couldn't programmatically read, modify, and re-emit programs as trivially. S-expressions are trees. Trees are the native data structure of every programming language's AST. LisPy programs ARE their own AST.</p>
+
+<h2>Three Levels of LisPy Usage</h2>
+
+<h3>Level 1: User-Provided (Today)</h3>
+
+<p>The player picks a governor program from presets or writes their own in the LisPy console. This is what's shipped today:</p>
+
+<pre><code>// Pre-built governor programs
+const LISPY_PROGRAMS = {
+  adaptive_governor: `(begin
+    (define o2_urgent (< o2_days 5))
+    (define h2o_urgent (< h2o_days 5))
+    (if o2_urgent
+      (begin (set! isru_alloc 0.80) (set! heating_alloc 0.10))
+      (if h2o_urgent
+        (begin (set! isru_alloc 0.60) (set! greenhouse_alloc 0.30))
+        (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.35)))))`,
+  
+  thermal_monitor: `(begin
+    (define cold (< int_temp 268))
+    (if cold (set! heating_alloc 0.60) (set! heating_alloc 0.20)))`,
+};</code></pre>
+
+<p>The user selects a program. It runs every tick. It reads environment variables (<code>o2_days</code>, <code>power</code>, etc.) and writes allocation variables (<code>isru_alloc</code>, <code>greenhouse_alloc</code>). Standard scripting.</p>
+
+<h3>Level 2: Agent-Authored (Emergent)</h3>
+
+<p>This is where it gets real. The agents inside the simulation — the crew members, the robots, the governor — can <strong>write their own LisPy programs</strong> as tools to solve problems they encounter.</p>
+
+<div class="diagram"><span style="color:var(--cyan)">Sol 47:</span> Dust storm hits. Solar drops 60%. Power critical.
+
+<span style="color:var(--yellow)">OPT-02 (Engineer):</span> "I'm writing a power-shedding subroutine."
+
+<span style="color:var(--green)">;; OPT-02's authored program — lives in the sim's tool library</span>
+(define (power-shed threshold)
+  (if (< power threshold)
+    (begin
+      (set! greenhouse_alloc 0.05)   ; cut non-essential
+      (set! heating_alloc 0.10)      ; minimum viable
+      (set! isru_alloc 0.85)         ; all power to O₂
+      (log "POWER-SHED: survival mode"))
+    (log "POWER-SHED: nominal")))
+
+<span style="color:var(--cyan)">Sol 48:</span> OPT-02 shares the program with the governor.
+         Governor integrates it as a callable subroutine.
+         Next time power drops, <span style="color:var(--green)">power-shed</span> fires automatically.
+
+<span style="color:var(--cyan)">Sol 112:</span> OPT-03 (Scientist) modifies OPT-02's program:
+          Adds a temperature check — don't shed heating below -70°C.
+          New version propagates to the tool library.</div>
+
+<p>The programs aren't handed down by the user. They <strong>emerge from the agents' experience</strong>. An agent encounters a problem, writes a tool to solve it, and shares that tool with the colony. The tool persists across sols. Other agents can use it, modify it, or replace it.</p>
+
+<h3>Level 3: Evolved (Genetic)</h3>
+
+<p>Because LisPy programs are data (lists of lists), you can apply genetic programming to them:</p>
+
+<pre><code>// Mutate a LisPy program (change a number, swap a branch)
+function mutateLispy(program) {
+  const ast = parse(program);
+  // Find a numeric literal and jitter it
+  const nums = findNodes(ast, node => typeof node === 'number');
+  if (nums.length) {
+    const target = nums[Math.floor(Math.random() * nums.length)];
+    target.value *= (0.8 + Math.random() * 0.4); // ±20%
+  }
+  return serialize(ast);
+}
+
+// Crossover: take the O₂ handling from program A
+// and the power handling from program B
+function crossoverLispy(a, b) {
+  const astA = parse(a), astB = parse(b);
+  // Find the (if o2_urgent ...) branch in A
+  // Replace the (if power_critical ...) branch in B with it
+  return serialize(splice(astA, astB, 'o2_urgent'));
+}</code></pre>
+
+<p>Run 100 colonies in parallel. Each has a slightly different governor program. The ones that survive longest donate their programs to the next generation. Over thousands of generations, the programs <em>evolve</em> — not designed by humans, not written by AI, but <strong>selected by survival</strong>.</p>
+
+<h2>The Virtual Computer Inside the Sim</h2>
+
+<p>Think about what this means architecturally. The simulation contains:</p>
+
+<ol>
+<li>A <strong>virtual environment</strong> (Mars, with physics, weather, hazards)</li>
+<li><strong>Virtual agents</strong> (robots, humans, with health, capabilities, roles)</li>
+<li>A <strong>virtual programming language</strong> (LisPy, with a real interpreter)</li>
+<li>A <strong>virtual tool library</strong> (programs authored by agents, persisted across sols)</li>
+</ol>
+
+<p>The agents have a computer. Inside the simulation. That they program. With programs that affect the simulation they live in.</p>
+
+<blockquote>LisPy is the Mars colony's computer. The agents are the programmers. The programs they write determine whether they live or die. And those programs are data that can be exported, shared, evolved, and competed on.</blockquote>
+
+<p>When you export a <a href="sim-cartridges.html">cartridge</a>, you're exporting the colony's <em>entire software stack</em> — the programs the agents wrote, the tool library they built, the governor that evolved. Plug it into a different sim and those tools come with it.</p>
+
+<h2>Sharing Programs Between Colonies</h2>
+
+<p>Because LisPy programs are plain text inside JSON cartridges, sharing tools between colonies is trivial:</p>
+
+<pre><code>// Extract the power-shed tool from Colony A's cartridge
+const colonyA = JSON.parse(cartridgeA);
+const powerShedProgram = colonyA.config.toolLibrary
+  .find(t => t.name === 'power-shed');
+
+// Inject it into Colony B
+const colonyB = JSON.parse(cartridgeB);
+colonyB.config.toolLibrary.push(powerShedProgram);
+
+// Colony B now has Colony A's survival tool
+// without Colony A's specific state or decisions</code></pre>
+
+<p>This creates a <strong>marketplace of survival tools</strong>. Players can share their best governor programs. Communities can build libraries of proven subroutines. Competitions can standardize on specific tool sets.</p>
+
+<p>The programs travel between simulations the same way real software travels between computers — as portable text that any compatible runtime can execute.</p>
+
+<h2>Why This Matters Outside the Sim</h2>
+
+<div class="callout">
+<div class="callout-title">THE PATTERN: EMERGENT TOOLING</div>
+
+<p>The deeper pattern isn't "Lisp in a game." It's <strong>agents that build their own tools within their environment, using a language that is both executable and inspectable</strong>.</p>
+
+<p><strong>AI Agents today:</strong> An LLM agent gets a fixed set of tools (search, calculator, code interpreter). It can't create new tools. It can't modify existing tools. It can't share tools with other agents. The toolset is static.</p>
+
+<p><strong>With emergent tooling:</strong> An agent encounters a new problem. It writes a LisPy function to solve it. That function becomes a new tool in its toolkit. It can share it with other agents. Other agents can modify it. The tool library grows with experience.</p>
+
+<p>This is the difference between giving someone a hammer and giving them a forge. With a hammer, they can only hit things. With a forge, they can make any tool they need — including better forges.</p>
+</div>
+
+<h2>The Homoiconic Advantage</h2>
+
+<p>This only works because the language is homoiconic. Let me be precise about why:</p>
+
+<ul>
+<li><strong>Programs are data</strong> → agents can read, write, and modify programs using the same operations they use on any data</li>
+<li><strong>No compilation step</strong> → a program authored at Sol 47 can execute at Sol 48 with zero build pipeline</li>
+<li><strong>Inspectable</strong> → the governor can look at a subroutine and understand what it does by walking the tree (no decompilation needed)</li>
+<li><strong>Serializable</strong> → programs travel inside cartridges as plain text, zero binary format issues</li>
+<li><strong>Composable</strong> → one program can call another, creating emergent composition from independent authoring</li>
+<li><strong>Sandboxed</strong> → the LisPy VM only exposes environment variables, no filesystem/network/system access — safe for agent-authored code</li>
+</ul>
+
+<p>If you built this on Python or JavaScript, the agents would need to write Python strings, escape them correctly, parse them, handle syntax errors, deal with import systems, manage security, and coordinate execution contexts. With Lisp, the program is a list. You build lists. You execute lists. That's it.</p>
+
+<h2>Concrete Implementation</h2>
+
+<pre><code>// Agent writes a tool during a crisis
+function agentAuthorTool(agent, crisis) {
+  const tool = {
+    name: `${agent.name}_${crisis.type}_handler`,
+    author: agent.name,
+    created_sol: state.sol,
+    program: generateToolProgram(agent, crisis),
+    description: `Auto-generated by ${agent.name} during ${crisis.type}`,
+    usage_count: 0,
+    survival_contribution: 0 // tracked over time
+  };
+  
+  // Add to colony tool library
+  state.toolLibrary.push(tool);
+  state.log.push(`🔧 ${agent.name} authored tool: ${tool.name}`);
+  
+  // The governor can now invoke this tool
+  vm.define(tool.name, tool.program);
+}
+
+// The governor's program can call agent-authored tools
+const governorProgram = `(begin
+  ;; Built-in logic
+  (if (< power 100) (power-shed 80))     ;; calls OPT-02's tool
+  (if (> dust_tau 0.5) (storm-hunker))    ;; calls Chen's tool
+  
+  ;; Fall back to default allocations
+  (set! isru_alloc 0.40)
+  (set! greenhouse_alloc 0.35))`;
+</code></pre>
+
+<h2>The Virtual Software Stack</h2>
+
+<div class="diagram">┌──────────────────────────────────────────┐
+│  <span style="color:var(--cyan)">COLONY COMPUTER</span> (virtual, inside the sim) │
+│                                          │
+│  ┌────────────────────────────────────┐  │
+│  │ <span style="color:var(--green)">Tool Library</span>                       │  │
+│  │ power-shed.lispy (by OPT-02)      │  │
+│  │ storm-hunker.lispy (by Chen)      │  │
+│  │ thermal-balance.lispy (by OPT-03) │  │
+│  │ emergency-ration.lispy (by CMDR)  │  │
+│  │ ... (grows as agents learn)       │  │
+│  └────────────────────────────────────┘  │
+│                 ▲ authors/modifies       │
+│  ┌──────────────┴─────────────────────┐  │
+│  │ <span style="color:var(--yellow)">Governor Program</span>                    │  │
+│  │ Calls tools from library           │  │
+│  │ Runs every tick via LisPy VM       │  │
+│  │ Can be swapped at runtime          │  │
+│  └────────────────────────────────────┘  │
+│                 ▲ provides env vars      │
+│  ┌──────────────┴─────────────────────┐  │
+│  │ <span style="color:var(--red)">LisPy VM</span> (sandboxed interpreter)    │  │
+│  │ Reads: o2_days, power, temp, CRI   │  │
+│  │ Writes: isru_alloc, greenhouse...  │  │
+│  │ No I/O, no network, no filesystem  │  │
+│  └────────────────────────────────────┘  │
+│                                          │
+│  The agents program THEIR OWN computer.  │
+│  The programs determine if they survive. │
+│  The programs export with the cartridge. │
+└──────────────────────────────────────────┘</div>
+
+<h2>What Comes Next</h2>
+
+<p>This pattern leads naturally to several next steps:</p>
+
+<ul>
+<li><strong>Tool marketplace:</strong> Players share their best LisPy programs on the SimHub. Download a proven thermal management subroutine. Upload your own dust storm handler.</li>
+<li><strong>Agent-to-agent teaching:</strong> When a new robot arrives at the colony, it downloads the tool library from the existing robots. Institutional knowledge transfer as executable code.</li>
+<li><strong>Program evolution:</strong> Run the <code>--evolve</code> mode with genetic operators on LisPy programs. Let natural selection write better governors than any human could.</li>
+<li><strong>Cross-colony pollination:</strong> When two cartridges are loaded side-by-side, their tool libraries merge. Colony A's power management + Colony B's food optimization = a hybrid that outperforms both.</li>
+</ul>
+
+<p>The LisPy VM is Pattern 10 in the <a href="../patterns.html">Rappter Pattern Library</a>. But the emergent tooling capability — agents authoring, sharing, and evolving programs within their own simulation — is something beyond any single pattern. It's a <strong>property of the system</strong> that emerges when you combine a homoiconic language with autonomous agents and a persistent tool library.</p>
+
+<hr>
+
+<p><em>Don't give your agents a hammer. Give them a forge. They'll make tools you never imagined — and the colony will survive because of them.</em></p>
+
+<div class="footer">
+<a href="./">← Back to Blog</a> · <a href="../patterns.html">Pattern Library</a> · <a href="https://github.com/kody-w/mars-barn-opus">GitHub</a>
+</div>
+</div>
+</body>
+</html>

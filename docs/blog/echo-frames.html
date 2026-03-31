@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Echo Frames: How to Give Your System Memory of Trajectory — kody-w</title>
+<meta name="description" content="Most systems know WHERE they are. Echo frames teach them WHERE THEY'RE GOING. A pattern for any autonomous system that needs to react to trends, not just thresholds.">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#484f58;
+--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--cyan:#79c0ff;
+--purple:#a371f7;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.9}
+.wrap{max-width:720px;margin:0 auto;padding:40px 24px 80px}
+.meta{color:var(--dim);font-size:12px;margin-bottom:32px}
+.meta a{color:var(--cyan);text-decoration:none}
+h1{font-size:28px;color:#fff;line-height:1.3;margin-bottom:8px}
+h2{font-size:20px;color:var(--cyan);margin:40px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+h3{font-size:15px;color:var(--green);margin:28px 0 8px}
+p{margin:12px 0}
+strong{color:#fff}
+em{color:var(--dim)}
+code{background:rgba(88,166,255,0.1);color:var(--cyan);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:0.9em}
+pre{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:16px 0;overflow-x:auto;line-height:1.5}
+pre code{background:none;padding:0;color:var(--text);font-size:13px}
+blockquote{border-left:3px solid var(--cyan);padding:12px 16px;margin:20px 0;background:rgba(88,166,255,0.05);border-radius:0 8px 8px 0;font-style:italic;color:var(--dim)}
+ul,ol{margin:12px 0 12px 24px}
+li{margin:6px 0}
+hr{border:none;border-top:1px solid var(--border);margin:40px 0}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline}
+.callout{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin:24px 0}
+.callout-title{color:var(--yellow);font-weight:700;font-size:12px;letter-spacing:1px;margin-bottom:8px}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin:2px}
+.tag-pattern{background:rgba(88,166,255,0.15);color:var(--blue)}
+.tag-infra{background:rgba(218,54,51,0.15);color:var(--red)}
+.tag-ai{background:rgba(255,215,0,0.15);color:#ffd700}
+.footer{text-align:center;color:var(--dim);font-size:11px;margin-top:48px;padding-top:24px;border-top:1px solid var(--border)}
+@media(max-width:600px){.wrap{padding:20px 16px 60px} h1{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="meta"><a href="./">← Blog</a> · <a href="../patterns.html">Pattern Library</a> · <a href="../viewer.html">Play the Sim</a></div>
+
+<h1>Echo Frames: How to Give Your System Memory of Trajectory</h1>
+<div class="meta">kody-w · March 2025 · <span class="tag tag-pattern">Pattern</span> <span class="tag tag-infra">Infrastructure</span> <span class="tag tag-ai">AI</span></div>
+
+<p>Every monitoring system I've ever worked with has the same problem: it knows <strong>where things are</strong> but not <strong>where they're going</strong>.</p>
+
+<p>Your dashboard says CPU is at 72%. Great. Is that going up or down? Was it 65% ten minutes ago and climbing, or 85% ten minutes ago and recovering? Those are wildly different situations, but your monitoring system can't tell them apart.</p>
+
+<p>Traditional alerting fires when you cross a threshold. Echo frames fire when your <em>trajectory</em> changes.</p>
+
+<h2>The Problem with Position-Only Systems</h2>
+
+<p>Think about driving a car. If I tell you you're 50 meters from a wall, you might be fine. But if I also tell you you're going 120 km/h toward it, you have a problem. And if your speed is <em>increasing</em>, you have a much bigger problem.</p>
+
+<p>Position. Velocity. Acceleration. Three layers of awareness.</p>
+
+<p>Most production systems only have position. They know the value of a metric <em>right now</em>. They don't compute velocity (rate of change) or acceleration (rate of change of rate of change). So they can't distinguish between:</p>
+
+<ul>
+<li>A metric that's high but stable (fine)</li>
+<li>A metric that's normal but accelerating toward a cliff (not fine)</li>
+<li>A metric that was critical but is now recovering (good, leave it alone)</li>
+</ul>
+
+<h2>The Echo Frame Pattern</h2>
+
+<p>An echo frame is a structured delta produced at the end of every tick. It captures not just what changed, but the <em>meaning</em> of the change — the derivatives, the events, and the trajectory.</p>
+
+<pre><code>// After each tick, build the echo
+const echo = {
+  frame: tickNumber,
+  utc: new Date().toISOString(),
+  
+  // POSITION: what changed this tick
+  delta: {
+    cpu:    post.cpu    - pre.cpu,
+    memory: post.memory - pre.memory,
+    errors: post.errors - pre.errors,
+    latency:post.latency- pre.latency,
+  },
+  
+  // EVENTS: what happened
+  events: newEvents.map(e => ({
+    type: e.type, severity: e.severity, desc: e.desc
+  })),
+  
+  // VELOCITY: how fast things are changing (computed from history)
+  inertia: {
+    cpu_velocity:     currentDelta.cpu    - previousDelta.cpu,
+    memory_velocity:  currentDelta.memory - previousDelta.memory,
+    error_velocity:   currentDelta.errors - previousDelta.errors,
+  },
+  
+  // FLIPS: direction reversals (the dangerous ones)
+  discourse_flips: [
+    // { system: 'errors', from: 'declining', to: 'rising' }
+  ]
+};</code></pre>
+
+<p>The echo gets appended to a bounded history (last N frames). The next tick reads this history to inform its decisions.</p>
+
+<h2>Why "Echo"?</h2>
+
+<p>Because the system is talking to itself across time. Frame N produces an echo that Frame N+1 hears. It's not a log — logs are for humans to read after the fact. An echo is for the <em>system itself</em> to consume programmatically.</p>
+
+<blockquote>The echo is the system's memory of its own trajectory. Not "where am I?" but "which way am I falling?"</blockquote>
+
+<h2>The Inertia Computation</h2>
+
+<p>The most powerful derivative in the echo is the <strong>velocity</strong> — the second derivative of the original metric. Here's why:</p>
+
+<pre><code>function computeInertia() {
+  const curr = echoHistory[echoHistory.length - 1];
+  const prev = echoHistory[echoHistory.length - 2];
+  
+  // Velocity = delta of deltas
+  inertia.cpu_velocity = curr.delta.cpu - prev.delta.cpu;
+  
+  // If cpu_velocity is negative: CPU usage is DECELERATING
+  //    (even if CPU is still high, it's getting better)
+  // If cpu_velocity is positive: CPU usage is ACCELERATING
+  //    (even if CPU is normal, it's getting worse)
+}</code></pre>
+
+<p>A threshold alarm fires when CPU > 80%. An inertia alarm fires when <code>cpu_velocity > 0.5</code> — CPU is accelerating upward at a rate that will breach 80% in N ticks. One is reactive. The other is predictive.</p>
+
+<h2>Discourse Flips: The Most Dangerous Signal</h2>
+
+<p>A discourse flip is when a metric reverses direction — specifically, when something that was getting <em>better</em> starts getting <em>worse</em>.</p>
+
+<pre><code>// Check for direction reversal
+if (Math.sign(curr.delta.errors) !== Math.sign(prev.delta.errors)) {
+  echo.discourse_flips.push({
+    system: 'errors',
+    from: prev.delta.errors < 0 ? 'declining' : 'rising',
+    to:   curr.delta.errors < 0 ? 'declining' : 'rising',
+    tick: tickNumber
+  });
+}</code></pre>
+
+<p>If your error rate was declining (delta negative) and now it's rising (delta positive), something changed. Not just "errors went up" — the <em>trend reversed</em>. That's not a blip. That's a regime change.</p>
+
+<p>No traditional monitoring system detects this. They see "errors: 42" and "errors: 45" and say "still under threshold." The echo sees "errors were declining at -3/tick and are now rising at +3/tick" — a 6-point velocity swing — and raises the alarm before the threshold is breached.</p>
+
+<h2>Feeding Back: The Closed Loop</h2>
+
+<p>The most important property of echo frames is that they <strong>feed back</strong>. The echo from tick N becomes input to tick N+1. This creates a closed loop where the system can react to its own reactions.</p>
+
+<pre><code>// In the Mars sim, reflexes log themselves into the echo
+echo.reflexes_fired = [
+  { id: 'o2_reflex', action: 'boosted ISRU by 5%', intensity: 0.7 }
+];
+
+// Next tick, the system sees what its own reflexes did
+// and can adjust: "I already boosted ISRU, is it working?"
+const lastReflexes = previousEcho.reflexes_fired;
+if (lastReflexes.some(r => r.id === 'o2_reflex') && 
+    inertia.o2_velocity < 0) {
+  // Reflex fired but O2 still declining — escalate
+}</code></pre>
+
+<p>This is the system watching itself act and evaluating whether its actions are working. Not just reacting — <em>reflecting</em>.</p>
+
+<h2>Where This Applies</h2>
+
+<div class="callout">
+<div class="callout-title">BEYOND THE SIM</div>
+<p><strong>SRE / Infrastructure:</strong> Error budget burn rate acceleration. Detect outage trajectories before PagerDuty fires.</p>
+<p><strong>Trading:</strong> Momentum reversal detection. A discourse flip in price velocity is a regime change signal.</p>
+<p><strong>IoT Fleets:</strong> Battery drain acceleration across a vehicle fleet. Predict which vehicles fail tomorrow.</p>
+<p><strong>AI Agents:</strong> Confidence trajectory across reasoning steps. Is the agent converging or diverging?</p>
+</div>
+
+<h2>Implementation Checklist</h2>
+
+<ol>
+<li>Define your echo schema (what deltas matter for your domain)</li>
+<li>Compute deltas at the end of every tick (post - pre)</li>
+<li>Keep a bounded history (50-500 frames depending on memory budget)</li>
+<li>Compute velocity from consecutive deltas</li>
+<li>Detect discourse flips (sign reversals)</li>
+<li>Feed the echo back as input to the next tick</li>
+<li>Log reflex actions into the echo so the system can self-evaluate</li>
+</ol>
+
+<p>The echo frame is Pattern 01 in the <a href="../patterns.html">Rappter Pattern Library</a>. It's the foundation everything else builds on — without trajectory memory, you can't compute inertia, fire reflexes, or detect emergent failures.</p>
+
+<hr>
+
+<p><em>The sim is just the vehicle. The pattern is the road. Build your own roads.</em></p>
+
+<div class="footer">
+<a href="./">← Back to Blog</a> · <a href="../patterns.html">Pattern Library</a> · <a href="https://github.com/kody-w/mars-barn-opus">GitHub</a>
+</div>
+</div>
+</body>
+</html>
