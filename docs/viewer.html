@@ -103,6 +103,17 @@ padding:8px;margin:4px 0;cursor:pointer;transition:all 0.2s}
 #landing-sub{font-size:12px;color:var(--dim);margin-top:8px;letter-spacing:1px;
   opacity:0;transition:opacity 0.8s}
 
+/* ── Landing HUD ── */
+#landing-hud{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:65;
+  background:var(--panel);border:1px solid var(--cyan);border-radius:8px;padding:12px 20px;
+  font-family:var(--font);font-size:12px;display:none;text-align:center}
+/* ── FPS crosshair ── */
+#fps-crosshair{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:62;
+  color:rgba(255,255,255,0.4);font-size:24px;display:none;pointer-events:none}
+#fps-mode-label{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:62;
+  color:var(--cyan);font-size:10px;letter-spacing:2px;display:none;pointer-events:none;
+  background:var(--panel);padding:4px 12px;border:1px solid var(--border);border-radius:4px}
+
 /* ── Death Screen ── */
 #death-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:450;
   background:rgba(0,0,0,0.92);display:none;align-items:center;justify-content:center;
@@ -407,6 +418,20 @@ body.cinematic-active .cartridge-bar,body.cinematic-active #task-panel{
   <div id="landing-text"></div>
   <div id="landing-sub"></div>
 </div>
+
+<!-- ══ LANDING HUD ══ -->
+<div id="landing-hud">
+  <div style="color:var(--cyan);font-weight:700;letter-spacing:1px;margin-bottom:6px">DESCENT</div>
+  <div style="display:flex;gap:20px">
+    <div><span id="lh-alt" style="font-size:20px;color:var(--text)">120</span><div style="font-size:9px;color:var(--dim)">ALT (m)</div></div>
+    <div><span id="lh-vel" style="font-size:20px;color:var(--text)">0.0</span><div style="font-size:9px;color:var(--dim)">V (m/s)</div></div>
+    <div><span id="lh-fuel" style="font-size:20px;color:var(--green)">100</span><div style="font-size:9px;color:var(--dim)">FUEL %</div></div>
+  </div>
+  <button id="lh-override" onclick="toggleLandingManual()" style="margin-top:8px;padding:4px 16px;background:rgba(210,153,34,0.2);border:1px solid var(--yellow);color:var(--yellow);border-radius:6px;cursor:pointer;font-family:var(--font);font-size:11px">🎮 MANUAL OVERRIDE</button>
+</div>
+<!-- FPS crosshair + mode label -->
+<div id="fps-crosshair">+</div>
+<div id="fps-mode-label">FREE-WALK · CLICK TO LOOK · TAB TO RIDE CREW</div>
 
 <!-- ══ PAPERS PLEASE TASK PANEL ══ -->
 <div id="task-panel">
@@ -2038,6 +2063,21 @@ let groundScene=null,groundCamera=null,groundRenderer=null,groundAnimId=null;
 let groundRobots=[], groundCrew=[];
 let cameraPOV=null; // {target: mesh, returnAt: timestamp} — for robot POV lock
 
+// ── FPS free-walk state ──
+let fpsPlayer={x:0,y:1.7,z:5,yaw:0,pitch:0};
+let fpsMode='walk'; // 'walk' = free-walk WASD, 'ride' = old shoulder-cam
+let fpsKeys={w:false,a:false,s:false,d:false,shift:false,
+  ArrowUp:false,ArrowDown:false,ArrowLeft:false,ArrowRight:false};
+let fpsPointerLocked=false;
+
+// ── Landing sequence state ──
+let landingPhase='idle'; // 'idle'|'globe'|'descent'|'touchdown'|'deploy'|'playing'
+let landingShip=null; // THREE.Group for the lander
+let landingShipData={y:120,vy:0,vx:0,vz:0,fuel:100,manual:false,
+  retroParticles:[],rampMesh:null,rampAngle:0,shakeFrames:0,dustBoost:0,
+  deployTimer:0,crewDeployed:false,elapsed:0};
+let landingMissionRef=null; // stash mission data for post-deploy sim start
+
 // ── Globe Setup ──
 function initGlobe(){
   globe=Globe()(document.getElementById('globeViz'))
@@ -2076,6 +2116,21 @@ function setZoom(level){
   currentZoom=level;
   document.querySelectorAll('.zoom-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('z-'+level)?.classList.add('active');
+
+  // FPS UI management
+  const ch=document.getElementById('fps-crosshair');
+  const ml=document.getElementById('fps-mode-label');
+  if(level==='crew'){
+    fpsPlayer={x:0,y:1.7,z:5,yaw:0,pitch:0};
+    fpsMode='walk';
+    if(ch) ch.style.display='block';
+    if(ml){ml.style.display='block';ml.textContent='FREE-WALK · CLICK TO LOOK · TAB TO RIDE CREW'}
+    setTimeout(()=>initFpsPointerLock(),400);
+  } else {
+    if(ch) ch.style.display='none';
+    if(ml) ml.style.display='none';
+    if(document.pointerLockElement) document.exitPointerLock();
+  }
 
   // Fade out all views
   ['globe-container','warmap-view','ground-view'].forEach(id=>{
@@ -2293,6 +2348,169 @@ function exitGround(){
   if(warmapAnim)cancelAnimationFrame(warmapAnim);
   if(groundRenderer){groundRenderer.dispose();document.getElementById('ground-canvas').innerHTML=''}
   groundScene=null;groundCamera=null;groundRenderer=null;
+  // Exit pointer lock if active
+  if(document.pointerLockElement) document.exitPointerLock();
+  fpsPointerLocked=false;
+}
+
+// ── FPS Input Handlers ──
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
+  const k=e.key.toLowerCase();
+  if(currentZoom==='crew'){
+    if(k==='w'||e.key==='ArrowUp'){fpsKeys.w=true;e.preventDefault()}
+    if(k==='a'||e.key==='ArrowLeft'){fpsKeys.a=true;e.preventDefault()}
+    if(k==='s'||e.key==='ArrowDown'){fpsKeys.s=true;e.preventDefault()}
+    if(k==='d'||e.key==='ArrowRight'){fpsKeys.d=true;e.preventDefault()}
+    if(e.key==='Shift') fpsKeys.shift=true;
+  }
+  // Landing manual override arrow keys
+  if(landingPhase==='descent'&&landingShipData.manual){
+    if(e.key==='ArrowLeft'){landingShipData.vx=-0.15;e.preventDefault()}
+    if(e.key==='ArrowRight'){landingShipData.vx=0.15;e.preventDefault()}
+    if(e.key==='ArrowUp'){landingShipData.vz=-0.15;e.preventDefault()}
+    if(e.key==='ArrowDown'){landingShipData.vz=0.15;e.preventDefault()}
+  }
+});
+document.addEventListener('keyup',e=>{
+  const k=e.key.toLowerCase();
+  if(k==='w'||e.key==='ArrowUp') fpsKeys.w=false;
+  if(k==='a'||e.key==='ArrowLeft') fpsKeys.a=false;
+  if(k==='s'||e.key==='ArrowDown') fpsKeys.s=false;
+  if(k==='d'||e.key==='ArrowRight') fpsKeys.d=false;
+  if(e.key==='Shift') fpsKeys.shift=false;
+  // Stop landing drift when key released
+  if(landingPhase==='descent'&&landingShipData.manual){
+    if(e.key==='ArrowLeft'||e.key==='ArrowRight') landingShipData.vx=0;
+    if(e.key==='ArrowUp'||e.key==='ArrowDown') landingShipData.vz=0;
+  }
+});
+document.addEventListener('mousemove',e=>{
+  if(!fpsPointerLocked||currentZoom!=='crew'||fpsMode!=='walk') return;
+  fpsPlayer.yaw-=e.movementX*0.002;
+  fpsPlayer.pitch-=e.movementY*0.002;
+  fpsPlayer.pitch=Math.max(-Math.PI/2.2,Math.min(Math.PI/2.2,fpsPlayer.pitch));
+});
+document.addEventListener('pointerlockchange',()=>{
+  fpsPointerLocked=!!document.pointerLockElement;
+});
+
+function initFpsPointerLock(){
+  const canvas=document.getElementById('ground-canvas');
+  if(!canvas) return;
+  canvas.addEventListener('click',()=>{
+    if(currentZoom==='crew'&&fpsMode==='walk'&&!fpsPointerLocked){
+      canvas.requestPointerLock();
+    }
+  });
+}
+
+// ── Landing Ship Builder ──
+function createLandingShip(){
+  const T=window.THREE;if(!T||!groundScene) return;
+  landingShip=new T.Group();
+
+  // Capsule body (cone + cylinder)
+  const cone=new T.Mesh(new T.ConeGeometry(1.8,3,8),
+    new T.MeshStandardMaterial({color:0xcccccc,metalness:0.6,roughness:0.3}));
+  cone.position.y=3;
+  landingShip.add(cone);
+
+  const body=new T.Mesh(new T.CylinderGeometry(1.8,1.8,2.5,8),
+    new T.MeshStandardMaterial({color:0xaaaaaa,metalness:0.5,roughness:0.4}));
+  body.position.y=0.75;
+  landingShip.add(body);
+
+  // Heat shield (hemisphere at bottom)
+  const shield=new T.Mesh(new T.SphereGeometry(2,12,8,0,Math.PI*2,Math.PI/2,Math.PI/2),
+    new T.MeshStandardMaterial({color:0x553300,metalness:0.2,roughness:0.8}));
+  shield.rotation.x=Math.PI;
+  shield.position.y=-0.5;
+  landingShip.add(shield);
+
+  // 4 Landing legs
+  for(let i=0;i<4;i++){
+    const angle=(i/4)*Math.PI*2;
+    const leg=new T.Mesh(new T.CylinderGeometry(0.05,0.08,2.5,4),
+      new T.MeshStandardMaterial({color:0x888888}));
+    leg.position.set(Math.cos(angle)*1.6,-1.5,Math.sin(angle)*1.6);
+    leg.rotation.z=Math.cos(angle)*0.3;
+    leg.rotation.x=-Math.sin(angle)*0.3;
+    leg.name='leg'+i;
+    landingShip.add(leg);
+  }
+
+  // Retro-rocket light
+  const retroLight=new T.PointLight(0xff6600,3,30);
+  retroLight.position.y=-2;
+  retroLight.name='retroLight';
+  landingShip.add(retroLight);
+
+  // Retro-rocket glow mesh
+  const glowGeo=new T.SphereGeometry(0.6,8,8);
+  const glowMat=new T.MeshBasicMaterial({color:0xff8800,transparent:true,opacity:0.6});
+  const glow=new T.Mesh(glowGeo,glowMat);
+  glow.position.y=-1.5;
+  glow.name='retroGlow';
+  landingShip.add(glow);
+
+  // Ramp/door (plane that rotates down)
+  const ramp=new T.Mesh(new T.PlaneGeometry(1.2,2),
+    new T.MeshStandardMaterial({color:0x999999,side:T.DoubleSide}));
+  ramp.position.set(0,0,1.8);
+  ramp.rotation.x=Math.PI/2; // starts closed (flat against body)
+  ramp.name='ramp';
+  landingShip.add(ramp);
+  landingShipData.rampMesh=ramp;
+
+  // Retro-rocket exhaust particles
+  landingShipData.retroParticles=[];
+  for(let i=0;i<20;i++){
+    const p=new T.Mesh(new T.SphereGeometry(0.12,4,4),
+      new T.MeshBasicMaterial({color:0xff6600,transparent:true,opacity:0.7}));
+    p.visible=false;
+    p.userData={vy:0,life:0};
+    landingShip.add(p);
+    landingShipData.retroParticles.push(p);
+  }
+
+  // Reset landing data
+  landingShipData.y=120;
+  landingShipData.vy=0;
+  landingShipData.vx=0;
+  landingShipData.vz=0;
+  landingShipData.fuel=100;
+  landingShipData.manual=false;
+  landingShipData.rampAngle=0;
+  landingShipData.shakeFrames=0;
+  landingShipData.dustBoost=0;
+  landingShipData.deployTimer=0;
+  landingShipData.crewDeployed=false;
+  landingShipData.elapsed=0;
+
+  landingShip.position.set(0,120,0);
+  groundScene.add(landingShip);
+}
+
+function removeLandingShip(){
+  if(landingShip&&groundScene){
+    groundScene.remove(landingShip);
+    landingShip.traverse(child=>{
+      if(child.geometry) child.geometry.dispose();
+      if(child.material) child.material.dispose();
+    });
+    landingShip=null;
+  }
+}
+
+function toggleLandingManual(){
+  landingShipData.manual=!landingShipData.manual;
+  const btn=document.getElementById('lh-override');
+  if(btn){
+    btn.textContent=landingShipData.manual?'🤖 AUTO PILOT':'🎮 MANUAL OVERRIDE';
+    btn.style.borderColor=landingShipData.manual?'var(--green)':'var(--yellow)';
+    btn.style.color=landingShipData.manual?'var(--green)':'var(--yellow)';
+  }
 }
 
 function buildGroundScene(){
@@ -2761,24 +2979,40 @@ function buildGroundScene(){
       groundCamera.lookAt(t.position.x,1.5,t.position.z);
       if(cameraPOV.light) cameraPOV.light.material.color.setHex(frame%20<10?0xff4444:0xff0000);
     } else if(currentZoom==='crew'){
-      // FPS VIEW — ride on a robot or crew member's shoulder
-      const target=groundRobots.length?groundRobots[Math.floor(frame*0.001)%groundRobots.length]:
-        groundCrew.length?groundCrew[0]:null;
-      if(target){
-        const m=target.mesh;
-        // Position camera at head height, slightly behind
-        const fwd=target.vx!==undefined?Math.atan2(target.vx||0,target.vz||0):m.rotation.y;
-        const eyeHeight=target.vx!==undefined?1.2:1.8; // robots shorter than humans
-        const behindDist=1.5;
-        const targetX=m.position.x-Math.sin(fwd)*behindDist;
-        const targetZ=m.position.z-Math.cos(fwd)*behindDist;
-        groundCamera.position.x+=(targetX-groundCamera.position.x)*0.03;
-        groundCamera.position.z+=(targetZ-groundCamera.position.z)*0.03;
-        groundCamera.position.y+=(eyeHeight-groundCamera.position.y)*0.05;
-        // Look in the direction of movement, slightly toward colony center
-        const lookX=m.position.x+Math.sin(fwd)*5;
-        const lookZ=m.position.z+Math.cos(fwd)*5;
-        groundCamera.lookAt(lookX,1,lookZ);
+      if(fpsMode==='walk'){
+        // FREE-WALK FPS — WASD movement relative to camera yaw
+        const speed=(fpsKeys.shift?0.18:0.08);
+        const sinY=Math.sin(fpsPlayer.yaw),cosY=Math.cos(fpsPlayer.yaw);
+        if(fpsKeys.w){fpsPlayer.x-=sinY*speed;fpsPlayer.z-=cosY*speed}
+        if(fpsKeys.s){fpsPlayer.x+=sinY*speed;fpsPlayer.z+=cosY*speed}
+        if(fpsKeys.a){fpsPlayer.x-=cosY*speed;fpsPlayer.z+=sinY*speed}
+        if(fpsKeys.d){fpsPlayer.x+=cosY*speed;fpsPlayer.z-=sinY*speed}
+        // Clamp to terrain bounds
+        fpsPlayer.x=Math.max(-180,Math.min(180,fpsPlayer.x));
+        fpsPlayer.z=Math.max(-180,Math.min(180,fpsPlayer.z));
+        // Apply position and rotation to camera
+        groundCamera.position.set(fpsPlayer.x,fpsPlayer.y,fpsPlayer.z);
+        // Build rotation from yaw + pitch
+        const euler=new THREE.Euler(fpsPlayer.pitch,fpsPlayer.yaw,0,'YXZ');
+        groundCamera.quaternion.setFromEuler(euler);
+      } else {
+        // RIDE MODE — old shoulder-cam on a robot or crew member
+        const target=groundRobots.length?groundRobots[Math.floor(frame*0.001)%groundRobots.length]:
+          groundCrew.length?groundCrew[0]:null;
+        if(target){
+          const m=target.mesh;
+          const fwd=target.vx!==undefined?Math.atan2(target.vx||0,target.vz||0):m.rotation.y;
+          const eyeHeight=target.vx!==undefined?1.2:1.8;
+          const behindDist=1.5;
+          const targetX=m.position.x-Math.sin(fwd)*behindDist;
+          const targetZ=m.position.z-Math.cos(fwd)*behindDist;
+          groundCamera.position.x+=(targetX-groundCamera.position.x)*0.03;
+          groundCamera.position.z+=(targetZ-groundCamera.position.z)*0.03;
+          groundCamera.position.y+=(eyeHeight-groundCamera.position.y)*0.05;
+          const lookX=m.position.x+Math.sin(fwd)*5;
+          const lookZ=m.position.z+Math.cos(fwd)*5;
+          groundCamera.lookAt(lookX,1,lookZ);
+        }
       }
     } else if(currentZoom==='module'){
       // LOW ORBIT — closer, lower angle, focused on buildings and activity
@@ -2857,6 +3091,244 @@ function buildGroundScene(){
     // Reads standing orders (reflex arcs) and applies continuous effects.
     // This is the spinal cord — reacting between heartbeats.
     if(frame%3===0) runPatrol(); // every 3rd render frame (~20Hz)
+
+    // ── LANDING SEQUENCE ANIMATION ──
+    if(landingShip&&(landingPhase==='descent'||landingPhase==='touchdown'||landingPhase==='deploy')){
+      landingShipData.elapsed++;
+
+      if(landingPhase==='descent'){
+        // Show manual override button after 3 seconds (~180 frames)
+        if(landingShipData.elapsed>180){
+          const hud=document.getElementById('landing-hud');
+          if(hud) hud.style.display='block';
+        }
+        // Deceleration descent
+        const gravity=0.003;
+        const thrust=landingShipData.y>20?0.001:0.0025;
+        landingShipData.vy+=gravity;
+        landingShipData.vy=Math.max(landingShipData.vy-thrust,0.04);
+        // Ease-out: slow down as we approach ground
+        if(landingShipData.y<30) landingShipData.vy*=0.98;
+        if(landingShipData.y<10) landingShipData.vy*=0.95;
+        landingShipData.y-=landingShipData.vy;
+
+        // Manual drift
+        if(landingShipData.manual){
+          landingShip.position.x+=landingShipData.vx;
+          landingShip.position.z+=landingShipData.vz;
+        }
+
+        landingShip.position.y=landingShipData.y;
+
+        // Slight tilt during descent for realism
+        landingShip.rotation.z=Math.sin(frame*0.02)*0.05;
+        landingShip.rotation.x=Math.cos(frame*0.015)*0.03;
+
+        // Retro-rocket pulsing light
+        const rl=landingShip.getObjectByName('retroLight');
+        const rg=landingShip.getObjectByName('retroGlow');
+        if(rl) rl.intensity=2+Math.sin(frame*0.1)*1.5;
+        if(rg){rg.scale.setScalar(0.8+Math.sin(frame*0.15)*0.3);rg.material.opacity=0.5+Math.sin(frame*0.1)*0.2}
+
+        // Retro-rocket exhaust particles
+        landingShipData.retroParticles.forEach((p,pi)=>{
+          if(!p.visible&&Math.random()<0.3){
+            p.visible=true;
+            p.position.set((Math.random()-0.5)*0.8,-2,(Math.random()-0.5)*0.8);
+            p.userData.vy=-0.3-Math.random()*0.3;
+            p.userData.life=30;
+          }
+          if(p.visible){
+            p.position.y+=p.userData.vy;
+            p.userData.life--;
+            p.material.opacity=p.userData.life/30*0.7;
+            if(p.userData.life<=0) p.visible=false;
+          }
+        });
+
+        // Camera tracks from behind and below
+        const cx=landingShip.position.x+8;
+        const cy=Math.max(landingShipData.y*0.6,4);
+        const cz=landingShip.position.z+12;
+        groundCamera.position.x+=(cx-groundCamera.position.x)*0.03;
+        groundCamera.position.y+=(cy-groundCamera.position.y)*0.03;
+        groundCamera.position.z+=(cz-groundCamera.position.z)*0.03;
+        groundCamera.lookAt(landingShip.position.x,landingShipData.y+2,landingShip.position.z);
+
+        // Update HUD
+        const altEl=document.getElementById('lh-alt');
+        const velEl=document.getElementById('lh-vel');
+        const fuelEl=document.getElementById('lh-fuel');
+        if(altEl) altEl.textContent=Math.max(0,landingShipData.y-2).toFixed(0);
+        if(velEl) velEl.textContent=landingShipData.vy.toFixed(1);
+        if(fuelEl){
+          landingShipData.fuel=Math.max(0,landingShipData.fuel-0.05);
+          fuelEl.textContent=landingShipData.fuel.toFixed(0);
+          fuelEl.style.color=landingShipData.fuel<30?'var(--red)':'var(--green)';
+        }
+
+        // Touchdown detection
+        if(landingShipData.y<=2.5){
+          landingPhase='touchdown';
+          landingShipData.shakeFrames=30;
+          landingShipData.dustBoost=120;
+          landingShip.position.y=2;
+          landingShip.rotation.z=0;
+          landingShip.rotation.x=0;
+          // Kill retro-rockets
+          if(rl) rl.intensity=0;
+          if(rg) rg.visible=false;
+          landingShipData.retroParticles.forEach(p=>{p.visible=false});
+        }
+      }
+
+      if(landingPhase==='touchdown'){
+        // Camera shake
+        if(landingShipData.shakeFrames>0){
+          landingShipData.shakeFrames--;
+          const s=landingShipData.shakeFrames*0.003;
+          groundCamera.position.x+=(Math.random()-0.5)*s;
+          groundCamera.position.y+=(Math.random()-0.5)*s;
+          groundCamera.lookAt(landingShip.position.x,2,landingShip.position.z);
+        }
+
+        // Dust cloud boost (temporarily increase dust particle drift)
+        if(landingShipData.dustBoost>0){
+          landingShipData.dustBoost--;
+          // Speed up existing dust particles
+          const dp=dustParticles.geometry.attributes.position;
+          for(let i=0;i<Math.min(dp.count,20);i++){
+            dp.setX(i,dp.getX(i)+(Math.random()-0.3)*0.3);
+            dp.setY(i,Math.max(0.5,dp.getY(i)+(Math.random()-0.5)*0.15));
+          }
+          dp.needsUpdate=true;
+        }
+
+        // Compress landing legs slightly
+        for(let i=0;i<4;i++){
+          const leg=landingShip.getObjectByName('leg'+i);
+          if(leg) leg.scale.y=0.9;
+        }
+
+        // Settle camera
+        groundCamera.position.x+=(landingShip.position.x+6-groundCamera.position.x)*0.03;
+        groundCamera.position.y+=(3-groundCamera.position.y)*0.03;
+        groundCamera.position.z+=(landingShip.position.z+8-groundCamera.position.z)*0.03;
+        groundCamera.lookAt(landingShip.position.x,2,landingShip.position.z);
+
+        // Transition to deploy after shake ends
+        if(landingShipData.shakeFrames<=0&&landingShipData.dustBoost<=0){
+          landingPhase='deploy';
+          landingShipData.deployTimer=0;
+        }
+      }
+
+      if(landingPhase==='deploy'){
+        landingShipData.deployTimer++;
+
+        // Open ramp (animate over ~60 frames)
+        const ramp=landingShipData.rampMesh;
+        if(ramp&&landingShipData.rampAngle<Math.PI/2){
+          landingShipData.rampAngle=Math.min(Math.PI/2,landingShipData.rampAngle+0.02);
+          ramp.rotation.x=Math.PI/2-landingShipData.rampAngle;
+        }
+
+        // After ramp opens (~60 frames=1s), slide crew from ship to patrol positions
+        if(landingShipData.deployTimer>60&&!landingShipData.crewDeployed){
+          landingShipData.crewDeployed=true;
+          // Move crew figures from ship position; they'll lerp over a few seconds
+          crewFigures.forEach(cf=>{
+            cf.mesh.position.x=landingShip.position.x;
+            cf.mesh.position.z=landingShip.position.z;
+          });
+          robots.forEach(r=>{
+            r.mesh.position.x=landingShip.position.x;
+            r.mesh.position.z=landingShip.position.z;
+          });
+        }
+
+        // Crew slides to patrol positions over ~180 frames (3s)
+        if(landingShipData.crewDeployed&&landingShipData.deployTimer<240){
+          const t=Math.min(1,(landingShipData.deployTimer-60)/180);
+          crewFigures.forEach((cf,i)=>{
+            const targetA=cf.baseAngle;
+            const tx=Math.cos(targetA)*8;
+            const tz=Math.sin(targetA)*8;
+            cf.mesh.position.x+=(tx-cf.mesh.position.x)*t*0.05;
+            cf.mesh.position.z+=(tz-cf.mesh.position.z)*t*0.05;
+          });
+        }
+
+        // Camera orbits during deploy
+        groundCamera.position.x+=(landingShip.position.x+10*Math.sin(landingShipData.deployTimer*0.01)-groundCamera.position.x)*0.02;
+        groundCamera.position.y+=(5-groundCamera.position.y)*0.03;
+        groundCamera.position.z+=(landingShip.position.z+10*Math.cos(landingShipData.deployTimer*0.01)-groundCamera.position.z)*0.02;
+        groundCamera.lookAt(landingShip.position.x,1.5,landingShip.position.z);
+
+        // Finish deploy after crew has walked out (~4s total)
+        if(landingShipData.deployTimer>300){
+          landingPhase='playing';
+          removeLandingShip();
+          // Hide landing HUD
+          const hud=document.getElementById('landing-hud');
+          if(hud) hud.style.display='none';
+          // Hide landing overlay text
+          const lo=document.getElementById('landing-overlay');
+          if(lo) lo.style.display='none';
+          const mo=document.getElementById('mission-overlay');
+          if(mo) mo.style.display='none';
+
+          // Show game UI
+          document.getElementById('game-hdr').classList.remove('game-hidden');
+          document.getElementById('game-hdr').classList.add('game-visible');
+          document.getElementById('left-panel').classList.remove('game-hidden');
+          document.getElementById('left-panel').classList.add('game-visible');
+          document.getElementById('right-panel').classList.remove('game-hidden');
+          document.getElementById('right-panel').classList.add('game-visible');
+          document.getElementById('top-nav').classList.remove('game-hidden');
+          document.getElementById('top-nav').classList.add('game-visible');
+          document.getElementById('cartridge-bar').classList.remove('game-hidden');
+          document.getElementById('cartridge-bar').classList.add('game-visible');
+
+          // Start simulation
+          updateAllUI();
+          if(typeof landingMissionRef!=='undefined'&&landingMissionRef){
+            const m=landingMissionRef.mission;
+            const wx=landingMissionRef.wx;
+            const seed=landingMissionRef.seed;
+            const startInDust=landingMissionRef.startInDust;
+            state.log.push('Mission: '+m.name);
+            state.log.push('Governor: '+m.arch.toUpperCase()+' + LisPy ('+activeLispy+')');
+            state.log.push('Crew: '+m.crewList.length+' members deployed');
+            state.log.push('\u{1F321}\u{FE0F} Real Mars: '+wx.season+' \u00B7 '+wx.tempC+'\u00B0C \u00B7 Solar '+wx.solarWm2+' W/m\u00B2');
+            state.log.push('\u{1F32A}\u{FE0F} Dust \u03C4: '+wx.dustTau+' \u00B7 Wind: '+wx.windMs+' m/s \u00B7 Storm risk: '+wx.dustStormProb+'%');
+            if(startInDust) state.log.push('\u26A0\u{FE0F} DUST STORM ACTIVE \u2014 starting in reduced solar conditions');
+            state.log.push('\u2500\u2500\u2500 Sol 1 begins \u2500\u2500\u2500');
+            setTimeout(()=>{
+              simSpeed=1;
+              running=true;
+              cartridgeId=generateCartridgeId();
+              state.startConfig={o2:state.o2,h2o:state.h2o,food:state.food,power:state.power};
+              state.startSeed=seed;
+              updateCartridgeDisplay();
+              document.getElementById('sim-btn').textContent='\u23F8 PAUSE';
+              simInterval=setInterval(()=>{
+                stepSim();
+                autoSaveCheck();
+                if(state.sol%25===0&&groundScene){exitGround();enterGround()}
+                if(!state.alive){
+                  running=false;
+                  clearInterval(simInterval);
+                  document.getElementById('sim-btn').textContent='COLONY LOST';
+                  showDeathScreen();
+                }
+              },Math.max(50,500/simSpeed));
+            },500);
+            landingMissionRef=null;
+          }
+        }
+      }
+    }
 
     groundRenderer.render(groundScene,groundCamera);
   }
@@ -4259,77 +4731,35 @@ function launchMission(key, customConfig){
     globe.pointOfView({lat:state.lat,lng:state.lng,altitude:0.4},2000);
   }, 3500);
 
-  // Phase 3: Zoom to surface
+  // Phase 3: Transition to ground view for 3D landing sequence
   setTimeout(()=>{
     textEl.style.opacity = '0';
     subEl.style.opacity = '0';
   }, 6000);
 
   setTimeout(()=>{
-    textEl.textContent = 'LANDING';
+    // Enter ground view and build landing ship
+    landingPhase='descent';
+    enterGround();
+    setZoom('base');
+    createLandingShip();
+    initFpsPointerLock();
+
+    // Stash mission data so the deploy-complete handler can start the sim
+    landingMissionRef={mission:m,wx:wx,seed:seed,startInDust:startInDust};
+
+    // Show landing text overlay
+    textEl.textContent = 'POWERED DESCENT';
     subEl.textContent = `Solar: ${wx.solarWm2} W/m² · Dust τ: ${wx.dustTau} · Ls ${wx.ls}°`;
     textEl.style.opacity = '1';
     subEl.style.opacity = '1';
-    globe.pointOfView({lat:state.lat,lng:state.lng,altitude:0.08},2000);
-  }, 6500);
 
-  // Phase 4: Transition to ground view and start sim
-  setTimeout(()=>{
-    textEl.style.opacity = '0';
-    subEl.style.opacity = '0';
-  }, 9000);
-
-  setTimeout(()=>{
-    landingEl.style.display = 'none';
-    overlay.style.display = 'none';
-
-    // Show game UI
-    document.getElementById('game-hdr').classList.remove('game-hidden');
-    document.getElementById('game-hdr').classList.add('game-visible');
-    document.getElementById('left-panel').classList.remove('game-hidden');
-    document.getElementById('left-panel').classList.add('game-visible');
-    document.getElementById('right-panel').classList.remove('game-hidden');
-    document.getElementById('right-panel').classList.add('game-visible');
-    document.getElementById('top-nav').classList.remove('game-hidden');
-    document.getElementById('top-nav').classList.add('game-visible');
-    document.getElementById('cartridge-bar').classList.remove('game-hidden');
-    document.getElementById('cartridge-bar').classList.add('game-visible');
-
-    // Enter ground view
-    setZoom('base');
-
-    // Auto-start simulation
-    updateAllUI();
-    state.log.push(`Mission: ${m.name}`);
-    state.log.push(`Governor: ${m.arch.toUpperCase()} + LisPy (${activeLispy})`);
-    state.log.push(`Crew: ${m.crewList.length} members deployed`);
-    state.log.push(`🌡️ Real Mars: ${wx.season} · ${wx.tempC}°C · Solar ${wx.solarWm2} W/m²`);
-    state.log.push(`🌪️ Dust τ: ${wx.dustTau} · Wind: ${wx.windMs} m/s · Storm risk: ${wx.dustStormProb}%`);
-    if(startInDust) state.log.push('⚠️ DUST STORM ACTIVE — starting in reduced solar conditions');
-    state.log.push('─── Sol 1 begins ───');
-
+    // Fade text after 3s, ship descent runs in animate() loop
     setTimeout(()=>{
-      simSpeed = 1; // reset speed for new game
-      running = true;
-      cartridgeId = generateCartridgeId();
-      state.startConfig = {o2:state.o2,h2o:state.h2o,food:state.food,power:state.power};
-      state.startSeed = seed;
-      updateCartridgeDisplay();
-      document.getElementById('sim-btn').textContent = '⏸ PAUSE';
-      simInterval = setInterval(()=>{
-        stepSim();
-        autoSaveCheck();
-        // Rebuild ground scene periodically to reflect state changes (crew deaths, modules built, lighting)
-        if(state.sol % 25 === 0 && groundScene){ exitGround(); enterGround(); }
-        if(!state.alive){
-          running = false;
-          clearInterval(simInterval);
-          document.getElementById('sim-btn').textContent = 'COLONY LOST';
-          showDeathScreen();
-        }
-      }, Math.max(50, 500/simSpeed));
-    }, 500);
-  }, 9500);
+      textEl.style.opacity = '0';
+      subEl.style.opacity = '0';
+    }, 3000);
+  }, 6500);
 }
 
 function showDeathScreen(){
@@ -4914,9 +5344,15 @@ document.addEventListener('keydown', e=>{
   }
   if(e.key==='c'||e.key==='C'){toggleCinematic();e.preventDefault()}
   if(e.key==='s'&&(e.ctrlKey||e.metaKey)){exportCartridge();e.preventDefault()}
-  // Tab: cycle through crew/robot FPS perspectives
+  // Tab: toggle free-walk / ride-crew FPS modes
   if(e.key==='Tab'&&currentZoom==='crew'){
     e.preventDefault();
+    fpsMode=fpsMode==='walk'?'ride':'walk';
+    const label=document.getElementById('fps-mode-label');
+    if(label){
+      label.textContent=fpsMode==='walk'?'FREE-WALK · CLICK TO LOOK · TAB TO RIDE CREW':'RIDE MODE · TAB FOR FREE-WALK';
+    }
+    if(fpsMode==='ride'&&document.pointerLockElement) document.exitPointerLock();
   }
 });
 </script>
