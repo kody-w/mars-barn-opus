@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>First Principles to Mars — Executive Brief</title>
+<meta name="description" content="Partnership opportunity: autonomous colony operations simulation platform. Real physics, real training value, open architecture.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#fff;color:#1a1a2e;font-family:'Segoe UI',-apple-system,sans-serif;
+max-width:740px;margin:0 auto;padding:48px 32px 60px;line-height:1.7}
+h1{font-size:28px;color:#1a1a2e;letter-spacing:1px;margin-bottom:4px}
+.tagline{color:#666;font-size:15px;margin-bottom:32px;border-bottom:2px solid #e8e8e8;padding-bottom:16px}
+h2{font-size:17px;color:#1a1a2e;margin:28px 0 10px;text-transform:uppercase;letter-spacing:0.5px}
+h3{font-size:14px;color:#2563eb;margin:16px 0 6px}
+p{font-size:14px;margin:6px 0}
+strong{color:#1a1a2e}
+.highlight{background:#f0f7ff;border-left:3px solid #2563eb;padding:12px 16px;margin:12px 0;
+border-radius:0 6px 6px 0;font-size:13px}
+.highlight strong{color:#2563eb}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.card{background:#f8f9fa;border:1px solid #e8e8e8;border-radius:8px;padding:14px;font-size:13px}
+.card h3{margin:0 0 4px;font-size:13px}
+.stat-row{display:flex;justify-content:space-between;margin:16px 0;text-align:center}
+.stat{flex:1}
+.stat .v{font-size:28px;font-weight:700;color:#2563eb}
+.stat .l{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.5px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+th{text-align:left;padding:6px 10px;background:#f8f9fa;border-bottom:2px solid #e8e8e8;
+font-size:11px;text-transform:uppercase;color:#888;letter-spacing:0.5px}
+td{padding:6px 10px;border-bottom:1px solid #f0f0f0}
+.cta{text-align:center;margin:32px 0;padding:24px;background:#f0f7ff;border:1px solid #d0e0f0;
+border-radius:10px}
+.cta p{font-size:15px;color:#2563eb;font-weight:600}
+.footer{text-align:center;color:#aaa;font-size:11px;margin-top:32px;padding-top:16px;border-top:1px solid #e8e8e8}
+.footer a{color:#888;text-decoration:none}
+ul{font-size:13px;margin:6px 0 6px 20px}
+li{margin:3px 0}
+</style>
+</head>
+<body>
+
+<h1>First Principles to Mars</h1>
+<p class="tagline">Autonomous Colony Operations Simulation Platform — Partnership Brief</p>
+
+<h2>The Opportunity</h2>
+<p>We've built an <strong>open-source Mars colony simulation</strong> that runs on real NASA weather data, real physics, and real engineering constraints. It's playable in a browser with zero installation. It teaches autonomous systems, remote operations, and critical decision-making through gameplay — not lectures.</p>
+
+<div class="highlight">
+<strong>The core insight:</strong> The same software patterns that keep a simulated Mars colony alive are the same patterns that run autonomous fleets, manage distributed infrastructure, and operate remote systems. The simulation is the training ground. The skills transfer directly.
+</div>
+
+<h2>What We Built</h2>
+<div class="stat-row">
+<div class="stat"><div class="v">29</div><div class="l">Python Modules</div></div>
+<div class="stat"><div class="v">299</div><div class="l">Automated Tests</div></div>
+<div class="stat"><div class="v">15k</div><div class="l">Lines of Code</div></div>
+<div class="stat"><div class="v">0</div><div class="l">Dependencies</div></div>
+</div>
+
+<div class="grid">
+<div class="card"><h3>🔬 Physics Engine</h3><p>Mars atmosphere, solar irradiance, thermal dynamics, radiation — all NASA-sourced. Stefan-Boltzmann, Beer-Lambert, barometric formula. If the physics says the colony dies, it dies.</p></div>
+<div class="card"><h3>🤖 Autonomous AI</h3><p>10 governor archetypes + LisPy VM (sandboxed Lisp) for custom AI. Colony Risk Index computed every sol. Reflex arcs fire between heartbeats. The system reacts in 50ms even though it thinks every 2 seconds.</p></div>
+<div class="card"><h3>🎮 Oregon Trail Gameplay</h3><p>Mission selection → crew configuration → 3D colony view → Papers Please decision tasks → manual override minigames with light delay → post-mortem analysis. Playable in any browser.</p></div>
+<div class="card"><h3>🧠 Nervous System Architecture</h3><p>Echo frames (structured deltas), inertia signals (derivatives), reflex arcs (standing orders), patrol agents (continuous responsiveness). A discrete system with continuous behavior.</p></div>
+</div>
+
+<h2>Why This Matters Beyond Mars</h2>
+
+<h3>1. Autonomous Systems Training</h3>
+<p>Every organization running autonomous systems — drones, robots, vehicles, infrastructure — faces the same problem: <strong>the system needs to survive when the operator can't respond fast enough.</strong> Our nervous system pattern (echo → reflex → patrol) is a general solution. The Mars sim teaches it through play.</p>
+
+<h3>2. Remote Operations</h3>
+<p>The manual override minigames train <strong>real remote ops skills</strong>: send commands with latency, diagnose from telemetry, sequence procedures correctly. "Robot can't unscrew a bolt" is the Mars version of "drone needs manual intervention in a cell tower inspection." Same skill, different domain.</p>
+
+<h3>3. Decision-Making Under Uncertainty</h3>
+<p>The Papers Please task system presents <strong>real tradeoff decisions with cascading consequences</strong>. Reroute O₂ and starve the greenhouse. Deny medical care and the whole crew demoralizes. Every "mundane" decision has downstream effects. This is what operations management actually looks like — the sim just makes it visceral.</p>
+
+<h3>4. Educational Platform</h3>
+<p>Physics, engineering, computer science (write your own AI in LisPy), robotics, data science, game theory, systems thinking, ethics. <strong>Every STEM discipline in one simulation.</strong> Zero setup. Works on any school computer. Already has 299 automated tests validating every behavior.</p>
+
+<h2>The Architecture (Transferable)</h2>
+
+<table>
+<tr><th>Pattern</th><th>In the Sim</th><th>In Your Organization</th></tr>
+<tr><td><strong>Data Sloshing</strong></td><td>Frame N output → Frame N+1 input</td><td>Batch pipeline state propagation</td></tr>
+<tr><td><strong>Echo Frames</strong></td><td>Structured delta after each sol</td><td>System health summaries after each cycle</td></tr>
+<tr><td><strong>Inertia Signal</strong></td><td>Resource trajectory derivatives</td><td>KPI trend detection (not just thresholds)</td></tr>
+<tr><td><strong>Reflex Arcs</strong></td><td>Auto-boost ISRU when O₂ drops</td><td>Auto-scale when latency rises</td></tr>
+<tr><td><strong>CRI (Risk Index)</strong></td><td>Colony stress composite score</td><td>Operational risk dashboard</td></tr>
+<tr><td><strong>Manual Override</strong></td><td>Guide robot through procedure</td><td>Operator intervention in autonomous system</td></tr>
+<tr><td><strong>Post-Mortem</strong></td><td>Trace causal chain of colony death</td><td>Incident analysis with decision audit trail</td></tr>
+</table>
+
+<h2>Partnership Models</h2>
+
+<div class="grid">
+<div class="card">
+<h3>🎓 Education Sponsor</h3>
+<p>Deploy to schools and bootcamps. Your brand on the mission select screen. Students learn autonomous systems using your infrastructure metaphors. <strong>Talent pipeline.</strong></p>
+</div>
+<div class="card">
+<h3>🏢 Enterprise Training</h3>
+<p>Custom missions modeled on your operational scenarios. Same engine, your domain. Warehouse robots, drone fleets, remote infrastructure. <strong>Workforce readiness.</strong></p>
+</div>
+<div class="card">
+<h3>🔬 Research Platform</h3>
+<p>10,000-sol autonomy benchmarks. Genetic algorithm governor breeding. Statistically rigorous survival analysis. <strong>Published results on autonomous decision-making.</strong></p>
+</div>
+<div class="card">
+<h3>🚀 Space Industry</h3>
+<p>Literal Mars colony operations training. Digital twin → Earth rehearsal → Mars deployment. Same software at every stage. <strong>The pipeline is real.</strong></p>
+</div>
+</div>
+
+<h2>Traction</h2>
+<ul>
+<li><strong>Open source</strong> — MIT-licensable, full transparency, community-extensible</li>
+<li><strong>Zero dependencies</strong> — Python 3.9+ stdlib. Runs anywhere. No vendor lock-in.</li>
+<li><strong>299 automated tests</strong> — every behavior is specified and verified</li>
+<li><strong>Live demo</strong> — playable now at <a href="https://kody-w.github.io/mars-barn-opus/" style="color:#2563eb">kody-w.github.io/mars-barn-opus</a></li>
+<li><strong>Full documentation</strong> — playbook, slides, cheatsheet, constitution, one-pager</li>
+<li><strong>Real Mars data</strong> — NASA/JPL sourced. Not approximations.</li>
+</ul>
+
+<h2>The Ask</h2>
+<div class="highlight">
+We're looking for partners who see what we see: <strong>the patterns that keep a Mars colony alive are the same patterns that keep any autonomous system alive.</strong> The simulation is the teaching tool. The architecture is the product. Mars is the story that makes people care enough to learn it.
+</div>
+
+<div class="cta">
+<p>Let's talk about what this looks like for your organization.</p>
+<p style="font-size:13px;color:#888;font-weight:400;margin-top:8px">
+<a href="https://kody-w.github.io/mars-barn-opus/" style="color:#2563eb">Play it</a> · 
+<a href="https://kody-w.github.io/mars-barn-opus/slides.html" style="color:#2563eb">Slide deck</a> · 
+<a href="https://kody-w.github.io/mars-barn-opus/playbook.html" style="color:#2563eb">Technical playbook</a> · 
+<a href="https://github.com/kody-w/mars-barn-opus" style="color:#2563eb">Source code</a>
+</p>
+</div>
+
+<div class="footer">
+First Principles to Mars — <a href="https://github.com/kody-w/mars-barn-opus">github.com/kody-w/mars-barn-opus</a><br>
+The code is the argument. The simulation is the proof.
+</div>
+</body>
+</html>
