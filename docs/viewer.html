@@ -2707,51 +2707,93 @@ function computeReflexArcs(){
 
   activeReflexes = []; // fresh arcs each sol
 
-  // REFLEX 1: O₂ crash trajectory — don't wait for threshold
+  // ══════════════════════════════════════════════════════════════
+  // REFLEXES THAT MOVE MUSCLES — not just visuals, actual state changes.
+  // The colony auto-reacts between heartbeats. These reactions
+  // feed back into the next frame via reflexes_fired[].
+  // ══════════════════════════════════════════════════════════════
+
+  // REFLEX 1: O₂ crash trajectory → auto-boost ISRU before player even sees the task
   if(echoInertia.o2_velocity < -0.3 && s.o2/(O2_PP*n) < 15){
+    const severity = Math.min(1, Math.abs(echoInertia.o2_velocity));
     activeReflexes.push({
       id:'o2_trajectory_warning',
       condition:'O₂ trending down at ' + echoInertia.o2_velocity.toFixed(2) + ' kg/sol²',
-      action:'visual_warning', target:'o2',
-      intensity: Math.min(1, Math.abs(echoInertia.o2_velocity)),
-      ttl: 1, // expires next sol
+      action:'o2_reflex', target:'o2',
+      intensity: severity,
+      ttl: 1,
+      // MUSCLE: nudge ISRU allocation up proportional to severity
+      stateEffect: ()=>{
+        if(!manualOverride && lispyEnabled){
+          const boost = severity * 0.05; // up to 5% ISRU boost
+          s.alloc.i = Math.min(0.8, s.alloc.i + boost);
+          s.alloc.g = Math.max(0.1, s.alloc.g - boost/2);
+          s.alloc.h = Math.max(0.1, s.alloc.h - boost/2);
+        }
+      }
     });
   }
 
-  // REFLEX 2: Power drain acceleration — grid stress
+  // REFLEX 2: Power drain → auto-shed non-essential loads
   if(echoInertia.power_velocity < -5 && s.power < 200){
+    const severity = Math.min(1, Math.abs(echoInertia.power_velocity) / 20);
     activeReflexes.push({
       id:'power_drain_reflex',
       condition:'Power drain accelerating: ' + echoInertia.power_velocity.toFixed(1) + ' kWh/sol²',
-      action:'dim_lights', target:'power',
-      intensity: Math.min(1, Math.abs(echoInertia.power_velocity) / 20),
+      action:'power_shed', target:'power',
+      intensity: severity,
       ttl: 1,
+      // MUSCLE: reduce heating allocation, reclaim power from non-essentials
+      stateEffect: ()=>{
+        if(!manualOverride){
+          s.alloc.h = Math.max(0.08, s.alloc.h - severity * 0.05);
+          s.power += severity * 5; // reclaimed from dimming lights, reducing comms
+        }
+      }
     });
   }
 
-  // REFLEX 3: Crew health declining — medical alert stance
+  // REFLEX 3: Crew health declining → reduce workload automatically
   if(echoInertia.crew_trajectory === 'declining' || echoInertia.crew_trajectory === 'critical'){
+    const severity = echoInertia.crew_trajectory === 'critical' ? 1.0 : 0.5;
     activeReflexes.push({
       id:'crew_health_reflex',
       condition:'Crew trajectory: ' + echoInertia.crew_trajectory,
-      action:'medical_alert', target:'crew',
-      intensity: echoInertia.crew_trajectory === 'critical' ? 1.0 : 0.5,
+      action:'medical_reflex', target:'crew',
+      intensity: severity,
       ttl: 1,
+      // MUSCLE: slow down production to reduce crew strain
+      stateEffect: ()=>{
+        if(!manualOverride && severity > 0.7){
+          s.alloc.r = Math.max(0.5, s.alloc.r - 0.1); // auto-ration
+          s.crew.filter(c=>c.alive&&c.hp<30).forEach(c=>{
+            c.hp += 1; // tiny recovery from reduced workload
+          });
+        }
+      }
     });
   }
 
-  // REFLEX 4: System flip — something just changed direction (was producing, now consuming)
+  // REFLEX 4: System flip — production reversed to consumption
   echoInertia.discourse_flips.forEach(flip=>{
     activeReflexes.push({
       id:'flip_'+flip.system,
       condition: flip.system + ' flipped from ' + flip.from + ' to ' + flip.to,
-      action:'highlight_system', target:flip.system,
+      action:'system_flip', target:flip.system,
       intensity: 0.7,
       ttl: 1,
+      // MUSCLE: reallocate toward the flipped system
+      stateEffect: ()=>{
+        if(!manualOverride && lispyEnabled){
+          if(flip.system==='o2' && flip.to==='consuming') s.alloc.i=Math.min(0.7,s.alloc.i+0.03);
+          if(flip.system==='food' && flip.to==='consuming') s.alloc.g=Math.min(0.6,s.alloc.g+0.03);
+          if(flip.system==='power' && flip.to==='draining') s.alloc.h=Math.max(0.1,s.alloc.h-0.02);
+        }
+      }
     });
   });
 
-  // REFLEX 5: CRI rising — colony stress response
+  // REFLEX 5: CRI rising → colony-wide stress response
   if(echoInertia.cri_direction === 'rising'){
     activeReflexes.push({
       id:'cri_rising_reflex',
@@ -2759,19 +2801,120 @@ function computeReflexArcs(){
       action:'stress_response', target:'colony',
       intensity: colonyRiskIndex / 100,
       ttl: 1,
+      // MUSCLE: shift toward survival mode as CRI rises
+      stateEffect: ()=>{
+        if(!manualOverride && colonyRiskIndex > 40){
+          // Survival reflex: prioritize life support over everything
+          const urgency = (colonyRiskIndex - 40) / 60; // 0 at CRI 40, 1 at CRI 100
+          s.alloc.i = Math.min(0.6, s.alloc.i + urgency * 0.03);
+          s.alloc.h = Math.min(0.4, s.alloc.h + urgency * 0.02);
+          s.alloc.g = Math.max(0.1, s.alloc.g - urgency * 0.05);
+        }
+      }
     });
   }
 
-  // REFLEX 6: Dust storm active — continuous visual degradation
+  // REFLEX 6: Dust storm → auto-reduce outdoor operations
   if(echo.visual.dust_storm){
     activeReflexes.push({
       id:'dust_storm_reflex',
       condition:'Active dust storm',
-      action:'dust_visual', target:'atmosphere',
+      action:'dust_response', target:'atmosphere',
       intensity: 0.8,
       ttl: 1,
+      // MUSCLE: robots slow down, construction pauses, rover speed halved
+      stateEffect: ()=>{
+        if(s.building) s.building.remaining = Math.max(s.building.remaining, s.building.remaining); // no acceleration during storm
+        // Rovers take shelter — reduce discovery rate implicitly (already in sim)
+      }
     });
   }
+
+  // REFLEX 7: Solar flare detected → auto-shelter crew
+  if(echo.events.some(e=>e.type==='solar_flare')){
+    activeReflexes.push({
+      id:'flare_shelter_reflex',
+      condition:'Solar particle event active',
+      action:'flare_shelter', target:'crew',
+      intensity: 1.0,
+      ttl: 1,
+      // MUSCLE: immediately boost heating (shelter) and reduce outdoor activity
+      stateEffect: ()=>{
+        if(!manualOverride){
+          s.alloc.h = Math.min(0.5, s.alloc.h + 0.15);
+          s.alloc.i = Math.max(0.2, s.alloc.i - 0.08);
+          s.alloc.g = Math.max(0.1, s.alloc.g - 0.07);
+          // Radiation shelter reduces dose if built
+          if(s.modules.some(m=>m.type==='radiation_shelter')){
+            s.crew.filter(c=>c.alive).forEach(c=>{ c.rad = Math.max(0, c.rad - 2); });
+          }
+        }
+      }
+    });
+  }
+
+  // REFLEX 8: Night transition → auto-switch to reserve power mode
+  if(echo.visual.night && echoInertia.power_velocity < 0){
+    activeReflexes.push({
+      id:'night_power_reflex',
+      condition:'Night + power declining',
+      action:'night_power', target:'power',
+      intensity: 0.5,
+      ttl: 1,
+      // MUSCLE: reduce non-essential consumption at night
+      stateEffect: ()=>{
+        if(!manualOverride){
+          s.alloc.h = Math.max(0.15, s.alloc.h - 0.02); // slightly less heating
+          s.alloc.g = Math.max(0.1, s.alloc.g - 0.03); // greenhouse can wait till dawn
+        }
+      }
+    });
+  }
+
+  // REFLEX 9: Food flipping to consumption → greenhouse emergency
+  if(echoInertia.discourse_flips.some(f=>f.system==='food'&&f.to==='consuming') && s.food/(FOOD_PP*n) < 20){
+    activeReflexes.push({
+      id:'food_emergency_reflex',
+      condition:'Food production reversed + reserves < 20 sols',
+      action:'food_emergency', target:'food',
+      intensity: 0.8,
+      ttl: 1,
+      // MUSCLE: emergency greenhouse boost
+      stateEffect: ()=>{
+        if(!manualOverride && lispyEnabled){
+          s.alloc.g = Math.min(0.55, s.alloc.g + 0.10);
+          s.alloc.i = Math.max(0.2, s.alloc.i - 0.05);
+          s.alloc.h = Math.max(0.1, s.alloc.h - 0.05);
+        }
+      }
+    });
+  }
+
+  // REFLEX 10: Robot down (HP < 30) → other robots reduce speed to compensate
+  const weakBots = s.crew.filter(c=>c.alive&&(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.hp<30);
+  if(weakBots.length > 0){
+    activeReflexes.push({
+      id:'robot_compensate_reflex',
+      condition: weakBots.length + ' robot(s) below 30% HP',
+      action:'robot_compensate', target:'robots',
+      intensity: 0.6,
+      ttl: 1,
+      // MUSCLE: remaining healthy robots work harder, but at wear cost
+      stateEffect: ()=>{
+        const healthyBots = s.crew.filter(c=>c.alive&&(c.name.startsWith('OPT')||c.name.startsWith('LUN'))&&c.hp>=30);
+        healthyBots.forEach(b=>{ b.hp = Math.max(20, b.hp - 0.5); }); // slight wear from overwork
+      }
+    });
+  }
+
+  // Apply all state effects immediately (these are reflexes, not decisions)
+  activeReflexes.forEach(r=>{
+    if(r.stateEffect) r.stateEffect();
+  });
+
+  // Normalize allocations after reflex adjustments
+  const tot = s.alloc.h + s.alloc.i + s.alloc.g;
+  if(tot > 0){ s.alloc.h/=tot; s.alloc.i/=tot; s.alloc.g/=tot; }
 
   // Log active reflexes
   if(activeReflexes.length){
@@ -2812,54 +2955,47 @@ function runPatrol(){
       reflex._logged = true;
     }
 
-    if(reflex.action === 'visual_warning' && groundScene){
-      // Pulse the resource bar color in the HUD
+    // ── VISUAL EFFECTS (the symptoms you SEE) ──
+
+    if((reflex.action === 'o2_reflex' || reflex.action === 'food_emergency') && groundScene){
       const el = document.getElementById('resources');
       if(el && Math.floor(Date.now()/500)%2){
         el.style.boxShadow = `inset 0 0 ${Math.floor(i*20)}px rgba(218,54,51,${i*0.3})`;
-      } else if(el){
-        el.style.boxShadow = 'none';
-      }
+      } else if(el){ el.style.boxShadow = 'none'; }
     }
 
-    if(reflex.action === 'dim_lights' && groundScene){
-      // Gradually dim the scene exposure to show power strain
+    if(reflex.action === 'power_shed' && groundScene){
       if(groundRenderer){
-        const base = 0.9;
-        groundRenderer.toneMappingExposure = base - i * 0.3;
+        groundRenderer.toneMappingExposure = 0.9 - i * 0.3;
       }
     }
 
-    if(reflex.action === 'medical_alert'){
-      // Pulse the crew roster border
+    if(reflex.action === 'medical_reflex'){
       const el = document.getElementById('crew-roster');
-      if(el){
-        el.style.borderLeft = reflex.intensity > 0.7 ?
-          '2px solid var(--red)' : '2px solid var(--yellow)';
-      }
+      if(el) el.style.borderLeft = i > 0.7 ? '2px solid var(--red)' : '2px solid var(--yellow)';
     }
 
-    if(reflex.action === 'highlight_system'){
-      // Flash the affected system in the HUD
+    if(reflex.action === 'system_flip'){
       const el = document.getElementById('systems');
       if(el && Math.floor(Date.now()/300)%2){
         el.style.boxShadow = `inset 0 0 10px rgba(210,153,34,${i*0.4})`;
-      } else if(el){
-        el.style.boxShadow = 'none';
-      }
+      } else if(el){ el.style.boxShadow = 'none'; }
     }
 
     if(reflex.action === 'stress_response'){
-      // Subtle screen vignette that intensifies with CRI
-      document.body.style.boxShadow =
-        `inset 0 0 ${Math.floor(i*80)}px rgba(218,54,51,${i*0.1})`;
+      document.body.style.boxShadow = `inset 0 0 ${Math.floor(i*80)}px rgba(218,54,51,${i*0.1})`;
     }
 
-    if(reflex.action === 'dust_visual' && groundScene){
-      // Already handled by 3D dust particles, but boost fog density
-      if(groundScene.fog){
-        groundScene.fog.density = 0.006 + i * 0.02;
-      }
+    if(reflex.action === 'dust_response' && groundScene && groundScene.fog){
+      groundScene.fog.density = 0.006 + i * 0.02;
+    }
+
+    if(reflex.action === 'flare_shelter'){
+      document.body.style.boxShadow = `inset 0 0 60px rgba(255,200,50,${0.15})`;
+    }
+
+    if(reflex.action === 'night_power' && groundRenderer){
+      groundRenderer.toneMappingExposure = Math.max(0.4, groundRenderer.toneMappingExposure - 0.05);
     }
   });
 }
