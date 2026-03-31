@@ -2615,6 +2615,11 @@ function buildGroundScene(){
     const flickerAmp=isNight?0.2:0.1;
     glowLight.intensity=baseGlow+Math.sin(frame*0.02)*flickerAmp;
 
+    // ── PATROL: nervous system runs every render frame ──
+    // Reads standing orders (reflex arcs) and applies continuous effects.
+    // This is the spinal cord — reacting between heartbeats.
+    if(frame%3===0) runPatrol(); // every 3rd render frame (~20Hz)
+
     groundRenderer.render(groundScene,groundCamera);
   }
   animate();
@@ -2627,10 +2632,259 @@ function solIrr(sol){
   const dust=state.events.some(e=>e.type==='dust_storm')?0.25:1;
   return sc*el*dust*0.7;
 }
+// ══════════════════════════════════════════════════════════════════════
+// THE RAPPTER NERVOUS SYSTEM — Reflexes Between Heartbeats
+//
+// Cortex  = stepSim() — the sol tick. Slow, expensive, deliberate.
+// Brainstem = echo frame — structured delta after each sol.
+// Spinal Cord = reflex arcs — pre-computed IF/THEN rules from the echo.
+// Patrol = runs on animation frame between sols, fires reflexes.
+//
+// The colony doesn't wait for the next sol to react. It reacts NOW.
+// Output of frame N becomes the standing orders for inter-frame behavior.
+// ══════════════════════════════════════════════════════════════════════
+
+// ── Echo Inertia — the derivative of colony state ──
+let echoInertia = {
+  o2_velocity: 0,      // kg/sol change rate
+  h2o_velocity: 0,
+  food_velocity: 0,
+  power_velocity: 0,
+  engagement_trend: 'steady', // accelerating, decelerating, steady
+  crew_trajectory: 'stable',  // stable, declining, critical
+  cri_direction: 'flat',      // rising, falling, flat
+  discourse_flips: [],        // systems that changed direction
+};
+
+function computeInertia(){
+  if(echoHistory.length<2) return;
+  const curr=echoHistory[echoHistory.length-1];
+  const prev=echoHistory[echoHistory.length-2];
+
+  echoInertia.o2_velocity = curr.delta.o2 - prev.delta.o2;
+  echoInertia.h2o_velocity = curr.delta.h2o - prev.delta.h2o;
+  echoInertia.food_velocity = curr.delta.food - prev.delta.food;
+  echoInertia.power_velocity = curr.delta.power - prev.delta.power;
+
+  // Resource trend: are things getting better or worse?
+  const currTotal = curr.delta.o2 + curr.delta.h2o/3 + curr.delta.food/3000 + curr.delta.power/50;
+  const prevTotal = prev.delta.o2 + prev.delta.h2o/3 + prev.delta.food/3000 + prev.delta.power/50;
+  echoInertia.engagement_trend = currTotal > prevTotal + 0.5 ? 'accelerating' :
+    currTotal < prevTotal - 0.5 ? 'decelerating' : 'steady';
+
+  // Crew trajectory
+  const currCrewHp = state.crew.filter(c=>c.alive).reduce((a,c)=>a+c.hp,0);
+  echoInertia.crew_trajectory = currCrewHp < 200 ? 'critical' :
+    curr.delta.o2 < -1 || curr.delta.food < -5000 ? 'declining' : 'stable';
+
+  // CRI direction (computed from last 3 echoes if available)
+  if(echoHistory.length>=3){
+    const prev2=echoHistory[echoHistory.length-3];
+    // Use visual alert as proxy for CRI trend
+    echoInertia.cri_direction =
+      curr.visual.alert!=='nominal' && prev.visual.alert==='nominal' ? 'rising' :
+      curr.visual.alert==='nominal' && prev.visual.alert!=='nominal' ? 'falling' : 'flat';
+  }
+
+  // Discourse flips — systems that changed direction
+  echoInertia.discourse_flips = [];
+  if(Math.sign(curr.delta.o2) !== Math.sign(prev.delta.o2))
+    echoInertia.discourse_flips.push({system:'o2', from:prev.delta.o2>0?'producing':'consuming', to:curr.delta.o2>0?'producing':'consuming'});
+  if(Math.sign(curr.delta.food) !== Math.sign(prev.delta.food))
+    echoInertia.discourse_flips.push({system:'food', from:prev.delta.food>0?'producing':'consuming', to:curr.delta.food>0?'producing':'consuming'});
+  if(Math.sign(curr.delta.power) !== Math.sign(prev.delta.power))
+    echoInertia.discourse_flips.push({system:'power', from:prev.delta.power>0?'charging':'draining', to:curr.delta.power>0?'charging':'draining'});
+}
+
+// ── Reflex Arcs — standing orders from the last echo ──
+let activeReflexes = [];
+
+function computeReflexArcs(){
+  const s = state;
+  const n = Math.max(1, s.crew.filter(c=>c.alive).length);
+  const echo = lastEcho;
+  if(!echo) return;
+
+  activeReflexes = []; // fresh arcs each sol
+
+  // REFLEX 1: O₂ crash trajectory — don't wait for threshold
+  if(echoInertia.o2_velocity < -0.3 && s.o2/(O2_PP*n) < 15){
+    activeReflexes.push({
+      id:'o2_trajectory_warning',
+      condition:'O₂ trending down at ' + echoInertia.o2_velocity.toFixed(2) + ' kg/sol²',
+      action:'visual_warning', target:'o2',
+      intensity: Math.min(1, Math.abs(echoInertia.o2_velocity)),
+      ttl: 1, // expires next sol
+    });
+  }
+
+  // REFLEX 2: Power drain acceleration — grid stress
+  if(echoInertia.power_velocity < -5 && s.power < 200){
+    activeReflexes.push({
+      id:'power_drain_reflex',
+      condition:'Power drain accelerating: ' + echoInertia.power_velocity.toFixed(1) + ' kWh/sol²',
+      action:'dim_lights', target:'power',
+      intensity: Math.min(1, Math.abs(echoInertia.power_velocity) / 20),
+      ttl: 1,
+    });
+  }
+
+  // REFLEX 3: Crew health declining — medical alert stance
+  if(echoInertia.crew_trajectory === 'declining' || echoInertia.crew_trajectory === 'critical'){
+    activeReflexes.push({
+      id:'crew_health_reflex',
+      condition:'Crew trajectory: ' + echoInertia.crew_trajectory,
+      action:'medical_alert', target:'crew',
+      intensity: echoInertia.crew_trajectory === 'critical' ? 1.0 : 0.5,
+      ttl: 1,
+    });
+  }
+
+  // REFLEX 4: System flip — something just changed direction (was producing, now consuming)
+  echoInertia.discourse_flips.forEach(flip=>{
+    activeReflexes.push({
+      id:'flip_'+flip.system,
+      condition: flip.system + ' flipped from ' + flip.from + ' to ' + flip.to,
+      action:'highlight_system', target:flip.system,
+      intensity: 0.7,
+      ttl: 1,
+    });
+  });
+
+  // REFLEX 5: CRI rising — colony stress response
+  if(echoInertia.cri_direction === 'rising'){
+    activeReflexes.push({
+      id:'cri_rising_reflex',
+      condition:'CRI trending upward',
+      action:'stress_response', target:'colony',
+      intensity: colonyRiskIndex / 100,
+      ttl: 1,
+    });
+  }
+
+  // REFLEX 6: Dust storm active — continuous visual degradation
+  if(echo.visual.dust_storm){
+    activeReflexes.push({
+      id:'dust_storm_reflex',
+      condition:'Active dust storm',
+      action:'dust_visual', target:'atmosphere',
+      intensity: 0.8,
+      ttl: 1,
+    });
+  }
+
+  // Log active reflexes
+  if(activeReflexes.length){
+    state.log.push(`  🧠 REFLEXES: ${activeReflexes.length} active — ${activeReflexes.map(r=>r.id.replace(/_/g,' ')).join(', ')}`);
+  }
+}
+
+// ── Reflex History — mid-frame events become input to next frame ──
+// Each reflex that fires is logged with frame key + UTC timestamp.
+// Frame N+1 reads this to know what happened between heartbeats.
+let reflexHistory = [];
+
+function logReflexFire(reflex){
+  reflexHistory.push({
+    frame: lastEcho ? lastEcho.frame : state.sol,
+    utc: new Date().toISOString(),
+    id: reflex.id,
+    condition: reflex.condition,
+    action: reflex.action,
+    intensity: reflex.intensity,
+  });
+  // Keep last 100 reflex events
+  if(reflexHistory.length > 100) reflexHistory.shift();
+}
+
+// ── Patrol Agent — runs on animation frame between sols ──
+// Reads standing orders (reflex arcs) and applies continuous effects
+// to the 3D scene, UI, and colony behavior. No expensive computation.
+function runPatrol(){
+  if(!state.alive || !activeReflexes.length) return;
+
+  activeReflexes.forEach(reflex=>{
+    const i = reflex.intensity;
+
+    // Log every reflex fire with frame key + UTC
+    if(!reflex._logged){
+      logReflexFire(reflex);
+      reflex._logged = true;
+    }
+
+    if(reflex.action === 'visual_warning' && groundScene){
+      // Pulse the resource bar color in the HUD
+      const el = document.getElementById('resources');
+      if(el && Math.floor(Date.now()/500)%2){
+        el.style.boxShadow = `inset 0 0 ${Math.floor(i*20)}px rgba(218,54,51,${i*0.3})`;
+      } else if(el){
+        el.style.boxShadow = 'none';
+      }
+    }
+
+    if(reflex.action === 'dim_lights' && groundScene){
+      // Gradually dim the scene exposure to show power strain
+      if(groundRenderer){
+        const base = 0.9;
+        groundRenderer.toneMappingExposure = base - i * 0.3;
+      }
+    }
+
+    if(reflex.action === 'medical_alert'){
+      // Pulse the crew roster border
+      const el = document.getElementById('crew-roster');
+      if(el){
+        el.style.borderLeft = reflex.intensity > 0.7 ?
+          '2px solid var(--red)' : '2px solid var(--yellow)';
+      }
+    }
+
+    if(reflex.action === 'highlight_system'){
+      // Flash the affected system in the HUD
+      const el = document.getElementById('systems');
+      if(el && Math.floor(Date.now()/300)%2){
+        el.style.boxShadow = `inset 0 0 10px rgba(210,153,34,${i*0.4})`;
+      } else if(el){
+        el.style.boxShadow = 'none';
+      }
+    }
+
+    if(reflex.action === 'stress_response'){
+      // Subtle screen vignette that intensifies with CRI
+      document.body.style.boxShadow =
+        `inset 0 0 ${Math.floor(i*80)}px rgba(218,54,51,${i*0.1})`;
+    }
+
+    if(reflex.action === 'dust_visual' && groundScene){
+      // Already handled by 3D dust particles, but boost fog density
+      if(groundScene.fog){
+        groundScene.fog.density = 0.006 + i * 0.02;
+      }
+    }
+  });
+}
+
+// Clear reflex visual effects when reflexes expire
+function clearReflexVisuals(){
+  document.body.style.boxShadow = 'none';
+  const res = document.getElementById('resources');
+  if(res) res.style.boxShadow = 'none';
+  const sys = document.getElementById('systems');
+  if(sys) sys.style.boxShadow = 'none';
+  const crew = document.getElementById('crew-roster');
+  if(crew) crew.style.borderLeft = 'none';
+  if(groundRenderer) groundRenderer.toneMappingExposure = 0.9;
+}
+
+// ── Wire into sol tick ──
+// After each stepSim echo, compute inertia and new reflex arcs.
+// The patrol runs continuously on requestAnimationFrame.
+
 // ── Echo Frame System ──
 // Each sim step produces an echo frame: a delta describing what changed.
 // The 3D scene reacts to the echo. The echo IS the heartbeat of the colony.
 // Output of frame N is input to frame N+1 — data sloshing.
+// THEN: inertia is computed, reflex arcs are generated, patrol executes between heartbeats.
 let echoHistory=[];
 let lastEcho=null;
 
@@ -2797,6 +3051,9 @@ function stepSim(){
   }}
 
   // ── Build Echo Frame Delta ──
+  // Include reflexes that fired since last frame as input context.
+  // Frame N+1 knows what the nervous system did between heartbeats.
+  const reflexesSinceLastFrame = reflexHistory.filter(r=>r.frame === s-1 || r.frame === s);
   const post={o2:state.o2,h2o:state.h2o,food:state.food,power:state.power,
     crew_alive:state.crew.filter(c=>c.alive).length,morale:state.morale};
   const echo={
@@ -2806,6 +3063,14 @@ function stepSim(){
     crew_events:crewEvents,
     build:buildEvent,
     alive:state.alive,cause:state.cause,
+    // Inertia — the derivative (how things are CHANGING, not just where they ARE)
+    inertia:{...echoInertia},
+    // Reflexes that fired between this frame and the last — the colony's mid-heartbeat reactions
+    reflexes_fired: reflexesSinceLastFrame,
+    reflex_count: reflexesSinceLastFrame.length,
+    // Colony Risk Index at time of echo
+    cri: colonyRiskIndex,
+    cri_grade: riskGrade,
     // Visual hints for the 3D scene
     visual:{
       dust_storm:state.events.some(e=>e.type==='dust_storm'),
@@ -2845,6 +3110,12 @@ function stepSim(){
     mistakes.forEach(m=>state.log.push(`  ❌ ${m}`));
     recs.forEach(r=>state.log.push(`  ✅ ${r}`));
   }
+
+  // ── NERVOUS SYSTEM: compute inertia + reflex arcs from this echo ──
+  // Then clear previous reflex visuals before new ones take effect.
+  clearReflexVisuals();
+  computeInertia();
+  computeReflexArcs();
 
   updateAllUI();
   applyEchoVisuals(echo);
