@@ -694,20 +694,29 @@ async function govRefresh(){
 
 async function govLoadFrames(){
   const st = document.getElementById('gov-status');
-  st.textContent = 'Loading frames for chart...';
+  st.textContent = 'Loading frames bundle (1 request)...';
   try{
-    const manifest = await fetch(RAW_BASE+'/data/frames/manifest.json').then(r=>r.json());
-    // Load last 100 frames for the dust chart
-    const start = Math.max(1, manifest.last_sol - 99);
-    const promises = [];
-    for(let s=start; s<=manifest.last_sol; s++){
-      promises.push(fetch(RAW_BASE+'/data/frames/sol-'+String(s).padStart(4,'0')+'.json').then(r=>r.ok?r.json():null).catch(()=>null));
-    }
-    govFrameData = (await Promise.all(promises)).filter(Boolean);
+    // One fetch for ALL frames instead of 500+ individual requests
+    const bundle = await fetch(RAW_BASE+'/data/frames/frames.json').then(r=>r.json());
+    govFrameData = Object.values(bundle.frames).sort((a,b)=>a.sol-b.sol);
     drawGovDustChart();
-    st.textContent = govFrameData.length+' frames loaded';
+    st.textContent = govFrameData.length+' frames loaded (single bundle)';
   }catch(e){
-    st.textContent = 'Error: '+e.message;
+    // Fallback: try loading last 50 individually
+    st.textContent = 'Bundle failed, loading individually...';
+    try{
+      const manifest = await fetch(RAW_BASE+'/data/frames/manifest.json').then(r=>r.json());
+      const start = Math.max(1, manifest.last_sol - 49);
+      const promises = [];
+      for(let s=start; s<=manifest.last_sol; s++){
+        promises.push(fetch(RAW_BASE+'/data/frames/sol-'+String(s).padStart(4,'0')+'.json').then(r=>r.ok?r.json():null).catch(()=>null));
+      }
+      govFrameData = (await Promise.all(promises)).filter(Boolean);
+      drawGovDustChart();
+      st.textContent = govFrameData.length+' frames loaded (fallback)';
+    }catch(e2){
+      st.textContent = 'Error: '+e2.message;
+    }
   }
 }
 

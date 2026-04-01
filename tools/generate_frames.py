@@ -311,6 +311,24 @@ def main():
     print(f'Generated {count} frames (Sol {start_sol}-{end_sol})')
     print(f'Total: {manifest["total_frames"]} frames (Sol {manifest["first_sol"]}-{manifest["last_sol"]})')
 
+    # Build consolidated frames.json bundle (one fetch for all frames)
+    bundle = {
+        '_format': 'mars-barn-frames-bundle',
+        'version': 1,
+        'total': manifest['total_frames'],
+        'first_sol': manifest['first_sol'],
+        'last_sol': manifest['last_sol'],
+        'generated': manifest['generated'],
+        'frames': {}
+    }
+    for entry in manifest['frames']:
+        fp = frames_dir / f'sol-{entry["sol"]:04d}.json'
+        if fp.exists():
+            bundle['frames'][str(entry['sol'])] = json.loads(fp.read_text())
+    bundle_json = json.dumps(bundle)
+    (frames_dir / 'frames.json').write_text(bundle_json)
+    print(f'Bundle: {len(bundle["frames"])} frames, {len(bundle_json)//1024} KB')
+
 
 if __name__ == '__main__':
     main()
