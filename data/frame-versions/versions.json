@@ -1,0 +1,54 @@
+{
+  "_format": "mars-barn-frame-versions",
+  "description": "Track sim growth over time. Each version adds hazards/fidelity. Same cartridge run against different versions produces different outcomes — the delta IS the learning signal.",
+
+  "versions": [
+    {
+      "version": 1,
+      "name": "Foundation",
+      "released": "2025-07-09",
+      "sol_range": [1, 161],
+      "hazards": ["micrometeorite", "equipment_fatigue", "dust_accumulation"],
+      "events": ["dust_storm", "dust_devil", "solar_flare", "thermal_cycle"],
+      "challenges": ["solar_tracking_fault", "pressure_anomaly", "water_recycler_fault", "isru_catalyst_degradation", "co2_scrubber_saturation", "radiation_dosimetry"],
+      "notes": "Base sim. Mars weather + basic equipment hazards. Robot-only colonies are nearly immortal.",
+      "best_known_run": {"strategy": "optimus_4_robots", "sols": 161, "status": "alive", "grade": "A", "score": 20150}
+    },
+    {
+      "version": 2,
+      "name": "Robot Killers",
+      "released": "2025-04-01",
+      "sol_range": [162, 201],
+      "hazards_added": ["perchlorate_corrosion", "regolith_abrasion", "electrostatic_dust", "thermal_fatigue", "radiation_seu", "battery_degradation"],
+      "events_added": ["comms_blackout", "cold_snap"],
+      "challenges_added": ["actuator_calibration", "nav_sensor_degradation", "battery_reconditioning", "software_watchdog_reset"],
+      "notes": "Addresses the robot exploit. Perchlorate eats joints, regolith blinds cameras, radiation flips bits. Pure robot colonies now face real Mars challenges. Hybrid strategies become competitive.",
+      "best_known_run": null,
+      "backtest_target": "Run v1 best cartridge (optimus_4_robots) against v2 frames. Expected: colony faces new hazards it has no governor logic for. Delta = what the governor needs to learn."
+    }
+  ],
+
+  "backtest_protocol": {
+    "description": "Run a cartridge from version N against frames from version N+1. The cartridge's governor was optimized for v1 hazards. v2 frames introduce hazards the governor has never seen. The survival delta between v1 and v2 measures how much the sim grew.",
+    "steps": [
+      "1. Take a successful cartridge from version N (e.g., optimus 161 sols alive)",
+      "2. Load its governor program (the LisPy allocation strategy)",
+      "3. Replay that exact governor against version N+1 frames",
+      "4. Record: at which sol does the colony first encounter a v2 hazard?",
+      "5. Record: does the governor handle it? (it won't — it was never trained for perchlorate)",
+      "6. Record: at which sol does the colony die (or survive)?",
+      "7. The delta (v1_sols - v2_sols) = the sim's growth in difficulty",
+      "8. The governor must evolve to handle v2 hazards → write new LisPy tools",
+      "9. The evolved governor becomes the v2 best cartridge",
+      "10. Repeat for v3, v4, ... — the sim grows forever, cartridges evolve forever"
+    ]
+  },
+
+  "growth_metrics": {
+    "hazard_count": "How many distinct hazard types exist in this version",
+    "event_count": "How many distinct event types",
+    "challenge_count": "How many distinct challenge types",
+    "fidelity_score": "Composite: hazard_count + event_count + challenge_count + (data_sources * 10)",
+    "data_sources": "Number of real NASA instruments/missions referenced"
+  }
+}
