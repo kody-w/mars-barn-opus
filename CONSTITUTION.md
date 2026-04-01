@@ -319,5 +319,83 @@ The private engine reads a `manifest.json` from any public repo to know where to
 
 ---
 
+## Amendment IV — The Monte Carlo Scoring Law
+
+*Ratified: Session of the Gauntlet*
+
+**A colony's score is not one run. It is the statistical distribution of 100 runs.**
+
+Random number generation (RNG) introduces variance. A lucky seed survives a dust storm that an unlucky seed doesn't. This variance is noise, not signal. To separate strategy quality from luck, all official scores are computed as the **Monte Carlo Median** of 100 independent runs through the full frame gauntlet.
+
+### The Protocol
+
+1. A cartridge defines a **strategy**: mission configuration, governor program (LisPy), build order, and autopilot decision logic.
+
+2. The strategy is run **100 times** through ALL available frames (the gauntlet), each with a different RNG seed (seed = run_index × 7919 + 1).
+
+3. Each run produces: sols survived, alive/dead, crew count, CRI, resources, modules built.
+
+4. The **official score** is computed from the distribution:
+
+```
+MONTE_CARLO_SCORE = (
+    median_sols × 100                    # survival (the P50 outcome)
+  + min_crew_alive × 500                 # worst-case crew (robustness)
+  + median_modules × 150                 # infrastructure
+  + survival_rate × 200                  # % of runs that survived ALL frames
+  - p75_cri × 10                         # typical risk level (penalty)
+)
+```
+
+5. The **grade** is:
+
+| Grade | Score Range | Meaning |
+|-------|-------------|---------|
+| S+    | ≥ 80,000   | Immortal strategy — survives everything |
+| S     | 50,000–79,999 | Mars-ready — robust across all seeds |
+| A     | 30,000–49,999 | Strong — most runs survive |
+| B     | 15,000–29,999 | Viable — survives but fragile |
+| C     | 5,000–14,999  | Struggling — luck-dependent |
+| D     | 1,000–4,999   | Doomed — strategy is fundamentally flawed |
+| F     | < 1,000       | Colony barely began |
+
+6. The **survival rate** (% of 100 runs that are still alive at the latest frame) is the primary ranking tiebreaker. A strategy with 80% survival at Grade A outranks a strategy with 20% survival at Grade A.
+
+7. A colony is only "**alive on the leaderboard**" if its survival rate ≥ 50% on the latest frame version. Below 50%, the strategy is considered non-viable — it depends on luck, not skill.
+
+### Frame Version Gauntlet
+
+The 100 runs go through ALL frame versions sequentially:
+- v1 Foundation (Sol 1-161): base hazards
+- v2 Robot Killers (Sol 162+): perchlorate, abrasion, radiation, etc.
+- v3, v4, ... (future): each adds fidelity
+
+State carries forward across versions. Damage accumulates. A strategy that "worked" on v1 must also survive v2's new hazards to be considered current. **There is no grandfathering. The gauntlet always runs the full chain.**
+
+### Why This Matters
+
+- **Eliminates luck.** A strategy that survives 95/100 runs is genuinely better than one that survives 60/100.
+- **Rewards robustness over optimization.** A strategy tuned to one seed is brittle. The Monte Carlo finds the strategies that work across ALL conditions.
+- **Makes the leaderboard meaningful.** When someone is #1, they are statistically #1 — not just #1 on a lucky day.
+- **Enables fair comparison.** Two players with different RNG seeds are compared on the same statistical footing.
+- **Drives evolution.** When a strategy drops from 90% to 40% survival after a new frame version, the signal is clear: adapt or die.
+
+### Tooling
+
+```bash
+# Official scoring run
+node tools/gauntlet.js --monte-carlo 100
+
+# Quick test (faster but not official)
+node tools/gauntlet.js --monte-carlo 10
+
+# Single run (for debugging, not scoring)
+node tools/gauntlet.js
+```
+
+**This scoring protocol is permanent and constitutional. No single run is an official score.**
+
+---
+
 *Ratified by one mind, in one session, on sol zero of the competition.*
 *First Principles to Mars — the 1vsM Protocol.*

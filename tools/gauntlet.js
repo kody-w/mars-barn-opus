@@ -194,9 +194,9 @@ if(runs === 1){
   const dead = results.filter(r=>!r.alive);
   const avgSols = Math.round(results.reduce((s,r)=>s+r.sols,0)/runs);
   const avgHP = Math.round(alive.length ? alive.reduce((s,r)=>s+r.hp,0)/alive.length : 0);
-  const survivalRate = (alive.length/runs*100).toFixed(1);
+  const survivalPct = (alive.length/runs*100).toFixed(1);
 
-  console.log('SURVIVAL RATE: ' + survivalRate + '% (' + alive.length + '/' + runs + ' survived all ' + totalSols + ' sols)\n');
+  console.log('SURVIVAL RATE: ' + survivalPct + '% (' + alive.length + '/' + runs + ' survived all ' + totalSols + ' sols)\n');
   console.log('Average sols survived: ' + avgSols);
   console.log('Average HP (survivors): ' + avgHP);
 
@@ -216,24 +216,49 @@ if(runs === 1){
       console.log('  Sol '+b+'-'+(parseInt(b)+24)+': '+n+' deaths'));
   }
 
-  // Score distribution
-  const scores = results.map(r=>r.sols*100+r.crew*500+r.modules*150-r.cri*10);
-  scores.sort((a,b)=>a-b);
-  console.log('\nScore distribution:');
-  console.log('  Min: ' + scores[0]);
-  console.log('  P25: ' + scores[Math.floor(runs*0.25)]);
-  console.log('  Median: ' + scores[Math.floor(runs*0.5)]);
-  console.log('  P75: ' + scores[Math.floor(runs*0.75)]);
-  console.log('  Max: ' + scores[runs-1]);
+  // ── OFFICIAL MONTE CARLO SCORE (Amendment IV) ──
+  const solsSorted = results.map(r=>r.sols).sort((a,b)=>a-b);
+  const medianSols = solsSorted[Math.floor(runs/2)];
+  const minCrew = Math.min(...results.map(r=>r.crew));
+  const medianModules = results.map(r=>r.modules).sort((a,b)=>a-b)[Math.floor(runs/2)];
+  const survivalRate = alive.length / runs;
+  const criSorted = results.map(r=>r.cri).sort((a,b)=>a-b);
+  const p75CRI = criSorted[Math.floor(runs*0.75)];
 
-  // Grade distribution
-  const grades = {};
-  scores.forEach(s=>{
-    const g=s>=50000?'S+':s>=30000?'S':s>=20000?'A':s>=10000?'B':s>=5000?'C':'D';
-    grades[g]=(grades[g]||0)+1;
-  });
-  console.log('\nGrade distribution:');
-  ['S+','S','A','B','C','D'].forEach(g=>{if(grades[g])console.log('  '+g+': '+grades[g]+' ('+Math.round(grades[g]/runs*100)+'%)')});
+  const officialScore = Math.round(
+    medianSols * 100
+    + minCrew * 500
+    + medianModules * 150
+    + survivalRate * 200 * 100
+    - p75CRI * 10
+  );
+
+  const officialGrade = officialScore>=80000?'S+':officialScore>=50000?'S':officialScore>=30000?'A':
+    officialScore>=15000?'B':officialScore>=5000?'C':officialScore>=1000?'D':'F';
+
+  const leaderboardAlive = survivalRate >= 0.5;
+
+  console.log('\n╔══════════════════════════════════════════╗');
+  console.log('║     OFFICIAL MONTE CARLO SCORE           ║');
+  console.log('║     (Amendment IV — Constitutional)      ║');
+  console.log('╠══════════════════════════════════════════╣');
+  console.log('║  Median sols:    ' + String(medianSols).padStart(6) + '              ×100 ║');
+  console.log('║  Min crew alive: ' + String(minCrew).padStart(6) + '              ×500 ║');
+  console.log('║  Median modules: ' + String(medianModules).padStart(6) + '              ×150 ║');
+  console.log('║  Survival rate:  ' + (survivalRate*100).toFixed(1).padStart(5) + '%     ×200×100 ║');
+  console.log('║  P75 CRI:        ' + String(p75CRI).padStart(6) + '              ×-10 ║');
+  console.log('╠══════════════════════════════════════════╣');
+  console.log('║  SCORE: ' + String(officialScore).padStart(8) + '   GRADE: ' + officialGrade.padStart(2) + '            ║');
+  console.log('║  Leaderboard: ' + (leaderboardAlive ? '🟢 ALIVE' : '☠ NON-VIABLE') + '               ║');
+  console.log('╚══════════════════════════════════════════╝');
+
+  // Per-run score distribution (for reference)
+  const perRunScores = results.map(r=>r.sols*100+r.crew*500+r.modules*150-r.cri*10);
+  perRunScores.sort((a,b)=>a-b);
+  console.log('\nPer-run score distribution:');
+  console.log('  Min: ' + perRunScores[0] + ' | P25: ' + perRunScores[Math.floor(runs*0.25)] +
+    ' | Median: ' + perRunScores[Math.floor(runs*0.5)] + ' | P75: ' + perRunScores[Math.floor(runs*0.75)] +
+    ' | Max: ' + perRunScores[runs-1]);
 
   console.log('\n═══════════════════════════════════════════════');
 }
