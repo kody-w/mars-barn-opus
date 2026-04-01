@@ -610,6 +610,22 @@ body.cinematic-active .cartridge-bar,body.cinematic-active #task-panel{
     </div>
     <div id="autopilot-status" style="font-size:9px;color:var(--dim);margin-top:4px"></div>
   </div>
+  <h3 style="cursor:pointer" onclick="document.getElementById('treasury-panel').style.display=document.getElementById('treasury-panel').style.display==='none'?'block':'none'">🏛️ Treasury Governor ▾</h3>
+  <div id="treasury-panel" style="display:none">
+    <div style="font-size:10px;color:var(--dim);margin-bottom:6px;line-height:1.6">
+      Wildhaven Rappter's LisPy program. Controls MARS distribution from genesis wallet. Same VM — edit it.
+    </div>
+    <div style="font-size:9px;color:var(--dim);margin-bottom:4px;display:flex;justify-content:space-between">
+      <span>Genesis: <span id="treasury-genesis-bal" style="color:var(--cyan)">21,000,000</span> MARS</span>
+      <span>Distributed: <span id="treasury-dist-total" style="color:var(--green)">0</span></span>
+    </div>
+    <textarea id="treasury-editor" spellcheck="false" style="width:100%;height:140px;background:#080b10;border:1px solid var(--border);color:var(--purple);font-family:'SFMono-Regular',Consolas,monospace;font-size:9px;padding:6px;border-radius:4px;resize:vertical;line-height:1.4" oninput="treasuryGovernorProgram=this.value"></textarea>
+    <div style="display:flex;gap:4px;margin-top:4px">
+      <button onclick="treasuryGovernorProgram=null;document.getElementById('treasury-editor').value=DEFAULT_TREASURY_GOVERNOR" style="flex:1;background:none;border:1px solid var(--border);color:var(--dim);font-family:var(--font);font-size:9px;padding:3px;cursor:pointer;border-radius:3px">↻ Reset</button>
+      <button onclick="testTreasuryGovernor()" style="flex:1;background:none;border:1px solid var(--purple);color:var(--purple);font-family:var(--font);font-size:9px;padding:3px;cursor:pointer;border-radius:3px">▶ Test Run</button>
+    </div>
+    <div id="treasury-test-output" style="font-size:9px;color:var(--dim);margin-top:4px"></div>
+  </div>
   <h3>Mission Log</h3>
   <div id="mini-log" style="max-height:120px;overflow-y:auto;font-size:10px;color:var(--dim)"></div>
 </div>
@@ -1298,9 +1314,133 @@ function generateRunAttestation(){
 let marsWallets = {};   // address → {owner, balance, type, created}
 let marsTransfers = []; // full transfer log (the transaction history)
 const USER_WALLET = 'mars1_user_' + (typeof cartridgeId !== 'undefined' ? cartridgeId : 'local');
+const GENESIS_WALLET = 'mars1_genesis_wildhaven';
+
+// ── Treasury Governor (LisPy) ──
+// The Wildhaven Rappter is a virtual entity that holds the genesis supply
+// and distributes MARS according to a LisPy program — same VM, same
+// language, swappable by the user. It's another layer of the nervous
+// system: cortex (sim) → brainstem (echo) → spinal cord (reflexes) →
+// patrol (visual) → MARKETPLACE (treasury governor).
+let treasuryGovernorProgram = null; // user override
+
+const DEFAULT_TREASURY_GOVERNOR = `(begin
+  ;; ── Wildhaven Treasury Governor ──
+  ;; Runs every sol. Reads colony state. Decides distributions from
+  ;; the genesis wallet. Same VM as everything else. Edit this.
+  
+  ;; Only distribute if colony is alive and producing
+  (define should_distribute (and alive (> crew_alive 0) (> sol 0)))
+  
+  ;; Distribution budget per sol (decreases with supply)
+  (define daily_budget
+    (cond
+      ((< circulating_pct 1) 500)    ;; early: generous
+      ((< circulating_pct 5) 200)    ;; growth: moderate
+      ((< circulating_pct 10) 100)   ;; mature: conservative
+      ((< circulating_pct 25) 50)    ;; late: scarce
+      (true 10)))                     ;; endgame: trickle
+  
+  ;; Halving overlay
+  (define halving (+ 1 (round (/ sol 500))))
+  (define budget (max 1 (round (/ daily_budget halving))))
+  
+  ;; Split: 60% to agents (earned), 20% to treasury, 20% to user
+  (define agent_share (round (* budget 0.6)))
+  (define treasury_share (round (* budget 0.2)))
+  (define user_share (round (* budget 0.2)))
+  
+  ;; Bonus for low CRI (good management = more distribution)
+  (define mgmt_bonus
+    (cond
+      ((< colony_risk_index 10) (round (* budget 0.5)))  ;; pristine
+      ((< colony_risk_index 25) (round (* budget 0.2)))  ;; good
+      (true 0)))                                          ;; stressed = no bonus
+  
+  ;; Final outputs (read by computeTreasuryDistribution)
+  (set! dist_agents (if should_distribute (+ agent_share mgmt_bonus) 0))
+  (set! dist_treasury (if should_distribute treasury_share 0))
+  (set! dist_user (if should_distribute user_share 0))
+  (set! dist_total (+ dist_agents dist_treasury dist_user)))`;
+
+function computeTreasuryDistribution(sol){
+  const program = treasuryGovernorProgram || DEFAULT_TREASURY_GOVERNOR;
+  const vm = new LispyVM();
+  const n = Math.max(1, state.crew.filter(c=>c.alive).length);
+  const circPct = (marsCirculating / MARS_TOTAL_SUPPLY) * 100;
+  
+  vm.setEnv('sol', sol);
+  vm.setEnv('alive', state.alive);
+  vm.setEnv('crew_alive', n);
+  vm.setEnv('colony_risk_index', colonyRiskIndex);
+  vm.setEnv('circulating_pct', circPct);
+  vm.setEnv('total_supply', MARS_TOTAL_SUPPLY);
+  vm.setEnv('circulating', marsCirculating);
+  vm.setEnv('genesis_balance', marsWallets[GENESIS_WALLET]?.balance || 0);
+  vm.setEnv('modules_built', state.modules.length);
+  vm.setEnv('research_count', (state.research||[]).length);
+  vm.setEnv('dist_agents', 0);
+  vm.setEnv('dist_treasury', 0);
+  vm.setEnv('dist_user', 0);
+  vm.setEnv('dist_total', 0);
+  
+  const result = vm.run(program);
+  if(!result.ok) return null;
+  
+  return {
+    agents: Math.max(0, Math.round(result.env.dist_agents || 0)),
+    treasury: Math.max(0, Math.round(result.env.dist_treasury || 0)),
+    user: Math.max(0, Math.round(result.env.dist_user || 0)),
+    total: Math.max(0, Math.round(result.env.dist_total || 0)),
+  };
+}
+
+function runTreasuryGovernor(sol){
+  if(!marsWallets[GENESIS_WALLET]) return;
+  const dist = computeTreasuryDistribution(sol);
+  if(!dist || dist.total <= 0) return;
+  
+  // Cap at genesis wallet balance
+  const available = marsWallets[GENESIS_WALLET].balance;
+  if(available <= 0) return;
+  const scale = Math.min(1, available / dist.total);
+  
+  // Distribute to agents (split evenly among alive crew)
+  const ac = state.crew.filter(c=>c.alive);
+  if(dist.agents > 0 && ac.length > 0){
+    const perAgent = Math.floor(dist.agents * scale / ac.length);
+    if(perAgent > 0){
+      ac.forEach(c => {
+        const addr = getWalletAddress(c.name);
+        if(addr) marsTransfer(GENESIS_WALLET, addr, perAgent, 'treasury distribution');
+      });
+    }
+  }
+  
+  // Distribute to colony treasury
+  if(dist.treasury > 0){
+    const amt = Math.floor(dist.treasury * scale);
+    if(amt > 0) marsTransfer(GENESIS_WALLET, 'mars1_treasury', amt, 'treasury reserve');
+  }
+  
+  // Distribute to user
+  if(dist.user > 0){
+    const amt = Math.floor(dist.user * scale);
+    if(amt > 0) marsTransfer(GENESIS_WALLET, USER_WALLET, amt, 'operator share');
+  }
+}
 
 function initWallets(){
-  // Create user wallet (you — the builder, the player, a participant)
+  // Genesis wallet — Wildhaven Rappter holds the full initial supply
+  // This is the virtual "mint". All MARS originates from here.
+  if(!marsWallets[GENESIS_WALLET]){
+    marsWallets[GENESIS_WALLET] = {
+      owner: 'Wildhaven Rappter', type: 'genesis', balance: MARS_TOTAL_SUPPLY,
+      created: new Date().toISOString(),
+      desc: 'Genesis wallet. Treasury governor (LisPy) distributes MARS to the sim economy.'
+    };
+  }
+  // User wallet
   if(!marsWallets[USER_WALLET]){
     marsWallets[USER_WALLET] = {
       owner: 'Mission Control', type: 'user', balance: 0,
@@ -1423,6 +1563,64 @@ function setupWalletEnvForLispy(vm, agentName){
   vm.setEnv('user_wallet', USER_WALLET);
   vm.setEnv('treasury_wallet', 'mars1_treasury');
 }
+
+function testTreasuryGovernor(){
+  const dist = computeTreasuryDistribution(state.sol);
+  const out = document.getElementById('treasury-test-output');
+  if(!dist){ if(out) out.textContent = 'Error running treasury program'; return; }
+  if(out) out.innerHTML = `<span style="color:var(--green)">Agents: ${dist.agents} · Treasury: ${dist.treasury} · User: ${dist.user} · Total: ${dist.total}/sol</span>`;
+}
+
+function updateTreasuryUI(){
+  const genBal = marsWallets[GENESIS_WALLET]?.balance || 0;
+  const el = document.getElementById('treasury-genesis-bal');
+  if(el) el.textContent = genBal.toLocaleString();
+  const distEl = document.getElementById('treasury-dist-total');
+  if(distEl) distEl.textContent = (MARS_TOTAL_SUPPLY - genBal).toLocaleString();
+  // Init editor if empty
+  const ed = document.getElementById('treasury-editor');
+  if(ed && !ed.value) ed.value = treasuryGovernorProgram || DEFAULT_TREASURY_GOVERNOR;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PHYSICAL TWIN INJECTION PROTOCOL
+//
+// A local Rappter (physical hardware running LisPy VM) connects to
+// the sim via the BroadcastChannel twin protocol. It's the same VM,
+// same wallet addresses, same transfer protocol. The physical machine
+// IS a participant in the virtual world.
+//
+// The physical twin can:
+// 1. Register its own wallet (mars1_physical_rappter)
+// 2. Run LisPy programs that affect the sim (push_lispy)
+// 3. Send/receive MARS to/from any sim agent
+// 4. Read echo frames and react with its own reflex arcs
+// 5. Override the treasury governor with its own program
+//
+// Connection modes:
+// - BroadcastChannel (same machine, different tab)
+// - WebSocket bridge (remote machine — user builds the bridge)
+// - postMessage (iframe embedding)
+//
+// The protocol is the same regardless of transport. The physical
+// hardware doesn't get special privileges — it's just another
+// wallet address sending the same messages any participant sends.
+// The only difference is the atoms are real.
+// ══════════════════════════════════════════════════════════════════
+
+// Physical twin connection state
+let physicalTwinConnected = false;
+let physicalTwinAddress = 'mars1_physical_rappter';
+
+// Handle physical twin registration via twin protocol
+// (already handled by register_wallet + push_lispy commands)
+// The physical Rappter just sends:
+//   {cmd:'register_wallet', payload:{address:'mars1_physical_rappter', owner:'Wildhaven Rappter (Physical)'}}
+//   {cmd:'push_lispy', payload:{code:'(begin ...)'}}
+//   {cmd:'tip_agent', payload:{agent:'Chen W.', amount:500, memo:'good work from the real world'}}
+//   {cmd:'mars_transfer', payload:{from:'mars1_physical_rappter', to:'mars1_agent_opt_01', amount:100}}
+//
+// Same protocol. Same VM. Same chain. Physical ↔ virtual through the same pipe.
 
 function doTip(){
   const sel = document.getElementById('tip-target');
@@ -4594,6 +4792,8 @@ function stepSim(){
   state.economy = Object.values(state.marsLedger).reduce((sum, l) => sum + l.balance, 0);
   // Build chain block (hash-linked to previous)
   if(tokenResult) buildChainBlock(s, lastEcho, tokenResult);
+  // Treasury governor — Wildhaven Rappter distributes from genesis wallet
+  runTreasuryGovernor(s);
   // Conversation — crew dialogue
   if(ac.length>=2&&R()<0.4){
     const a2=ac[Math.floor(R()*ac.length)],b2=ac[Math.floor(R()*ac.length)];
@@ -4960,6 +5160,7 @@ function updateAllUI(){
   }
   // Wallets
   updateWalletUI();
+  updateTreasuryUI();
   // DNA
   updateDNA(s);
   // LisPy console
