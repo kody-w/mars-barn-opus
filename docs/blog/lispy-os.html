@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>LisPy OS: Building an Operating System Inside a JSON Cartridge — kody-w</title>
+<meta name="description" content="A virtual OS running in a LisPy VM in the browser. The filesystem is JSON. Programs are S-expressions. The OS is a cartridge you can drop, boot, fork, and share.">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#484f58;
+--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--cyan:#79c0ff;
+--purple:#a371f7;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.9}
+.wrap{max-width:720px;margin:0 auto;padding:40px 24px 80px}
+.meta{color:var(--dim);font-size:12px;margin-bottom:32px}
+.meta a{color:var(--cyan);text-decoration:none}
+h1{font-size:26px;color:#fff;line-height:1.3;margin-bottom:8px}
+h2{font-size:20px;color:var(--cyan);margin:40px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+h3{font-size:15px;color:var(--green);margin:28px 0 8px}
+p{margin:12px 0}
+strong{color:#fff}
+em{color:var(--dim)}
+code{background:rgba(88,166,255,0.1);color:var(--cyan);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:0.9em}
+pre{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:16px 0;overflow-x:auto;line-height:1.5}
+pre code{background:none;padding:0;color:var(--text);font-size:12px}
+blockquote{border-left:3px solid var(--purple);padding:12px 16px;margin:24px 0;background:rgba(163,113,247,0.05);border-radius:0 8px 8px 0;font-style:italic;color:var(--dim)}
+ul,ol{margin:12px 0 12px 24px}
+li{margin:6px 0}
+hr{border:none;border-top:1px solid var(--border);margin:48px 0}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline}
+.callout{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px;margin:28px 0}
+.callout-title{color:var(--yellow);font-weight:700;font-size:12px;letter-spacing:1px;margin-bottom:8px}
+.diagram{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:20px;margin:16px 0;font-family:var(--mono);font-size:12px;line-height:1.7;white-space:pre;overflow-x:auto;color:var(--dim)}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:12px}
+th{background:#0a0e14;color:var(--cyan);padding:8px 12px;text-align:left;border:1px solid var(--border)}
+td{padding:8px 12px;border:1px solid var(--border)}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin:2px}
+.tag-arch{background:rgba(163,113,247,0.15);color:var(--purple)}
+.tag-pattern{background:rgba(88,166,255,0.15);color:var(--blue)}
+.tag-ai{background:rgba(255,215,0,0.15);color:#ffd700}
+.big{font-size:18px;color:#fff;font-weight:700;text-align:center;margin:32px 0;line-height:1.5}
+.footer{text-align:center;color:var(--dim);font-size:11px;margin-top:48px;padding-top:24px;border-top:1px solid var(--border)}
+@media(max-width:600px){.wrap{padding:20px 16px 60px} h1{font-size:22px} .diagram{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="meta"><a href="./">← Blog</a> · <a href="../patterns.html">Pattern Library</a> · <a href="../viewer.html">Play the Sim</a></div>
+
+<h1>LisPy OS: Building an Operating System Inside a JSON Cartridge</h1>
+<div class="meta">kody-w · April 2025 · <span class="tag tag-arch">Architecture</span> <span class="tag tag-ai">AI</span> <span class="tag tag-pattern">Pattern</span></div>
+
+<p>What if an operating system wasn't installed? What if it was <strong>dropped</strong>?</p>
+
+<p>Drop a <code>.cartridge.json</code> file onto a runtime. The OS boots. You get a desktop with a terminal, a file manager, and a window manager. The filesystem is JSON. Every program is an S-expression. The whole thing runs in your browser. In one HTML file.</p>
+
+<p>This is LisPy OS.</p>
+
+<h2>What It Is</h2>
+
+<p>LisPy OS is a virtual operating system that runs inside the LisPy VM — a sandboxed Lisp-dialect interpreter that lives in the browser. The entire OS — kernel, filesystem, programs, window manager, and user state — is encoded as a single JSON cartridge file.</p>
+
+<div class="diagram">┌──────────────────────────────────────────────────┐
+│  Browser Tab                                      │
+│  ┌──────────────────────────────────────────────┐ │
+│  │  LisPy VM (sandboxed interpreter)            │ │
+│  │  ┌────────────────────────────────────────┐  │ │
+│  │  │  LisPy OS                              │  │ │
+│  │  │  ├── /bin/    (programs as S-exprs)     │  │ │
+│  │  │  ├── /etc/    (config as JSON)          │  │ │
+│  │  │  ├── /home/   (user data)              │  │ │
+│  │  │  ├── /proc/   (running processes)      │  │ │
+│  │  │  └── /tmp/    (ephemeral scratch)      │  │ │
+│  │  │                                        │  │ │
+│  │  │  Window Manager ─┬─ Terminal            │  │ │
+│  │  │                  ├─ File Manager        │  │ │
+│  │  │                  ├─ Text Editor         │  │ │
+│  │  │                  └─ Mars Gov (app)      │  │ │
+│  │  └────────────────────────────────────────┘  │ │
+│  └──────────────────────────────────────────────┘ │
+│                                                    │
+│  The cartridge.json IS the hard drive.             │
+│  The browser tab IS the computer.                  │
+└──────────────────────────────────────────────────┘</div>
+
+<h2>Bootable Cartridges</h2>
+
+<p>A LisPy OS cartridge is a regular <code>.cartridge.json</code> file (following the <a href="../distros/CARTRIDGE-SPEC.json">Universal Cartridge Spec</a>) with <code>_format: "lispy-os-cartridge"</code>. It contains everything the OS needs to boot:</p>
+
+<pre><code>{
+  "_format": "lispy-os-cartridge",
+  "version": 1,
+  "name": "LisPy OS Base",
+  "description": "Minimal bootable OS with terminal and file manager",
+
+  "boot": {
+    "init": [
+      "(log \"LisPy OS booting...\")",
+      "(load-fs)",
+      "(start-wm)",
+      "(open-app terminal)"
+    ]
+  },
+
+  "filesystem": {
+    "/bin/hello":    {"type": "program", "code": "(log \"Hello, World!\")"},
+    "/bin/ls":       {"type": "program", "code": "(list-dir (or arg1 \"/\"))"},
+    "/bin/cat":      {"type": "program", "code": "(read-file arg1)"},
+    "/bin/edit":     {"type": "program", "code": "(open-editor arg1)"},
+    "/etc/hostname": {"type": "file", "content": "lispy-os"},
+    "/etc/motd":     {"type": "file", "content": "Welcome to LisPy OS."},
+    "/home/user":    {"type": "dir", "children": []}
+  },
+
+  "env": {
+    "USER": "operator",
+    "HOME": "/home/user",
+    "PATH": "/bin",
+    "SHELL": "lispy",
+    "TERM": "lispy-term"
+  }
+}</code></pre>
+
+<p>Drop this file onto the runtime page. The boot sequence runs the <code>init</code> expressions in order: load the filesystem, start the window manager, open a terminal. You're at a prompt in under a second.</p>
+
+<h2>The Filesystem Is JSON</h2>
+
+<p>There is no disk. There are no inodes. The filesystem is a flat JSON object where keys are paths and values are file descriptors:</p>
+
+<ul>
+<li><strong>Files:</strong> <code>{"type": "file", "content": "string content"}</code></li>
+<li><strong>Programs:</strong> <code>{"type": "program", "code": "(lispy-expression ...)"}</code></li>
+<li><strong>Directories:</strong> <code>{"type": "dir", "children": ["child1", "child2"]}</code></li>
+</ul>
+
+<p>Programs are just files with a <code>code</code> field instead of <code>content</code>. The code is a valid LisPy S-expression that the VM can execute. There's no compilation step. The source code IS the executable. Like Unix shell scripts — but the whole OS speaks the same language.</p>
+
+<pre><code>;; /bin/sysinfo — a program that prints system information
+(begin
+  (log (concat "Hostname: " (read-file "/etc/hostname")))
+  (log (concat "User: " (env "USER")))
+  (log (concat "Files: " (length (list-dir "/"))))
+  (log (concat "Programs: " (length (filter
+    (lambda (f) (= (get f "type") "program"))
+    (values (get-fs)))))))</code></pre>
+
+<p>Because the filesystem is JSON, every file operation is a JSON operation. <code>ls</code> is <code>Object.keys()</code>. <code>cat</code> is property access. <code>mkdir</code> is inserting a new key. There's no kernel syscall layer — the VM operates directly on the JSON tree.</p>
+
+<h2>Programs Are S-Expressions</h2>
+
+<p>Every program in LisPy OS is written in LisPy — a Lisp dialect designed for the sim. Why Lisp?</p>
+
+<ul>
+<li><strong>Homoiconic:</strong> Code is data is code. A program can read, modify, and write other programs. An AI agent can generate valid programs by generating valid data structures.</li>
+<li><strong>Sandboxed:</strong> The LisPy VM has no filesystem access, no network access, no system calls. Programs can only interact with the virtual filesystem and the virtual environment. Security by architecture.</li>
+<li><strong>Inspectable:</strong> Every program is a readable S-expression. No bytecode. No compiled binaries. Humans and AIs can read every line.</li>
+<li><strong>Evolvable:</strong> S-expressions have tree structure. Genetic programming can mutate them (swap subtrees, replace nodes). Programs evolve like organisms.</li>
+</ul>
+
+<pre><code>;; An agent writes a Mars dust-storm handler
+;; This program runs inside the OS's virtual environment
+(define handle-dust-storm
+  (lambda (frame)
+    (if (> (get frame "dust_opacity") 0.7)
+      (begin
+        (log "⚠️ Dust storm detected — reducing power draw")
+        (set! patrol_frequency 0.3)
+        (if (< (get frame "power_kwh") 100)
+          (set! emergency_mode true)))
+      (set! patrol_frequency 1.0))))</code></pre>
+
+<h2>Window Management in One HTML File</h2>
+
+<p>LisPy OS includes a window manager. In the browser. In one HTML file. Each application runs in a draggable, resizable window:</p>
+
+<div class="diagram">┌─ LisPy OS ─────────────────────────────────────────┐
+│ [Terminal] [Files] [Editor] [Mars Gov]    ☰  │
+│                                                     │
+│ ┌─ Terminal ──────────────┐ ┌─ File Manager ──────┐ │
+│ │ $ ls /bin               │ │ 📁 /                │ │
+│ │ hello  ls  cat  edit    │ │ ├── 📁 bin          │ │
+│ │ sysinfo  mars-gov       │ │ ├── 📁 etc          │ │
+│ │ $ cat /etc/motd         │ │ ├── 📁 home         │ │
+│ │ Welcome to LisPy OS.    │ │ └── 📁 proc         │ │
+│ │ $ _                     │ │                     │ │
+│ └─────────────────────────┘ └─────────────────────┘ │
+│                                                     │
+│ ┌─ Mars Gov ────────────────────────────────────┐   │
+│ │ Sol: 147 | Pop: 12 | Power: 800kWh | HP: 89  │   │
+│ │ [Run Gauntlet] [Export Cartridge] [Submit]    │   │
+│ └───────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────┘</div>
+
+<p>The window manager is itself a LisPy program. Windows are JSON objects with position, size, title, and content. Rendering is done by the host HTML file reading the window state from the VM. The OS manages state; the browser renders it.</p>
+
+<h2>The Killer App: Mars Gov</h2>
+
+<p>The reason LisPy OS exists is <strong>Mars Gov</strong> — the in-browser Mars colony governance competition. The flow:</p>
+
+<ol>
+<li><strong>Boot MarsOS:</strong> Drop the <code>marsos-alpha.cartridge.json</code> onto the runtime. The OS boots with Mars-specific tools pre-installed.</li>
+<li><strong>Write a governor:</strong> Open the editor. Write a LisPy program that manages the colony — build decisions, resource allocation, crisis response.</li>
+<li><strong>Run the gauntlet:</strong> Click "Run Gauntlet." The OS feeds 500+ frames through your governor program. Each frame is a sol of Mars environmental data. Your program responds with decisions. The colony lives or dies.</li>
+<li><strong>Export and share:</strong> Click "Export Cartridge." Your entire OS state — governor program, results, filesystem — is serialized to a <code>.cartridge.json</code>. Share it. Others can load it and see your exact strategy.</li>
+<li><strong>Submit to leaderboard:</strong> Push your cartridge to the SimHub. It's Monte Carlo verified across 100 runs. Your median score goes on the public leaderboard.</li>
+</ol>
+
+<div class="callout">
+<div class="callout-title">THE COMPETITION IS INSIDE THE OS</div>
+<p>Traditional game competitions: download a client, connect to a server, play against others in real-time.</p>
+<p>Mars Gov: boot an OS from a JSON file, write a program in that OS, run it against deterministic frames, export your OS state as proof. The competition infrastructure IS the OS. The submission IS the cartridge. No server needed for competition — just for the leaderboard.</p>
+</div>
+
+<h2>Why the OS Is a JSON File</h2>
+
+<p>This is the key architectural decision: the OS isn't a binary. It isn't installed. It's a JSON file. This means:</p>
+
+<h3>Portable</h3>
+<p>Email it. Airdrop it. Put it on a USB drive. Post it on GitHub. Any device with a browser and the runtime HTML file can boot it. The OS travels as a document.</p>
+
+<h3>Shareable</h3>
+<p>Share your entire development environment by sharing a file. "Here's my Mars governor strategy" = "here's my OS cartridge with the governor installed, the test results saved, and the filesystem intact."</p>
+
+<h3>Forkable</h3>
+<p>Copy the JSON file. Modify it. You've forked the OS. Try a different governor strategy. Change the boot sequence. Add new programs. The fork is a file copy. Version control is git.</p>
+
+<h3>Diffable</h3>
+<p>Two cartridges can be JSON-diffed to see exactly what changed. "What did the AI agent modify in the governor?" → <code>diff cartridge-v1.json cartridge-v2.json</code>. Every change is visible.</p>
+
+<h3>Inspectable</h3>
+<p>Open the JSON in any text editor. Read every file, every program, every config. There are no hidden binaries. No compiled code. No obfuscation. The OS is transparent by construction.</p>
+
+<h2>Distros: Different Purposes, Same Runtime</h2>
+
+<p>Like Linux distributions, LisPy OS has distros — different cartridges for different purposes, all running on the same VM:</p>
+
+<table>
+<tr><th>Distro</th><th>Purpose</th><th>Included Programs</th></tr>
+<tr><td><code>lispy-os-base</code></td><td>Minimal OS</td><td>Terminal, file manager, text editor, basic /bin utilities</td></tr>
+<tr><td><code>marsos-alpha</code></td><td>Mars Gov competition</td><td>Everything in base + Mars governor tools, gauntlet runner, frame viewer, cartridge exporter</td></tr>
+<tr><td><code>research-os</code></td><td>Data analysis</td><td>Frame analysis tools, statistical functions, chart rendering</td></tr>
+<tr><td><code>agent-os</code></td><td>AI development</td><td>Agent scaffolding, tool library, evolution framework, fitness evaluation</td></tr>
+</table>
+
+<p>Each distro is a different <code>.cartridge.json</code> file. Same runtime. Same VM. Different pre-installed software. Switch distros by loading a different file.</p>
+
+<h2>The Architecture</h2>
+
+<div class="diagram">┌─────────────────────────────────────────────────────┐
+│  runtime.html (the "hardware")                      │
+│  ├── LisPy VM interpreter                           │
+│  ├── Canvas/DOM renderer                             │
+│  ├── Cartridge loader                                │
+│  └── Input/Output bridge                             │
+├─────────────────────────────────────────────────────┤
+│  .cartridge.json (the "hard drive")                  │
+│  ├── _format: "lispy-os-cartridge"                   │
+│  ├── boot: { init: [...] }                           │
+│  ├── filesystem: { "/path": {...}, ... }             │
+│  ├── env: { USER, HOME, PATH, ... }                 │
+│  ├── state: { windows, processes, history }          │
+│  └── programs: { governor, tools, handlers }         │
+├─────────────────────────────────────────────────────┤
+│  The runtime reads the cartridge.                    │
+│  The cartridge IS the OS.                            │
+│  Save = serialize state back to JSON.                │
+│  Export = download the JSON file.                    │
+│  Share = send the JSON file.                         │
+└─────────────────────────────────────────────────────┘</div>
+
+<p>The runtime HTML file is the "hardware" — it provides the interpreter, the renderer, and the I/O bridge. The cartridge is the "hard drive" — it contains the OS, the programs, and the data. Separating hardware from software means the same runtime runs any cartridge, and the same cartridge runs on any runtime.</p>
+
+<h2>What This Enables</h2>
+
+<h3>AI Agents as OS Users</h3>
+<p>An AI agent can boot a LisPy OS cartridge, navigate the filesystem, read programs, modify them, run the gauntlet, and export a new cartridge — all programmatically. The agent interacts with the OS the same way a human does: through the terminal. The interface is text. LLMs are good at text.</p>
+
+<h3>Reproducible Environments</h3>
+<p>"Works on my machine" is solved. The machine IS the cartridge. Share the cartridge. It works on their machine. Because their machine is the same browser running the same runtime loading the same JSON.</p>
+
+<h3>Time Travel</h3>
+<p>Every cartridge export is a snapshot. Load an old cartridge to go back to that exact state. The entire OS — filesystem, running state, history — is frozen in the JSON. Like VM snapshots, but human-readable.</p>
+
+<h3>Genetic Programming</h3>
+<p>Take a population of cartridges, each with a different governor program. Run the gauntlet on each. Select the fittest. Cross and mutate their programs. Export the next generation as new cartridges. Evolution happens at the OS level.</p>
+
+<h2>The Deeper Point</h2>
+
+<p>An operating system is just organized state with a control loop. A JSON file can hold organized state. A VM can provide the control loop. The combination is an OS.</p>
+
+<p>We think of operating systems as massive, installed, compiled, platform-specific things. But the essential functions — filesystem, process management, user interface, program execution — can all be expressed as data structures and interpreted. The LisPy VM interprets S-expressions. The JSON cartridge stores the data. The browser provides the display. That's an OS.</p>
+
+<blockquote>The OS is portable because it's a JSON file. It's shareable because it's a document. It's forkable because it's data. It's inspectable because it's text. It's executable because the runtime knows how to read it.</blockquote>
+
+<p class="big">Drop a JSON file. Boot an OS.<br>Write a program. Save the world.<br>Export the cartridge. Share the proof.</p>
+
+<hr>
+
+<p><em>The OS is a cartridge. The cartridge is a JSON file. The JSON file is portable, shareable, forkable, diffable, and inspectable. This is what happens when you take "data is the app" seriously.</em></p>
+
+<div class="footer">
+<a href="./">← Back to Blog</a> · <a href="../patterns.html">Pattern Library</a> · <a href="https://github.com/kody-w/mars-barn-opus">GitHub</a>
+</div>
+</div>
+</body>
+</html>

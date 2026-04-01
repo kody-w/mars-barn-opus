@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Frame-Driven Everything: When Your Data Model IS Your Application — kody-w</title>
+<meta name="description" content="Frames aren't just sim data. They're the unit of truth for APIs, competition, evolution, economy, governance, and verification. The frame is the atom. Everything else is a reaction.">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#484f58;
+--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--cyan:#79c0ff;
+--purple:#a371f7;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.9}
+.wrap{max-width:720px;margin:0 auto;padding:40px 24px 80px}
+.meta{color:var(--dim);font-size:12px;margin-bottom:32px}
+.meta a{color:var(--cyan);text-decoration:none}
+h1{font-size:26px;color:#fff;line-height:1.3;margin-bottom:8px}
+h2{font-size:20px;color:var(--cyan);margin:40px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+h3{font-size:15px;color:var(--green);margin:28px 0 8px}
+p{margin:12px 0}
+strong{color:#fff}
+em{color:var(--dim)}
+code{background:rgba(88,166,255,0.1);color:var(--cyan);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:0.9em}
+pre{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:16px 0;overflow-x:auto;line-height:1.5}
+pre code{background:none;padding:0;color:var(--text);font-size:12px}
+blockquote{border-left:3px solid var(--purple);padding:12px 16px;margin:24px 0;background:rgba(163,113,247,0.05);border-radius:0 8px 8px 0;font-style:italic;color:var(--dim)}
+ul,ol{margin:12px 0 12px 24px}
+li{margin:6px 0}
+hr{border:none;border-top:1px solid var(--border);margin:48px 0}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline}
+.callout{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px;margin:28px 0}
+.callout-title{color:var(--yellow);font-weight:700;font-size:12px;letter-spacing:1px;margin-bottom:8px}
+.diagram{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:20px;margin:16px 0;font-family:var(--mono);font-size:12px;line-height:1.7;white-space:pre;overflow-x:auto;color:var(--dim)}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:12px}
+th{background:#0a0e14;color:var(--cyan);padding:8px 12px;text-align:left;border:1px solid var(--border)}
+td{padding:8px 12px;border:1px solid var(--border)}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin:2px}
+.tag-arch{background:rgba(163,113,247,0.15);color:var(--purple)}
+.tag-pattern{background:rgba(88,166,255,0.15);color:var(--blue)}
+.tag-thesis{background:rgba(218,54,51,0.15);color:var(--red)}
+.big{font-size:18px;color:#fff;font-weight:700;text-align:center;margin:32px 0;line-height:1.5}
+.footer{text-align:center;color:var(--dim);font-size:11px;margin-top:48px;padding-top:24px;border-top:1px solid var(--border)}
+@media(max-width:600px){.wrap{padding:20px 16px 60px} h1{font-size:22px} .diagram{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="meta"><a href="./">← Blog</a> · <a href="../patterns.html">Pattern Library</a> · <a href="../viewer.html">Play the Sim</a></div>
+
+<h1>Frame-Driven Everything: When Your Data Model IS Your Application</h1>
+<div class="meta">kody-w · April 2025 · <span class="tag tag-arch">Architecture</span> <span class="tag tag-thesis">Thesis</span> <span class="tag tag-pattern">Pattern</span></div>
+
+<p>Here's a question that changed how we build everything: <strong>what if you had one data structure, and every feature in your system was a reaction to it?</strong></p>
+
+<p>Not a database table that features query. Not an event stream that features subscribe to. A single, concrete, structured unit of truth — the <strong>frame</strong> — and every part of the system derives its behavior from frames. The API serves frames. The competition scores frames. Evolution mutates programs that respond to frames. The economy computes rewards per frame. Governance runs per frame. Verification chains frames.</p>
+
+<p>The frame isn't a data model. It's the <em>atom</em> of the system. Everything else is a reaction.</p>
+
+<h2>What Is a Frame?</h2>
+
+<p>A frame is one tick of reality. In the Mars sim, it's one sol (one Martian day) of environmental and colony state:</p>
+
+<pre><code>{
+  "sol": 147,
+  "timestamp": "2025-04-01T12:00:00Z",
+  "environment": {
+    "temperature": -62.3,
+    "dust_opacity": 0.45,
+    "wind_speed": 12.8,
+    "solar_irradiance": 410,
+    "uv_index": 8.2,
+    "perchlorate_ppm": 0.6
+  },
+  "colony": {
+    "population": 12,
+    "robots": 4,
+    "power_kwh": 780,
+    "water_liters": 4200,
+    "food_days": 89,
+    "modules": ["hab", "greenhouse", "solar_farm_1", "solar_farm_2", "repair_bay"]
+  },
+  "events": ["dust_storm_warning", "solar_panel_degradation"],
+  "chain": {
+    "hash": "a1b2c3...",
+    "prev_hash": "z9y8x7...",
+    "engine_signature": "ed25519:..."
+  }
+}</code></pre>
+
+<p>That's a frame. One sol. One snapshot. One truth. Now watch what happens when you make <em>everything</em> react to it.</p>
+
+<h2>Frame-Driven APIs</h2>
+
+<p>Traditional APIs serve data from a database when a client asks. Frame-driven APIs serve <strong>frames as static files that update when new frames are generated</strong>.</p>
+
+<div class="diagram">Traditional:
+  Client → Server → Database → Query → Response
+  (server must be running, database must be reachable)
+
+Frame-driven:
+  Engine generates frame → rebuilds frames.json → git push
+  Client → CDN → frames.json (static file)
+  (no server, no database, no ops)</div>
+
+<p>The API doesn't serve data <em>about</em> frames. The API IS frames. <code>frames.json</code> is literally the array of frames, served as a static file. When the engine generates a new frame, it appends it to the array, pushes, and the CDN serves the new version. Clients poll <code>latest.json</code> (< 1KB heartbeat) to detect changes.</p>
+
+<p>The frame drives the API. No frame, no update. New frame, new data. The API's state is identical to the frame state. There's nothing else to synchronize.</p>
+
+<h2>Frame-Driven Competition</h2>
+
+<p>In traditional competitions, players compete in real-time on shared infrastructure. Frame-driven competition is different: <strong>everyone consumes the same frames independently, and the competition is pure management skill.</strong></p>
+
+<div class="diagram">Published Frames (immutable, same for everyone):
+  Sol 1 → Sol 2 → Sol 3 → ... → Sol 500
+
+Player A's governor program processes frames:
+  Sol 1: build solar → Sol 2: build hab → ... → Sol 500: <span style="color:var(--green)">ALIVE (score: 15,000)</span>
+
+Player B's governor program processes same frames:
+  Sol 1: build robot → Sol 2: mine ice → ... → Sol 500: <span style="color:var(--red)">DEAD at Sol 312 (score: 8,400)</span>
+
+Same input. Different programs. Different outcomes.
+The delta IS the skill gap.</div>
+
+<p>The frames are the environment. They're immutable, deterministic, and published. Every competitor sees the same Mars. The competition is about who writes the better program to respond to those frames. Zero infrastructure. Zero luck. Pure strategy.</p>
+
+<p>When the snowball rolls and a new version adds harder frames, every strategy is re-evaluated against the new frames. The frame drives the competition. The competition is always fair because the frames are always the same.</p>
+
+<h2>Frame-Driven Evolution</h2>
+
+<p>The <a href="rolling-snowball.html">Rolling Snowball</a> pattern is frame-driven evolution: <strong>each version adds new frames with higher fidelity, and programs must evolve to handle them.</strong></p>
+
+<table>
+<tr><th>Version</th><th>Frames</th><th>What Changed</th><th>Evolution Pressure</th></tr>
+<tr><td>v1</td><td>Sol 1-161</td><td>Base hazards</td><td>Basic resource management</td></tr>
+<tr><td>v2</td><td>Sol 162-501</td><td>Robot-killer hazards added</td><td>Must handle perchlorate, radiation, abrasion</td></tr>
+<tr><td>v3</td><td>Sol 502+</td><td>Human factors added</td><td>Must handle crew psychology, morale</td></tr>
+</table>
+
+<p>Each version bump changes the frames. The frames change the selection pressure. The selection pressure drives program evolution. Programs that handled v1 frames die on v2 frames. New programs emerge that handle both. The frame is the forcing function.</p>
+
+<p>This isn't abstract. A program that scored 15,000 on v1 frames scored 0 on v2 frames. The v2 frames contained hazards the program had never seen. The program must evolve — write new LisPy tools for the new hazard types — or it dies. The frame drove the evolution.</p>
+
+<h2>Frame-Driven Economy</h2>
+
+<p>Token rewards aren't distributed on a schedule. They're <strong>computed per frame</strong>. Every frame triggers an economic calculation:</p>
+
+<pre><code>;; Per-frame economic computation
+(define compute-rewards (lambda (frame colony)
+  (let ((survival-bonus (if (get colony "alive") 100 0))
+        (efficiency     (* (get colony "power_kwh") 0.1))
+        (population     (* (get colony "population") 10))
+        (crisis-bonus   (if (> (length (get frame "events")) 0)
+                           (* (length (get frame "events")) 50)
+                           0)))
+    (+ survival-bonus efficiency population crisis-bonus)))
+
+;; Frame 147: compute-rewards → 100 + 78 + 120 + 100 = 398 tokens
+;; Frame 148: compute-rewards → 100 + 65 + 120 + 0   = 285 tokens
+;; Frame 149: compute-rewards → 0   + 0  + 0   + 0   = 0 tokens (colony died)</code></pre>
+
+<p>The economy is deterministic. Given the same frames and the same colony state, the reward computation produces the same tokens. No black box. No server-side adjustment. The frame drives the economy. Anyone can verify any token reward by replaying the frames.</p>
+
+<h2>Frame-Driven Governance</h2>
+
+<p>The treasury governor doesn't run on a cron job. It <strong>runs per frame</strong>. Every frame is a governance cycle:</p>
+
+<div class="diagram">Frame N arrives
+  ↓
+Treasury Governor evaluates:
+  - Current treasury balance
+  - Colony needs (power? water? repairs?)
+  - Risk assessment (upcoming dust storm in frame forecast?)
+  - Population pressure (enough food for N+1 sols?)
+  ↓
+Governor allocates:
+  - 40% to infrastructure maintenance
+  - 30% to emergency reserves
+  - 20% to expansion
+  - 10% to research
+  ↓
+Allocation applied to colony state
+  ↓
+Frame N+1 arrives → repeat</div>
+
+<p>The governor program is a LisPy function that takes a frame and returns allocation decisions. Different governor programs make different decisions on the same frames. The competition is: whose governance produces the best outcomes over 500 frames?</p>
+
+<p>Governance isn't a periodic committee meeting. It's a function that runs on every tick of reality. The frame drives the governance. The governance shapes the next frame's starting conditions. The loop is tight, deterministic, and auditable.</p>
+
+<h2>Frame-Driven Verification</h2>
+
+<p>Each frame contains a <code>chain</code> object with a hash of the frame's content and the previous frame's hash. This forms a hash chain — an immutable, verifiable sequence:</p>
+
+<pre><code>Frame 1: hash=H1, prev=null        (genesis)
+Frame 2: hash=H2, prev=H1
+Frame 3: hash=H3, prev=H2
+...
+Frame N: hash=HN, prev=H(N-1)
+
+Verification: for each frame, recompute its hash and check
+that prev_hash matches the previous frame's actual hash.
+If any frame is tampered, the chain breaks.</code></pre>
+
+<p>Verification is per-frame. Each frame verifies against the previous frame. The chain grows one block per frame. Insert, remove, or reorder a frame and the chain breaks. The frame drives the chain. The chain ensures the frames are trustworthy.</p>
+
+<p>Engine signatures add another layer: the engine that produced each frame signs it with its Ed25519 key. The signature is in the frame. Anyone can verify that frame 147 was produced by the official engine, not forged.</p>
+
+<h2>The Unified Model</h2>
+
+<p>Here's what frame-driven everything looks like when you put it all together:</p>
+
+<div class="diagram">                          ┌─────────┐
+                          │  FRAME  │ ← the atom
+                          └────┬────┘
+                               │
+          ┌────────┬────────┬──┴──┬────────┬────────┬────────┐
+          ↓        ↓        ↓     ↓        ↓        ↓        ↓
+       <span style="color:var(--cyan)">API</span>    <span style="color:var(--green)">Compete</span>  <span style="color:var(--purple)">Evolve</span>  <span style="color:var(--yellow)">Economy</span>  <span style="color:var(--red)">Govern</span>  <span style="color:var(--cyan)">Verify</span>  <span style="color:var(--green)">Display</span>
+    frames   same      new      tokens   allocate  chain    render
+    .json    frames    hazards  per      per       per      per
+    served   scored    break    frame    frame     frame    frame
+             diff      old
+                       strats
+
+All seven subsystems react to the same data structure.
+No message bus. No event system. No pub/sub.
+Just: frame arrives → everything reacts.</div>
+
+<p>There's no middleware. No message broker. No event bus. No pub/sub system. The frame is published. Every subsystem reads it and does its thing. The frame is the only coordination mechanism. This is radically simple.</p>
+
+<div class="callout">
+<div class="callout-title">WHY THIS WORKS</div>
+<p>Traditional architectures coordinate subsystems through APIs, message queues, and event buses. Each integration point is a potential failure, a source of latency, and a thing to maintain.</p>
+<p>Frame-driven architecture coordinates through <strong>shared data</strong>. Every subsystem reads the same frames. There's nothing to integrate. The frame IS the integration. If a subsystem needs to react to something, it reads the frame. If it needs to produce something, it writes it into the frame's response. The data model IS the integration layer.</p>
+</div>
+
+<h2>Applying It Beyond Mars</h2>
+
+<p>The pattern works anywhere a system has a regular tick:</p>
+
+<ul>
+<li><strong>IoT fleet management:</strong> Frame = one sensor reading cycle. Dashboard reacts. Alerts react. Analytics react. Billing reacts. One reading, seven reactions.</li>
+<li><strong>Trading systems:</strong> Frame = one candle (1min/5min/1hr). Strategies react. Risk management reacts. P&L reacts. Compliance reacts.</li>
+<li><strong>Game engines:</strong> Frame = one game tick. Physics reacts. AI reacts. Rendering reacts. Networking reacts. Audio reacts. Already frame-driven.</li>
+<li><strong>CI/CD pipelines:</strong> Frame = one commit. Build reacts. Test reacts. Deploy reacts. Notify reacts. Audit reacts.</li>
+<li><strong>Health monitoring:</strong> Frame = one vitals check. Dashboard reacts. Alerts react. Treatment plans react. Billing reacts.</li>
+</ul>
+
+<p>If your system has a heartbeat — a regular tick where state is captured — you can make everything react to that tick. That tick is your frame. Everything else is a function of frames.</p>
+
+<h2>The Seven Properties</h2>
+
+<div class="callout" style="border-color:var(--purple)">
+<div class="callout-title" style="color:var(--purple)">FRAME-DRIVEN ARCHITECTURE — PROPERTIES</div>
+
+<p><strong>1. Single Source of Truth.</strong> The frame is the only data structure. Everything derives from it. No secondary stores. No caches that diverge. The frame is the truth.</p>
+
+<p><strong>2. Deterministic.</strong> Given the same frames and the same program, you get the same output. Always. Everywhere. Determinism enables verification, competition, and debugging.</p>
+
+<p><strong>3. Auditable.</strong> Every frame is a record. Every reaction to a frame is reproducible. The audit trail is the frame sequence. Nothing happens off-frame.</p>
+
+<p><strong>4. Composable.</strong> New subsystems can be added by writing a new function that reads frames. No integration work. No API design. Just: read the frame, do your thing.</p>
+
+<p><strong>5. Forkable.</strong> Copy the frames. Run a different program against them. Compare outcomes. Forking is a file copy, not an infrastructure operation.</p>
+
+<p><strong>6. Evolvable.</strong> New frame versions add fields. Old programs ignore new fields. New programs leverage them. Forward and backward compatibility by convention.</p>
+
+<p><strong>7. Verifiable.</strong> The chain in each frame ensures integrity. Signatures ensure authenticity. Determinism ensures reproducibility. The system is trustworthy by construction.</p>
+</div>
+
+<h2>The Philosophical Point</h2>
+
+<p>Most software systems have a data model and an application. The data model stores state. The application reads and transforms it. They're separate concerns connected by code.</p>
+
+<p>Frame-driven architecture erases this separation. The data model — the frame — IS the application. The application is just a collection of functions that react to frames. There's no application logic that exists independently of frames. Remove the frames and there's nothing left. The frames are the system.</p>
+
+<p>This is a strong claim. It means:</p>
+<ul>
+<li>You can understand the entire system by understanding frames</li>
+<li>You can test the entire system by feeding it frames</li>
+<li>You can verify the entire system by checking frame chains</li>
+<li>You can evolve the entire system by adding frame fields</li>
+<li>You can compete in the entire system by responding to frames differently</li>
+</ul>
+
+<p>One data structure. One truth. Everything else reacts.</p>
+
+<p class="big">The frame is the atom of the system.<br>Everything else is a reaction to frames.</p>
+
+<hr>
+
+<p><em>Frames aren't data. Frames are the system. The API serves them. The competition scores them. Evolution pressures them. The economy computes from them. Governance decides on them. Verification chains them. The frame is the atom. Everything else is chemistry.</em></p>
+
+<div class="footer">
+<a href="./">← Back to Blog</a> · <a href="../patterns.html">Pattern Library</a> · <a href="https://github.com/kody-w/mars-barn-opus">GitHub</a>
+</div>
+</div>
+</body>
+</html>

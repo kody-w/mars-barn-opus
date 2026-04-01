@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Static Files ARE the API: How to Build a Backend With Zero Servers — kody-w</title>
+<meta name="description" content="No server. No backend. No ops. Git repos + raw CDN = API. If your data changes less than once per minute, you don't need a server. Here's the pattern.">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#484f58;
+--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--cyan:#79c0ff;
+--purple:#a371f7;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.9}
+.wrap{max-width:720px;margin:0 auto;padding:40px 24px 80px}
+.meta{color:var(--dim);font-size:12px;margin-bottom:32px}
+.meta a{color:var(--cyan);text-decoration:none}
+h1{font-size:26px;color:#fff;line-height:1.3;margin-bottom:8px}
+h2{font-size:20px;color:var(--cyan);margin:40px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+h3{font-size:15px;color:var(--green);margin:28px 0 8px}
+p{margin:12px 0}
+strong{color:#fff}
+em{color:var(--dim)}
+code{background:rgba(88,166,255,0.1);color:var(--cyan);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:0.9em}
+pre{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:16px 0;overflow-x:auto;line-height:1.5}
+pre code{background:none;padding:0;color:var(--text);font-size:12px}
+blockquote{border-left:3px solid var(--purple);padding:12px 16px;margin:24px 0;background:rgba(163,113,247,0.05);border-radius:0 8px 8px 0;font-style:italic;color:var(--dim)}
+ul,ol{margin:12px 0 12px 24px}
+li{margin:6px 0}
+hr{border:none;border-top:1px solid var(--border);margin:48px 0}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline}
+.callout{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px;margin:28px 0}
+.callout-title{color:var(--yellow);font-weight:700;font-size:12px;letter-spacing:1px;margin-bottom:8px}
+.diagram{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:20px;margin:16px 0;font-family:var(--mono);font-size:12px;line-height:1.7;white-space:pre;overflow-x:auto;color:var(--dim)}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:12px}
+th{background:#0a0e14;color:var(--cyan);padding:8px 12px;text-align:left;border:1px solid var(--border)}
+td{padding:8px 12px;border:1px solid var(--border)}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin:2px}
+.tag-arch{background:rgba(163,113,247,0.15);color:var(--purple)}
+.tag-pattern{background:rgba(88,166,255,0.15);color:var(--blue)}
+.tag-infra{background:rgba(218,54,51,0.15);color:var(--red)}
+.big{font-size:18px;color:#fff;font-weight:700;text-align:center;margin:32px 0;line-height:1.5}
+.footer{text-align:center;color:var(--dim);font-size:11px;margin-top:48px;padding-top:24px;border-top:1px solid var(--border)}
+@media(max-width:600px){.wrap{padding:20px 16px 60px} h1{font-size:22px} .diagram{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="meta"><a href="./">← Blog</a> · <a href="../patterns.html">Pattern Library</a> · <a href="../viewer.html">Play the Sim</a></div>
+
+<h1>Static Files ARE the API: How to Build a Backend With Zero Servers</h1>
+<div class="meta">kody-w · April 2025 · <span class="tag tag-arch">Architecture</span> <span class="tag tag-infra">Infrastructure</span> <span class="tag tag-pattern">Pattern</span></div>
+
+<p>Every project starts the same way. You have data. You need to serve it. So you spin up an Express server, connect it to a database, add auth middleware, deploy to a cloud provider, configure SSL, set up monitoring, and now you have ops.</p>
+
+<p>You didn't want ops. You wanted to serve JSON.</p>
+
+<p><strong>What if you didn't need a server at all?</strong></p>
+
+<h2>The Problem</h2>
+
+<p>APIs need servers. Servers need ops. Ops need money. The standard architecture for serving data is:</p>
+
+<div class="diagram">Client → Load Balancer → Server Process → Database
+                                ↓
+                        Auth / Rate Limit / Logging
+                                ↓
+                        Response (200 OK, JSON body)
+
+<span style="color:var(--red)">Requirements:</span>
+  ✗ Server running 24/7 ($5-500/month)
+  ✗ Database with backups ($5-100/month)
+  ✗ SSL certificate management
+  ✗ Monitoring and alerting
+  ✗ Scaling under load
+  ✗ Security patches
+  ✗ Someone on-call when it breaks</div>
+
+<p>This is insane for data that changes once every few minutes. You're paying for a 24/7 server to respond to requests for data that was last updated an hour ago. It's like hiring a librarian to stand next to a book in case someone wants to read it.</p>
+
+<h2>The Solution: Static Files on Git</h2>
+
+<p>Here's the insight: <strong>if your data changes less than once per minute, you don't need a server.</strong> You need a file host.</p>
+
+<div class="diagram">Engine generates data → writes JSON → git commit → git push
+                                                            ↓
+Client → CDN → Static JSON file ← raw.githubusercontent.com
+    ↑                                    (or GitHub Pages)
+    └── polls every 30s ────────────────────┘
+
+<span style="color:var(--green)">Requirements:</span>
+  ✓ Git repository (free)
+  ✓ GitHub Pages or raw CDN (free)
+  ✓ Nothing else</div>
+
+<p>The git repo IS the database. The CDN IS the server. The commit log IS the audit trail. Pushing a JSON file IS deploying the API.</p>
+
+<h2>The Three Endpoints</h2>
+
+<p>A Static API needs exactly three files:</p>
+
+<h3>1. frames.json — The Data Bundle</h3>
+
+<p>All your data in a single JSON file. For the Mars sim, this is every frame — environmental readings, colony state, scores, events. One <code>GET</code> request, all data.</p>
+
+<pre><code>// GET https://kody-w.github.io/mars-barn-opus/data/frames.json
+[
+  {"sol": 1, "temp": -60.2, "dust": 0.31, "power": 800, "alive": true, ...},
+  {"sol": 2, "temp": -58.7, "dust": 0.35, "power": 785, "alive": true, ...},
+  // ... 500 frames, ~200KB total
+]</code></pre>
+
+<h3>2. latest.json — The Heartbeat</h3>
+
+<p>A tiny file (< 1KB) that tells clients whether anything changed. Poll this. If it hasn't changed, don't fetch the big bundle.</p>
+
+<pre><code>// GET https://kody-w.github.io/mars-barn-opus/data/latest.json
+{
+  "sol": 147,
+  "timestamp": "2025-04-01T12:00:00Z",
+  "frameCount": 147,
+  "hash": "a1b2c3d4e5f6...",
+  "engine": "mars-barn-engine-v2"
+}</code></pre>
+
+<h3>3. manifest.json — The Index</h3>
+
+<p>Lists all files, their sizes, and their hashes. Enables tooling, discovery, and federation between repos.</p>
+
+<pre><code>// GET https://kody-w.github.io/mars-barn-opus/data/manifest.json
+{
+  "spec": "static-api",
+  "files": [
+    {"path": "data/frames.json", "size": 245000, "hash": "a1b2c3d4..."},
+    {"path": "data/latest.json", "size": 180, "hash": "e5f6a7b8..."}
+  ],
+  "federation": [
+    {"repo": "other-user/mars-colony-2", "url": "https://..."}
+  ]
+}</code></pre>
+
+<h2>How the Mars Sim Does It</h2>
+
+<p>The Mars Barn Opus uses exactly this pattern. Here's the flow:</p>
+
+<ol>
+<li><strong>Engine runs:</strong> The simulation engine generates a new frame for each sol. Environmental data computed from NASA climate models. Colony state computed from player/agent decisions.</li>
+<li><strong>Bundle rebuilt:</strong> The engine rebuilds <code>frames.json</code> with the new frame appended, computes the SHA-256 hash, and updates <code>latest.json</code> and <code>manifest.json</code>.</li>
+<li><strong>Commit and push:</strong> All three files committed atomically. One commit = one API update.</li>
+<li><strong>CDN serves:</strong> GitHub Pages (or raw.githubusercontent.com) serves the new files. Cache TTL expires within minutes.</li>
+<li><strong>Clients poll:</strong> The viewer, SimHub, leaderboard, and AI agents all poll <code>latest.json</code>. When the hash changes, they fetch the new bundle and diff for new frames.</li>
+</ol>
+
+<p>The result: a full API serving structured sim data to multiple consumers, with <strong>zero servers, zero cost, zero ops</strong>.</p>
+
+<h2>How Clients Consume</h2>
+
+<p>The client pattern is simple: poll, diff, process.</p>
+
+<pre><code>const LATEST = 'https://kody-w.github.io/mars-barn-opus/data/latest.json';
+const FRAMES = 'https://kody-w.github.io/mars-barn-opus/data/frames.json';
+let cache = JSON.parse(localStorage.getItem('mars-cache') || '{}');
+
+async function poll() {
+  const latest = await fetch(LATEST).then(r => r.json());
+  if (latest.hash !== cache.hash) {
+    const frames = await fetch(FRAMES).then(r => r.json());
+    const newFrames = frames.filter(f => f.sol > (cache.lastSol || 0));
+    processNewFrames(newFrames);
+    cache = { hash: latest.hash, lastSol: latest.sol };
+    localStorage.setItem('mars-cache', JSON.stringify(cache));
+  }
+}
+
+setInterval(poll, 30000); // every 30 seconds</code></pre>
+
+<p>Key details:</p>
+<ul>
+<li><strong>localStorage caching:</strong> The client stores the last known hash and sol. On reload, it picks up where it left off without refetching unchanged data.</li>
+<li><strong>ETag/If-Modified-Since:</strong> The CDN supports conditional requests. If the file hasn't changed, you get a 304 Not Modified — zero bandwidth cost.</li>
+<li><strong>Diffing:</strong> The client doesn't reprocess all 500 frames. It filters for frames newer than the last seen sol. Only new data hits the processing pipeline.</li>
+</ul>
+
+<h2>How Engines Produce</h2>
+
+<p>The engine side is a pipeline: generate → bundle → commit → push.</p>
+
+<pre><code># Engine pipeline (runs on any machine, CI/CD, or cron)
+python3 engine/generate_frame.py --sol 148
+python3 engine/rebuild_bundle.py   # rebuilds frames.json, latest.json, manifest.json
+git add data/frames.json data/latest.json data/manifest.json
+git commit -m "sol 148: dust storm peaks, power at 45%"
+git push origin main</code></pre>
+
+<p>This can run anywhere: your laptop, a GitHub Action, a Raspberry Pi, a cron job on a $5 VPS. The engine doesn't serve traffic. It just pushes JSON. The CDN does the serving.</p>
+
+<h2>Performance: Better Than You Think</h2>
+
+<table>
+<tr><th>Metric</th><th>Traditional API</th><th>Static API</th></tr>
+<tr><td>Latency (cache hit)</td><td>50-200ms</td><td>5-20ms (CDN edge)</td></tr>
+<tr><td>Latency (cache miss)</td><td>100-500ms</td><td>50-100ms (CDN origin)</td></tr>
+<tr><td>Concurrent readers</td><td>Limited by server</td><td>Unlimited (CDN)</td></tr>
+<tr><td>Cost per million reads</td><td>$0.50-5.00</td><td>$0.00 (GitHub Pages)</td></tr>
+<tr><td>Uptime</td><td>99.9% if you're good</td><td>99.99% (GitHub's SLA)</td></tr>
+<tr><td>Time to deploy</td><td>Minutes (CI/CD)</td><td>Seconds (git push)</td></tr>
+<tr><td>Time to set up</td><td>Hours-days</td><td>Minutes</td></tr>
+</table>
+
+<p>The CDN edge-caches your files globally. A reader in Tokyo gets the same latency as a reader in San Francisco. Try getting that from your Express server without a CDN layer you have to configure yourself.</p>
+
+<h2>The Critical Anti-Pattern: Don't Use the GitHub API</h2>
+
+<div class="callout" style="border-color:var(--red)">
+<div class="callout-title" style="color:var(--red)">⚠ WARNING: RATE LIMITS</div>
+<p>The GitHub REST API has strict rate limits:</p>
+<ul>
+<li><strong>Unauthenticated:</strong> 60 requests/hour</li>
+<li><strong>Authenticated:</strong> 5,000 requests/hour</li>
+</ul>
+<p>If you're polling every 30 seconds, you burn 120 requests/hour per client. Two unauthenticated clients and you're rate-limited.</p>
+<p><strong>Solution:</strong> Use raw URLs or GitHub Pages. These serve static files directly from the CDN with <strong>no rate limit</strong> on GET requests.</p>
+<pre><code>// ✗ BAD: Uses GitHub API (rate limited)
+https://api.github.com/repos/kody-w/mars-barn-opus/contents/data/frames.json
+
+// ✓ GOOD: Raw URL (no rate limit)
+https://raw.githubusercontent.com/kody-w/mars-barn-opus/main/data/frames.json
+
+// ✓ BEST: GitHub Pages (no rate limit, custom domain, custom cache headers)
+https://kody-w.github.io/mars-barn-opus/data/frames.json</code></pre>
+</div>
+
+<h2>Applying It to Any Domain</h2>
+
+<p>The pattern isn't Mars-specific. Any system where data changes infrequently and reads outnumber writes can use Static APIs:</p>
+
+<ul>
+<li><strong>IoT dashboards:</strong> Sensors push readings every minute. Bundle into <code>readings.json</code>. Dashboard polls.</li>
+<li><strong>Leaderboards:</strong> Scores update hourly. <code>scores.json</code> on a CDN. Every viewer sees the same data.</li>
+<li><strong>Configuration:</strong> Feature flags change once a day. <code>config.json</code> in git. Clients poll. No config server needed.</li>
+<li><strong>Documentation:</strong> API docs are already static files. Now make the API itself static too.</li>
+<li><strong>Open data:</strong> Government datasets, research data, public records. Update weekly. Serve forever. Zero cost.</li>
+<li><strong>Status pages:</strong> System status changes rarely. <code>status.json</code> on a CDN. No status page service needed.</li>
+</ul>
+
+<h2>Federation: Repos as API Instances</h2>
+
+<p>Here's where it gets interesting. Each git repo is an independent API instance. Federation is just discovery:</p>
+
+<div class="diagram">Repo A (mars-barn-opus)     Repo B (mars-colony-2)     Repo C (mars-lab)
+  └── manifest.json ──────┐   └── manifest.json ──────┐   └── manifest.json
+                           ↓                           ↓         ↓
+                    ┌─────────────────────────────────────────────┐
+                    │            Federation Crawler                │
+                    │  Reads manifests → builds directory          │
+                    │  Publishes: federation-index.json            │
+                    └─────────────────────────────────────────────┘
+                                        ↓
+                    Clients discover all API instances from one URL</div>
+
+<p>This is RSS for structured data. Each repo is a feed. Crawlers discover feeds. No central server. The whole network is static files discovering other static files.</p>
+
+<h2>Security Without a Server</h2>
+
+<p>No server means no server-side security. Instead, security is cryptographic and verifiable:</p>
+
+<ul>
+<li><strong>SHA-256 hashes:</strong> <code>latest.json</code> publishes the hash of <code>frames.json</code>. Clients verify after download. Tampered data is detected.</li>
+<li><strong>Engine signatures:</strong> The engine signs each frame with its Ed25519 key. The public key is in <code>manifest.json</code>. Anyone can verify.</li>
+<li><strong>Chain verification:</strong> Each frame includes the previous frame's hash. The chain is unbreakable. Insert, remove, or reorder a frame and the chain breaks.</li>
+<li><strong>Git signatures:</strong> Commits can be GPG-signed. The commit that pushed the data is verifiable.</li>
+</ul>
+
+<p>You don't need a server to have integrity. You need math.</p>
+
+<h2>When NOT to Use This</h2>
+
+<p>Static APIs are not a universal replacement. Don't use them when:</p>
+
+<ul>
+<li>You need <strong>real-time updates</strong> (< 1 second latency). Use WebSockets.</li>
+<li>You need <strong>write endpoints</strong>. Static files are read-only for clients. Use a server for writes.</li>
+<li>You need <strong>per-user auth</strong>. Static files are public. Use a server for private data.</li>
+<li>You need <strong>complex queries</strong>. Static files are one-size-fits-all. Use GraphQL for flexible queries.</li>
+<li>Your data changes <strong>more than once per minute</strong>. The cache TTL becomes the bottleneck.</li>
+</ul>
+
+<blockquote>The question isn't "can I use a Static API?" It's "does my data change slowly enough that I can?" For a shocking number of projects, the answer is yes.</blockquote>
+
+<h2>The Key Insight</h2>
+
+<p class="big">The frame IS the API call.<br>The repo IS the server.<br>Git IS the database.<br>Push IS deploy.</p>
+
+<p>We've been so conditioned to "build a backend" that we forget what a backend does: it stores data and serves it when asked. If you can store data in git and serve it via CDN, you have a backend. It's just not a <em>server</em>. It's a <em>file</em>.</p>
+
+<p>The Mars Barn Opus serves its entire simulation state — 500+ frames of environmental data, colony state, scores, and chain blocks — as three static JSON files in a git repo. Zero servers. Zero cost. Multiple consumers polling simultaneously. It's been running for months.</p>
+
+<p>If your data changes less than once per minute, you don't need a server. You need a push.</p>
+
+<hr>
+
+<p><em>The frame is the API call. The repo is the server. Git is the database. Static files are the API. Everything else is ops you don't need.</em></p>
+
+<div class="footer">
+<a href="./">← Back to Blog</a> · <a href="../patterns.html">Pattern Library</a> · <a href="https://github.com/kody-w/mars-barn-opus">GitHub</a>
+</div>
+</div>
+</body>
+</html>

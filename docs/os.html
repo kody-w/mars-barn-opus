@@ -952,6 +952,220 @@ async function runBrowserGauntlet(runs){
 
 // Click desktop to close start menu
 document.getElementById('desktop').addEventListener('click',()=>toggleStart(true));
+
+// ══════════════════════════════════════════════════════════════
+// LISPY OS SDK — Console-accessible API for agents + Playwright
+//
+// Access from browser console or Playwright page.evaluate():
+//   window.os.exec("(+ 2 3)")        → run LisPy
+//   window.os.open("terminal")        → open an app
+//   window.os.close("terminal")       → close an app
+//   window.os.status()                → colony status object
+//   window.os.frames()                → loaded frame data
+//   window.os.gauntlet(10)            → run 10 gauntlet sims
+//   window.os.type("terminal","code") → type into terminal
+//   window.os.click("run-editor")     → click a button by id
+//   window.os.apps()                  → list open apps
+//   window.os.env()                   → VM environment variables
+//   window.os.setEnv("key", value)    → set VM env var
+//   window.os.fs()                    → virtual filesystem listing
+//   window.os.cat("/etc/motd")        → read a virtual file
+//   window.os.version                 → SDK version
+//
+// This IS the agent interface. Playwright drives it.
+// The console IS the API. The SDK IS the OS.
+// ══════════════════════════════════════════════════════════════
+
+window.os = {
+  version: '1.0.0',
+
+  // ── LisPy Execution ──
+  exec(code) {
+    const result = vm.run(code);
+    if (result.ok) {
+      console.log('%c✓ ' + (result.output.length ? result.output.join('\n') : String(result.result)),
+        'color: #3fb950');
+    } else {
+      console.log('%c✗ ' + result.error, 'color: #da3633');
+    }
+    return result;
+  },
+
+  // ── App Management ──
+  open(name) { openApp(name); return `Opened: ${name}`; },
+  close(name) { closeApp(name); return `Closed: ${name}`; },
+  apps() { return [...openApps]; },
+  focus(name) { focusApp(name); return `Focused: ${name}`; },
+
+  // Open any page as iframe window
+  iframe(id, title, url) { openIframeApp(id, title, url); return `Opened iframe: ${title}`; },
+
+  // ── Terminal ──
+  type(app, text) {
+    if (app === 'terminal') {
+      const input = document.getElementById('term-input');
+      if (input) { input.value = text; execTerm(); return 'Typed + executed'; }
+    }
+    return 'App not found or no input';
+  },
+
+  // ── UI Interaction ──
+  click(id) {
+    const el = document.getElementById(id);
+    if (el) { el.click(); return `Clicked: #${id}`; }
+    return `Not found: #${id}`;
+  },
+
+  dblclick(selector) {
+    const el = document.querySelector(selector);
+    if (el) { el.dispatchEvent(new MouseEvent('dblclick', {bubbles: true})); return 'Double-clicked'; }
+    return 'Not found';
+  },
+
+  // ── VM State ──
+  env() { return { ...vm.env }; },
+  setEnv(k, v) { vm.setEnv(k, v); return `${k} = ${v}`; },
+
+  // ── Colony Status ──
+  status() {
+    return {
+      sol: vm.env.sol,
+      o2_days: vm.env.o2_days,
+      h2o_days: vm.env.h2o_days,
+      food_days: vm.env.food_days,
+      power_kwh: vm.env.power_kwh,
+      crew_alive: vm.env.crew_alive,
+      cri: vm.env.colony_risk_index,
+      morale: vm.env.morale,
+      solar_eff: vm.env.solar_eff,
+      dust_tau: vm.env.dust_tau,
+    };
+  },
+
+  // ── Frame Data ──
+  frames() { return govFrameData; },
+  frameCount() { return govFrameData.length; },
+  latestFrame() { return govFrameData.length ? govFrameData[govFrameData.length - 1] : null; },
+
+  // ── Gauntlet ──
+  async gauntlet(runs = 10) {
+    console.log(`%c⚔️ Running ${runs} gauntlet simulations...`, 'color: #d29922');
+    const mKey = document.getElementById('gov-mission')?.value || 'optimus';
+    const bKey = document.getElementById('gov-build')?.value || 'repair-solar';
+
+    // Ensure frames loaded
+    if (!govFrameData.length) await govLoadFrames();
+    if (!govFrameData.length) return { error: 'No frames loaded' };
+
+    const frames = {};
+    govFrameData.forEach(f => { frames[f.sol] = f; });
+
+    const results = [];
+    for (let i = 0; i < runs; i++) {
+      results.push(simOneRun(mKey, bKey, frames, i * 7919 + 1));
+    }
+
+    const alive = results.filter(r => r.alive);
+    const sols = results.map(r => r.sols).sort((a, b) => a - b);
+    const medianSols = sols[Math.floor(runs / 2)];
+    const survRate = alive.length / runs;
+    const score = Math.round(medianSols * 100 + Math.min(...results.map(r => r.crew)) * 500 +
+      results.map(r => r.modules).sort((a, b) => a - b)[Math.floor(runs / 2)] * 150 +
+      survRate * 20000 - results.map(r => r.cri).sort((a, b) => a - b)[Math.floor(runs * 0.75)] * 10);
+    const grade = score >= 80000 ? 'S+' : score >= 50000 ? 'S' : score >= 30000 ? 'A' :
+      score >= 15000 ? 'B' : score >= 5000 ? 'C' : 'D';
+
+    const summary = { runs, mission: mKey, build: bKey, score, grade,
+      medianSols, survivalRate: Math.round(survRate * 100) + '%',
+      alive: alive.length, dead: runs - alive.length };
+
+    console.log(`%c${grade} — ${score.toLocaleString()} pts — ${summary.survivalRate} survival`,
+      `color: ${grade[0] === 'S' ? '#ffd700' : grade === 'A' ? '#3fb950' : '#79c0ff'}; font-size: 14px; font-weight: bold`);
+    console.table(summary);
+    return summary;
+  },
+
+  // ── Virtual Filesystem ──
+  _vfs: null,
+  async loadDistro(url) {
+    try {
+      const resp = await fetch(url);
+      const cart = await resp.json();
+      if (cart.filesystem) this._vfs = cart.filesystem;
+      if (cart.boot?.init) {
+        for (const expr of cart.boot.init) vm.run(expr);
+      }
+      if (cart.boot?.motd) cart.boot.motd.forEach(l => console.log('%c' + l, 'color: #79c0ff'));
+      if (cart.env) Object.entries(cart.env).forEach(([k, v]) => vm.setEnv(k, v));
+      return `Loaded: ${cart.name || 'cartridge'}`;
+    } catch (e) { return `Error: ${e.message}`; }
+  },
+
+  fs() {
+    if (!this._vfs) return 'No filesystem loaded. Use os.loadDistro("distros/marsos-alpha.cartridge.json")';
+    return Object.keys(this._vfs).sort();
+  },
+
+  cat(path) {
+    if (!this._vfs) return 'No filesystem';
+    const file = this._vfs[path];
+    if (!file) return `Not found: ${path}`;
+    if (file.type === 'program') return file.code;
+    if (file.type === 'file') return file.content;
+    if (file.type === 'dir') return `Directory: ${(file.children || []).join(', ')}`;
+    return JSON.stringify(file);
+  },
+
+  run(path) {
+    if (!this._vfs) return 'No filesystem';
+    const file = this._vfs[path];
+    if (!file || file.type !== 'program') return `Not a program: ${path}`;
+    return this.exec(file.code);
+  },
+
+  // ── Batch Operations (for Playwright) ──
+  async batch(commands) {
+    const results = [];
+    for (const cmd of commands) {
+      if (cmd.type === 'exec') results.push(this.exec(cmd.code));
+      else if (cmd.type === 'open') results.push(this.open(cmd.app));
+      else if (cmd.type === 'close') results.push(this.close(cmd.app));
+      else if (cmd.type === 'click') results.push(this.click(cmd.id));
+      else if (cmd.type === 'type') results.push(this.type(cmd.app, cmd.text));
+      else if (cmd.type === 'wait') await new Promise(r => setTimeout(r, cmd.ms || 100));
+      else results.push(`Unknown: ${cmd.type}`);
+    }
+    return results;
+  },
+
+  // ── Help ──
+  help() {
+    const cmds = [
+      'os.exec("(+ 2 3)")         — Run LisPy code',
+      'os.open("terminal")         — Open an app',
+      'os.close("terminal")        — Close an app',
+      'os.apps()                   — List open apps',
+      'os.type("terminal","code")  — Type + execute in terminal',
+      'os.click("element-id")      — Click a button',
+      'os.status()                 — Colony status object',
+      'os.env()                    — All VM variables',
+      'os.setEnv("key", val)       — Set a variable',
+      'os.frames()                 — Loaded frame data',
+      'os.gauntlet(10)             — Run 10 gauntlet sims',
+      'os.loadDistro("url")        — Boot a cartridge',
+      'os.fs()                     — List virtual files',
+      'os.cat("/path")             — Read a file',
+      'os.run("/bin/program")      — Run a program',
+      'os.batch([{type,..},...])   — Batch commands (Playwright)',
+    ];
+    console.log('%cLisPy OS SDK', 'color: #79c0ff; font-size: 14px; font-weight: bold');
+    cmds.forEach(c => console.log('  ' + c));
+    return cmds;
+  }
+};
+
+// Announce SDK availability
+console.log('%c🖥️ LisPy OS SDK loaded — type os.help() for commands', 'color: #79c0ff; font-weight: bold');
 </script>
 </body>
 </html>
