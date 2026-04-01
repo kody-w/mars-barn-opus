@@ -1,0 +1,150 @@
+{
+  "_spec": "universal-cartridge",
+  "version": "1.0.0",
+  "title": "Universal Cartridge Specification",
+  "description": "A flat JSON file that can carry anything a floppy disk could — but structured, self-describing, version-aware, and executable. The portable unit of state for the third space where AIs and humans collaborate as one.",
+  "author": "kody-w (Wildhaven Homes LLC)",
+  "license": "Specification is public. Implementations may be proprietary.",
+
+  "spec": {
+    "overview": "A cartridge is a single .cartridge.json file. It is self-describing (_format tells you what it is), versioned (version field), and complete (contains everything needed to resume/boot/replay). No external dependencies. No server required. Drop it anywhere. The runtime reads it.",
+
+    "required_fields": {
+      "_format": {
+        "type": "string",
+        "description": "Self-identifying format tag. Any system can look at this field and know what the cartridge contains.",
+        "examples": ["lispy-os-cartridge", "mars-barn-cartridge", "rappter-agent-state", "game-save", "dataset", "config-bundle", "training-checkpoint"],
+        "rule": "Must be a kebab-case string. Must be unique per cartridge type. The runtime uses this to pick the correct loader."
+      },
+      "version": {
+        "type": "integer",
+        "description": "Schema version. Allows the runtime to handle old cartridges gracefully.",
+        "rule": "Increment when the schema changes. Loaders must handle version N and N-1 at minimum."
+      }
+    },
+
+    "recommended_fields": {
+      "name": "Human-readable name for this cartridge",
+      "description": "What this cartridge contains and what it does",
+      "created": "ISO-8601 timestamp of creation",
+      "author": "Who created it (human, agent, or engine)",
+      "id": "Unique identifier (generated, not sequential)"
+    },
+
+    "content_types": {
+      "state": {
+        "description": "Full runtime state snapshot. Everything needed to resume exactly where you left off.",
+        "examples": ["Colony state (resources, crew, modules)", "Game save (player position, inventory)", "Agent memory (conversation history, tool results)", "Workflow checkpoint (pipeline stage, intermediate results)"],
+        "rule": "Must be a deep clone. No references to external state. The cartridge IS the state."
+      },
+      "filesystem": {
+        "description": "A virtual filesystem encoded as a JSON object. Paths as keys, content as values.",
+        "schema": {
+          "/path/to/file": {"type": "file", "content": "string content"},
+          "/path/to/program": {"type": "program", "code": "executable LisPy code"},
+          "/path/to/dir": {"type": "dir", "children": ["child1", "child2"]}
+        },
+        "rule": "Flat namespace. No symlinks. Programs are files with a 'code' field instead of 'content'. The code field contains a valid LisPy S-expression."
+      },
+      "programs": {
+        "description": "Executable code bundled with the cartridge. Same language as the runtime VM.",
+        "rule": "Programs are LisPy S-expressions (or whatever the target VM speaks). They must be text, not compiled. Inspectable by humans and AIs. The code IS the documentation."
+      },
+      "history": {
+        "description": "Decision log, echo history, transaction log, or any time-series data.",
+        "rule": "Bounded. A cartridge should trim history to the last N entries to keep file size manageable. Recommended: 100-500 entries max."
+      },
+      "chain": {
+        "description": "Hash-linked blocks for verification. Each block references the previous block's hash.",
+        "rule": "Include at least the last 10-100 blocks for quick verification. Full chain can be reconstructed from the public ledger."
+      },
+      "config": {
+        "description": "Configuration that was active when the cartridge was created. Allows reproduction.",
+        "rule": "Must include everything needed to reproduce the run: parameters, seed, program selection, etc."
+      },
+      "score": {
+        "description": "Computed metrics from the state. What this run achieved.",
+        "rule": "Include both the total and the breakdown. Transparent scoring — no hidden multipliers."
+      },
+      "env": {
+        "description": "Environment variables to seed the VM with when loading the cartridge.",
+        "rule": "Key-value pairs. Values must be JSON primitives (string, number, boolean)."
+      },
+      "boot": {
+        "description": "Startup sequence. Programs to run when the cartridge is loaded.",
+        "rule": "An array of LisPy expressions executed in order. The last one's output is the boot message."
+      }
+    },
+
+    "size_guidelines": {
+      "target": "< 1 MB for most cartridges",
+      "max_recommended": "10 MB (GitHub has 100MB file limit)",
+      "trimming": "History, echo, and chain data should be bounded. State should be deep-cloned, not referenced.",
+      "compression": "Not required. JSON is human-readable by design. Gzip for transport if needed."
+    },
+
+    "naming_convention": {
+      "format": "{name}-{identifier}.cartridge.json",
+      "examples": [
+        "marsos-alpha.cartridge.json",
+        "hybrid-sol502.cartridge.json",
+        "agent-memory-MBC-LZ4K2.cartridge.json",
+        "training-checkpoint-epoch50.cartridge.json"
+      ]
+    },
+
+    "operations": {
+      "export": "Serialize current state → write .cartridge.json → download or git push",
+      "import": "Read .cartridge.json → validate _format → deserialize into runtime → resume",
+      "merge": "Two cartridges with the same _format can be merged: newer state wins, histories concatenate, chains extend",
+      "diff": "Because it's JSON, diff two cartridges to see what changed between saves",
+      "verify": "Check chain integrity (hash linkage), check against public frame ledger, Monte Carlo replay",
+      "share": "Drop in a repo, upload to SimHub, email, airdrop, USB drive — it's a file"
+    },
+
+    "compatibility": {
+      "forward": "A version N+1 loader must be able to read version N cartridges (ignore unknown fields)",
+      "backward": "A version N loader encountering N+1 should load what it can and warn about unknown fields",
+      "cross_format": "Different _format cartridges are not compatible. A mars-barn-cartridge cannot be loaded by a lispy-os loader. The _format field prevents this."
+    },
+
+    "security": {
+      "no_executable_outside_vm": "Programs in the cartridge run ONLY inside the sandboxed LisPy VM. No filesystem access. No network access (except pre-fetched cache). No system calls.",
+      "chain_verification": "Cartridges with chain data can be verified against the public frame ledger. Tampered cartridges fail verification.",
+      "signing": "Engine-signed cartridges include _engineId and _signature fields. Chain nodes verify the signature before accepting."
+    }
+  },
+
+  "examples": {
+    "minimal": {
+      "_format": "example-cartridge",
+      "version": 1,
+      "name": "Hello Cartridge",
+      "state": {"counter": 42}
+    },
+    "with_filesystem": {
+      "_format": "lispy-os-cartridge",
+      "version": 1,
+      "name": "My OS",
+      "boot": {"init": ["(log \"Booting...\")"]},
+      "filesystem": {
+        "/bin/hello": {"type": "program", "code": "(log \"Hello World\")"},
+        "/etc/config": {"type": "file", "content": "key=value"}
+      }
+    },
+    "with_chain": {
+      "_format": "mars-barn-cartridge",
+      "version": 1,
+      "name": "Colony Run",
+      "state": {"sol": 147, "alive": true},
+      "chainBlocks": [{"sol": 1, "hash": "abc123", "prevHash": null}],
+      "score": {"total": 15000, "grade": "B"}
+    }
+  },
+
+  "philosophy": {
+    "the_floppy_analogy": "A floppy disk was a universal container. You could put a game, an OS, a document, or raw data on it. Any computer with a floppy drive could read it. The cartridge.json is the same idea for the age of git and LLMs. Any runtime that understands the _format can load it. The cartridge IS the application state, frozen in time, portable across space.",
+    "the_third_space": "The cartridge is how humans and AIs share state. A human writes a LisPy governor program, exports it in a cartridge. An AI agent loads the cartridge, evolves the program, exports a new cartridge. Another human loads that cartridge and reviews the AI's changes. The cartridge is the handoff point between species. Same format. Same language. Same truth.",
+    "data_is_the_app": "The cartridge doesn't reference an external database. It doesn't call an API. It doesn't depend on a server. The data IS the app. Drop it on any compatible runtime and it boots. Like a Datasette database that IS the application."
+  }
+}

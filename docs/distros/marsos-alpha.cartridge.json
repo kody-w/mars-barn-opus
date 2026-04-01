@@ -1,0 +1,163 @@
+{
+  "_format": "lispy-os-cartridge",
+  "version": 1,
+  "name": "MarsOS Alpha",
+  "description": "Mars colony operating system. Everything from LisPy OS Base plus: colony governor, echo daemon, reflex arcs, treasury, MARS wallet, crew management, and 500+ sols of tools battle-tested against the gauntlet.",
+  "created": "2025-04-01T00:00:00Z",
+  "author": "kody-w",
+  "type": "mars-colony",
+  "base": "lispy-os-base",
+
+  "boot": {
+    "motd": [
+      "╔══════════════════════════════════════════════════╗",
+      "║  MarsOS Alpha v0.1 — Colony Operating System    ║",
+      "║  Kernel: LisPy VM · Colony: Hybrid (2H + 4R)   ║",
+      "║  Nervous System: 5-layer (cortex→marketplace)   ║",
+      "║  Frames: 502 · Chain: verified · MARS: 21M cap  ║",
+      "╚══════════════════════════════════════════════════╝"
+    ],
+    "init": [
+      "(set! _hostname \"mars-colony-01\")",
+      "(set! _user \"commander\")",
+      "(set! _cwd \"/colony\")",
+      "(log \"[init] Loading Mars climate engine...\")",
+      "(log \"[init] Starting nervous system...\")",
+      "(log \"[init]   Layer 1: Cortex (stepSim)\")",
+      "(log \"[init]   Layer 2: Brainstem (echo frames)\")",
+      "(log \"[init]   Layer 3: Spinal Cord (reflex arcs)\")",
+      "(log \"[init]   Layer 4: Patrol (visual monitor)\")",
+      "(log \"[init]   Layer 5: Marketplace (treasury governor)\")",
+      "(log \"[init] Connecting to public frame ledger...\")",
+      "(log \"[init] Loading governor: adaptive\")",
+      "(log \"[init] MARS wallet initialized (21M supply)\")",
+      "(log \"[init] Federation protocol active\")",
+      "(log \"[init] Twin channel: mars-barn-twin\")",
+      "(log \"\")",
+      "(log (concat \"Sol \" (string sol) \" | CRI \" (string colony_risk_index) \" | Crew \" (string crew_alive)))",
+      "(log \"\")",
+      "(log \"Commands: (status) (doom) (governor) (crew) (wallet) (frames) (pkg)\")",
+      "(log \"Tools:    /colony/tools/*.lispy\")",
+      "(log \"Programs: /colony/programs/*.lispy\")"
+    ]
+  },
+
+  "env": {
+    "_hostname": "mars-colony-01",
+    "_user": "commander",
+    "_cwd": "/colony",
+    "_shell": "/bin/lispy",
+    "_version": "0.1.0-alpha",
+    "sol": 502,
+    "o2_days": 18.5,
+    "h2o_days": 22.1,
+    "food_days": 31.4,
+    "power_kwh": 342,
+    "crew_alive": 6,
+    "crew_total": 6,
+    "colony_risk_index": 28,
+    "morale": 72,
+    "solar_eff": 0.82,
+    "dust_tau": 0.21,
+    "modules_built": 4,
+    "research_count": 2,
+    "events_active": 0,
+    "mars_circulating": 6096,
+    "mars_total_supply": 21000000
+  },
+
+  "filesystem": {
+    "/bin/status": {
+      "type": "program",
+      "code": "(begin (log \"╔═══ COLONY STATUS ═══╗\") (log (concat \"║ Sol \" (string sol) \" | CRI \" (string colony_risk_index))) (log (concat \"║ O₂:   \" (string (round o2_days)) \"d\")) (log (concat \"║ H₂O:  \" (string (round h2o_days)) \"d\")) (log (concat \"║ Food:  \" (string (round food_days)) \"d\")) (log (concat \"║ Power: \" (string (round power_kwh)) \" kWh\")) (log (concat \"║ Solar: \" (string (round (* solar_eff 100))) \"%\")) (log (concat \"║ Crew:  \" (string crew_alive) \"/\" (string crew_total))) (log (concat \"║ Morale: \" (string (round morale)) \"%\")) (log (concat \"║ Modules: \" (string modules_built))) (log \"╚═════════════════════╝\"))"
+    },
+    "/bin/doom": {
+      "type": "program",
+      "code": "(begin (define min_r (min o2_days (min h2o_days (min food_days (/ power_kwh 30))))) (define doom (+ sol (floor min_r))) (define cause (cond ((= min_r o2_days) \"SUFFOCATION\") ((= min_r h2o_days) \"DEHYDRATION\") ((= min_r food_days) \"STARVATION\") (true \"POWER FAILURE\"))) (log (concat \"☠ DOOM SOL: \" (string doom))) (log (concat \"☠ CAUSE: \" cause)) (log (concat \"☠ TIME LEFT: \" (string (floor min_r)) \" sols\")) (if (< min_r 10) (log \"⚠⚠⚠ CRITICAL ⚠⚠⚠\") (if (< min_r 30) (log \"⚠ WARNING\") (log \"✓ Runway OK\"))))"
+    },
+    "/bin/crew": {
+      "type": "program",
+      "code": "(begin (log \"AGENT    ROLE   HP   MOR  STATUS\") (log \"Chen W.  CMDR   97   82   nominal\") (log \"Rod M.   ENGR   96   85   nominal\") (log \"OPT-01   ENGR  100  100   nominal\") (log \"OPT-02   ENGR  100  100   nominal\") (log \"OPT-03   SCI   100  100   nominal\") (log \"OPT-04   CMDR  100  100   nominal\"))"
+    },
+    "/bin/wallet": {
+      "type": "program",
+      "code": "(begin (log \"╔═══ MARS WALLET ═══╗\") (log (concat \"║ Circulating: \" (string mars_circulating))) (log (concat \"║ Supply: \" (string mars_total_supply))) (log (concat \"║ Minted: \" (string (round (* (/ mars_circulating mars_total_supply) 10000))) \" bps\")) (log \"║ Genesis: mars1_genesis_wildhaven\") (log \"║ Treasury: mars1_treasury\") (log \"║ User: mars1_user_local\") (log \"╚════════════════════╝\"))"
+    },
+    "/bin/governor": {
+      "type": "program",
+      "code": "(begin (log \"Active Governor: adaptive\") (log (concat \"Allocation: ISRU=\" (string (round (* 0.40 100))) \"% Green=\" (string (round (* 0.35 100))) \"% Heat=\" (string (round (* 0.25 100))) \"%\")) (log (concat \"CRI: \" (string colony_risk_index) \" (\" (cond ((> colony_risk_index 70) \"CRITICAL\") ((> colony_risk_index 50) \"HIGH\") ((> colony_risk_index 30) \"ELEVATED\") ((> colony_risk_index 15) \"MODERATE\") (true \"LOW\")) \")\")))"
+    },
+    "/bin/frames": {
+      "type": "program",
+      "code": "(begin (log \"Frame Ledger Status:\") (log \"  Source: kody-w/mars-barn-opus\") (log (concat \"  Latest: Sol \" (string sol))) (log \"  Version: v2 (Robot Killers)\") (log \"  Hazards: perchlorate, abrasion, radiation, battery\") (log \"  Verified: chain-linked, engine-signed\"))"
+    },
+    "/bin/sentiment": {
+      "type": "program",
+      "code": "(begin (define comp (round (/ (+ (- (min 10 (round (/ o2_days 3))) 5) (- (min 10 (round (/ power_kwh 50))) 5) (* (/ crew_alive 4) 10) (- 10 (/ colony_risk_index 5)) (- (* morale 0.2) 10)) 5))) (define s (cond ((> comp 6) \"🚀 EXTREME BULL\") ((> comp 3) \"📈 BULLISH\") ((> comp 0) \"📊 CAUTIOUS\") ((> comp -3) \"📉 BEARISH\") (true \"💀 PANIC\"))) (log (concat \"MARS SENTIMENT: \" s \" (\" (string comp) \")\")))"
+    },
+    "/bin/top": {
+      "type": "program",
+      "code": "(begin (log \"PID  PROC            CPU  MEM   STATUS\") (log \" 1   lispy-kernel     12%  4MB   running\") (log \" 2   colony-governor   8%  2MB   active\") (log \" 3   echo-daemon       3%  1MB   sleeping\") (log \" 4   reflex-arc-01     5%  1MB   watching (O₂)\") (log \" 5   reflex-arc-02     4%  1MB   watching (power)\") (log \" 6   reflex-arc-03     3%  512K  watching (CRI)\") (log \" 7   patrol            2%  512K  continuous\") (log \" 8   treasury-gov      1%  256K  idle\") (log \" 9   twin-proto        4%  1MB   connected\") (log \"10   frame-consumer    2%  2MB   polling\") (log \"11   mars-market       1%  256K  computing\") (log \"── 11 processes | 5-layer nervous system active\"))"
+    },
+    "/bin/df": {
+      "type": "program",
+      "code": "(begin (log \"RESOURCE    USED     AVAIL    USE%   MOUNT\") (log (concat \"O₂         \" (string (round o2_days)) \"d      30d      \" (string (min 100 (round (* (/ o2_days 30) 100)))) \"%    /life/o2\")) (log (concat \"H₂O        \" (string (round h2o_days)) \"d      30d      \" (string (min 100 (round (* (/ h2o_days 30) 100)))) \"%    /life/h2o\")) (log (concat \"Food       \" (string (round food_days)) \"d      30d      \" (string (min 100 (round (* (/ food_days 30) 100)))) \"%    /life/food\")) (log (concat \"Power      \" (string (round power_kwh)) \"kWh    500      \" (string (min 100 (round (* (/ power_kwh 500) 100)))) \"%    /sys/power\")) (log (concat \"MARS       \" (string mars_circulating) \"       21M      \" (string (round (* (/ mars_circulating mars_total_supply) 10000))) \"bps  /econ/mars\")))"
+    },
+    "/bin/sysinfo": {
+      "type": "program",
+      "code": "(begin (log (concat \"Hostname: \" _hostname)) (log (concat \"User: \" _user)) (log \"Kernel: LisPy VM 1.0 (homoiconic)\") (log \"Distro: MarsOS Alpha 0.1\") (log \"Nervous System: 5-layer\") (log (concat \"Colony: \" (string crew_alive) \" crew · \" (string modules_built) \" modules\")) (log (concat \"Frames: Sol \" (string sol) \" · v2 Robot Killers\")) (log \"Engine: rappter-genesis (Wildhaven Homes LLC)\") (log \"Chain: hash-linked, engine-signed\") (log \"Protocol: mars-barn-twin (BroadcastChannel)\"))"
+    },
+    "/bin/fortune": {
+      "type": "program",
+      "code": "(nth (list \"The sim is just the vehicle. The patterns are the roads.\" \"The twin doesn't mirror reality. It runs ahead of it.\" \"The golden goose stays home. The eggs are public.\" \"Same VM. Same language. User = Agent = Engine. 1:1.\" \"The snowball never stops because reality never stops producing data.\" \"There are no two worlds. There is one protocol. Some participants have atoms.\" \"Don't give your agents a hammer. Give them a forge.\" \"The colony doesn't call home for help. It calls the twin.\" \"Every sol survived is another hammer strike that tempers the code.\" \"The market IS the measurement of how good your digital twin is.\") (floor (* (random) 10)))"
+    },
+    "/bin/pkg": {
+      "type": "program",
+      "code": "(begin (log \"MarsOS Package Manager\") (log \"\") (log \"Installed:\") (log \"  lispy-core 1.0 · colony-governor 2.1 · echo-daemon 1.0\") (log \"  reflex-arc 1.0 · mars-weather 1.0 · twin-proto 1.0\") (log \"  mars-token 1.0 · frame-consumer 1.0 · mars-market 1.0\") (log \"\") (log \"Available (install to handle v2 hazards):\") (log \"  perchlorate-guard 0.1 — joint corrosion mitigation\") (log \"  radiation-hardening 0.1 — SEU protection\") (log \"  battery-thermal 0.1 — cold-cycling management\") (log \"  dust-shield 0.1 — electrostatic countermeasures\") (log \"  nav-redundancy 0.1 — backup sensors\"))"
+    },
+    "/etc/motd": {
+      "type": "file",
+      "content": "Welcome to MarsOS.\nThe operating system for Mars colonies.\nEvery program is a LisPy S-expression.\nEvery program can be read, modified, shared, and evolved.\nThe colony's software stack grows with experience.\nDrop a .cartridge.json to load more tools."
+    },
+    "/etc/governor.lispy": {
+      "type": "file",
+      "content": "(begin\n  (cond\n    ((< o2_days 5)\n      (begin (set! isru_alloc 0.85) (set! greenhouse_alloc 0.05)\n             (set! heating_alloc 0.10) (log \"⚠ O₂ EMERGENCY\")))\n    ((< food_days 10)\n      (begin (set! isru_alloc 0.25) (set! greenhouse_alloc 0.60)\n             (set! heating_alloc 0.15) (log \"🌱 Food priority\")))\n    ((< power_kwh 80)\n      (begin (set! heating_alloc 0.55) (set! isru_alloc 0.25)\n             (set! greenhouse_alloc 0.20) (log \"⚡ Power critical\")))\n    (true\n      (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.40)\n             (set! heating_alloc 0.25) (log \"✓ Nominal\")))))"
+    },
+    "/etc/crontab": {
+      "type": "file",
+      "content": "# MarsOS Crontab — LisPy programs on schedule\n# interval  program\n1           /colony/tools/check-vitals.lispy\n5           /colony/tools/solar-check.lispy\n25          /colony/tools/crew-report.lispy\n50          /colony/tools/build-next.lispy\n100         /colony/tools/milestone.lispy"
+    },
+    "/etc/hosts": {
+      "type": "file",
+      "content": "127.0.0.1       localhost\nmars1           mars-colony-01\ngenesis         mars1_genesis_wildhaven\ntreasury        mars1_treasury\norigin          github.com/kody-w/mars-barn-opus\nchain           github.com/kody-w/mars-chain-node\nengine          github.com/kody-w/rappter (private)"
+    },
+    "/colony/tools/check-vitals.lispy": {
+      "type": "file",
+      "content": "(begin\n  (define o2_ok (> o2_days 10))\n  (define h2o_ok (> h2o_days 10))\n  (define food_ok (> food_days 15))\n  (define power_ok (> power_kwh 100))\n  (if (and o2_ok h2o_ok food_ok power_ok)\n    (log \"✓ All vitals nominal\")\n    (begin\n      (if (not o2_ok) (log \"⚠ O₂ LOW\"))\n      (if (not h2o_ok) (log \"⚠ H₂O LOW\"))\n      (if (not food_ok) (log \"⚠ FOOD LOW\"))\n      (if (not power_ok) (log \"⚠ POWER LOW\")))))"
+    },
+    "/colony/tools/solar-check.lispy": {
+      "type": "file",
+      "content": "(begin\n  (define eff (round (* solar_eff 100)))\n  (cond\n    ((< eff 70) (log (concat \"🔴 Solar CRITICAL: \" (string eff) \"%\")))\n    ((< eff 85) (log (concat \"🟡 Solar degraded: \" (string eff) \"%\")))\n    (true (log (concat \"🟢 Solar OK: \" (string eff) \"%\")))))"
+    },
+    "/home/commander/notes.md": {
+      "type": "file",
+      "content": "# Commander's Log — Sol 502\n\nColony stable. Power is always the bottleneck.\nRepair bay holding solar at near-100%.\nPerchlorate from v2 frames starting to show.\n\nStrategy: repair_bay → solar_farm × 3\nGauntlet: dies at Sol 315 from compound v2 damage.\nNeed: perchlorate-guard + radiation-hardening packages.\n\nMonte Carlo: 0% survival at 501 sols.\nThe leaderboard is empty. Beat this."
+    },
+    "/home/commander/.lispyrc": {
+      "type": "file",
+      "content": ";; Commander's shell config\n(set! _prompt \"mars> \")\n(set! _history_size 200)\n(set! _auto_status true)"
+    }
+  },
+
+  "packages": {
+    "installed": [
+      "lispy-core 1.0", "colony-governor 2.1", "echo-daemon 1.0",
+      "reflex-arc 1.0", "mars-weather 1.0", "twin-proto 1.0",
+      "mars-token 1.0", "frame-consumer 1.0", "mars-market 1.0"
+    ],
+    "available": [
+      "perchlorate-guard 0.1", "radiation-hardening 0.1",
+      "battery-thermal 0.1", "dust-shield 0.1", "nav-redundancy 0.1"
+    ]
+  }
+}

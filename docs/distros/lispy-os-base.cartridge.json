@@ -1,0 +1,102 @@
+{
+  "_format": "lispy-os-cartridge",
+  "version": 1,
+  "name": "LisPy OS Base",
+  "description": "Minimal LisPy operating system. A clean VM with a filesystem, shell, and core utilities. No colony-specific programs. The foundation that other distros build on.",
+  "created": "2025-04-01T00:00:00Z",
+  "author": "kody-w",
+  "type": "base-os",
+
+  "boot": {
+    "motd": [
+      "┌────────────────────────────────────┐",
+      "│  LisPy OS v1.0 — Base System      │",
+      "│  Kernel: LisPy VM · Arch: S-expr  │",
+      "│  RAM: ∞ (garbage collected)        │",
+      "│  Storage: Virtual Filesystem       │",
+      "│  Network: raw.githubusercontent    │",
+      "└────────────────────────────────────┘"
+    ],
+    "init": [
+      "(set! _hostname \"lispy-base\")",
+      "(set! _user \"root\")",
+      "(set! _cwd \"/home/root\")",
+      "(set! _sol 0)",
+      "(log \"[init] Kernel loaded\")",
+      "(log \"[init] Filesystem mounted\")",
+      "(log \"[init] Shell ready\")",
+      "(log \"\")",
+      "(log \"Type (help) for commands\")",
+      "(log \"Type (ls) to browse files\")",
+      "(log \"Type (cat \\\"/etc/motd\\\") to read a file\")",
+      "(log \"Type (run \\\"/bin/hello\\\") to run a program\")"
+    ]
+  },
+
+  "env": {
+    "_hostname": "lispy-base",
+    "_user": "root",
+    "_cwd": "/home/root",
+    "_shell": "/bin/lispy",
+    "_version": "1.0.0"
+  },
+
+  "filesystem": {
+    "/bin/hello": {
+      "type": "program",
+      "code": "(log \"Hello from LisPy OS!\")"
+    },
+    "/bin/echo": {
+      "type": "program",
+      "code": "(log _args)"
+    },
+    "/bin/uptime": {
+      "type": "program",
+      "code": "(log (concat \"System up since boot. VM steps: \" (string _steps)))"
+    },
+    "/bin/calc": {
+      "type": "program",
+      "code": "(begin (log \"Calculator: enter (calc-eval EXPR)\") (log \"Example: (calc-eval (+ 2 (* 3 4)))\"))"
+    },
+    "/bin/fortune": {
+      "type": "program",
+      "code": "(nth (list \"The sim is just the vehicle.\" \"Programs are data. Data is programs.\" \"The twin gets there first.\" \"Every sol survived is another hammer strike.\" \"The snowball never stops rolling.\" \"There are no two worlds. There is one protocol.\" \"The golden goose stays home.\" \"Adapt or die. There is no plateau.\") (floor (* (random) 8)))"
+    },
+    "/bin/sysinfo": {
+      "type": "program",
+      "code": "(begin (log (concat \"Hostname: \" _hostname)) (log (concat \"User: \" _user)) (log (concat \"Shell: \" _shell)) (log (concat \"CWD: \" _cwd)) (log (concat \"Version: \" _version)) (log \"Kernel: LisPy VM (homoiconic)\") (log \"Arch: S-expression\") (log \"License: Wildhaven Homes LLC\"))"
+    },
+    "/bin/pkg": {
+      "type": "program",
+      "code": "(begin (log \"Package Manager\") (log \"  pkg list     — installed packages\") (log \"  pkg search   — available packages\") (log \"  pkg install  — install a package (loads cartridge)\"))"
+    },
+    "/etc/motd": {
+      "type": "file",
+      "content": "Welcome to LisPy OS.\nThe homoiconic operating system.\nEverything is an S-expression.\nPrograms are data. Data is programs."
+    },
+    "/etc/hosts": {
+      "type": "file",
+      "content": "127.0.0.1  localhost\nmars1      mars-colony-01\norigin     github.com/kody-w/mars-barn-opus"
+    },
+    "/etc/packages.json": {
+      "type": "file",
+      "content": "{\"installed\":[\"lispy-core 1.0\",\"vfs 1.0\",\"shell 1.0\"],\"repos\":[\"https://raw.githubusercontent.com/kody-w/mars-barn-opus/main/docs/distros/\"]}"
+    },
+    "/home/root/.lispyrc": {
+      "type": "file",
+      "content": ";; Shell config\n(set! _prompt \"λ> \")\n(set! _history_size 200)"
+    },
+    "/home/root/README.md": {
+      "type": "file",
+      "content": "# LisPy OS Base\n\nThis is the minimal base system. Install distro cartridges to add:\n- MarsOS: colony management tools\n- DevOS: development environment\n- Custom: build your own\n\nUse (pkg) to manage packages."
+    },
+    "/tmp": {
+      "type": "dir",
+      "children": []
+    },
+    "/var/log/boot.log": {
+      "type": "file",
+      "content": "[0.00] LisPy kernel initialized\n[0.01] Virtual filesystem mounted\n[0.02] Shell started\n[0.03] Boot complete"
+    }
+  }
+}
