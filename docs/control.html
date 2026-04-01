@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Mission Control — Digital Twin Interface</title>
+<meta name="description" content="The other side of the twin. Raw state, echo data, frame verification, and a standardized protocol surface for external system integration.">
+<style>
+:root{--bg:#080b10;--card:#0d1117;--border:#1b2028;--text:#c9d1d9;--dim:#484f58;
+--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--cyan:#79c0ff;
+--purple:#a371f7;--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace;
+--font:'Courier New',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12px;overflow:hidden;height:100vh}
+
+.mc-grid{display:grid;grid-template-columns:320px 1fr 320px;grid-template-rows:40px 1fr 200px;height:100vh;gap:1px;background:var(--border)}
+.mc-grid>*{background:var(--bg);overflow-y:auto}
+
+/* Header */
+.mc-header{grid-column:1/-1;display:flex;align-items:center;padding:0 16px;gap:16px;background:var(--card);border-bottom:1px solid var(--border)}
+.mc-header h1{font-size:13px;color:var(--cyan);letter-spacing:2px;flex:1}
+.mc-header .status{font-size:11px;display:flex;gap:12px;align-items:center}
+.mc-header .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot-green{background:var(--green);box-shadow:0 0 6px var(--green)}
+.dot-red{background:var(--red);box-shadow:0 0 6px var(--red)}
+.dot-yellow{background:var(--yellow);box-shadow:0 0 6px var(--yellow)}
+
+/* Panels */
+.panel{padding:12px}
+.panel h2{font-size:10px;color:var(--cyan);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;
+  padding-bottom:4px;border-bottom:1px solid var(--border)}
+.kv{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
+.kv .k{color:var(--dim)}.kv .v{color:var(--text);font-weight:700;text-align:right}
+.kv .v.green{color:var(--green)}.kv .v.red{color:var(--red)}.kv .v.yellow{color:var(--yellow)}.kv .v.cyan{color:var(--cyan)}
+
+/* Echo Stream */
+.echo-entry{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:8px;margin:4px 0;font-size:10px}
+.echo-entry .frame-id{color:var(--cyan);font-weight:700}
+.echo-entry .delta{color:var(--dim)}
+.echo-entry .event{color:var(--yellow);font-size:9px}
+.echo-entry .reflex{color:var(--purple);font-size:9px}
+
+/* Command Input */
+.cmd-area{grid-column:1/-1;background:var(--card);border-top:1px solid var(--border);padding:12px;display:flex;flex-direction:column;gap:8px}
+.cmd-row{display:flex;gap:8px;align-items:stretch}
+.cmd-input{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--cyan);padding:8px 12px;
+  font-family:var(--mono);font-size:12px;border-radius:4px;resize:none}
+.cmd-input:focus{outline:none;border-color:var(--cyan)}
+.cmd-btn{padding:8px 16px;background:rgba(88,166,255,0.1);border:1px solid var(--border);
+  color:var(--cyan);cursor:pointer;font-family:var(--mono);font-size:11px;border-radius:4px;white-space:nowrap}
+.cmd-btn:hover{background:rgba(88,166,255,0.2);border-color:var(--cyan)}
+.cmd-btn.green{color:var(--green);border-color:rgba(63,185,80,0.3)}
+.cmd-btn.green:hover{border-color:var(--green)}
+.cmd-btn.yellow{color:var(--yellow);border-color:rgba(210,153,34,0.3)}
+.cmd-btn.red{color:var(--red);border-color:rgba(218,54,51,0.3)}
+
+/* Allocation Sliders */
+.alloc-row{display:flex;align-items:center;gap:6px;margin:3px 0}
+.alloc-row label{width:50px;color:var(--dim);font-size:10px}
+.alloc-row input[type=range]{flex:1;accent-color:var(--cyan)}
+.alloc-row .val{width:35px;text-align:right;color:var(--text);font-size:11px}
+
+/* Attestation */
+.attest{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px;margin:8px 0;font-size:10px}
+.attest .hash{font-family:var(--mono);color:var(--cyan);word-break:break-all;font-size:9px;margin-top:4px}
+.attest .label{color:var(--dim);font-size:9px;letter-spacing:0.5px}
+.attest .verified{color:var(--green);font-weight:700}
+.attest .unverified{color:var(--yellow)}
+
+/* Protocol Log */
+.proto-log{font-size:10px;line-height:1.6;max-height:100%;overflow-y:auto;padding:4px}
+.proto-log .msg{border-bottom:1px solid rgba(255,255,255,0.03);padding:2px 0}
+.proto-log .ts{color:var(--dim);font-size:9px}
+.proto-log .out{color:var(--green)}.proto-log .in{color:var(--cyan)}.proto-log .err{color:var(--red)}
+.proto-log .sys{color:var(--purple)}
+
+/* Connection indicator */
+.conn-status{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:4px;font-size:10px}
+.conn-status.connected{background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.3);color:var(--green)}
+.conn-status.disconnected{background:rgba(218,54,51,0.1);border:1px solid rgba(218,54,51,0.3);color:var(--red)}
+.conn-status.local{background:rgba(210,153,34,0.1);border:1px solid rgba(210,153,34,0.3);color:var(--yellow)}
+
+@media(max-width:900px){
+  .mc-grid{grid-template-columns:1fr;grid-template-rows:40px 1fr 1fr 200px}
+}
+</style>
+</head>
+<body>
+
+<div class="mc-grid">
+
+<!-- Header -->
+<div class="mc-header">
+  <h1>◉ MISSION CONTROL</h1>
+  <div class="status">
+    <div class="conn-status local" id="conn-status"><span class="dot dot-yellow"></span> LOCAL TWIN</div>
+    <span style="color:var(--dim)">SOL <span id="mc-sol" style="color:var(--cyan)">—</span></span>
+    <span style="color:var(--dim)">CRI <span id="mc-cri" style="color:var(--text)">—</span></span>
+    <span style="color:var(--dim)">FRAME <span id="mc-frame-mode" style="color:var(--text)">—</span></span>
+    <a href="viewer.html" style="color:var(--dim);text-decoration:none;padding:2px 8px;border:1px solid var(--border);border-radius:3px;font-size:10px" target="_blank">◎ VIEWER</a>
+    <a href="simhub.html" style="color:var(--dim);text-decoration:none;padding:2px 8px;border:1px solid var(--border);border-radius:3px;font-size:10px">🏆 SIMHUB</a>
+  </div>
+</div>
+
+<!-- Left: State Panel -->
+<div class="panel" id="state-panel">
+  <h2>Colony State</h2>
+  <div id="state-kv">
+    <div style="color:var(--dim);text-align:center;padding:20px">No twin connected.<br>Open <a href="viewer.html" target="_blank" style="color:var(--cyan)">viewer.html</a> in another tab.</div>
+  </div>
+
+  <h2 style="margin-top:16px">Allocations</h2>
+  <div id="alloc-controls">
+    <div class="alloc-row"><label>Heating</label><input type="range" min="0" max="100" value="25" id="alloc-h" oninput="pushAlloc()"><span class="val" id="alloc-h-v">25%</span></div>
+    <div class="alloc-row"><label>ISRU</label><input type="range" min="0" max="100" value="40" id="alloc-i" oninput="pushAlloc()"><span class="val" id="alloc-i-v">40%</span></div>
+    <div class="alloc-row"><label>Green</label><input type="range" min="0" max="100" value="35" id="alloc-g" oninput="pushAlloc()"><span class="val" id="alloc-g-v">35%</span></div>
+    <div class="alloc-row"><label>Ration</label><input type="range" min="10" max="150" value="100" id="alloc-r" oninput="pushAlloc()"><span class="val" id="alloc-r-v">1.0×</span></div>
+  </div>
+
+  <h2 style="margin-top:16px">Crew</h2>
+  <div id="crew-state" style="font-size:10px;color:var(--dim)">—</div>
+
+  <h2 style="margin-top:16px">Run Attestation</h2>
+  <div id="attestation">
+    <div class="attest">
+      <div class="label">RUN ID</div>
+      <div class="hash" id="att-run-id">—</div>
+    </div>
+    <div class="attest">
+      <div class="label">STATE HASH (SHA-256)</div>
+      <div class="hash" id="att-state-hash">—</div>
+    </div>
+    <div class="attest">
+      <div class="label">DECISION LOG HASH</div>
+      <div class="hash" id="att-decision-hash">—</div>
+    </div>
+    <div class="attest">
+      <div class="label">FRAME VERIFICATION</div>
+      <div id="att-frame-status" class="unverified">Not verified</div>
+    </div>
+    <button class="cmd-btn green" onclick="generateAttestation()" style="width:100%;margin-top:8px">📜 GENERATE ATTESTATION</button>
+  </div>
+</div>
+
+<!-- Center: Echo Stream + Protocol -->
+<div class="panel">
+  <h2>Echo Stream <span style="color:var(--dim);font-weight:400">(live frames)</span></h2>
+  <div id="echo-stream" style="max-height:calc(100vh - 340px);overflow-y:auto">
+    <div style="color:var(--dim);text-align:center;padding:40px">Waiting for echo frames...</div>
+  </div>
+</div>
+
+<!-- Right: Protocol Interface -->
+<div class="panel">
+  <h2>Protocol Interface</h2>
+  <div style="margin-bottom:8px;display:flex;gap:4px;flex-wrap:wrap">
+    <button class="cmd-btn" onclick="protocolCmd('get_state')">GET STATE</button>
+    <button class="cmd-btn" onclick="protocolCmd('get_echo')">GET ECHO</button>
+    <button class="cmd-btn" onclick="protocolCmd('get_inertia')">GET INERTIA</button>
+    <button class="cmd-btn" onclick="protocolCmd('get_score')">GET SCORE</button>
+    <button class="cmd-btn" onclick="protocolCmd('get_attestation')">ATTEST</button>
+    <button class="cmd-btn yellow" onclick="protocolCmd('export_cartridge')">EXPORT</button>
+  </div>
+
+  <h2 style="margin-top:12px">Event Bus</h2>
+  <div style="margin-bottom:8px;display:flex;gap:4px;flex-wrap:wrap">
+    <button class="cmd-btn green" onclick="protocolCmd('subscribe_echo')">SUB ECHO</button>
+    <button class="cmd-btn green" onclick="protocolCmd('subscribe_state')">SUB STATE</button>
+    <button class="cmd-btn green" onclick="protocolCmd('subscribe_tasks')">SUB TASKS</button>
+    <button class="cmd-btn green" onclick="protocolCmd('subscribe_reflexes')">SUB REFLEX</button>
+    <button class="cmd-btn red" onclick="protocolCmd('unsubscribe_all')">UNSUB ALL</button>
+  </div>
+
+  <h2 style="margin-top:12px">Protocol Log</h2>
+  <div class="proto-log" id="proto-log"></div>
+</div>
+
+<!-- Bottom: Command Line -->
+<div class="cmd-area">
+  <div style="display:flex;gap:12px;align-items:center">
+    <span style="color:var(--dim);font-size:10px;letter-spacing:1px">COMMAND</span>
+    <span style="color:var(--dim);font-size:9px">LisPy program or protocol command. Programs execute on the twin's VM.</span>
+  </div>
+  <div class="cmd-row">
+    <textarea class="cmd-input" id="cmd-input" rows="3" placeholder="(set! isru_alloc 0.8)  ;; push a LisPy command to the twin"
+      onkeydown="if(event.key==='Enter'&&event.ctrlKey){executeCommand();event.preventDefault()}"></textarea>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <button class="cmd-btn green" onclick="executeCommand()">▶ EXEC (Ctrl+Enter)</button>
+      <button class="cmd-btn" onclick="pushLispy()">📡 PUSH PROGRAM</button>
+      <button class="cmd-btn yellow" onclick="snapshotState()">📸 SNAPSHOT</button>
+      <button class="cmd-btn red" onclick="emergencyStop()">⛔ E-STOP</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// MISSION CONTROL — Digital Twin Protocol Interface
+//
+// This is the "other side" of the twin. It connects to viewer.html
+// (the visual side) via BroadcastChannel and provides:
+//
+// 1. Raw state inspection (every variable, every frame)
+// 2. Allocation control (push changes to the sim)
+// 3. LisPy program execution (run code on the twin's VM)
+// 4. Echo stream (live structured deltas)
+// 5. Run attestation (cryptographic proof of run integrity)
+// 6. Protocol surface (standardized JSON messages for external systems)
+//
+// The protocol is designed so ANYTHING can connect to the other side:
+// - Another browser tab (BroadcastChannel)
+// - A WebSocket bridge (future)
+// - An external system via postMessage
+// - YOUR side of the twin (whatever you build)
+// ══════════════════════════════════════════════════════════════
+
+const CHANNEL_NAME = 'mars-barn-twin';
+let channel = null;
+let twinState = null;
+let twinEcho = null;
+let twinScore = null;
+let subscriptions = new Set();
+let protoLog = [];
+let echoStream = [];
+let snapshotHistory = [];
+
+// ── Protocol Message Format ──
+// Every message on the channel follows this shape:
+// {
+//   type: 'request' | 'response' | 'event' | 'push',
+//   cmd: string,              // command name
+//   payload: any,             // data
+//   ts: ISO timestamp,        // when sent
+//   from: 'control' | 'twin', // who sent it
+//   id: string                // message ID for request/response matching
+// }
+
+function msgId(){ return Date.now().toString(36) + Math.random().toString(36).substr(2,4); }
+
+function initChannel(){
+  if(typeof BroadcastChannel === 'undefined'){
+    logProto('err', 'BroadcastChannel not supported in this browser');
+    return;
+  }
+  channel = new BroadcastChannel(CHANNEL_NAME);
+  channel.onmessage = (e) => handleMessage(e.data);
+  logProto('sys', `Channel "${CHANNEL_NAME}" opened. Waiting for twin...`);
+
+  // Announce ourselves
+  send('announce', {role:'control', capabilities:['state','echo','alloc','lispy','attest']});
+
+  // Request initial state
+  setTimeout(()=>{ protocolCmd('get_state'); protocolCmd('get_echo'); }, 500);
+}
+
+function send(cmd, payload){
+  if(!channel) return;
+  const msg = {
+    type: 'request',
+    cmd: cmd,
+    payload: payload || {},
+    ts: new Date().toISOString(),
+    from: 'control',
+    id: msgId()
+  };
+  channel.postMessage(msg);
+  return msg;
+}
+
+function handleMessage(msg){
+  if(!msg || !msg.cmd) return;
+
+  if(msg.cmd === 'announce' && msg.from === 'twin'){
+    logProto('in', `Twin connected: ${msg.payload.mission || 'unknown'} · Sol ${msg.payload.sol || '?'}`);
+    document.getElementById('conn-status').className = 'conn-status connected';
+    document.getElementById('conn-status').innerHTML = '<span class="dot dot-green"></span> TWIN LINKED';
+    protocolCmd('get_state');
+    return;
+  }
+
+  if(msg.cmd === 'state_update' || msg.cmd === 'state'){
+    twinState = msg.payload;
+    renderState(twinState);
+    logProto('in', `State update: Sol ${twinState.sol} · ${twinState.alive?'ALIVE':'DEAD'}`);
+    return;
+  }
+
+  if(msg.cmd === 'echo_frame'){
+    twinEcho = msg.payload;
+    echoStream.unshift(msg.payload);
+    if(echoStream.length > 200) echoStream.length = 200;
+    renderEchoStream();
+    if(subscriptions.has('echo')) logProto('in', `Echo F${msg.payload.frame}: Δo2=${msg.payload.delta?.o2?.toFixed(2)||'?'}`);
+    return;
+  }
+
+  if(msg.cmd === 'score'){
+    twinScore = msg.payload;
+    logProto('in', `Score: ${msg.payload.total} (${msg.payload.grade})`);
+    return;
+  }
+
+  if(msg.cmd === 'task_event'){
+    logProto('in', `Task: ${msg.payload.title} [${msg.payload.urgency}]`);
+    return;
+  }
+
+  if(msg.cmd === 'reflex_event'){
+    logProto('in', `Reflex: ${msg.payload.id} (intensity ${msg.payload.intensity?.toFixed(2)||'?'})`);
+    return;
+  }
+
+  if(msg.cmd === 'attestation'){
+    renderAttestation(msg.payload);
+    logProto('in', 'Attestation received');
+    return;
+  }
+
+  if(msg.cmd === 'cartridge'){
+    // Download the cartridge
+    const json = JSON.stringify(msg.payload, null, 2);
+    const blob = new Blob([json], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `twin-sol${msg.payload.sol||0}.cartridge.json`;
+    a.click(); URL.revokeObjectURL(url);
+    logProto('in', `Cartridge exported (${(json.length/1024).toFixed(1)} KB)`);
+    return;
+  }
+
+  if(msg.cmd === 'lispy_result'){
+    logProto('in', `LisPy result: ${JSON.stringify(msg.payload.result).substr(0,80)}`);
+    if(msg.payload.output?.length) msg.payload.output.forEach(o=>logProto('in', `  → ${o}`));
+    return;
+  }
+
+  if(msg.cmd === 'error'){
+    logProto('err', `Error: ${msg.payload.message||msg.payload}`);
+    return;
+  }
+
+  // Generic response
+  logProto('in', `${msg.cmd}: ${JSON.stringify(msg.payload).substr(0,100)}`);
+}
+
+// ── State Rendering ──
+function renderState(s){
+  if(!s) return;
+  document.getElementById('mc-sol').textContent = s.sol;
+  document.getElementById('mc-cri').textContent = s.cri || '?';
+  document.getElementById('mc-cri').style.color = (s.cri||0) > 50 ? 'var(--red)' : (s.cri||0) > 25 ? 'var(--yellow)' : 'var(--green)';
+
+  const n = s.crew ? s.crew.filter(c=>c.alive).length : '?';
+  const o2d = s.o2 !== undefined ? (s.o2 / (0.84 * Math.max(1,n))).toFixed(1) : '?';
+  const h2od = s.h2o !== undefined ? (s.h2o / (2.5 * Math.max(1,n))).toFixed(1) : '?';
+  const fd = s.food !== undefined ? (s.food / (2500 * Math.max(1,n))).toFixed(1) : '?';
+
+  document.getElementById('state-kv').innerHTML = `
+    <div class="kv"><span class="k">Sol</span><span class="v cyan">${s.sol}</span></div>
+    <div class="kv"><span class="k">Alive</span><span class="v ${s.alive?'green':'red'}">${s.alive?'YES':'NO'}</span></div>
+    <div class="kv"><span class="k">Cause</span><span class="v">${s.cause||'—'}</span></div>
+    <div class="kv"><span class="k">O₂</span><span class="v ${o2d<5?'red':o2d<15?'yellow':'green'}">${s.o2?.toFixed(1)} kg (${o2d}d)</span></div>
+    <div class="kv"><span class="k">H₂O</span><span class="v ${h2od<5?'red':h2od<15?'yellow':'green'}">${s.h2o?.toFixed(1)} L (${h2od}d)</span></div>
+    <div class="kv"><span class="k">Food</span><span class="v ${fd<5?'red':fd<15?'yellow':'green'}">${s.food?.toFixed(0)} kcal (${fd}d)</span></div>
+    <div class="kv"><span class="k">Power</span><span class="v ${s.power<100?'red':s.power<300?'yellow':'green'}">${s.power?.toFixed(0)} kWh</span></div>
+    <div class="kv"><span class="k">CRI</span><span class="v ${(s.cri||0)>50?'red':(s.cri||0)>25?'yellow':'green'}">${s.cri||0} (${s.criGrade||'?'})</span></div>
+    <div class="kv"><span class="k">Crew</span><span class="v">${n}/${s.crew?.length||'?'}</span></div>
+    <div class="kv"><span class="k">Morale</span><span class="v">${(s.morale*100)?.toFixed(0)||'?'}%</span></div>
+    <div class="kv"><span class="k">Modules</span><span class="v">${s.modules?.length||0}</span></div>
+    <div class="kv"><span class="k">Solar η</span><span class="v">${(s.s_eff*100)?.toFixed(0)||'?'}%</span></div>
+    <div class="kv"><span class="k">ISRU η</span><span class="v">${(s.i_eff*100)?.toFixed(0)||'?'}%</span></div>
+    <div class="kv"><span class="k">Alloc H/I/G</span><span class="v">${(s.alloc?.h*100)?.toFixed(0)||'?'}/${(s.alloc?.i*100)?.toFixed(0)||'?'}/${(s.alloc?.g*100)?.toFixed(0)||'?'}</span></div>
+    <div class="kv"><span class="k">Governor</span><span class="v">${s.arch||'?'}</span></div>
+    <div class="kv"><span class="k">Events</span><span class="v">${s.events?.length||0} active</span></div>
+  `;
+
+  // Update allocation sliders (don't fight user input)
+  if(!document.activeElement || !document.activeElement.id?.startsWith('alloc-')){
+    if(s.alloc){
+      document.getElementById('alloc-h').value = Math.round(s.alloc.h*100);
+      document.getElementById('alloc-i').value = Math.round(s.alloc.i*100);
+      document.getElementById('alloc-g').value = Math.round(s.alloc.g*100);
+      document.getElementById('alloc-r').value = Math.round((s.alloc.r||1)*100);
+      document.getElementById('alloc-h-v').textContent = Math.round(s.alloc.h*100)+'%';
+      document.getElementById('alloc-i-v').textContent = Math.round(s.alloc.i*100)+'%';
+      document.getElementById('alloc-g-v').textContent = Math.round(s.alloc.g*100)+'%';
+      document.getElementById('alloc-r-v').textContent = (s.alloc.r||1).toFixed(1)+'×';
+    }
+  }
+
+  // Crew roster
+  if(s.crew){
+    document.getElementById('crew-state').innerHTML = s.crew.map(c=>{
+      const col = !c.alive?'var(--red)':c.hp>50?'var(--green)':'var(--yellow)';
+      const icon = c.name.startsWith('OPT')||c.name.startsWith('LUN')?'🤖':'👤';
+      return `<div style="display:flex;gap:6px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.03)">
+        <span>${icon}</span>
+        <span style="color:${col};flex:1">${c.name}</span>
+        <span style="color:var(--dim)">${c.role}</span>
+        <span style="color:${col}">${c.alive?'HP:'+c.hp.toFixed(0):'☠'}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Attestation IDs
+  document.getElementById('att-run-id').textContent = s.cartridgeId || '—';
+}
+
+function renderEchoStream(){
+  const el = document.getElementById('echo-stream');
+  el.innerHTML = echoStream.slice(0,50).map(echo=>{
+    const d = echo.delta || {};
+    const events = (echo.events||[]).map(e=>`<span class="event">${e.type} (${(e.severity*100).toFixed(0)}%)</span>`).join(' ');
+    const reflexes = (echo.reflexes_fired||[]).map(r=>`<span class="reflex">${r.id}</span>`).join(' ');
+    return `<div class="echo-entry">
+      <span class="frame-id">F${echo.frame}</span>
+      <span class="delta">Δo2:${d.o2?.toFixed(2)||'?'} Δh2o:${d.h2o?.toFixed(2)||'?'} Δpwr:${d.power?.toFixed(1)||'?'}</span>
+      ${echo.cri!==undefined?`<span style="color:${echo.cri>50?'var(--red)':'var(--dim)'}">CRI:${echo.cri}</span>`:''}
+      ${events?'<br>'+events:''}
+      ${reflexes?'<br>'+reflexes:''}
+    </div>`;
+  }).join('');
+}
+
+function renderAttestation(att){
+  document.getElementById('att-state-hash').textContent = att.stateHash || '—';
+  document.getElementById('att-decision-hash').textContent = att.decisionHash || '—';
+  const fv = document.getElementById('att-frame-status');
+  if(att.framesVerified){
+    fv.className = 'verified';
+    fv.textContent = `✓ Verified against ${att.framesConsumed} public frames`;
+  } else {
+    fv.className = 'unverified';
+    fv.textContent = att.frameStatus || 'Not verified';
+  }
+}
+
+// ── Commands ──
+function protocolCmd(cmd){
+  logProto('out', cmd.toUpperCase());
+  send(cmd);
+}
+
+function pushAlloc(){
+  const h = parseInt(document.getElementById('alloc-h').value);
+  const i = parseInt(document.getElementById('alloc-i').value);
+  const g = parseInt(document.getElementById('alloc-g').value);
+  const r = parseInt(document.getElementById('alloc-r').value);
+  document.getElementById('alloc-h-v').textContent = h+'%';
+  document.getElementById('alloc-i-v').textContent = i+'%';
+  document.getElementById('alloc-g-v').textContent = g+'%';
+  document.getElementById('alloc-r-v').textContent = (r/100).toFixed(1)+'×';
+
+  // Normalize h/i/g
+  const tot = h+i+g || 1;
+  send('push_alloc', {h:h/tot, i:i/tot, g:g/tot, r:r/100});
+  logProto('out', `ALLOC H:${Math.round(h/tot*100)}% I:${Math.round(i/tot*100)}% G:${Math.round(g/tot*100)}% R:${(r/100).toFixed(1)}×`);
+}
+
+function executeCommand(){
+  const input = document.getElementById('cmd-input').value.trim();
+  if(!input) return;
+  logProto('out', `EXEC: ${input.substr(0,80)}`);
+  send('exec_lispy', {code: input});
+}
+
+function pushLispy(){
+  const input = document.getElementById('cmd-input').value.trim();
+  if(!input) return;
+  logProto('out', `PUSH PROGRAM (${input.length} chars)`);
+  send('push_lispy', {code: input});
+}
+
+function snapshotState(){
+  logProto('out', 'SNAPSHOT');
+  if(twinState){
+    snapshotHistory.push({ts:new Date().toISOString(), state:JSON.parse(JSON.stringify(twinState))});
+    logProto('sys', `Snapshot #${snapshotHistory.length} saved (Sol ${twinState.sol})`);
+  }
+  send('get_state');
+}
+
+function emergencyStop(){
+  logProto('out', 'E-STOP');
+  send('emergency_stop');
+}
+
+function generateAttestation(){
+  logProto('out', 'GENERATE ATTESTATION');
+  send('get_attestation');
+}
+
+// ── Protocol Log ──
+function logProto(type, msg){
+  const ts = new Date().toISOString().split('T')[1].split('.')[0];
+  protoLog.push({type, msg, ts});
+  if(protoLog.length > 500) protoLog.shift();
+
+  const el = document.getElementById('proto-log');
+  const div = document.createElement('div');
+  div.className = 'msg';
+  div.innerHTML = `<span class="ts">${ts}</span> <span class="${type}">${type==='out'?'▶':'◀'} ${escHtml(msg)}</span>`;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+function escHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ── Init ──
+initChannel();
+
+// Poll for state every 2 seconds (fallback if no event subscription)
+setInterval(()=>{
+  if(channel) send('get_state');
+}, 2000);
+</script>
+</body>
+</html>

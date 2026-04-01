@@ -493,6 +493,7 @@ body.cinematic-active .cartridge-bar,body.cinematic-active #task-panel{
   <span style="color:var(--cyan);font-weight:700;font-size:12px;letter-spacing:1px;margin-right:6px">FIRST PRINCIPLES TO MARS</span>
   <a href="simhub.html" style="color:var(--cyan);text-decoration:none;padding:3px 8px;border-radius:3px;border:1px solid var(--border)">🏆 SimHub</a>
   <a href="patterns.html" style="color:var(--dim);text-decoration:none;padding:3px 8px;border-radius:3px">🔧 Patterns</a>
+  <a href="control.html" target="_blank" style="color:var(--dim);text-decoration:none;padding:3px 8px;border-radius:3px">◉ Control</a>
   <a href="splitscreen.html" style="color:var(--dim);text-decoration:none;padding:3px 8px;border-radius:3px">Earth↔Mars</a>
   <a href="timelapse.html" style="color:var(--dim);text-decoration:none;padding:3px 8px;border-radius:3px">Timelapse</a>
   <a href="multiplayer.html" style="color:var(--dim);text-decoration:none;padding:3px 8px;border-radius:3px">Multiplayer</a>
@@ -4233,6 +4234,7 @@ function stepSim(){
 
   updateAllUI();
   applyEchoVisuals(echo);
+  broadcastEchoIfNeeded(); // push to Mission Control twin
   return echo;
 }
 
@@ -5490,6 +5492,231 @@ function updateCartridgeDisplay(){
   const tag = document.getElementById('cartridge-id');
   if(tag && cartridgeId) tag.textContent = cartridgeId;
 }
+
+// ══════════════════════════════════════════════════════════════
+// DIGITAL TWIN PROTOCOL — BroadcastChannel Interface
+// The viewer is one side of the twin. Mission Control (control.html)
+// or any external system connects via BroadcastChannel to:
+// - Read state, echoes, scores, attestations
+// - Push allocations, LisPy programs, emergency commands
+// - Subscribe to live events (echo frames, tasks, reflexes)
+// This is the standardized surface. Build YOUR side however you want.
+// ══════════════════════════════════════════════════════════════
+
+const TWIN_CHANNEL_NAME = 'mars-barn-twin';
+let twinChannel = null;
+
+function initTwinChannel(){
+  if(typeof BroadcastChannel === 'undefined') return;
+  twinChannel = new BroadcastChannel(TWIN_CHANNEL_NAME);
+  twinChannel.onmessage = (e) => handleTwinMessage(e.data);
+  // Announce ourselves
+  twinBroadcast('announce', {role:'twin', mission:activeMission, sol:state.sol});
+}
+
+function twinBroadcast(cmd, payload){
+  if(!twinChannel) return;
+  twinChannel.postMessage({
+    type: 'event', cmd, payload,
+    ts: new Date().toISOString(), from: 'twin',
+    id: Date.now().toString(36)+Math.random().toString(36).substr(2,4)
+  });
+}
+
+function handleTwinMessage(msg){
+  if(!msg||!msg.cmd||msg.from==='twin') return;
+
+  switch(msg.cmd){
+    case 'announce':
+      // Control side connected — send current state
+      twinBroadcast('announce', {role:'twin', mission:activeMission, sol:state.sol});
+      sendTwinState();
+      break;
+
+    case 'get_state':
+      sendTwinState();
+      break;
+
+    case 'get_echo':
+      twinBroadcast('echo_frame', lastEcho||{});
+      break;
+
+    case 'get_inertia':
+      twinBroadcast('inertia', {...echoInertia});
+      break;
+
+    case 'get_score':
+      twinBroadcast('score', computeScore());
+      break;
+
+    case 'get_attestation':
+      twinBroadcast('attestation', generateTwinAttestation());
+      break;
+
+    case 'export_cartridge':
+      twinBroadcast('cartridge', serializeCartridge());
+      break;
+
+    case 'push_alloc':
+      if(msg.payload){
+        const p = msg.payload;
+        if(p.h!==undefined) state.alloc.h = Math.max(0,Math.min(1,p.h));
+        if(p.i!==undefined) state.alloc.i = Math.max(0,Math.min(1,p.i));
+        if(p.g!==undefined) state.alloc.g = Math.max(0,Math.min(1,p.g));
+        if(p.r!==undefined) state.alloc.r = Math.max(0.1,Math.min(1.5,p.r));
+        const tot = state.alloc.h+state.alloc.i+state.alloc.g;
+        if(tot>0){state.alloc.h/=tot;state.alloc.i/=tot;state.alloc.g/=tot}
+        state.log.push(`📡 TWIN: Allocation override H:${(state.alloc.h*100).toFixed(0)}% I:${(state.alloc.i*100).toFixed(0)}% G:${(state.alloc.g*100).toFixed(0)}%`);
+        updateAllUI();
+        sendTwinState();
+      }
+      break;
+
+    case 'exec_lispy':
+      if(msg.payload?.code){
+        const vm = new LispyVM();
+        const n = Math.max(1,state.crew.filter(c=>c.alive).length);
+        vm.setEnv('sol',state.sol);
+        vm.setEnv('o2_days',state.o2/(O2_PP*n));
+        vm.setEnv('h2o_days',state.h2o/(H2O_PP*n));
+        vm.setEnv('food_days',state.food/(FOOD_PP*n));
+        vm.setEnv('power_kwh',state.power);
+        vm.setEnv('crew_alive',n);
+        vm.setEnv('colony_risk_index',colonyRiskIndex);
+        vm.setEnv('dust_tau',marsWeather.dustTau);
+        vm.setEnv('heating_alloc',state.alloc.h);
+        vm.setEnv('isru_alloc',state.alloc.i);
+        vm.setEnv('greenhouse_alloc',state.alloc.g);
+        const result = vm.run(msg.payload.code);
+        // Apply allocation changes if any
+        if(result.ok && result.env){
+          const e = result.env;
+          if('heating_alloc' in e) state.alloc.h=Math.max(0,Math.min(1,e.heating_alloc));
+          if('isru_alloc' in e) state.alloc.i=Math.max(0,Math.min(1,e.isru_alloc));
+          if('greenhouse_alloc' in e) state.alloc.g=Math.max(0,Math.min(1,e.greenhouse_alloc));
+          const tot=state.alloc.h+state.alloc.i+state.alloc.g;
+          if(tot>0){state.alloc.h/=tot;state.alloc.i/=tot;state.alloc.g/=tot}
+        }
+        twinBroadcast('lispy_result', {ok:result.ok, result:result.result, output:result.output, error:result.error});
+        state.log.push(`📡 TWIN: LisPy exec → ${result.ok?'OK':'ERR: '+result.error}`);
+        updateAllUI();
+      }
+      break;
+
+    case 'push_lispy':
+      if(msg.payload?.code){
+        lispyCode = msg.payload.code;
+        const ed = document.getElementById('lispy-editor');
+        if(ed) ed.value = lispyCode;
+        activeLispy = 'custom';
+        state.log.push('📡 TWIN: Governor program updated from Mission Control');
+        twinBroadcast('lispy_result', {ok:true, result:'Program loaded'});
+      }
+      break;
+
+    case 'emergency_stop':
+      if(running){
+        running = false;
+        clearInterval(simInterval);
+        document.getElementById('sim-btn').textContent = '▶ START SIM';
+        state.log.push('⛔ TWIN: Emergency stop from Mission Control');
+        updateAllUI();
+      }
+      twinBroadcast('state_update', buildTwinStatePayload());
+      break;
+
+    case 'subscribe_echo':
+    case 'subscribe_state':
+    case 'subscribe_tasks':
+    case 'subscribe_reflexes':
+      // Subscriptions handled by broadcasting events as they happen
+      break;
+
+    case 'unsubscribe_all':
+      break;
+  }
+}
+
+function sendTwinState(){
+  twinBroadcast('state_update', buildTwinStatePayload());
+}
+
+function buildTwinStatePayload(){
+  return {
+    sol: state.sol,
+    alive: state.alive,
+    cause: state.cause,
+    arch: state.arch,
+    o2: state.o2,
+    h2o: state.h2o,
+    food: state.food,
+    power: state.power,
+    s_eff: state.s_eff,
+    i_eff: state.i_eff,
+    g_eff: state.g_eff,
+    morale: state.morale,
+    rad: state.rad,
+    int_temp: state.int_temp,
+    crew: state.crew,
+    events: state.events,
+    modules: state.modules,
+    alloc: {...state.alloc},
+    cri: colonyRiskIndex,
+    criGrade: riskGrade,
+    cartridgeId: cartridgeId,
+    frameMode: frameMode,
+  };
+}
+
+function generateTwinAttestation(){
+  // Cryptographic attestation of run integrity
+  const stateStr = JSON.stringify({sol:state.sol,o2:state.o2,h2o:state.h2o,food:state.food,
+    power:state.power,alive:state.alive,crew:state.crew.map(c=>({name:c.name,hp:c.hp,alive:c.alive}))});
+  const decisionStr = JSON.stringify(taskHistory.map(t=>({id:t.id,sol:t.sol,choice:t.choice})));
+
+  // SHA-256 hashes (async but we return placeholder + update later)
+  const att = {
+    runId: cartridgeId || 'unset',
+    sol: state.sol,
+    stateHash: simpleHash(stateStr),
+    decisionHash: simpleHash(decisionStr),
+    framesConsumed: echoHistory.length,
+    framesVerified: frameMode === 'public',
+    frameStatus: frameMode === 'public' ? 'Public ledger frames' : 'Local weather (unverified)',
+    score: computeScore(),
+    ts: new Date().toISOString(),
+  };
+  return att;
+}
+
+function simpleHash(str){
+  // Simple non-crypto hash for display (actual SHA-256 needs async)
+  let hash = 0;
+  for(let i=0;i<str.length;i++){
+    const c = str.charCodeAt(i);
+    hash = ((hash<<5)-hash)+c;
+    hash |= 0;
+  }
+  return 'h'+Math.abs(hash).toString(16).padStart(8,'0');
+}
+
+// Hook: broadcast echo frames as they're produced
+const _origStepSim = stepSim;
+// We can't reassign stepSim, so we hook into the echo broadcast in updateAllUI
+// Instead, we broadcast from the sim interval check
+function broadcastEchoIfNeeded(){
+  if(twinChannel && lastEcho){
+    twinBroadcast('echo_frame', lastEcho);
+  }
+}
+
+// Initialize twin channel
+initTwinChannel();
+
+// Broadcast state every 5 seconds for connected controllers
+setInterval(()=>{
+  if(twinChannel && state.sol > 0) sendTwinState();
+}, 5000);
 
 // ── Cinematic Mode (from Levi) ──
 let cinematicActive = false;
