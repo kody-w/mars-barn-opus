@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "network": "mars-barn",
+  "token": {"name": "MARS", "symbol": "MARS", "total_supply": 21000000},
+  "nodes": [
+    {
+      "id": "node-1-kody",
+      "owner": "kody-w",
+      "repo": "mars-chain-node",
+      "url": "https://github.com/kody-w/mars-chain-node",
+      "pages": "https://kody-w.github.io/mars-chain-node/",
+      "api": "https://raw.githubusercontent.com/kody-w/mars-chain-node/main/docs/api/",
+      "role": "genesis",
+      "added": "2025-07-09T00:00:00Z"
+    }
+  ],
+  "how_to_run_a_node": "Fork https://github.com/kody-w/mars-chain-node, enable Actions + Pages, add your node to this file via PR."
+}
