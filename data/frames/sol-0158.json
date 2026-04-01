@@ -1,0 +1,48 @@
+{
+  "sol": 158,
+  "utc": "2025-12-18T08:16:48Z",
+  "mars": {
+    "ls": 209.8,
+    "season": "Northern Autumn",
+    "temp_k": 230.4,
+    "temp_c": -42.7,
+    "pressure_pa": 725,
+    "solar_wm2": 494,
+    "dust_tau": 0.206,
+    "wind_ms": 4.9,
+    "lmst": 0.9
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0095
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "isru_unit",
+      "degradation": 0.0057
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 13.8,
+    "window_open": false,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.53,
+    "water_ice_depth_m": 1.7,
+    "surface_radiation_usv": 0.57
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 157,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 3.8,
+    "dust_delta": 0.011
+  },
+  "_engineId": "rappter-genesis",
+  "_signature": "e8c82bd6fd2495609ca6065e",
+  "_hash": "e36b64f67d7300a2"
+}
