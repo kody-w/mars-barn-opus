@@ -1,0 +1,48 @@
+{
+  "sol": 179,
+  "utc": "2026-01-08T22:08:24Z",
+  "mars": {
+    "ls": 220.8,
+    "season": "Northern Autumn",
+    "temp_k": 229.1,
+    "temp_c": -44.1,
+    "pressure_pa": 720,
+    "solar_wm2": 519,
+    "dust_tau": 0.242,
+    "wind_ms": 3.4,
+    "lmst": 11.4
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.58,
+      "duration_sols": 18,
+      "desc": "Regional dust storm approaching from the north"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0154
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 14.0,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.9,
+    "water_ice_depth_m": 1.6,
+    "surface_radiation_usv": 0.56
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 178,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -3.4,
+    "dust_delta": -0.025
+  },
+  "_hash": "df9ff1e42288bf39"
+}

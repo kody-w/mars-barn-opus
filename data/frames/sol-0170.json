@@ -1,0 +1,49 @@
+{
+  "sol": 170,
+  "utc": "2025-12-30T16:12:00Z",
+  "mars": {
+    "ls": 216.1,
+    "season": "Northern Autumn",
+    "temp_k": 227.8,
+    "temp_c": -45.3,
+    "pressure_pa": 722,
+    "solar_wm2": 498,
+    "dust_tau": 0.288,
+    "wind_ms": 7.2,
+    "lmst": 17.2
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0104
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 14.0,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.59,
+    "water_ice_depth_m": 2.1,
+    "surface_radiation_usv": 0.97
+  },
+  "challenge": {
+    "id": "sol170_nav_sensor_degradation",
+    "type": "nav_sensor_degradation",
+    "params": {
+      "sensor": "rear_hazcam",
+      "obscuration_pct": 23,
+      "cause": "abrasion"
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 169,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -2.1,
+    "dust_delta": 0.082
+  },
+  "_hash": "2fed33861dac9f3c"
+}

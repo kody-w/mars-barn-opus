@@ -1,0 +1,54 @@
+{
+  "sol": 188,
+  "utc": "2026-01-18T04:04:48Z",
+  "mars": {
+    "ls": 225.5,
+    "season": "Northern Autumn",
+    "temp_k": 229.3,
+    "temp_c": -43.9,
+    "pressure_pa": 719,
+    "solar_wm2": 546,
+    "dust_tau": 0.28,
+    "wind_ms": 5.8,
+    "lmst": 5.7
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.64,
+      "duration_sols": 6,
+      "desc": "Regional dust storm approaching from the north"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0111
+    },
+    {
+      "type": "perchlorate_corrosion",
+      "target": "solar_gimbal",
+      "degradation": 0.0066,
+      "desc": "Perchlorate salt corrosion on mechanical joints"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 14.0,
+    "window_open": false,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.65,
+    "water_ice_depth_m": 1.6,
+    "surface_radiation_usv": 0.35
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 187,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -3.9,
+    "dust_delta": -0.051
+  },
+  "_hash": "85e3a96cad5c4aad"
+}

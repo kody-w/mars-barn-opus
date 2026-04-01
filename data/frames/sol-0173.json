@@ -1,0 +1,71 @@
+{
+  "sol": 173,
+  "utc": "2026-01-02T18:10:48Z",
+  "mars": {
+    "ls": 217.7,
+    "season": "Northern Autumn",
+    "temp_k": 239.9,
+    "temp_c": -33.3,
+    "pressure_pa": 722,
+    "solar_wm2": 557,
+    "dust_tau": 0.258,
+    "wind_ms": 6.1,
+    "lmst": 15.3
+  },
+  "events": [
+    {
+      "type": "dust_devil",
+      "severity": 0.18,
+      "duration_sols": 1,
+      "desc": "Dust devil spotted near habitat perimeter"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0194
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "antenna",
+      "degradation": 0.0072
+    },
+    {
+      "type": "regolith_abrasion",
+      "target": "nav_camera",
+      "degradation": 0.0046,
+      "desc": "Fine regolith abrasion on optical surfaces"
+    },
+    {
+      "type": "electrostatic_dust",
+      "target": "antenna_feed",
+      "degradation": 0.004,
+      "desc": "Electrostatic dust adhesion \u2014 charged particles cling to surfaces"
+    },
+    {
+      "type": "radiation_seu",
+      "target": "motor_controller",
+      "severity": 0.57,
+      "desc": "Radiation single-event upset \u2014 bit flip in robot computer"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 14.0,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.68,
+    "water_ice_depth_m": 1.6,
+    "surface_radiation_usv": 0.52
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 172,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 16.7,
+    "dust_delta": -0.058
+  },
+  "_hash": "f1843e92d0ecccdc"
+}

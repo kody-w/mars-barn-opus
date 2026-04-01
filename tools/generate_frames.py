@@ -89,6 +89,15 @@ def generate_events(sol, mars, rng):
         events.append({'type': 'thermal_cycle', 'severity': round(0.2 + rng.next() * 0.4, 2),
                        'delta_k': round(abs(mars['temp_c'] + 60) + rng.gauss(0, 5)),
                        'desc': 'Extreme thermal cycling — structural stress warning'})
+    # v2: Robot-specific events (real Mars challenges — NASA sourced)
+    if rng.next() < 0.04:
+        events.append({'type': 'comms_blackout', 'severity': round(0.3 + rng.next() * 0.5, 2),
+                       'duration_sols': rng.randint(2, 14),
+                       'desc': 'Solar conjunction — Earth comms degraded or lost'})
+    if mars['temp_c'] < -60 and rng.next() < 0.06:
+        events.append({'type': 'cold_snap', 'severity': round(0.4 + rng.next() * 0.4, 2),
+                       'duration_sols': rng.randint(3, 10),
+                       'desc': 'Extreme cold — battery and actuator performance degraded'})
     return events
 
 
@@ -101,12 +110,78 @@ def generate_hazards(sol, mars, rng):
     if mars['dust_tau'] > 0.3:
         hazards.append({'type': 'dust_accumulation', 'target': 'solar_array',
                         'degradation': round(mars['dust_tau'] * 0.02, 4)})
+
+    # v2: Robot-killer hazards (additive — never contradict existing frame data)
+    # These grow the fidelity of future frames without rewriting history.
+
+    # Perchlorate corrosion — Mars soil contains calcium perchlorate (0.5-1%)
+    # Corrodes metal joints over time. Worse in humid conditions (ISRU water vapor).
+    # Source: Phoenix lander soil chemistry, Curiosity SAM instrument
+    if rng.next() < 0.08:
+        hazards.append({'type': 'perchlorate_corrosion',
+                        'target': rng.choice(['actuator_joint', 'wheel_bearing', 'tool_gripper', 'solar_gimbal']),
+                        'degradation': round(0.003 + rng.next() * 0.007, 4),
+                        'desc': 'Perchlorate salt corrosion on mechanical joints'})
+
+    # Regolith abrasion — fine dust (1-10μm) grinds optical surfaces
+    # Killed Opportunity's flash memory. Degrades cameras and LIDAR.
+    # Source: MER mission post-mortem, Mars dust characterization studies
+    if mars['dust_tau'] > 0.15 and rng.next() < 0.10:
+        hazards.append({'type': 'regolith_abrasion',
+                        'target': rng.choice(['nav_camera', 'lidar_sensor', 'solar_sensor', 'spectrometer']),
+                        'degradation': round(0.002 + mars['dust_tau'] * 0.01, 4),
+                        'desc': 'Fine regolith abrasion on optical surfaces'})
+
+    # Electrostatic dust adhesion — Mars dust carries charge (triboelectric effect)
+    # Clings to everything. Harder to clean than Earth dust. Accumulates.
+    # Source: Apollo experience + Mars Pathfinder observations
+    if rng.next() < 0.12:
+        hazards.append({'type': 'electrostatic_dust',
+                        'target': rng.choice(['solar_array', 'antenna_feed', 'thermal_radiator', 'sensor_array']),
+                        'degradation': round(0.001 + rng.next() * 0.004, 4),
+                        'desc': 'Electrostatic dust adhesion — charged particles cling to surfaces'})
+
+    # Thermal cycling fatigue — daily swing of 60-80K stresses solder joints
+    # Electronics fail from repeated expansion/contraction. Real killer for long missions.
+    # Source: MSL RAD thermal data, ISS thermal cycling experience
+    daily_swing = abs(mars['temp_c'] + 20)  # approx daily amplitude
+    if daily_swing > 50 and rng.next() < 0.05:
+        hazards.append({'type': 'thermal_fatigue',
+                        'target': rng.choice(['circuit_board', 'battery_cell', 'motor_controller', 'comm_module']),
+                        'degradation': round(0.004 + daily_swing * 0.0001, 4),
+                        'cycles': sol,
+                        'desc': f'Thermal cycling fatigue — {round(daily_swing)}K daily swing on electronics'})
+
+    # Radiation bit flips — GCR + SEP cause single-event upsets in memory
+    # Mars has no magnetic field. 0.67 mSv/sol GCR baseline.
+    # Source: MSL/RAD instrument, Curiosity radiation measurements
+    if rng.next() < 0.03:
+        hazards.append({'type': 'radiation_seu',
+                        'target': rng.choice(['flight_computer', 'nav_system', 'comm_processor', 'motor_controller']),
+                        'severity': round(0.1 + rng.next() * 0.5, 2),
+                        'desc': 'Radiation single-event upset — bit flip in robot computer'})
+
+    # Battery degradation — cold cycling reduces lithium-ion capacity
+    # Mars cold (-70°C) is well below battery operating range
+    # Source: MER battery performance data, Li-ion cold cycling studies
+    if mars['temp_c'] < -50 and rng.next() < 0.06:
+        hazards.append({'type': 'battery_degradation',
+                        'target': 'battery_pack',
+                        'degradation': round(0.002 + abs(mars['temp_c'] + 30) * 0.0001, 4),
+                        'capacity_loss_pct': round(0.1 + rng.next() * 0.3, 2),
+                        'desc': f'Battery capacity loss from cold cycling at {mars["temp_c"]}°C'})
+
     return hazards
 
 
 CHALLENGE_TYPES = [
     'solar_tracking_fault', 'pressure_anomaly', 'water_recycler_fault',
     'isru_catalyst_degradation', 'co2_scrubber_saturation', 'radiation_dosimetry',
+    # v2: Robot-specific challenges
+    'actuator_calibration',    # joint drift from perchlorate + thermal cycling
+    'nav_sensor_degradation',  # camera/lidar obscured by regolith
+    'battery_reconditioning',  # cold-cycled cells need recalibration
+    'software_watchdog_reset', # cosmic ray bit flip triggered watchdog
 ]
 
 
@@ -127,6 +202,18 @@ def generate_challenge(sol, rng):
         params = {'saturation_pct': round(70 + rng.next() * 25), 'co2_ppm': round(800 + rng.next() * 600)}
     elif ch_type == 'radiation_dosimetry':
         params = {'cumulative_msv': round(50 + rng.next() * 200), 'rate_usv_h': round(0.5 + rng.next() * 1.5, 2)}
+    elif ch_type == 'actuator_calibration':
+        params = {'joint': rng.choice(['shoulder', 'elbow', 'wrist', 'hip', 'knee', 'ankle']),
+                  'drift_deg': round(1 + rng.next() * 8, 1), 'torque_loss_pct': round(5 + rng.next() * 25)}
+    elif ch_type == 'nav_sensor_degradation':
+        params = {'sensor': rng.choice(['front_hazcam', 'rear_hazcam', 'navcam', 'lidar']),
+                  'obscuration_pct': round(10 + rng.next() * 50), 'cause': rng.choice(['dust', 'abrasion', 'frost'])}
+    elif ch_type == 'battery_reconditioning':
+        params = {'cells_affected': rng.randint(1, 4), 'capacity_remaining_pct': round(50 + rng.next() * 40),
+                  'temp_at_failure': round(mars['temp_c'])}
+    elif ch_type == 'software_watchdog_reset':
+        params = {'subsystem': rng.choice(['nav', 'comm', 'motor', 'science', 'thermal']),
+                  'reboot_count': rng.randint(1, 5), 'memory_errors': rng.randint(1, 12)}
     return {'id': f'sol{sol}_{ch_type}', 'type': ch_type, 'params': params}
 
 
