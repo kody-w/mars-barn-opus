@@ -100,7 +100,8 @@ text-transform:uppercase;border-top:1px solid var(--border);margin-top:4px}
   <div class="desktop-icon" ondblclick="openApp('browser')"><div class="icon">🌐</div><div class="label">Frame Browser</div></div>
   <div class="desktop-icon" ondblclick="openApp('wallet')"><div class="icon">💰</div><div class="label">MARS Wallet</div></div>
   <div class="desktop-icon" ondblclick="openApp('help')"><div class="icon">📖</div><div class="label">LISPY.md</div></div>
-  <div class="desktop-icon" ondblclick="window.open('viewer.html')"><div class="icon">🔴</div><div class="label">Launch Sim</div></div>
+  <div class="desktop-icon" ondblclick="openApp('sim')"><div class="icon">🔴</div><div class="label">Colony Sim</div></div>
+  <div class="desktop-icon" ondblclick="openApp('gov')"><div class="icon">🏛️</div><div class="label">Mars Gov</div></div>
 </div>
 
 <!-- Start Menu -->
@@ -115,13 +116,16 @@ text-transform:uppercase;border-top:1px solid var(--border);margin-top:4px}
   <div class="start-item" onclick="openApp('monitor')"><span class="icon">📡</span> Colony Monitor</div>
   <div class="start-item" onclick="openApp('browser')"><span class="icon">🌐</span> Frame Browser</div>
   <div class="start-item" onclick="openApp('wallet')"><span class="icon">💰</span> MARS Wallet</div>
-  <div class="start-section">Links</div>
-  <div class="start-item" onclick="window.open('viewer.html')"><span class="icon">🔴</span> Launch Sim</div>
-  <div class="start-item" onclick="window.open('simhub.html')"><span class="icon">🏆</span> SimHub</div>
-  <div class="start-item" onclick="window.open('hall-of-fame.html')"><span class="icon">🏅</span> Hall of Fame</div>
-  <div class="start-item" onclick="window.open('patterns.html')"><span class="icon">🔧</span> Patterns</div>
-  <div class="start-item" onclick="window.open('blog/')"><span class="icon">📡</span> Blog</div>
-  <div class="start-item" onclick="window.open('control.html')"><span class="icon">◉</span> Mission Control</div>
+  <div class="start-item" onclick="openApp('sim')"><span class="icon">🔴</span> Colony Sim</div>
+  <div class="start-item" onclick="openApp('gov')"><span class="icon">🏛️</span> Mars Gov Dashboard</div>
+  <div class="start-section">Apps</div>
+  <div class="start-item" onclick="openIframeApp('simhub','🏆 SimHub','simhub.html')"><span class="icon">🏆</span> SimHub</div>
+  <div class="start-item" onclick="openIframeApp('hofame','🏅 Hall of Fame','hall-of-fame.html')"><span class="icon">🏅</span> Hall of Fame</div>
+  <div class="start-item" onclick="openIframeApp('patterns','🔧 Patterns','patterns.html')"><span class="icon">🔧</span> Patterns</div>
+  <div class="start-item" onclick="openIframeApp('blogapp','📡 Blog','blog/')"><span class="icon">📡</span> Blog</div>
+  <div class="start-item" onclick="openIframeApp('control','◉ Mission Control','control.html')"><span class="icon">◉</span> Mission Control</div>
+  <div class="start-item" onclick="openIframeApp('replay','📼 Replay Viewer','replay.html')"><span class="icon">📼</span> Replay Viewer</div>
+  <div class="start-item" onclick="openIframeApp('obs','📺 OBS Overlay','obs-overlay.html')"><span class="icon">📺</span> OBS Overlay</div>
 </div>
 
 <!-- Taskbar -->
@@ -255,6 +259,76 @@ Type (help) for commands. Type (prompt-list) for prompt library.
   </div>
 </div>
 
+<!-- Window: Mars Sim (embedded viewer.html) -->
+<div class="window" id="win-sim" style="width:85vw;height:80vh;top:20px;left:40px">
+  <div class="window-title" onmousedown="startDrag(event,'win-sim')">
+    <div class="btn btn-close" onclick="closeApp('sim')"></div>
+    <div class="btn btn-min"></div>
+    <div class="btn btn-max" onclick="maxWindow('win-sim')"></div>
+    <div class="title">🔴 FIRST PRINCIPLES TO MARS — Colony Sim</div>
+  </div>
+  <div class="window-body" style="padding:0;overflow:hidden">
+    <iframe id="sim-frame" style="width:100%;height:100%;border:none" src="about:blank"></iframe>
+  </div>
+</div>
+
+<!-- Window: Mars Gov Dashboard -->
+<div class="window" id="win-gov" style="width:700px;height:500px;top:30px;left:100px">
+  <div class="window-title" onmousedown="startDrag(event,'win-gov')">
+    <div class="btn btn-close" onclick="closeApp('gov')"></div>
+    <div class="btn btn-min"></div>
+    <div class="btn btn-max" onclick="maxWindow('win-gov')"></div>
+    <div class="title">🏛️ MARS GOV — Colony Government Dashboard</div>
+  </div>
+  <div class="window-body" style="padding:0;overflow:hidden;background:#080b10">
+    <div style="padding:12px;height:100%;overflow-y:auto" id="gov-body">
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <button onclick="govRefresh()" style="padding:4px 12px;background:none;border:1px solid var(--cyan);color:var(--cyan);font-family:var(--mono);font-size:10px;cursor:pointer;border-radius:4px">↻ Refresh</button>
+        <button onclick="govLoadFrames()" style="padding:4px 12px;background:none;border:1px solid var(--green);color:var(--green);font-family:var(--mono);font-size:10px;cursor:pointer;border-radius:4px">📡 Load Live Frames</button>
+        <button onclick="govGauntlet()" style="padding:4px 12px;background:none;border:1px solid var(--yellow);color:var(--yellow);font-family:var(--mono);font-size:10px;cursor:pointer;border-radius:4px">⚔️ Run Gauntlet</button>
+        <span id="gov-status" style="margin-left:auto;font-size:10px;color:var(--dim)"></span>
+      </div>
+
+      <!-- Top row: key metrics -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px" id="gov-metrics">
+        <div class="monitor-card"><div class="label">Latest Sol</div><div class="value" id="gm-sol">—</div></div>
+        <div class="monitor-card"><div class="label">Total Frames</div><div class="value" id="gm-frames">—</div></div>
+        <div class="monitor-card"><div class="label">Frame Version</div><div class="value" id="gm-version">—</div></div>
+        <div class="monitor-card"><div class="label">Chain Nodes</div><div class="value" id="gm-nodes">—</div></div>
+        <div class="monitor-card"><div class="label">Challengers</div><div class="value" id="gm-challengers">—</div></div>
+      </div>
+
+      <!-- Mars conditions from latest frame -->
+      <div style="background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px">
+        <div style="font-size:10px;color:var(--cyan);letter-spacing:1px;margin-bottom:8px">📡 LATEST FRAME — MARS CONDITIONS</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px" id="gov-mars">
+          <div class="monitor-card"><div class="label">Temp</div><div class="value" id="gm-temp">—</div></div>
+          <div class="monitor-card"><div class="label">Dust τ</div><div class="value" id="gm-dust">—</div></div>
+          <div class="monitor-card"><div class="label">Solar W/m²</div><div class="value" id="gm-solar">—</div></div>
+          <div class="monitor-card"><div class="label">Wind m/s</div><div class="value" id="gm-wind">—</div></div>
+        </div>
+        <div style="margin-top:8px;font-size:10px;color:var(--dim)" id="gov-events">Events: loading...</div>
+        <div style="font-size:10px;color:var(--dim)" id="gov-hazards">Hazards: loading...</div>
+      </div>
+
+      <!-- Frame timeline (dust chart) -->
+      <div style="background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px">
+        <div style="font-size:10px;color:var(--cyan);letter-spacing:1px;margin-bottom:6px">DUST OPTICAL DEPTH OVER TIME</div>
+        <canvas id="gov-dust-chart" style="width:100%;height:60px;background:#050508;border-radius:4px"></canvas>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--dim);margin-top:2px">
+          <span>Sol 1</span><span id="gov-chart-end">Sol —</span>
+        </div>
+      </div>
+
+      <!-- Leaderboard -->
+      <div style="background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:12px">
+        <div style="font-size:10px;color:var(--cyan);letter-spacing:1px;margin-bottom:8px">🏆 GAUNTLET LEADERBOARD (Monte Carlo)</div>
+        <div id="gov-leaderboard" style="font-size:10px;color:var(--dim)">Run gauntlet to see results...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════
 // LISPY OS — Virtual Operating System
@@ -294,11 +368,13 @@ function openApp(name){
   if(name==='monitor') connectMonitor();
   if(name==='help') loadHelp();
   if(name==='editor') populatePrompts();
+  if(name==='sim') openSim();
+  if(name==='gov') govRefresh();
   toggleStart(true);
 }
 
 function closeApp(name){
-  const win = document.getElementById('win-'+name);
+  const win = document.getElementById('win-'+name) || document.getElementById('win-'+name);
   if(win) win.classList.remove('open');
   openApps.delete(name);
   if(focusedApp===name) focusedApp=null;
@@ -307,7 +383,7 @@ function closeApp(name){
 
 function focusApp(name){
   document.querySelectorAll('.window').forEach(w=>w.classList.remove('focused'));
-  const win = document.getElementById('win-'+name);
+  const win = document.getElementById('win-'+name) || document.getElementById('win-iframe-'+name.replace('iframe-',''));
   if(win){win.classList.add('focused');win.style.zIndex=++zCounter}
   focusedApp = name;
   updateTaskbar();
@@ -316,8 +392,11 @@ let zCounter = 10;
 
 function updateTaskbar(){
   const el = document.getElementById('taskbar-apps');
+  const titles = {terminal:'🖥️ Terminal',editor:'📝 Editor',files:'📁 Files',monitor:'📡 Monitor',
+    browser:'🌐 Browser',wallet:'💰 Wallet',help:'📖 Help',sim:'🔴 Colony Sim',gov:'🏛️ Mars Gov',
+    'iframe-simhub':'🏆 SimHub','iframe-hofame':'🏅 Hall of Fame','iframe-patterns':'🔧 Patterns',
+    'iframe-blogapp':'📡 Blog','iframe-control':'◉ Control','iframe-replay':'📼 Replay','iframe-obs':'📺 OBS'};
   el.innerHTML = [...openApps].map(name=>{
-    const titles = {terminal:'🖥️ Terminal',editor:'📝 Editor',files:'📁 Files',monitor:'📡 Monitor',browser:'🌐 Browser',wallet:'💰 Wallet',help:'📖 Help'};
     return `<div class="taskbar-app ${focusedApp===name?'active':''}" onclick="focusApp('${name}')">${titles[name]||name}</div>`;
   }).join('');
 }
@@ -486,6 +565,185 @@ setInterval(updateClock,1000);
 updateClock();
 
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// ── Sim Window (embedded viewer.html) ──
+function openSim(){
+  const frame = document.getElementById('sim-frame');
+  if(frame && frame.src === 'about:blank') frame.src = 'viewer.html';
+}
+
+// ── Dynamic Iframe App Launcher ──
+// Opens any HTML page as a window inside the OS
+let iframeAppCounter = 0;
+function openIframeApp(id, title, url){
+  const winId = 'win-iframe-'+id;
+  let win = document.getElementById(winId);
+
+  if(!win){
+    // Create the window dynamically
+    iframeAppCounter++;
+    const offset = iframeAppCounter * 20;
+    win = document.createElement('div');
+    win.className = 'window';
+    win.id = winId;
+    win.style.cssText = `width:80vw;height:75vh;top:${20+offset}px;left:${50+offset}px`;
+    win.innerHTML = `
+      <div class="window-title" onmousedown="startDrag(event,'${winId}')">
+        <div class="btn btn-close" onclick="closeApp('iframe-${id}')"></div>
+        <div class="btn btn-min"></div>
+        <div class="btn btn-max" onclick="maxWindow('${winId}')"></div>
+        <div class="title">${escHtml(title)}</div>
+      </div>
+      <div class="window-body" style="padding:0;overflow:hidden">
+        <iframe style="width:100%;height:100%;border:none" src="${url}"></iframe>
+      </div>`;
+    document.body.insertBefore(win, document.querySelector('.taskbar'));
+  }
+
+  win.classList.add('open');
+  openApps.add('iframe-'+id);
+  focusApp('iframe-'+id);
+  updateTaskbar();
+  toggleStart(true);
+}
+
+function maxWindow(winId){
+  const win = document.getElementById(winId);
+  if(!win) return;
+  if(win.dataset.maximized === '1'){
+    win.style.width = win.dataset.ow; win.style.height = win.dataset.oh;
+    win.style.top = win.dataset.ot; win.style.left = win.dataset.ol;
+    win.dataset.maximized = '0';
+  } else {
+    win.dataset.ow = win.style.width; win.dataset.oh = win.style.height;
+    win.dataset.ot = win.style.top; win.dataset.ol = win.style.left;
+    win.style.width = '100vw'; win.style.height = 'calc(100vh - 32px)';
+    win.style.top = '0'; win.style.left = '0';
+    win.dataset.maximized = '1';
+  }
+}
+
+// ── Mars Gov Dashboard ──
+const RAW_BASE = 'https://raw.githubusercontent.com/kody-w/mars-barn-opus/main';
+let govFrameData = [];
+
+async function govRefresh(){
+  const st = document.getElementById('gov-status');
+  st.textContent = 'Loading...';
+  try{
+    // Latest frame
+    const latest = await fetch(RAW_BASE+'/data/frames/latest.json').then(r=>r.json());
+    document.getElementById('gm-sol').textContent = latest.sol;
+
+    // Manifest
+    const manifest = await fetch(RAW_BASE+'/data/frames/manifest.json').then(r=>r.json());
+    document.getElementById('gm-frames').textContent = manifest.total_frames;
+
+    // Frame versions
+    const versions = await fetch(RAW_BASE+'/data/frame-versions/versions.json').then(r=>r.json());
+    document.getElementById('gm-version').textContent = 'v'+versions.versions.length;
+
+    // Chain nodes
+    const nodes = await fetch(RAW_BASE+'/data/chain/nodes.json').then(r=>r.json());
+    document.getElementById('gm-nodes').textContent = nodes.nodes.length;
+
+    // Federation
+    const fed = await fetch(RAW_BASE+'/data/federation/registry.json').then(r=>r.json());
+    document.getElementById('gm-challengers').textContent = fed.challengers.length;
+
+    // Latest frame conditions
+    const frame = await fetch(RAW_BASE+'/data/frames/sol-'+String(latest.sol).padStart(4,'0')+'.json').then(r=>r.json());
+    const m = frame.mars;
+    document.getElementById('gm-temp').textContent = m.temp_c+'°C';
+    document.getElementById('gm-dust').textContent = m.dust_tau;
+    document.getElementById('gm-solar').textContent = m.solar_wm2;
+    document.getElementById('gm-wind').textContent = m.wind_ms;
+    document.getElementById('gov-events').textContent = 'Events: '+(frame.events.length?frame.events.map(e=>e.type).join(', '):'clear');
+    document.getElementById('gov-hazards').textContent = 'Hazards: '+frame.hazards.map(h=>h.type).join(', ');
+
+    st.textContent = 'Updated '+new Date().toLocaleTimeString();
+  }catch(e){
+    st.textContent = 'Error: '+e.message;
+  }
+}
+
+async function govLoadFrames(){
+  const st = document.getElementById('gov-status');
+  st.textContent = 'Loading frames for chart...';
+  try{
+    const manifest = await fetch(RAW_BASE+'/data/frames/manifest.json').then(r=>r.json());
+    // Load last 100 frames for the dust chart
+    const start = Math.max(1, manifest.last_sol - 99);
+    const promises = [];
+    for(let s=start; s<=manifest.last_sol; s++){
+      promises.push(fetch(RAW_BASE+'/data/frames/sol-'+String(s).padStart(4,'0')+'.json').then(r=>r.ok?r.json():null).catch(()=>null));
+    }
+    govFrameData = (await Promise.all(promises)).filter(Boolean);
+    drawGovDustChart();
+    st.textContent = govFrameData.length+' frames loaded';
+  }catch(e){
+    st.textContent = 'Error: '+e.message;
+  }
+}
+
+function drawGovDustChart(){
+  const canvas = document.getElementById('gov-dust-chart');
+  if(!canvas || !govFrameData.length) return;
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = (rect.width - 24) * (window.devicePixelRatio||1);
+  canvas.height = 60 * (window.devicePixelRatio||1);
+  ctx.scale(window.devicePixelRatio||1, window.devicePixelRatio||1);
+  const w = rect.width - 24, h = 60;
+  ctx.clearRect(0,0,w,h);
+
+  const maxDust = Math.max(...govFrameData.map(f=>f.mars.dust_tau), 0.5);
+  const barW = Math.max(1, w / govFrameData.length);
+
+  // Dust line
+  ctx.beginPath();
+  govFrameData.forEach((f,i)=>{
+    const x = i * barW;
+    const y = h - (f.mars.dust_tau / maxDust) * h * 0.9 - 2;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle = '#d29922';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Fill
+  ctx.lineTo((govFrameData.length-1)*barW, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0,0,0,h);
+  grad.addColorStop(0,'rgba(210,153,34,0.3)');
+  grad.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Event markers
+  govFrameData.forEach((f,i)=>{
+    if(f.events.some(e=>e.type==='dust_storm')){
+      ctx.fillStyle = 'rgba(218,54,51,0.6)';
+      ctx.fillRect(i*barW, 0, Math.max(1,barW), h);
+    }
+    if(f.hazards.some(h=>h.type==='perchlorate_corrosion'||h.type==='radiation_seu')){
+      ctx.fillStyle = 'rgba(163,113,247,0.4)';
+      ctx.fillRect(i*barW, h-4, Math.max(1,barW), 4);
+    }
+  });
+
+  document.getElementById('gov-chart-end').textContent = 'Sol '+govFrameData[govFrameData.length-1].sol;
+}
+
+function govGauntlet(){
+  document.getElementById('gov-leaderboard').innerHTML =
+    '<div style="color:var(--yellow)">⚔️ Running gauntlet requires CLI: <code>node tools/gauntlet.js --monte-carlo 100</code></div>' +
+    '<div style="margin-top:8px">Current best:</div>' +
+    '<div style="color:var(--cyan);margin-top:4px">Optimus (4 robots) · 315 median sols · Grade A · 0% survival at 501 sols</div>' +
+    '<div style="color:var(--red);margin-top:4px">LEADERBOARD EMPTY — nobody alive at Sol 501</div>' +
+    '<div style="margin-top:8px;color:var(--dim)">To compete: evolve governor LisPy to handle v2 perchlorate + radiation + abrasion</div>';
+}
 
 // Click desktop to close start menu
 document.getElementById('desktop').addEventListener('click',()=>toggleStart(true));
