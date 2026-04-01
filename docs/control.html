@@ -171,6 +171,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12
     <button class="cmd-btn red" onclick="protocolCmd('unsubscribe_all')">UNSUB ALL</button>
   </div>
 
+  <h2 style="margin-top:12px">💸 MARS Wallets</h2>
+  <div style="margin-bottom:6px">
+    <button class="cmd-btn" onclick="protocolCmd('get_wallets')">GET WALLETS</button>
+    <button class="cmd-btn green" onclick="showTipUI()">TIP AGENT</button>
+    <button class="cmd-btn" onclick="showRegisterUI()">+ EXTERNAL WALLET</button>
+  </div>
+  <div id="wallet-display" style="font-size:10px;max-height:120px;overflow-y:auto;margin-bottom:6px"></div>
+  <div id="wallet-action" style="display:none;margin-bottom:8px;padding:8px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:6px">
+    <div id="wallet-action-inner"></div>
+  </div>
+  <div id="transfer-display" style="font-size:9px;max-height:80px;overflow-y:auto;color:var(--dim)"></div>
+
   <h2 style="margin-top:12px">Protocol Log</h2>
   <div class="proto-log" id="proto-log"></div>
 </div>
@@ -336,6 +348,34 @@ function handleMessage(msg){
     return;
   }
 
+  if(msg.cmd === 'wallets'){
+    renderWallets(msg.payload);
+    logProto('in', `Wallets: ${Object.keys(msg.payload.wallets||{}).length} addresses, ${(msg.payload.transfers||[]).length} transfers`);
+    return;
+  }
+
+  if(msg.cmd === 'mars_transfer'){
+    logProto('in', `💸 ${msg.payload.fromOwner} → ${msg.payload.toOwner}: ${msg.payload.amount} MARS${msg.payload.memo?' ('+msg.payload.memo+')':''}`);
+    protocolCmd('get_wallets'); // refresh
+    return;
+  }
+
+  if(msg.cmd === 'mars_transfer_result'){
+    if(msg.payload.ok){
+      logProto('in', `✓ Transfer complete: ${msg.payload.tx?.amount||'?'} MARS`);
+      protocolCmd('get_wallets');
+    } else {
+      logProto('err', `Transfer failed: ${msg.payload.error}`);
+    }
+    return;
+  }
+
+  if(msg.cmd === 'wallet_registered'){
+    logProto('in', msg.payload.ok ? `✓ Wallet registered: ${msg.payload.address}` : `✗ ${msg.payload.error}`);
+    protocolCmd('get_wallets');
+    return;
+  }
+
   if(msg.cmd === 'error'){
     logProto('err', `Error: ${msg.payload.message||msg.payload}`);
     return;
@@ -490,6 +530,85 @@ function emergencyStop(){
 function generateAttestation(){
   logProto('out', 'GENERATE ATTESTATION');
   send('get_attestation');
+}
+
+// ── Wallet Functions ──
+let twinWallets = {};
+let twinTransfers = [];
+
+function showTipUI(){
+  const el = document.getElementById('wallet-action');
+  const inner = document.getElementById('wallet-action-inner');
+  el.style.display = 'block';
+  // Build agent dropdown from known wallets
+  const agents = Object.entries(twinWallets)
+    .filter(([a,w]) => w.type !== 'user' && w.type !== 'treasury')
+    .map(([a,w]) => `<option value="${w.owner}">${w.owner} (${(w.balance||0).toLocaleString()} MARS)</option>`)
+    .join('');
+  inner.innerHTML = `
+    <div style="font-size:10px;color:var(--cyan);margin-bottom:4px">TIP AN AGENT</div>
+    <div style="display:flex;gap:4px;align-items:center">
+      <select id="mc-tip-target" style="flex:1;background:#080b10;border:1px solid var(--border);color:var(--text);padding:4px;font-family:var(--mono);font-size:10px">${agents||'<option>No agents found — GET WALLETS first</option>'}</select>
+      <input type="number" id="mc-tip-amount" value="100" min="1" style="width:60px;background:#080b10;border:1px solid var(--border);color:var(--text);padding:4px;font-family:var(--mono);font-size:10px">
+      <button class="cmd-btn green" onclick="doMcTip()">SEND</button>
+      <button class="cmd-btn" onclick="document.getElementById('wallet-action').style.display='none'">✕</button>
+    </div>
+    <input type="text" id="mc-tip-memo" placeholder="memo (optional)" style="width:100%;margin-top:4px;background:#080b10;border:1px solid var(--border);color:var(--text);padding:4px;font-family:var(--mono);font-size:10px">
+  `;
+}
+
+function showRegisterUI(){
+  const el = document.getElementById('wallet-action');
+  const inner = document.getElementById('wallet-action-inner');
+  el.style.display = 'block';
+  inner.innerHTML = `
+    <div style="font-size:10px;color:var(--cyan);margin-bottom:4px">REGISTER EXTERNAL WALLET</div>
+    <div style="font-size:9px;color:var(--dim);margin-bottom:4px">Any address can participate in the sim economy. Virtual ↔ physical mesh.</div>
+    <div style="display:flex;gap:4px;align-items:center">
+      <input type="text" id="mc-ext-addr" placeholder="mars1_external_mynode" style="flex:1;background:#080b10;border:1px solid var(--border);color:var(--text);padding:4px;font-family:var(--mono);font-size:10px">
+      <input type="text" id="mc-ext-name" placeholder="Owner name" style="width:100px;background:#080b10;border:1px solid var(--border);color:var(--text);padding:4px;font-family:var(--mono);font-size:10px">
+      <button class="cmd-btn green" onclick="doRegister()">REGISTER</button>
+      <button class="cmd-btn" onclick="document.getElementById('wallet-action').style.display='none'">✕</button>
+    </div>
+  `;
+}
+
+function doMcTip(){
+  const agent = document.getElementById('mc-tip-target')?.value;
+  const amount = parseInt(document.getElementById('mc-tip-amount')?.value) || 0;
+  const memo = document.getElementById('mc-tip-memo')?.value || '';
+  if(!agent || amount <= 0) return;
+  send('tip_agent', {agent, amount, memo: memo || 'tip from Mission Control'});
+  logProto('out', `TIP ${amount} MARS → ${agent}${memo?' ('+memo+')':''}`);
+  document.getElementById('wallet-action').style.display = 'none';
+}
+
+function doRegister(){
+  const addr = document.getElementById('mc-ext-addr')?.value?.trim();
+  const name = document.getElementById('mc-ext-name')?.value?.trim();
+  if(!addr || !name) return;
+  send('register_wallet', {address: addr, owner: name});
+  logProto('out', `REGISTER WALLET ${addr} (${name})`);
+  document.getElementById('wallet-action').style.display = 'none';
+}
+
+function renderWallets(data){
+  twinWallets = data.wallets || {};
+  twinTransfers = data.transfers || [];
+  const el = document.getElementById('wallet-display');
+  const txEl = document.getElementById('transfer-display');
+  if(el){
+    const sorted = Object.entries(twinWallets).sort((a,b) => (b[1].balance||0) - (a[1].balance||0));
+    el.innerHTML = sorted.map(([addr, w]) => {
+      const icon = w.type==='user'?'👤':w.type==='robot'?'🤖':w.type==='human'?'👤':w.type==='treasury'?'🏛️':w.type==='external'?'🔗':'❓';
+      return `<div class="kv"><span class="k">${icon} ${w.owner}</span><span class="v cyan">${(w.balance||0).toLocaleString()} MARS</span></div>`;
+    }).join('');
+  }
+  if(txEl){
+    txEl.innerHTML = twinTransfers.slice(-10).reverse().map(tx =>
+      `<div>Sol ${tx.sol}: ${tx.fromOwner} → ${tx.toOwner}: ${tx.amount} MARS${tx.memo?' · '+tx.memo:''}</div>`
+    ).join('') || '<div style="color:var(--dim)">No transfers yet</div>';
+  }
 }
 
 // ── Protocol Log ──

@@ -556,7 +556,20 @@ body.cinematic-active .cartridge-bar,body.cinematic-active #task-panel{
   <h3>Discoveries</h3>
   <div id="discoveries" style="font-size:10px;color:var(--dim)">No surveys yet</div>
   <h3>Economy</h3>
-  <div id="economy-display" style="font-size:11px"><span style="color:var(--cyan)">10,000</span> <span style="color:var(--dim)">RAPPcoin</span></div>
+  <div id="economy-display" style="font-size:11px"><span style="color:var(--cyan)">0</span> <span style="color:var(--dim)">MARS</span></div>
+  <h3 style="cursor:pointer" onclick="document.getElementById('wallet-panel').style.display=document.getElementById('wallet-panel').style.display==='none'?'block':'none'">💸 Wallets ▾</h3>
+  <div id="wallet-panel" style="display:none">
+    <div style="font-size:9px;color:var(--dim);margin-bottom:6px">Your wallet + agent wallets. Tip agents, view transfers.</div>
+    <div id="wallet-list" style="font-size:10px;max-height:120px;overflow-y:auto"></div>
+    <div style="margin-top:6px;display:flex;gap:4px;align-items:center">
+      <select id="tip-target" style="flex:1;background:#0a0e14;border:1px solid var(--border);color:var(--text);padding:2px;font-family:var(--font);font-size:10px"></select>
+      <input type="number" id="tip-amount" value="100" min="1" max="99999" style="width:50px;background:#0a0e14;border:1px solid var(--border);color:var(--text);padding:2px 4px;font-family:var(--font);font-size:10px;border-radius:3px">
+      <button onclick="doTip()" style="background:rgba(63,185,80,0.15);border:1px solid var(--green);color:var(--green);padding:2px 8px;cursor:pointer;font-family:var(--font);font-size:10px;border-radius:3px">TIP</button>
+    </div>
+    <div id="tip-status" style="font-size:9px;color:var(--dim);margin-top:2px"></div>
+    <div style="margin-top:6px;font-size:9px;color:var(--cyan);letter-spacing:0.5px">RECENT TRANSFERS</div>
+    <div id="transfer-log" style="font-size:9px;max-height:80px;overflow-y:auto;color:var(--dim);line-height:1.6"></div>
+  </div>
   <h3>Crew Journal</h3>
   <div id="crew-journal" style="max-height:100px;overflow-y:auto;font-size:10px;line-height:1.5;color:var(--text);font-style:italic;padding:4px;background:rgba(0,0,0,0.3);border-radius:4px">Awaiting first sol...</div>
   <h3>Colony DNA</h3>
@@ -1272,6 +1285,192 @@ function generateRunAttestation(){
     recentBlocks: chainBlocks.slice(-10),
   };
   return att;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// MARS WALLET — Transfer Protocol
+// Everyone in the sim has a wallet: agents, the user (you), external
+// participants. Transfers are logged in the chain. You can tip agents,
+// agents can pay each other, anyone running the protocol can
+// send/receive MARS to any wallet address in the network.
+// ══════════════════════════════════════════════════════════════════
+
+let marsWallets = {};   // address → {owner, balance, type, created}
+let marsTransfers = []; // full transfer log (the transaction history)
+const USER_WALLET = 'mars1_user_' + (typeof cartridgeId !== 'undefined' ? cartridgeId : 'local');
+
+function initWallets(){
+  // Create user wallet (you — the builder, the player, a participant)
+  if(!marsWallets[USER_WALLET]){
+    marsWallets[USER_WALLET] = {
+      owner: 'Mission Control', type: 'user', balance: 0,
+      created: new Date().toISOString()
+    };
+  }
+  // Create agent wallets from the crew ledger
+  if(state.crew){
+    state.crew.forEach(c => {
+      const addr = 'mars1_agent_' + c.name.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase();
+      if(!marsWallets[addr]){
+        marsWallets[addr] = {
+          owner: c.name, type: c.name.startsWith('OPT')||c.name.startsWith('LUN')?'robot':'human',
+          balance: 0, role: c.role, created: new Date().toISOString()
+        };
+      }
+      // Sync balance from marsLedger
+      if(state.marsLedger && state.marsLedger[c.name]){
+        marsWallets[addr].balance = state.marsLedger[c.name].balance;
+      }
+    });
+  }
+  // Colony treasury wallet
+  const treasuryAddr = 'mars1_treasury';
+  if(!marsWallets[treasuryAddr]){
+    marsWallets[treasuryAddr] = {
+      owner: 'Colony Treasury', type: 'treasury', balance: 0,
+      created: new Date().toISOString()
+    };
+  }
+}
+
+function getWalletAddress(name){
+  // Find wallet by owner name
+  for(const[addr, w] of Object.entries(marsWallets)){
+    if(w.owner === name) return addr;
+  }
+  return null;
+}
+
+function marsTransfer(fromAddr, toAddr, amount, memo){
+  if(!marsWallets[fromAddr]) return {ok:false, error:'Sender wallet not found: '+fromAddr};
+  if(!marsWallets[toAddr]) return {ok:false, error:'Recipient wallet not found: '+toAddr};
+  if(amount <= 0) return {ok:false, error:'Amount must be positive'};
+  if(marsWallets[fromAddr].balance < amount) return {ok:false, error:`Insufficient balance: ${marsWallets[fromAddr].balance} < ${amount}`};
+
+  // Execute transfer
+  marsWallets[fromAddr].balance -= amount;
+  marsWallets[toAddr].balance += amount;
+
+  // Log transaction
+  const tx = {
+    id: 'tx_' + Date.now().toString(36) + Math.random().toString(36).substr(2,4),
+    from: fromAddr,
+    fromOwner: marsWallets[fromAddr].owner,
+    to: toAddr,
+    toOwner: marsWallets[toAddr].owner,
+    amount: amount,
+    memo: memo || '',
+    sol: state.sol,
+    ts: new Date().toISOString(),
+    hash: hashStr(JSON.stringify({from:fromAddr,to:toAddr,amount,sol:state.sol,ts:Date.now()}))
+  };
+  marsTransfers.push(tx);
+  if(marsTransfers.length > 1000) marsTransfers = marsTransfers.slice(-500);
+
+  // Sync back to marsLedger
+  if(state.marsLedger){
+    const fromCrew = Object.entries(marsWallets).find(([a,w])=>a===fromAddr);
+    const toCrew = Object.entries(marsWallets).find(([a,w])=>a===toAddr);
+    if(fromCrew && state.marsLedger[fromCrew[1].owner]){
+      state.marsLedger[fromCrew[1].owner].balance = marsWallets[fromAddr].balance;
+    }
+    if(toCrew && state.marsLedger[toCrew[1].owner]){
+      state.marsLedger[toCrew[1].owner].balance = marsWallets[toAddr].balance;
+    }
+  }
+
+  state.log.push(`  💸 ${tx.fromOwner} → ${tx.toOwner}: ${amount} MARS${memo?' ('+memo+')':''}`);
+
+  // Broadcast to twin
+  if(typeof twinBroadcast === 'function'){
+    twinBroadcast('mars_transfer', tx);
+  }
+
+  return {ok:true, tx};
+}
+
+// Tip an agent — user sends MARS from their wallet
+function tipAgent(agentName, amount, memo){
+  const toAddr = getWalletAddress(agentName);
+  if(!toAddr) return {ok:false, error:'Agent not found: '+agentName};
+  return marsTransfer(USER_WALLET, toAddr, amount, memo || 'tip from Mission Control');
+}
+
+// Agent-to-agent transfer (triggered by LisPy programs or reflex arcs)
+function agentTransfer(fromName, toName, amount, memo){
+  const fromAddr = getWalletAddress(fromName);
+  const toAddr = getWalletAddress(toName);
+  if(!fromAddr || !toAddr) return {ok:false, error:'Agent not found'};
+  return marsTransfer(fromAddr, toAddr, amount, memo);
+}
+
+// External wallet — anyone running the protocol can register a wallet
+function registerExternalWallet(address, ownerName){
+  if(marsWallets[address]) return {ok:false, error:'Address already exists'};
+  marsWallets[address] = {
+    owner: ownerName, type: 'external', balance: 0,
+    created: new Date().toISOString()
+  };
+  state.log.push(`  🔗 External wallet registered: ${address} (${ownerName})`);
+  return {ok:true, address};
+}
+
+// Make transfer function available to LisPy (agents can send MARS programmatically)
+// This extends the VM env with a transfer capability
+function setupWalletEnvForLispy(vm, agentName){
+  vm.setEnv('my_wallet', getWalletAddress(agentName) || '');
+  vm.setEnv('my_balance', marsWallets[getWalletAddress(agentName)]?.balance || 0);
+  vm.setEnv('user_wallet', USER_WALLET);
+  vm.setEnv('treasury_wallet', 'mars1_treasury');
+}
+
+function doTip(){
+  const sel = document.getElementById('tip-target');
+  const amt = parseInt(document.getElementById('tip-amount').value) || 0;
+  const st = document.getElementById('tip-status');
+  if(!sel || !sel.value || amt <= 0){ if(st) st.textContent='Select agent and amount'; return; }
+  const result = tipAgent(sel.value, amt);
+  if(st) st.textContent = result.ok ? `✓ Sent ${amt} MARS to ${sel.value}` : `✗ ${result.error}`;
+  if(st && result.ok) setTimeout(()=>st.textContent='', 3000);
+  updateWalletUI();
+}
+
+function updateWalletUI(){
+  initWallets();
+  const listEl = document.getElementById('wallet-list');
+  const selEl = document.getElementById('tip-target');
+  const logEl = document.getElementById('transfer-log');
+  if(!listEl) return;
+
+  // Wallet list
+  const sorted = Object.entries(marsWallets).sort((a,b) => b[1].balance - a[1].balance);
+  listEl.innerHTML = sorted.map(([addr, w]) => {
+    const icon = w.type==='user'?'👤':w.type==='robot'?'🤖':w.type==='treasury'?'🏛️':w.type==='external'?'🔗':'👤';
+    const color = w.type==='user'?'var(--cyan)':'var(--text)';
+    return `<div style="display:flex;gap:4px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.03)">
+      <span>${icon}</span>
+      <span style="color:${color};flex:1">${w.owner}</span>
+      <span style="color:var(--cyan);font-weight:700">${w.balance.toLocaleString()}</span>
+      <span style="color:var(--dim);font-size:9px">MARS</span>
+    </div>`;
+  }).join('');
+
+  // Tip target dropdown
+  if(selEl){
+    const current = selEl.value;
+    selEl.innerHTML = sorted
+      .filter(([addr, w]) => w.type !== 'user' && addr !== USER_WALLET)
+      .map(([addr, w]) => `<option value="${w.owner}">${w.owner} (${w.balance.toLocaleString()})</option>`)
+      .join('');
+    if(current) selEl.value = current;
+  }
+
+  // Transfer log
+  if(logEl){
+    logEl.innerHTML = marsTransfers.slice(-15).reverse().map(tx =>
+      `<div>Sol ${tx.sol}: ${tx.fromOwner} → ${tx.toOwner}: ${tx.amount} MARS${tx.memo?' · '+tx.memo:''}</div>`
+    ).join('');
+  }
 }
 
 // ── End LisPy VM ─────────────────────────────────────────────────
@@ -4759,6 +4958,8 @@ function updateAllUI(){
     const jEl=document.getElementById('crew-journal');
     if(jEl)jEl.innerHTML=genJournal(s.crew,s,s.sol);
   }
+  // Wallets
+  updateWalletUI();
   // DNA
   updateDNA(s);
   // LisPy console
@@ -5545,6 +5746,8 @@ function serializeCartridge(){
     chainHead: chainHead,
     chainBlocks: chainBlocks.slice(-100),
     marsLedger: state.marsLedger ? JSON.parse(JSON.stringify(state.marsLedger)) : {},
+    marsWallets: JSON.parse(JSON.stringify(marsWallets)),
+    marsTransfers: marsTransfers.slice(-200),
     attestation: generateRunAttestation(),
     
     // Score
@@ -5597,6 +5800,8 @@ function deserializeCartridge(cartridge){
   if(cartridge.chainHead) chainHead = cartridge.chainHead;
   if(cartridge.chainBlocks) chainBlocks = cartridge.chainBlocks;
   if(cartridge.marsLedger) state.marsLedger = cartridge.marsLedger;
+  if(cartridge.marsWallets) marsWallets = cartridge.marsWallets;
+  if(cartridge.marsTransfers) marsTransfers = cartridge.marsTransfers;
   
   // Restore config
   if(cartridge.config){
@@ -5915,11 +6120,38 @@ function handleTwinMessage(msg){
       twinBroadcast('state_update', buildTwinStatePayload());
       break;
 
+    case 'mars_transfer':
+      if(msg.payload){
+        const p = msg.payload;
+        const result = marsTransfer(p.from, p.to, p.amount, p.memo || 'via twin protocol');
+        twinBroadcast('mars_transfer_result', result);
+      }
+      break;
+
+    case 'tip_agent':
+      if(msg.payload){
+        const result = tipAgent(msg.payload.agent, msg.payload.amount, msg.payload.memo || 'tip via Mission Control');
+        twinBroadcast('mars_transfer_result', result);
+        updateAllUI();
+      }
+      break;
+
+    case 'get_wallets':
+      initWallets();
+      twinBroadcast('wallets', {wallets: marsWallets, transfers: marsTransfers.slice(-50)});
+      break;
+
+    case 'register_wallet':
+      if(msg.payload){
+        const result = registerExternalWallet(msg.payload.address, msg.payload.owner);
+        twinBroadcast('wallet_registered', result);
+      }
+      break;
+
     case 'subscribe_echo':
     case 'subscribe_state':
     case 'subscribe_tasks':
     case 'subscribe_reflexes':
-      // Subscriptions handled by broadcasting events as they happen
       break;
 
     case 'unsubscribe_all':
