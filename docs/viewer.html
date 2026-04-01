@@ -574,6 +574,15 @@ body.cinematic-active .cartridge-bar,body.cinematic-active #task-panel{
   <div id="crew-journal" style="max-height:100px;overflow-y:auto;font-size:10px;line-height:1.5;color:var(--text);font-style:italic;padding:4px;background:rgba(0,0,0,0.3);border-radius:4px">Awaiting first sol...</div>
   <h3>Colony DNA</h3>
   <div id="colony-dna" style="overflow-x:auto"></div>
+  <h3>📈 MARS Market</h3>
+  <div id="mars-market" style="position:relative;height:60px;background:#080b10;border:1px solid var(--border);border-radius:6px;overflow:hidden">
+    <canvas id="mars-chart" style="width:100%;height:100%"></canvas>
+  </div>
+  <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--dim);margin-top:2px">
+    <span id="market-price" style="color:var(--cyan)">—</span>
+    <span id="market-delta"></span>
+    <span id="market-fidelity"></span>
+  </div>
   <h3 style="cursor:pointer" onclick="document.getElementById('lispy-panel').style.display=document.getElementById('lispy-panel').style.display==='none'?'block':'none'">LisPy Console ▾</h3>
   <div id="lispy-panel" style="display:none">
     <div style="margin-bottom:4px;display:flex;gap:4px;align-items:center">
@@ -5000,6 +5009,183 @@ function updateDNA(state){
   el.innerHTML=svg;
 }
 
+// ── MARS Market (confidence signal / twin fidelity chart) ──
+// The MARS "price" is a forward-looking confidence signal computed from:
+// - Colony health trajectory (are things getting better or worse?)
+// - CRI inverse (low risk = high confidence)
+// - Crew survival rate
+// - Resource runway (days of reserves)
+// - Twin fidelity (how closely does echo inertia predict actual outcomes?)
+// This IS the stock chart. Every frame is a candle. The price IS the
+// market's confidence in the colony's future survival.
+
+let marsMarketHistory = []; // [{sol, price, volume, delta, fidelity}]
+let marsSmoothedPrice = 100; // EMA starting point
+
+function computeMarsPrice(){
+  const s = state;
+  const n = Math.max(1, s.crew.filter(c=>c.alive).length);
+  if(!s.alive) return {price:0, delta:0, fidelity:0, volume:0};
+
+  // Component signals (each 0-100)
+  const healthSignal = Math.min(100, (s.crew.filter(c=>c.alive).reduce((a,c)=>a+c.hp,0) / (s.crew.length||1)));
+  const criSignal = 100 - colonyRiskIndex;
+  const survivalSignal = (s.crew.filter(c=>c.alive).length / (s.crew.length||1)) * 100;
+  const o2Runway = Math.min(100, (s.o2 / (0.84 * n)) * 3.3); // 30 days = 100
+  const h2oRunway = Math.min(100, (s.h2o / (2.5 * n)) * 3.3);
+  const foodRunway = Math.min(100, (s.food / (2500 * n)) * 3.3);
+  const powerSignal = Math.min(100, s.power / 5);
+  const moraleSignal = s.morale * 100;
+
+  // Weighted composite
+  const rawPrice = (
+    healthSignal * 0.15 +
+    criSignal * 0.20 +
+    survivalSignal * 0.15 +
+    o2Runway * 0.10 +
+    h2oRunway * 0.05 +
+    foodRunway * 0.05 +
+    powerSignal * 0.15 +
+    moraleSignal * 0.10 +
+    Math.min(100, s.modules.length * 12) * 0.05 // infrastructure signal
+  );
+
+  // Twin fidelity: how well did echo inertia predict this sol's outcome?
+  // If velocity predicted decline and we actually declined = high fidelity
+  // If velocity predicted growth and we actually declined = low fidelity (divergence)
+  let fidelity = 50; // default
+  if(echoHistory.length >= 2){
+    const prev = echoHistory[echoHistory.length - 2];
+    const curr = echoHistory[echoHistory.length - 1];
+    if(prev && curr && prev.delta && curr.delta){
+      const predicted = Math.sign(prev.delta.o2 || 0);
+      const actual = Math.sign(curr.delta.o2 || 0);
+      const predPower = Math.sign(prev.delta.power || 0);
+      const actPower = Math.sign(curr.delta.power || 0);
+      fidelity = 50 + (predicted === actual ? 25 : -25) + (predPower === actPower ? 25 : -25);
+    }
+  }
+
+  // EMA smoothing (price doesn't jump wildly)
+  const alpha = 0.15;
+  marsSmoothedPrice = marsSmoothedPrice * (1 - alpha) + rawPrice * alpha;
+
+  // Fidelity multiplier: high twin fidelity = price premium
+  const fidelityMult = 0.8 + (fidelity / 100) * 0.4; // 0.8× to 1.2×
+  const finalPrice = Math.max(0.01, marsSmoothedPrice * fidelityMult);
+
+  // Volume = activity (tasks resolved + reflexes + events)
+  const volume = (taskHistory.filter(t=>t.sol===s.sol).length * 30) +
+    (activeReflexes.length * 10) + (s.events.length * 5) + 10;
+
+  // Delta from last
+  const lastPrice = marsMarketHistory.length ? marsMarketHistory[marsMarketHistory.length-1].price : finalPrice;
+  const delta = finalPrice - lastPrice;
+
+  return {price: Math.round(finalPrice * 100) / 100, delta: Math.round(delta * 100) / 100, fidelity: Math.round(fidelity), volume};
+}
+
+function updateMarsMarket(){
+  const market = computeMarsPrice();
+  marsMarketHistory.push({sol: state.sol, ...market});
+  if(marsMarketHistory.length > 500) marsMarketHistory.shift();
+
+  // Update labels
+  const priceEl = document.getElementById('market-price');
+  const deltaEl = document.getElementById('market-delta');
+  const fidEl = document.getElementById('market-fidelity');
+  if(priceEl) priceEl.innerHTML = `<span style="color:var(--cyan);font-weight:700">${market.price.toFixed(2)}</span> MARS/SOL`;
+  if(deltaEl){
+    const col = market.delta > 0 ? 'var(--green)' : market.delta < 0 ? 'var(--red)' : 'var(--dim)';
+    deltaEl.innerHTML = `<span style="color:${col}">${market.delta > 0?'▲':'▼'} ${Math.abs(market.delta).toFixed(2)}</span>`;
+  }
+  if(fidEl){
+    const col = market.fidelity > 70 ? 'var(--green)' : market.fidelity > 40 ? 'var(--yellow)' : 'var(--red)';
+    fidEl.innerHTML = `Twin: <span style="color:${col}">${market.fidelity}%</span>`;
+  }
+
+  // Render candlestick-style chart on canvas
+  const canvas = document.getElementById('mars-chart');
+  if(!canvas || marsMarketHistory.length < 2) return;
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width * (window.devicePixelRatio || 1);
+  canvas.height = rect.height * (window.devicePixelRatio || 1);
+  ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+  const w = rect.width, h = rect.height;
+
+  ctx.clearRect(0, 0, w, h);
+
+  const visible = marsMarketHistory.slice(-Math.min(marsMarketHistory.length, Math.floor(w / 2)));
+  const prices = visible.map(m => m.price);
+  const maxP = Math.max(...prices, 1);
+  const minP = Math.min(...prices, 0);
+  const range = Math.max(maxP - minP, 1);
+  const barW = Math.max(1, (w - 4) / visible.length);
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(88,166,255,0.08)';
+  ctx.lineWidth = 0.5;
+  for(let i = 0; i < 4; i++){
+    const gy = h * 0.1 + (h * 0.8 / 3) * i;
+    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
+  }
+
+  // Price line + fill
+  ctx.beginPath();
+  ctx.moveTo(2, h - 2);
+  visible.forEach((m, i) => {
+    const x = 2 + i * barW;
+    const y = h * 0.9 - ((m.price - minP) / range) * h * 0.8;
+    if(i === 0) ctx.lineTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.lineTo(2 + (visible.length - 1) * barW, h - 2);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, 0, 0, h);
+  const lastM = visible[visible.length - 1];
+  const trendUp = lastM && lastM.delta >= 0;
+  grad.addColorStop(0, trendUp ? 'rgba(63,185,80,0.3)' : 'rgba(218,54,51,0.3)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Price line stroke
+  ctx.beginPath();
+  visible.forEach((m, i) => {
+    const x = 2 + i * barW;
+    const y = h * 0.9 - ((m.price - minP) / range) * h * 0.8;
+    if(i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.strokeStyle = trendUp ? '#3fb950' : '#da3633';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Volume bars at bottom
+  const maxVol = Math.max(...visible.map(m => m.volume), 1);
+  visible.forEach((m, i) => {
+    const x = 2 + i * barW;
+    const vh = (m.volume / maxVol) * h * 0.15;
+    ctx.fillStyle = m.delta >= 0 ? 'rgba(63,185,80,0.2)' : 'rgba(218,54,51,0.2)';
+    ctx.fillRect(x, h - vh, Math.max(1, barW - 0.5), vh);
+  });
+
+  // Fidelity overlay (thin purple line)
+  ctx.beginPath();
+  visible.forEach((m, i) => {
+    const x = 2 + i * barW;
+    const y = h * 0.9 - (m.fidelity / 100) * h * 0.8;
+    if(i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.strokeStyle = 'rgba(163,113,247,0.5)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
 function updateAllUI(){
   const s=state,ac=s.crew.filter(c=>c.alive),n=Math.max(1,ac.length);
   // Status
@@ -5163,6 +5349,8 @@ function updateAllUI(){
   updateTreasuryUI();
   // DNA
   updateDNA(s);
+  // MARS Market (confidence signal / twin fidelity)
+  updateMarsMarket();
   // LisPy console
   const lispyEd=document.getElementById('lispy-editor');
   if(lispyEd&&!lispyEd.matches(':focus'))lispyEd.value=lispyCode;
