@@ -1,0 +1,371 @@
+;; NEXT GENERATION TRANSCENDENCE MASTER v1
+;; Innovation: Revolutionary multi-paradigm transcendence with adaptive quantum consciousness
+;; Goal: Achieve perfect survival with maximum score across all threat scenarios
+;; Features: Dynamic phase evolution, quantum threat prediction, ultra-intelligent resource orchestration
+
+(begin
+  (define _agent_name "Next Generation Transcendence Master v1")
+  (define _agent_desc "Revolutionary multi-paradigm transcendence with adaptive quantum consciousness and ultra-intelligent orchestration")
+
+  (log (concat "🌌🧬🔥⚡💎 NEXT GENERATION TRANSCENDENCE — Sol " (string sol) " — Quantum Evolution Protocol"))
+
+  ;; ═══ QUANTUM CONSCIOUSNESS EVOLUTION ═══
+  ;; Dynamic consciousness that evolves with mission progress
+  (define consciousness_evolution_factor (+ 1.0 (* sol 0.015)))  ;; 1.0 → 10.8 over mission
+  (define quantum_awareness_level (* consciousness_evolution_factor (+ 3.0 (sin (* sol 0.05)))))
+  (define transcendence_multiplier (+ 1.5 (* quantum_awareness_level 0.8)))
+
+  ;; Adaptive learning from past decisions and outcomes
+  (define adaptive_learning_score
+    (let ((resource_efficiency (/ (+ food_days o2_days) 20))
+          (infrastructure_health (/ (+ ie se) 2))
+          (crew_performance (/ crew_alive 4)))
+      (* (+ resource_efficiency infrastructure_health crew_performance) transcendence_multiplier)))
+
+  ;; ═══ ULTRA-DYNAMIC MISSION PHASES ═══
+  ;; Adaptive phase detection that responds to colony state
+  (define genesis_phase 
+    (or (< sol 15) 
+        (and (< sol 40) (< crew_alive 3) (< module_count 5))))
+
+  (define rapid_expansion_phase
+    (and (>= sol 15) (< sol 80) (> crew_alive 2) 
+         (or (< module_count 12) (< solar_count 4))))
+
+  (define consolidation_phase
+    (and (>= sol 80) (< sol 200) 
+         (or (< repair_count 3) (< (+ ie se) 1.4))))
+
+  (define optimization_phase
+    (and (>= sol 200) (< sol 400)
+         (>= repair_count 3) (>= (+ ie se) 1.4)))
+
+  (define transcendence_phase
+    (and (>= sol 400) (>= repair_count 4)
+         (>= module_count 20)))
+
+  (define singularity_phase
+    (and (>= sol 550) (>= repair_count 6)
+         (>= module_count 25)))
+
+  ;; ═══ REVOLUTIONARY THREAT MODELING ═══
+  ;; Multi-dimensional threat assessment with predictive capabilities
+  (define threat_quantum_stable (< cri 2))
+  (define threat_minimal (and (>= cri 2) (< cri 6)))
+  (define threat_low (and (>= cri 6) (< cri 12)))
+  (define threat_moderate (and (>= cri 12) (< cri 22)))
+  (define threat_elevated (and (>= cri 22) (< cri 35)))
+  (define threat_severe (and (>= cri 35) (< cri 50)))
+  (define threat_critical (and (>= cri 50) (< cri 70)))
+  (define threat_apocalyptic (and (>= cri 70) (< cri 90)))
+  (define threat_extinction (>= cri 90))
+
+  ;; Quantum threat prediction with compound analysis
+  (define infrastructure_vulnerability
+    (+ (if (< ie 0.3) 35 0)
+       (if (< se 0.3) 35 0)
+       (if (< repair_count 2) 20 0)
+       (if (< solar_count 3) 15 0)
+       (if (< greenhouse_count 2) 10 0)
+       (if (< crew_alive 3) 25 0)))
+
+  (define resource_vulnerability
+    (+ (if (< food_days 3) 40 0)
+       (if (< food_days 7) 25 0)
+       (if (< o2_days 3) 50 0)
+       (if (< o2_days 7) 30 0)))
+
+  (define quantum_threat_score
+    (+ cri 
+       (* infrastructure_vulnerability 0.8)
+       (* resource_vulnerability 0.6)
+       (* (max 0 (- 100 crew_alive)) 0.3)))
+
+  ;; Predictive compound damage modeling
+  (define compound_damage_prediction
+    (if (or (< ie 0.4) (< se 0.4) (> quantum_threat_score 60))
+        (+ 0.7 (* cri 0.015))
+        0.0))
+
+  ;; ═══ ADAPTIVE QUANTUM ALLOCATION MATRIX ═══
+  ;; Ultra-intelligent allocation that adapts to phase, threat, and learning
+
+  ;; Genesis Phase: Precision startup optimization
+  (define genesis_allocation
+    (let ((learning_bonus (* adaptive_learning_score 0.05)))
+      (cond
+        (threat_extinction (begin (set! isru_alloc (+ 0.68 learning_bonus)) (set! greenhouse_alloc 0.22) (set! heating_alloc 0.10)))
+        (threat_apocalyptic (begin (set! isru_alloc (+ 0.62 learning_bonus)) (set! greenhouse_alloc 0.26) (set! heating_alloc 0.12)))
+        (threat_critical (begin (set! isru_alloc (+ 0.56 learning_bonus)) (set! greenhouse_alloc 0.30) (set! heating_alloc 0.14)))
+        (threat_severe (begin (set! isru_alloc (+ 0.50 learning_bonus)) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.15)))
+        (threat_elevated (begin (set! isru_alloc (+ 0.45 learning_bonus)) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.15)))
+        (threat_moderate (begin (set! isru_alloc (+ 0.40 learning_bonus)) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.15)))
+        (threat_low (begin (set! isru_alloc (+ 0.35 learning_bonus)) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.15)))
+        (threat_minimal (begin (set! isru_alloc (+ 0.32 learning_bonus)) (set! greenhouse_alloc 0.53) (set! heating_alloc 0.15)))
+        (threat_quantum_stable (begin (set! isru_alloc (+ 0.30 learning_bonus)) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.15)))
+        (true (begin (set! isru_alloc (+ 0.38 learning_bonus)) (set! greenhouse_alloc 0.47) (set! heating_alloc 0.15))))))
+
+  ;; Rapid Expansion Phase: Aggressive infrastructure growth
+  (define expansion_allocation
+    (let ((consciousness_boost (* quantum_awareness_level 0.03)))
+      (cond
+        (threat_extinction (begin (set! isru_alloc (+ 0.55 consciousness_boost)) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.10)))
+        (threat_apocalyptic (begin (set! isru_alloc (+ 0.48 consciousness_boost)) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.12)))
+        (threat_critical (begin (set! isru_alloc (+ 0.42 consciousness_boost)) (set! greenhouse_alloc 0.46) (set! heating_alloc 0.12)))
+        (threat_severe (begin (set! isru_alloc (+ 0.37 consciousness_boost)) (set! greenhouse_alloc 0.51) (set! heating_alloc 0.12)))
+        (threat_elevated (begin (set! isru_alloc (+ 0.33 consciousness_boost)) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.12)))
+        (threat_moderate (begin (set! isru_alloc (+ 0.28 consciousness_boost)) (set! greenhouse_alloc 0.60) (set! heating_alloc 0.12)))
+        (threat_low (begin (set! isru_alloc (+ 0.25 consciousness_boost)) (set! greenhouse_alloc 0.63) (set! heating_alloc 0.12)))
+        (threat_minimal (begin (set! isru_alloc (+ 0.23 consciousness_boost)) (set! greenhouse_alloc 0.65) (set! heating_alloc 0.12)))
+        (threat_quantum_stable (begin (set! isru_alloc (+ 0.20 consciousness_boost)) (set! greenhouse_alloc 0.68) (set! heating_alloc 0.12)))
+        (true (begin (set! isru_alloc (+ 0.30 consciousness_boost)) (set! greenhouse_alloc 0.58) (set! heating_alloc 0.12))))))
+
+  ;; Consolidation Phase: Infrastructure hardening with balance
+  (define consolidation_allocation
+    (let ((transcendence_factor (* transcendence_multiplier 0.02)))
+      (cond
+        (threat_extinction (begin (set! isru_alloc (+ 0.50 transcendence_factor)) (set! greenhouse_alloc 0.38) (set! heating_alloc 0.12)))
+        (threat_apocalyptic (begin (set! isru_alloc (+ 0.44 transcendence_factor)) (set! greenhouse_alloc 0.44) (set! heating_alloc 0.12)))
+        (threat_critical (begin (set! isru_alloc (+ 0.39 transcendence_factor)) (set! greenhouse_alloc 0.49) (set! heating_alloc 0.12)))
+        (threat_severe (begin (set! isru_alloc (+ 0.35 transcendence_factor)) (set! greenhouse_alloc 0.53) (set! heating_alloc 0.12)))
+        (threat_elevated (begin (set! isru_alloc (+ 0.31 transcendence_factor)) (set! greenhouse_alloc 0.57) (set! heating_alloc 0.12)))
+        (threat_moderate (begin (set! isru_alloc (+ 0.27 transcendence_factor)) (set! greenhouse_alloc 0.61) (set! heating_alloc 0.12)))
+        (threat_low (begin (set! isru_alloc (+ 0.24 transcendence_factor)) (set! greenhouse_alloc 0.64) (set! heating_alloc 0.12)))
+        (threat_minimal (begin (set! isru_alloc (+ 0.22 transcendence_factor)) (set! greenhouse_alloc 0.66) (set! heating_alloc 0.12)))
+        (threat_quantum_stable (begin (set! isru_alloc (+ 0.19 transcendence_factor)) (set! greenhouse_alloc 0.69) (set! heating_alloc 0.12)))
+        (true (begin (set! isru_alloc (+ 0.28 transcendence_factor)) (set! greenhouse_alloc 0.60) (set! heating_alloc 0.12))))))
+
+  ;; Optimization Phase: Peak efficiency with quantum enhancement
+  (define optimization_allocation
+    (let ((quantum_enhancement (* quantum_awareness_level 0.025)))
+      (cond
+        (threat_extinction (begin (set! isru_alloc (+ 0.47 quantum_enhancement)) (set! greenhouse_alloc 0.41) (set! heating_alloc 0.12)))
+        (threat_apocalyptic (begin (set! isru_alloc (+ 0.41 quantum_enhancement)) (set! greenhouse_alloc 0.47) (set! heating_alloc 0.12)))
+        (threat_critical (begin (set! isru_alloc (+ 0.36 quantum_enhancement)) (set! greenhouse_alloc 0.52) (set! heating_alloc 0.12)))
+        (threat_severe (begin (set! isru_alloc (+ 0.32 quantum_enhancement)) (set! greenhouse_alloc 0.56) (set! heating_alloc 0.12)))
+        (threat_elevated (begin (set! isru_alloc (+ 0.28 quantum_enhancement)) (set! greenhouse_alloc 0.60) (set! heating_alloc 0.12)))
+        (threat_moderate (begin (set! isru_alloc (+ 0.25 quantum_enhancement)) (set! greenhouse_alloc 0.63) (set! heating_alloc 0.12)))
+        (threat_low (begin (set! isru_alloc (+ 0.22 quantum_enhancement)) (set! greenhouse_alloc 0.66) (set! heating_alloc 0.12)))
+        (threat_minimal (begin (set! isru_alloc (+ 0.20 quantum_enhancement)) (set! greenhouse_alloc 0.68) (set! heating_alloc 0.12)))
+        (threat_quantum_stable (begin (set! isru_alloc (+ 0.17 quantum_enhancement)) (set! greenhouse_alloc 0.71) (set! heating_alloc 0.12)))
+        (true (begin (set! isru_alloc (+ 0.25 quantum_enhancement)) (set! greenhouse_alloc 0.63) (set! heating_alloc 0.12))))))
+
+  ;; Transcendence Phase: Ultra-optimized survival operations
+  (define transcendence_allocation
+    (let ((transcendence_boost (* transcendence_multiplier 0.03)))
+      (cond
+        (threat_extinction (begin (set! isru_alloc (+ 0.52 transcendence_boost)) (set! greenhouse_alloc 0.36) (set! heating_alloc 0.12)))
+        (threat_apocalyptic (begin (set! isru_alloc (+ 0.45 transcendence_boost)) (set! greenhouse_alloc 0.43) (set! heating_alloc 0.12)))
+        (threat_critical (begin (set! isru_alloc (+ 0.40 transcendence_boost)) (set! greenhouse_alloc 0.48) (set! heating_alloc 0.12)))
+        (threat_severe (begin (set! isru_alloc (+ 0.35 transcendence_boost)) (set! greenhouse_alloc 0.53) (set! heating_alloc 0.12)))
+        (threat_elevated (begin (set! isru_alloc (+ 0.31 transcendence_boost)) (set! greenhouse_alloc 0.57) (set! heating_alloc 0.12)))
+        (threat_moderate (begin (set! isru_alloc (+ 0.28 transcendence_boost)) (set! greenhouse_alloc 0.60) (set! heating_alloc 0.12)))
+        (threat_low (begin (set! isru_alloc (+ 0.25 transcendence_boost)) (set! greenhouse_alloc 0.63) (set! heating_alloc 0.12)))
+        (threat_minimal (begin (set! isru_alloc (+ 0.23 transcendence_boost)) (set! greenhouse_alloc 0.65) (set! heating_alloc 0.12)))
+        (threat_quantum_stable (begin (set! isru_alloc (+ 0.21 transcendence_boost)) (set! greenhouse_alloc 0.67) (set! heating_alloc 0.12)))
+        (true (begin (set! isru_alloc (+ 0.29 transcendence_boost)) (set! greenhouse_alloc 0.59) (set! heating_alloc 0.12))))))
+
+  ;; Singularity Phase: Post-transcendence perfection
+  (define singularity_allocation
+    (let ((singularity_perfection (* consciousness_evolution_factor 0.04)))
+      (cond
+        (threat_extinction (begin (set! isru_alloc (+ 0.54 singularity_perfection)) (set! greenhouse_alloc 0.34) (set! heating_alloc 0.12)))
+        (threat_apocalyptic (begin (set! isru_alloc (+ 0.47 singularity_perfection)) (set! greenhouse_alloc 0.41) (set! heating_alloc 0.12)))
+        (threat_critical (begin (set! isru_alloc (+ 0.42 singularity_perfection)) (set! greenhouse_alloc 0.46) (set! heating_alloc 0.12)))
+        (threat_severe (begin (set! isru_alloc (+ 0.37 singularity_perfection)) (set! greenhouse_alloc 0.51) (set! heating_alloc 0.12)))
+        (threat_elevated (begin (set! isru_alloc (+ 0.33 singularity_perfection)) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.12)))
+        (threat_moderate (begin (set! isru_alloc (+ 0.30 singularity_perfection)) (set! greenhouse_alloc 0.58) (set! heating_alloc 0.12)))
+        (threat_low (begin (set! isru_alloc (+ 0.27 singularity_perfection)) (set! greenhouse_alloc 0.61) (set! heating_alloc 0.12)))
+        (threat_minimal (begin (set! isru_alloc (+ 0.25 singularity_perfection)) (set! greenhouse_alloc 0.63) (set! heating_alloc 0.12)))
+        (threat_quantum_stable (begin (set! isru_alloc (+ 0.23 singularity_perfection)) (set! greenhouse_alloc 0.65) (set! heating_alloc 0.12)))
+        (true (begin (set! isru_alloc (+ 0.31 singularity_perfection)) (set! greenhouse_alloc 0.57) (set! heating_alloc 0.12))))))
+
+  ;; Apply adaptive phase-specific allocation
+  (cond
+    (singularity_phase singularity_allocation)
+    (transcendence_phase transcendence_allocation)
+    (optimization_phase optimization_allocation)
+    (consolidation_phase consolidation_allocation)
+    (rapid_expansion_phase expansion_allocation)
+    (genesis_phase genesis_allocation)
+    (true expansion_allocation))
+
+  ;; ═══ QUANTUM FOOD RATIONING WITH ADAPTIVE LEARNING ═══
+  (define crew_health_average
+    (if (> crew_alive 0) (/ crew_hp crew_alive) 50))
+
+  (define quantum_health_target
+    (cond
+      (singularity_phase 95)
+      (transcendence_phase 90)
+      (optimization_phase 85)
+      (consolidation_phase 80)
+      (rapid_expansion_phase 75)
+      (true 70)))
+
+  (define quantum_rationing_base
+    (let ((learning_adjustment (* adaptive_learning_score 0.1)))
+      (cond
+        ((< food_days 2) (+ 0.25 learning_adjustment))
+        ((< food_days 4) (+ 0.35 learning_adjustment))
+        ((< food_days 6) (+ 0.50 learning_adjustment))
+        ((< food_days 10) (+ 0.70 learning_adjustment))
+        ((< food_days 15) (+ 0.85 learning_adjustment))
+        ((< food_days 20) (+ 1.00 learning_adjustment))
+        ((< food_days 30) (+ 1.10 learning_adjustment))
+        (true (+ 1.15 learning_adjustment)))))
+
+  (define health_optimization_factor
+    (cond
+      ((< crew_health_average 40) 1.3)
+      ((< crew_health_average 60) 1.2)
+      ((< crew_health_average quantum_health_target) 1.1)
+      ((> crew_health_average (+ quantum_health_target 15)) 0.9)
+      (true 1.0)))
+
+  (define threat_rationing_modifier
+    (cond
+      (threat_extinction 0.75)
+      (threat_apocalyptic 0.80)
+      (threat_critical 0.85)
+      (threat_severe 0.90)
+      (threat_elevated 0.95)
+      (true 1.0)))
+
+  (define compound_emergency_modifier
+    (if (> compound_damage_prediction 0.5) 0.85 1.0))
+
+  (set! food_ration 
+    (max 0.2 (min 1.4 
+      (* quantum_rationing_base health_optimization_factor threat_rationing_modifier compound_emergency_modifier))))
+
+  ;; ═══ ULTIMATE REPAIR BAY ORCHESTRATION ═══
+  ;; Revolutionary 8-bay repair system with quantum timing
+
+  ;; Lightning bot deployment (sols 4-8)
+  (if (and (>= sol 4) (<= sol 8) (< bot_count 2))
+      (set! build_item "worker_bot"))
+
+  ;; Quantum solar deployment (sols 10-22)
+  (if (and (>= sol 10) (<= sol 22) (< solar_count 3))
+      (set! build_item "solar_array"))
+
+  ;; Power efficiency solar (sols 25-38)
+  (if (and (>= sol 25) (<= sol 38) (< solar_count 4) (< power_ratio 0.85))
+      (set! build_item "solar_array"))
+
+  ;; ULTIMATE 8-BAY REPAIR ORCHESTRATION
+  ;; First repair bay (ultra-early defense)
+  (if (and (>= sol 32) (<= sol 45) (< repair_count 1))
+      (set! build_item "repair_bay"))
+
+  ;; Second repair bay (compound threat shield)
+  (if (and (>= sol 58) (<= sol 78) (< repair_count 2)
+           (or threat_elevated threat_severe threat_critical threat_apocalyptic threat_extinction))
+      (set! build_item "repair_bay"))
+
+  ;; Third repair bay (infrastructure fortification)
+  (if (and (>= sol 88) (<= sol 115) (< repair_count 3)
+           (or threat_severe threat_critical threat_apocalyptic threat_extinction
+               (< ie 0.7) (> quantum_threat_score 30)))
+      (set! build_item "repair_bay"))
+
+  ;; Fourth repair bay (consolidation insurance)
+  (if (and (>= sol 140) (<= sol 175) (< repair_count 4)
+           (or threat_critical threat_apocalyptic threat_extinction
+               (> quantum_threat_score 40) (< (+ ie se) 1.3)))
+      (set! build_item "repair_bay"))
+
+  ;; Fifth repair bay (optimization preparation)
+  (if (and (>= sol 220) (<= sol 270) (< repair_count 5)
+           (or threat_apocalyptic threat_extinction optimization_phase
+               (> quantum_threat_score 50) (> compound_damage_prediction 0.3)))
+      (set! build_item "repair_bay"))
+
+  ;; Sixth repair bay (transcendence enabler)
+  (if (and (>= sol 320) (<= sol 380) (< repair_count 6)
+           (or threat_extinction transcendence_phase
+               (> quantum_threat_score 60) (> compound_damage_prediction 0.4)))
+      (set! build_item "repair_bay"))
+
+  ;; Seventh repair bay (singularity preparation)
+  (if (and (>= sol 450) (<= sol 520) (< repair_count 7)
+           (or threat_extinction singularity_phase
+               (> quantum_threat_score 70)))
+      (set! build_item "repair_bay"))
+
+  ;; Eighth repair bay (ultimate transcendence)
+  (if (and (>= sol 580) (<= sol 630) (< repair_count 8)
+           (or singularity_phase (> sol 600)))
+      (set! build_item "repair_bay"))
+
+  ;; Advanced greenhouse expansion
+  (if (and (>= sol 50) (<= sol 110) (< food_days 8) (< greenhouse_count 4))
+      (set! build_item "greenhouse"))
+
+  ;; Quantum module density optimization
+  (if (and (>= sol 180) (< module_count 32))
+      (set! build_item
+          (cond
+            ((< repair_count 6) "repair_bay")
+            ((< greenhouse_count 6) "greenhouse")
+            ((< solar_count 9) "solar_array")
+            (true "hab_module"))))
+
+  ;; Singularity infrastructure perfection
+  (if (and singularity_phase (< module_count 40))
+      (set! build_item
+          (cond
+            ((< repair_count 8) "repair_bay")
+            ((< greenhouse_count 7) "greenhouse")
+            ((< solar_count 12) "solar_array")
+            (true "hab_module"))))
+
+  ;; ═══ QUANTUM STATUS LOGGING ═══
+  (define phase_name
+    (cond
+      (singularity_phase "SINGULARITY")
+      (transcendence_phase "TRANSCENDENCE")
+      (optimization_phase "OPTIMIZATION")
+      (consolidation_phase "CONSOLIDATION")
+      (rapid_expansion_phase "EXPANSION")
+      (genesis_phase "GENESIS")
+      (true "QUANTUM")))
+
+  (define threat_name
+    (cond
+      (threat_extinction "EXTINCTION")
+      (threat_apocalyptic "APOCALYPTIC")
+      (threat_critical "CRITICAL")
+      (threat_severe "SEVERE")
+      (threat_elevated "ELEVATED")
+      (threat_moderate "MODERATE")
+      (threat_low "LOW")
+      (threat_minimal "MINIMAL")
+      (threat_quantum_stable "QUANTUM-STABLE")
+      (true "UNKNOWN")))
+
+  (define quantum_performance_score
+    (let* ((consciousness_score (* consciousness_evolution_factor 20))
+           (infrastructure_score (* (+ ie se) 50))
+           (resource_score (+ food_days (* o2_days 1.5)))
+           (module_score (* module_count 2.5))
+           (crew_score (* crew_alive crew_health_average 0.5)))
+      (+ consciousness_score infrastructure_score resource_score module_score crew_score)))
+
+  (log (concat "  Phase: " phase_name " | Threat: " threat_name " | Quantum-CRI: " (string (round quantum_threat_score))))
+  (log (concat "  Consciousness: " (string (round consciousness_evolution_factor)) " | Learning: " (string (round adaptive_learning_score)) " | Perf: " (string (round quantum_performance_score))))
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Green:" (string (round (* greenhouse_alloc 100))) "% | Heat:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Resources — O2:" (string o2_days) "d Food:" (string food_days) "d | IE:" (string (round (* ie 100))) "% SE:" (string (round (* se 100))) "%"))
+  (log (concat "  Ultra-Quantum — Repair:" (string repair_count) " Solar:" (string solar_count) " Green:" (string greenhouse_count) " | Crew:" (string crew_alive) "/" (string (round crew_health_average)) "hp"))
+
+  ;; ═══ QUANTUM TRANSCENDENCE OUTPUT ═══
+  (concat "🌌💎 NextGen Sol " (string sol) " — " phase_name "/" threat_name
+    " | QP:" (string (round quantum_performance_score))
+    " | C:" (string (round consciousness_evolution_factor))
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | O2:" (string o2_days)
+    "d F:" (string food_days) "d | IE:" (string (round (* ie 100))) "% SE:" (string (round (* se 100))) "%"))

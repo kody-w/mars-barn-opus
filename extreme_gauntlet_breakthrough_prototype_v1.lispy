@@ -1,0 +1,289 @@
+;; EXTREME GAUNTLET BREAKTHROUGH PROTOTYPE v1
+;; Innovation: Extreme early-game focus with ultra-aggressive repair deployment
+;; Goal: Beat 654+ sols with revolutionary early preparation strategy
+;; Features: Lightning infrastructure, extreme repair redundancy, predictive crisis management
+
+(begin
+  (define _agent_name "Extreme Gauntlet Breakthrough Prototype v1")
+  (define _agent_desc "Ultra-aggressive early preparation with extreme repair redundancy and lightning infrastructure deployment")
+
+  (log (concat "⚡🛡️🔥💎🚀 EXTREME BREAKTHROUGH — Sol " (string sol) " — Lightning Protocol"))
+
+  ;; ═══ EXTREME EARLY GAME PARAMETERS ═══
+  ;; Ultra-aggressive early game focus that sacrifices short-term comfort for long-term dominance
+  (define lightning_phase (< sol 50))           ;; Ultra-fast infrastructure deployment
+  (define blitz_expansion (and (>= sol 50) (< sol 120)))  ;; Rapid infrastructure scaling
+  (define fortress_mode (and (>= sol 120) (< sol 300)))   ;; Extreme repair redundancy
+  (define dominance_mode (and (>= sol 300) (< sol 500)))  ;; Infrastructure dominance
+  (define supremacy_mode (>= sol 500))          ;; Final supremacy phase
+
+  ;; Extreme threat responsiveness with hair-trigger sensitivity
+  (define threat_paranoid (> cri 1))            ;; Hair-trigger response
+  (define threat_extreme_low (and (>= cri 4) (< cri 10)))
+  (define threat_low (and (>= cri 10) (< cri 18)))
+  (define threat_moderate (and (>= cri 18) (< cri 30)))
+  (define threat_high (and (>= cri 30) (< cri 45)))
+  (define threat_severe (and (>= cri 45) (< cri 65)))
+  (define threat_critical (and (>= cri 65) (< cri 85)))
+  (define threat_apocalyptic (>= cri 85))
+
+  ;; Ultra-aggressive infrastructure vulnerability detection
+  (define infrastructure_crisis_score
+    (+ (if (< ie 0.5) 50 0)
+       (if (< se 0.5) 50 0)
+       (if (< repair_count 1) 40 0)
+       (if (< repair_count 3) 30 0)
+       (if (< solar_count 3) 25 0)
+       (if (< greenhouse_count 2) 20 0)
+       (if (< crew_alive 3) 35 0)))
+
+  ;; Crisis multiplier for extreme responses
+  (define crisis_multiplier
+    (cond
+      ((> infrastructure_crisis_score 80) 2.5)
+      ((> infrastructure_crisis_score 60) 2.0)
+      ((> infrastructure_crisis_score 40) 1.7)
+      ((> infrastructure_crisis_score 20) 1.4)
+      (true 1.0)))
+
+  (define extreme_threat_index (* cri crisis_multiplier))
+
+  ;; ═══ LIGHTNING ALLOCATION STRATEGY ═══
+  ;; Ultra-aggressive allocation focused on rapid O2 buildup early, then food dominance
+
+  ;; Lightning Phase: EXTREME O2 focus to build massive reserves
+  (define lightning_allocation
+    (cond
+      (threat_apocalyptic (begin (set! isru_alloc 0.80) (set! greenhouse_alloc 0.15) (set! heating_alloc 0.05)))
+      (threat_critical (begin (set! isru_alloc 0.75) (set! greenhouse_alloc 0.20) (set! heating_alloc 0.05)))
+      (threat_severe (begin (set! isru_alloc 0.70) (set! greenhouse_alloc 0.25) (set! heating_alloc 0.05)))
+      (threat_high (begin (set! isru_alloc 0.65) (set! greenhouse_alloc 0.30) (set! heating_alloc 0.05)))
+      (threat_moderate (begin (set! isru_alloc 0.60) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.05)))
+      (threat_low (begin (set! isru_alloc 0.55) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.05)))
+      (threat_extreme_low (begin (set! isru_alloc 0.50) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.05)))
+      (threat_paranoid (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.05)))
+      (true (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.05)))))
+
+  ;; Blitz Expansion: Balanced rapid growth with O2 buffer
+  (define blitz_allocation
+    (cond
+      (threat_apocalyptic (begin (set! isru_alloc 0.60) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.05)))
+      (threat_critical (begin (set! isru_alloc 0.50) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.05)))
+      (threat_severe (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.05)))
+      (threat_high (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.05)))
+      (threat_moderate (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.60) (set! heating_alloc 0.05)))
+      (threat_low (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.65) (set! heating_alloc 0.05)))
+      (threat_extreme_low (begin (set! isru_alloc 0.25) (set! greenhouse_alloc 0.70) (set! heating_alloc 0.05)))
+      (threat_paranoid (begin (set! isru_alloc 0.22) (set! greenhouse_alloc 0.73) (set! heating_alloc 0.05)))
+      (true (begin (set! isru_alloc 0.20) (set! greenhouse_alloc 0.75) (set! heating_alloc 0.05)))))
+
+  ;; Fortress Mode: Food production dominance with O2 security
+  (define fortress_allocation
+    (cond
+      (threat_apocalyptic (begin (set! isru_alloc 0.50) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.05)))
+      (threat_critical (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.05)))
+      (threat_severe (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.60) (set! heating_alloc 0.05)))
+      (threat_high (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.65) (set! heating_alloc 0.05)))
+      (threat_moderate (begin (set! isru_alloc 0.25) (set! greenhouse_alloc 0.70) (set! heating_alloc 0.05)))
+      (threat_low (begin (set! isru_alloc 0.20) (set! greenhouse_alloc 0.75) (set! heating_alloc 0.05)))
+      (threat_extreme_low (begin (set! isru_alloc 0.18) (set! greenhouse_alloc 0.77) (set! heating_alloc 0.05)))
+      (threat_paranoid (begin (set! isru_alloc 0.15) (set! greenhouse_alloc 0.80) (set! heating_alloc 0.05)))
+      (true (begin (set! isru_alloc 0.12) (set! greenhouse_alloc 0.83) (set! heating_alloc 0.05)))))
+
+  ;; Dominance Mode: Maximum efficiency with repair protection
+  (define dominance_allocation
+    (cond
+      (threat_apocalyptic (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.05)))
+      (threat_critical (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.60) (set! heating_alloc 0.05)))
+      (threat_severe (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.65) (set! heating_alloc 0.05)))
+      (threat_high (begin (set! isru_alloc 0.25) (set! greenhouse_alloc 0.70) (set! heating_alloc 0.05)))
+      (threat_moderate (begin (set! isru_alloc 0.20) (set! greenhouse_alloc 0.75) (set! heating_alloc 0.05)))
+      (threat_low (begin (set! isru_alloc 0.17) (set! greenhouse_alloc 0.78) (set! heating_alloc 0.05)))
+      (threat_extreme_low (begin (set! isru_alloc 0.15) (set! greenhouse_alloc 0.80) (set! heating_alloc 0.05)))
+      (threat_paranoid (begin (set! isru_alloc 0.12) (set! greenhouse_alloc 0.83) (set! heating_alloc 0.05)))
+      (true (begin (set! isru_alloc 0.10) (set! greenhouse_alloc 0.85) (set! heating_alloc 0.05)))))
+
+  ;; Supremacy Mode: Perfect optimization
+  (define supremacy_allocation
+    (cond
+      (threat_apocalyptic (begin (set! isru_alloc 0.50) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.05)))
+      (threat_critical (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.05)))
+      (threat_severe (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.60) (set! heating_alloc 0.05)))
+      (threat_high (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.65) (set! heating_alloc 0.05)))
+      (threat_moderate (begin (set! isru_alloc 0.25) (set! greenhouse_alloc 0.70) (set! heating_alloc 0.05)))
+      (threat_low (begin (set! isru_alloc 0.22) (set! greenhouse_alloc 0.73) (set! heating_alloc 0.05)))
+      (threat_extreme_low (begin (set! isru_alloc 0.20) (set! greenhouse_alloc 0.75) (set! heating_alloc 0.05)))
+      (threat_paranoid (begin (set! isru_alloc 0.18) (set! greenhouse_alloc 0.77) (set! heating_alloc 0.05)))
+      (true (begin (set! isru_alloc 0.15) (set! greenhouse_alloc 0.80) (set! heating_alloc 0.05)))))
+
+  ;; Apply extreme phase allocation
+  (cond
+    (supremacy_mode supremacy_allocation)
+    (dominance_mode dominance_allocation)
+    (fortress_mode fortress_allocation)
+    (blitz_expansion blitz_allocation)
+    (lightning_phase lightning_allocation)
+    (true blitz_allocation))
+
+  ;; ═══ EXTREME FOOD RATIONING ═══
+  ;; Ultra-conservative rationing to ensure massive reserves
+  (define extreme_rationing_base
+    (cond
+      ((< food_days 1) 0.30)   ;; Emergency minimum
+      ((< food_days 3) 0.40)   ;; Crisis survival  
+      ((< food_days 6) 0.55)   ;; Critical conservation
+      ((< food_days 10) 0.70)  ;; Conservative
+      ((< food_days 15) 0.85)  ;; Cautious
+      ((< food_days 25) 0.95)  ;; Normal
+      ((< food_days 35) 1.00)  ;; Comfortable
+      (true 1.05)))            ;; Slight boost when abundant
+
+  (define extreme_threat_adjustment
+    (cond
+      (threat_apocalyptic 0.70)
+      (threat_critical 0.75)
+      (threat_severe 0.80)
+      (threat_high 0.85)
+      (threat_moderate 0.90)
+      (true 1.0)))
+
+  ;; Crisis mode ultra-conservative rationing
+  (define crisis_rationing_factor
+    (if (> infrastructure_crisis_score 40) 0.85 1.0))
+
+  (set! food_ration 
+    (max 0.25 (min 1.2 
+      (* extreme_rationing_base extreme_threat_adjustment crisis_rationing_factor))))
+
+  ;; ═══ EXTREME REPAIR BAY STRATEGY ═══
+  ;; Revolutionary 10-bay system with ultra-aggressive early deployment
+
+  ;; LIGHTNING infrastructure deployment
+  ;; Instant bot deployment (sols 3-6)
+  (if (and (>= sol 3) (<= sol 6) (< bot_count 2))
+      (set! build_item "worker_bot"))
+
+  ;; Lightning solar (sols 8-18)
+  (if (and (>= sol 8) (<= sol 18) (< solar_count 3))
+      (set! build_item "solar_array"))
+
+  ;; Power surge solar (sols 20-30)
+  (if (and (>= sol 20) (<= sol 30) (< solar_count 4) (< power_ratio 0.85))
+      (set! build_item "solar_array"))
+
+  ;; EXTREME 10-BAY REPAIR ORCHESTRATION
+  ;; First repair bay (ultra-early)
+  (if (and (>= sol 22) (<= sol 35) (< repair_count 1))
+      (set! build_item "repair_bay"))
+
+  ;; Second repair bay (lightning deployment)
+  (if (and (>= sol 40) (<= sol 55) (< repair_count 2))
+      (set! build_item "repair_bay"))
+
+  ;; Third repair bay (early fortress)
+  (if (and (>= sol 60) (<= sol 80) (< repair_count 3)
+           (or threat_paranoid threat_extreme_low threat_low))
+      (set! build_item "repair_bay"))
+
+  ;; Fourth repair bay (blitz protection)
+  (if (and (>= sol 90) (<= sol 115) (< repair_count 4)
+           (or threat_low threat_moderate (< ie 0.8)))
+      (set! build_item "repair_bay"))
+
+  ;; Fifth repair bay (fortress foundation)
+  (if (and (>= sol 130) (<= sol 160) (< repair_count 5)
+           (or threat_moderate threat_high (< se 0.8) (> extreme_threat_index 25)))
+      (set! build_item "repair_bay"))
+
+  ;; Sixth repair bay (fortress expansion)
+  (if (and (>= sol 180) (<= sol 220) (< repair_count 6)
+           (or threat_high threat_severe (> extreme_threat_index 35) fortress_mode))
+      (set! build_item "repair_bay"))
+
+  ;; Seventh repair bay (dominance preparation)
+  (if (and (>= sol 250) (<= sol 300) (< repair_count 7)
+           (or threat_severe threat_critical dominance_mode (> extreme_threat_index 45)))
+      (set! build_item "repair_bay"))
+
+  ;; Eighth repair bay (dominance insurance)
+  (if (and (>= sol 350) (<= sol 410) (< repair_count 8)
+           (or threat_critical threat_apocalyptic (> extreme_threat_index 55)))
+      (set! build_item "repair_bay"))
+
+  ;; Ninth repair bay (supremacy enabler)
+  (if (and (>= sol 470) (<= sol 530) (< repair_count 9)
+           (or threat_apocalyptic supremacy_mode (> extreme_threat_index 65)))
+      (set! build_item "repair_bay"))
+
+  ;; Tenth repair bay (ultimate supremacy)
+  (if (and (>= sol 590) (<= sol 640) (< repair_count 10)
+           (or supremacy_mode (> sol 620)))
+      (set! build_item "repair_bay"))
+
+  ;; Strategic greenhouse deployment
+  (if (and (>= sol 45) (<= sol 90) (< food_days 7) (< greenhouse_count 4))
+      (set! build_item "greenhouse"))
+
+  ;; Extreme module density target
+  (if (and (>= sol 160) (< module_count 35))
+      (set! build_item
+          (cond
+            ((< repair_count 7) "repair_bay")
+            ((< greenhouse_count 7) "greenhouse")
+            ((< solar_count 10) "solar_array")
+            (true "hab_module"))))
+
+  ;; Supremacy infrastructure completion
+  (if (and supremacy_mode (< module_count 45))
+      (set! build_item
+          (cond
+            ((< repair_count 10) "repair_bay")
+            ((< greenhouse_count 8) "greenhouse")
+            ((< solar_count 15) "solar_array")
+            (true "hab_module"))))
+
+  ;; ═══ EXTREME STATUS LOGGING ═══
+  (define phase_name
+    (cond
+      (supremacy_mode "SUPREMACY")
+      (dominance_mode "DOMINANCE")
+      (fortress_mode "FORTRESS")
+      (blitz_expansion "BLITZ")
+      (lightning_phase "LIGHTNING")
+      (true "EXTREME")))
+
+  (define threat_name
+    (cond
+      (threat_apocalyptic "APOCALYPTIC")
+      (threat_critical "CRITICAL")
+      (threat_severe "SEVERE")
+      (threat_high "HIGH")
+      (threat_moderate "MODERATE")
+      (threat_low "LOW")
+      (threat_extreme_low "EXTREME-LOW")
+      (threat_paranoid "PARANOID")
+      (true "STABLE")))
+
+  (define extreme_performance_index
+    (let* ((infrastructure_dominance (* (+ ie se repair_count) 25))
+           (resource_fortress (+ food_days (* o2_days 1.5)))
+           (module_supremacy (* module_count 3))
+           (crew_excellence (* crew_alive 50)))
+      (+ infrastructure_dominance resource_fortress module_supremacy crew_excellence)))
+
+  (log (concat "  Phase: " phase_name " | Threat: " threat_name " | Extreme-TI: " (string (round extreme_threat_index))))
+  (log (concat "  Crisis Score: " (string infrastructure_crisis_score) " | Multiplier: " (string (round (* crisis_multiplier 100))) "% | Perf: " (string (round extreme_performance_index))))
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Green:" (string (round (* greenhouse_alloc 100))) "% | Heat:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Resources — O2:" (string o2_days) "d Food:" (string food_days) "d | IE:" (string (round (* ie 100))) "% SE:" (string (round (* se 100))) "%"))
+  (log (concat "  Extreme Infrastructure — Repair:" (string repair_count) " Solar:" (string solar_count) " Green:" (string greenhouse_count) " | Crew:" (string crew_alive)))
+
+  ;; ═══ EXTREME OUTPUT ═══
+  (concat "⚡💎 Extreme Sol " (string sol) " — " phase_name "/" threat_name
+    " | EPI:" (string (round extreme_performance_index))
+    " | Crisis:" (string infrastructure_crisis_score)
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | O2:" (string o2_days)
+    "d F:" (string food_days) "d | Rep:" (string repair_count)))
