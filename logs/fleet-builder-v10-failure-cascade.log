@@ -27,3 +27,340 @@ Let me examine specific sections of the gauntlet to understand the current physi
   │ tools/gauntlet.js
   └ L1:50 (50 lines read)
 
+● Search (grep)
+  │ "dependency|cascade|failure" (tools)
+  └ 8 lines found
+
+Let me search for specific system dependency and failure handling in the current gauntlet:
+
+● Search (grep)
+  │ "water_recycler|humidity|greenhouse|power_grid" (tools/gauntlet.js)
+  └ 22 lines found
+
+● Search (grep)
+  │ "processHazards|handleHazard|resource" (tools/gauntlet.js)
+  └ 49 lines found
+
+Now let me examine the specific queue item for v10-failure-cascade:
+
+● Read fidelity-queue.json
+  │ data/fidelity-queue.json
+  └ L33:180 (44 lines read)
+
+● Web Search (MCP: github-mcp-server) · ISS failure mode and effects analysis FMEA database system …
+  └ {"type":"text","text":{"value":"A Failure Mode and Effects Analysis (FMEA) is...
+
+Now let me search for Apollo 13 cascade failure details:
+
+● Web Search (MCP: github-mcp-server) · Apollo 13 cascade failure timeline oxygen tank explosion po…
+  └ {"type":"text","text":{"value":"Here's a detailed timeline and breakdown of t...
+
+Excellent! Now I have the detailed specifications for the v10-failure-cascade physics. Let me analyze the current frame versions and examine frame files:
+
+● Read versions.json
+  │ data/frame-versions/versions.json
+  └ 312 lines read
+
+● List directory data/frames
+  └ 910 files found
+
+Let me examine a few frame examples to understand the structure:
+
+✗ Read sol-0978.json
+  │ data/frames/sol-0978.json
+  └ Path does not exist
+
+● Read latest.json
+  │ data/frames/latest.json
+  └ 5 lines read
+
+Let me check the structure of existing frames to understand the format:
+
+● Read sol-0800.json
+  │ data/frames/sol-0800.json
+  └ 54 lines read
+
+● Read sol-0850.json
+  │ data/frames/sol-0850.json
+  └ 33 lines read
+
+Now I need to understand the system dependency specification from the original fidelity queue details. Let me look for the full specification:
+
+● Web Search (MCP: github-mcp-server) · ISS Environmental Control Life Support System ECLSS depende…
+  └ {"type":"text","text":{"value":"The Environmental Control and Life Support Sy...
+
+Perfect! Now I have all the information I need. Let me create a task breakdown using SQL:
+
+✗ Setup v10 dependency work plan (sql)
+  │ CREATE TABLE todos (
+  └ Error: table todos already exists
+
+● Todo added 9 items
+  │ Research System Dependencies
+  │ Add Dependency Physics to Gauntlet
+  │ Generate v10 Frames
+  │ Create Retroactive Enrichment
+  │ Update Versions Config
+  │ Update RULES.md
+  │ Test Monte Carlo
+  │ Mark Queue Complete
+  └ Commit & Push
+
+Now let me start with implementing the system dependency physics. First, let me complete the research phase and then implement the dependency graph in the gauntlet:
+
+✔ Todo completed research-physics
+
+● Todo started implement-gauntlet
+
+Based on my research, I need to implement the system dependency graph that mimics ISS ECLSS. Let me examine the current gauntlet implementation to understand where to add the dependency processing:
+
+● Search (grep)
+  │ "function processHazards|function runStep|st\\.o2|st\\.h2o|st\\.power" (tools/gauntlet.js)
+  └ No matches found
+
+Let me search for the main simulation step function:
+
+● Search (grep)
+  │ "hazards.*forEach|o2.*production|water.*production|power.*consumption" (tools/gauntlet.js)
+  └ 13 lines found
+
+Let me find the main simulation loop structure:
+
+● Find main simulation functions (shell)
+  │ grep -n "function runCartridge\|function step\|st\.o2.*="
+  │ /Users/rapptertwo/Documents/GitHub/mars-barn-opus/tools/gauntlet.js | head -20
+  └ 8 lines...
+
+Now let me find the main cartridge running function:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L1130:1200 (21 lines read)
+
+● Find run functions (shell)
+  │ grep -n "function.*run" /Users/rapptertwo/Documents/GitHub/mars-barn-opus/tools/gauntlet.js
+  └ 2 lines...
+
+Let me find the main simulation step that processes each sol:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L1025:1080 (56 lines read)
+
+Now let me find the tick function that processes each sol:
+
+● Find tick function (shell)
+  │ grep -n "function tick\|^function tick\|function.*tick"
+  │ /Users/rapptertwo/Documents/GitHub/mars-barn-opus/tools/gauntlet.js
+  └ 2 lines...
+
+Perfect! Let me examine the tick function where I need to add the dependency processing:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L363:450 (88 lines read)
+
+Let me continue reading the tick function to see where hazard processing ends:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L450:550 (100 lines read)
+
+Let me continue to see the rest of the hazard processing:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L550:650 (101 lines read)
+
+Let me continue to see the end of hazard processing:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L650:750 (101 lines read)
+
+Perfect! Now I can see where hazard processing ends. I need to add the v10 failure cascade system after this. Let me examine the rest of the tick function to understand production and consumption logic:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L750:850 (101 lines read)
+
+Let me continue to see the production logic:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L850:950 (101 lines read)
+
+Perfect! Now I can see exactly where I need to add the v10 failure cascade system. It should be inserted before the production section (around line 855) to allow dependency failures to affect production. Let me implement the dependency graph system:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L100:150 (50 lines read)
+
+Now let me implement the system dependency graph. I need to add the v10 cascade failure processing after all the hazards are processed but before production. Let me add this to the gauntlet:
+
+● Edit gauntlet.js +54
+  └ tools/gauntlet.js
+
+Now I need to implement the dependency cascade functions. Let me add them near the top with the other physics functions:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L150:200 (51 lines read)
+
+Let me find a good place to add the dependency functions after the existing physics functions:
+
+● Find function locations (shell)
+  │ grep -n "function createState\|function tick"
+  │ /Users/rapptertwo/Documents/GitHub/mars-barn-opus/tools/gauntlet.js
+  └ 3 lines...
+
+Let me add the dependency functions before the createState function:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L1040:1080 (41 lines read)
+
+Perfect! Let me add the dependency functions right before the createState function:
+
+● Edit gauntlet.js +166
+  └ tools/gauntlet.js
+
+Now I need to mark the implementation phase as complete and move to frame generation:
+
+✔ Todo completed implement-gauntlet
+
+● Todo started generate-frames
+
+Now I need to generate the v10 frames. Let me create a Python script to generate the frames for Sol 978-1007 with dependency failure scenarios:
+
+● Create generate_v10_frames.py +318
+
+Now let me run the frame generation script:
+
+● Generate v10 frames (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && python3 generate_v10_frames.py
+  └ 44 lines...
+
+Excellent! Now I need to create the retroactive enrichment file for v10:
+
+✔ Todo completed generate-frames
+
+● Todo started create-enrichment
+
+Now let me create the v10 echo enrichment file:
+
+● Create echo-enrichments-v10.json +83
+  └ data/frames/echo-enrichments-v10.json
+
+Now I need to update the versions.json file:
+
+✔ Todo completed create-enrichment
+
+● Todo started update-versions
+
+✗ Edit versions.json
+  │ data/frame-versions/versions.json
+  └ No match found
+
+Let me check the current versions.json file and add the v10 entry:
+
+● Read versions.json
+  │ data/frame-versions/versions.json
+  └ L280:320 (33 lines read)
+
+● Edit versions.json +52
+  └ data/frame-versions/versions.json
+
+Now let me update RULES.md to document the new v10 dependency mechanics:
+
+✔ Todo completed update-versions
+
+● Todo started update-rules
+
+● Read RULES.md
+  └ L84:98 (15 lines read)
+
+● Edit RULES.md +2
+
+Now I need to add the detailed v10 physics description to RULES.md. Let me find the appropriate section:
+
+● Read RULES.md
+  └ L245:290 (46 lines read)
+
+Let me add the v10 physics section after the v9 section and before consumption:
+
+● Edit RULES.md +42
+
+Now let me run a quick test of the gauntlet to make sure it doesn't crash with the new v10 code:
+
+✔ Todo completed update-rules
+
+● Todo started test-gauntlet
+
+● Test gauntlet with v10 physics (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && timeout 30 node tools/gauntlet.js
+  │ --monte-carlo 5
+  └ 2 lines...
+
+● Test gauntlet with v10 physics (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 5
+  └ 28 lines...
+
+Excellent! The gauntlet runs without errors and the Monte Carlo test completed successfully. However, I notice that the scores are still very high (121,440 with 100% survival rate). This suggests the new v10 physics isn't affecting the strategy yet because it might not have encountered v10 frames (Sol 978+). Let me run a test that goes beyond Sol 978:
+
+● Test single run to see if it reaches v10 frames (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js
+  └ 8 lines...
+
+I see the issue. The gauntlet is only running to Sol 977, but the v10 frames start at Sol 978. I need to check why the latest frames aren't being loaded. Let me check the frames directory and loadFrames function:
+
+● Read latest.json
+  │ data/frames/latest.json
+  └ 5 lines read
+
+● Check v10 frame files (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && ls -la data/frames/sol-1* | tail -10
+  └ 9 lines...
+
+Good! The v10 frames exist and latest.json shows 1007 frames, but the gauntlet is only loading 977. Let me check the loadFrames function in the gauntlet:
+
+● Find loadFrames function (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && grep -n "function
+  │ loadFrames\|loadFrames\|977" tools/gauntlet.js | head -10
+  └ 3 lines...
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L340:365 (26 lines read)
+
+I see! The gauntlet is loading frames from frames.json bundle or manifest.json. Let me check if the frames.json bundle has been updated with v10 frames:
+
+● Check frames.json bundle (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && tail -n 20 data/frames/frames.json |
+  │ head -10
+  └ 11 lines...
+
+The frames.json bundle only goes to Sol 977 (v9). I need to update the frames bundle to include the new v10 frames. Let me check the manifest.json:
+
+● Read manifest.json
+  │ data/frames/manifest.json
+  └ 1 line read
+
+● Check manifest.json end (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && tail -n 10 data/frames/manifest.json
+  └ 11 lines...
+
+The manifest.json also only goes to Sol 947. I need to update these manifests. But actually, let me check how the frame loading works when individual files exist:
+
+● Check manifest.json structure (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && head -5 data/frames/manifest.json
+  └ 6 lines...
+
+I see the issue. The loadFrames function prioritizes frames.json bundle, then manifest.json, but doesn't automatically scan for all individual frame files. I need to either update the manifest.json or create a simple fallback. Since the individual frame files exist, let me add a fallback to scan for all individual frame files when the manifest is outdated. But first, let me just test by temporarily removing or renaming the frames.json bundle so it falls back to individual files:
+
+● Test gauntlet without bundle file (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && mv data/frames/frames.json
+  │ data/frames/frames.json.backup && node tools/gauntlet.js
+  └ 8 lines...
+
+Still only 947 frames because manifest.json only lists up to Sol 947. I need to update the frame loading to scan all available individual files. Let me add a third fallback option to the loadFrames function:

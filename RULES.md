@@ -85,6 +85,7 @@ runs ALL versions sequentially. State carries forward. Damage accumulates.
 | v7 Sabatier Chemistry | 848-897 | Catalyst poisoning, reactor fouling, membrane degradation, CO₂ compressor failure, water separator malfunction |
 | v8 Heat Transfer Model | 898-947 | Insulation degradation, thermal bridges, heating failures, thermal shock, condensation damage |
 | v9 Spatial Layout | 948-977 | Cable degradation, foundation settling, infrastructure overextension, thermal bridge formation, excavation hazard |
+| v10 System Dependencies | 978-1007 | System cascade failures, water recycler → humidity → greenhouse → O₂ → power → thermal dependencies, Apollo 13 style failures, micro-failure accumulation |
 
 ### Retroactive echo enrichment:
 - Past frames get richer data layers WITHOUT changing (additive overlay files)
@@ -95,6 +96,7 @@ runs ALL versions sequentially. State carries forward. Damage accumulates.
 - v7 enrichment: cumulative catalyst age, catalyst efficiency degradation, electrode wear from Sol 1
 - v8 enrichment: cumulative insulation degradation, thermal bridge formation, heating system wear from Sol 1
 - v9 enrichment: None (new mechanic, not retroactive) - spatial layout is additive from Sol 948+
+- v10 enrichment: cumulative micro-failure stress accumulation from Sol 1 (Apollo 13 precursor events analysis)
 - These are ALWAYS applied — you can't opt out of enrichment
 
 ### v5 Entropy Collapse — what it counters:
@@ -247,6 +249,48 @@ Construction Constraints:
 
 By Sol 977: Spatial overhead can consume 5-15% of power budget
 Legacy strategies assuming instantaneous/free construction will fail
+```
+
+### v10 System Dependency Graph Physics (NEW):
+```
+Real ISS ECLSS-style system interdependencies (Sol 978+):
+
+System Dependency Graph (based on ISS Environmental Control and Life Support System):
+  water_recycler → [humidity_control, greenhouse_irrigation]
+  humidity_control → [greenhouse_transpiration, crew_comfort, thermal_control]
+  greenhouse → [o2_production_biological, food_production, crew_morale]
+  power_grid → [ALL_SYSTEMS]  // Power failure affects everything
+  isru_chemistry → [o2_production_chemical, h2o_production]
+  thermal_control → [crew_life_support, equipment_efficiency, power_grid]
+
+Apollo 13 Cascade Example:
+  Oxygen tank explosion → fuel cell power loss → water production stops → 
+  thermal control fails → crew life support emergency → mission abort
+
+Dependency Cascade Processing:
+  1. Frame hazard triggers initial system failure
+  2. Failure propagates through dependency graph (1-3 sol delay)
+  3. Each dependent system degrades according to severity
+  4. Multiple cascades can overlap and compound
+  5. Repair requires addressing root cause, not just symptoms
+
+Micro-Failure Accumulation (retroactive enrichment):
+  Base rate: 0.001 stress units per sol
+  Equipment aging factor: +0.0002 per sol
+  Cascade threshold: 1.0 accumulated stress units
+  Sources: thermal cycling, radiation damage, dust infiltration, 
+          software glitches, seal degradation, electrical corrosion
+
+Real Physics Data Sources:
+- ISS ECLSS system integration documentation
+- NASA FMEA database for space systems
+- Apollo 13 Detailed Chronology of Events 
+- ISS maintenance logs and failure reports
+
+Legacy Impact: 
+Strategies assuming independent resource buckets will fail when 
+water recycler cascade destroys greenhouse O₂ production and forces 
+emergency power allocation to backup life support systems.
 ```
 
 ### Consumption per sol:
