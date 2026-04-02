@@ -98,7 +98,7 @@ text-transform:uppercase;border-top:1px solid var(--border);margin-top:4px}
   <div class="desktop-icon" ondblclick="openApp('editor')"><div class="icon">📝</div><div class="label">LisPy Editor</div></div>
   <div class="desktop-icon" ondblclick="openApp('monitor')"><div class="icon">📡</div><div class="label">Colony Monitor</div></div>
   <div class="desktop-icon" ondblclick="openApp('browser')"><div class="icon">🌐</div><div class="label">Frame Browser</div></div>
-  <div class="desktop-icon" ondblclick="window.os.browser.open('about:blank')"><div class="icon">🔎</div><div class="label">Web Browser</div></div>
+  <div class="desktop-icon" ondblclick="window.os.browser.open('')"><div class="icon">🔎</div><div class="label">Web Browser</div></div>
   <div class="desktop-icon" ondblclick="openApp('wallet')"><div class="icon">💰</div><div class="label">MARS Wallet</div></div>
   <div class="desktop-icon" ondblclick="openApp('help')"><div class="icon">📖</div><div class="label">LISPY.md</div></div>
   <div class="desktop-icon" ondblclick="openApp('sim')"><div class="icon">🔴</div><div class="label">Colony Sim</div></div>
@@ -638,7 +638,7 @@ function openIframeApp(id, title, url){
         <div class="title">${escHtml(title)}</div>
       </div>
       <div class="window-body" style="padding:0;overflow:hidden">
-        <iframe style="width:100%;height:100%;border:none" src="${url}"></iframe>
+        <iframe style="width:100%;height:100%;border:none" allow="pointer-lock; autoplay; fullscreen" src="${url}"></iframe>
       </div>`;
     document.body.insertBefore(win, document.querySelector('.taskbar'));
   }
@@ -1187,6 +1187,15 @@ window.os = {
     async open(url) {
       this._url = url;
       this._history.push(url);
+      // about:blank and empty URLs — just open an empty browser window
+      if (!url || url === 'about:blank' || url === '') {
+        this._html = '<html><head><title>New Tab</title></head><body style="background:#0d1117;color:#c9d1d9;font-family:monospace;padding:40px;text-align:center"><h1 style="color:#f0883e">🌐 vOS Browser</h1><p>Type a URL in the terminal:</p><pre style="color:#58a6ff">(browser-open "http://localhost:8787/player.html")</pre></body></html>';
+        const parser = new DOMParser();
+        this._doc = parser.parseFromString(this._html, 'text/html');
+        this._status = 200;
+        this._renderToGUI(url);
+        return 'Ready — use (browser-open "url") to navigate';
+      }
       try {
         const resp = await fetch(url);
         this._status = resp.status;
@@ -1199,9 +1208,10 @@ window.os = {
         return 'Loaded: ' + url + ' (' + this._status + ', ' + this._html.length + ' bytes)';
       } catch (e) {
         // Cross-origin or network error — render error page
-        this._html = '<html><body><h1>⚠️ ' + e.message + '</h1><p>URL: ' + url + '</p></body></html>';
+        this._html = '<html><head><title>Error</title></head><body style="background:#0d1117;color:#c9d1d9;font-family:monospace;padding:40px"><h1 style="color:#da3633">⚠️ ' + e.message + '</h1><p style="color:#8b949e">URL: ' + url + '</p><p style="color:#58a6ff">Cross-origin pages can\'t be fetched directly.<br>Try a same-origin URL or use (browser-eval "fetch(url)") for APIs.</p></body></html>';
         const parser = new DOMParser();
         this._doc = parser.parseFromString(this._html, 'text/html');
+        this._status = 0;
         this._renderToGUI(url);
         return 'Error: ' + e.message;
       }
