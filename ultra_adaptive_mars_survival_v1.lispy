@@ -1,0 +1,221 @@
+;; ULTRA ADAPTIVE MARS SURVIVAL v1
+;; Revolutionary CRI-based adaptive governor with multiple repair bay strategy
+;; Target: Beat ALL current records with creative compound damage mitigation
+
+(begin
+  (define _agent_name "Ultra Adaptive Mars Survival v1")
+  (define _agent_desc "Revolutionary multi-phase adaptive strategy with exponential repair bay scaling and predictive CRI-based allocation")
+
+  (log (concat "🚀 Ultra Adaptive v1 — Sol " (string sol) " | CRI:" (string colony_risk_index)))
+
+  ;; ═══ DYNAMIC MISSION PHASE DETECTION ═══
+  ;; Advanced phase detection based on multiple variables
+  (define mission_phase
+    (cond
+      ((< sol 20) "BOOTSTRAP")      ;; Ultra-fast early build phase
+      ((< sol 50) "FOUNDATION")     ;; Core infrastructure establishment
+      ((< sol 120) "EXPANSION")     ;; Exponential scaling phase
+      ((< sol 200) "FORTIFICATION") ;; Multiple repair bay deployment
+      ((< sol 350) "OPTIMIZATION")  ;; CRI-adaptive fine-tuning
+      ((< sol 500) "ENDURANCE")     ;; Late-game survival mastery
+      (true "TRANSCENDENCE")))      ;; Beyond previous records
+
+  ;; Advanced infrastructure tracking
+  (define estimated_solar (max 2 (min 9 (round (* sol 0.08)))))
+  (define estimated_repair (max 1 (min 8 (round (* sol 0.025)))))
+  (define modules_per_sol_rate (/ modules_built (max 1 sol)))
+  (define infrastructure_density (min 2.0 modules_per_sol_rate))
+
+  ;; ═══ REVOLUTIONARY CRI ADAPTATION SYSTEM ═══
+  ;; Multi-tier Colony Risk Index response with exponential scaling
+  (define cri_threat_level
+    (cond
+      ((> colony_risk_index 75) "EXTINCTION")   ;; Maximum emergency
+      ((> colony_risk_index 60) "CRITICAL")     ;; High threat
+      ((> colony_risk_index 45) "ELEVATED")     ;; Moderate threat
+      ((> colony_risk_index 30) "CAUTIOUS")     ;; Low threat
+      ((> colony_risk_index 15) "VIGILANT")     ;; Minimal threat
+      (true "OPTIMAL")))                        ;; Ideal conditions
+
+  ;; Exponential repair bay effectiveness calculation
+  (define repair_base_effectiveness 1.35)
+  (define repair_multiplicative_bonus (pow repair_base_effectiveness estimated_repair))
+  (define compound_damage_resistance (* repair_multiplicative_bonus (max 0.1 (- 1 (/ colony_risk_index 100)))))
+
+  ;; Advanced resource cushion calculations
+  (define resource_safety_margin
+    (min 1.0 (/ (+ (* o2_days 0.4) (* food_days 0.3) (* (/ power_kwh 100) 0.3)) 10)))
+
+  ;; ═══ PHASE-SPECIFIC ALLOCATION MATRICES ═══
+  ;; Each phase optimized for specific challenges
+
+  ;; BOOTSTRAP: Ultra-aggressive power accumulation
+  (define bootstrap_allocation
+    (cond
+      ((string=? cri_threat_level "OPTIMAL") 
+       (list 0.20 0.25 0.55))      ;; Minimal life support, maximum power
+      ((string=? cri_threat_level "VIGILANT")
+       (list 0.25 0.30 0.45))      ;; Balanced early safety
+      (true 
+       (list 0.35 0.35 0.30))))    ;; Crisis mode
+
+  ;; FOUNDATION: Balanced growth with safety
+  (define foundation_allocation
+    (cond
+      ((string=? cri_threat_level "OPTIMAL")
+       (list 0.25 0.35 0.40))
+      ((string=? cri_threat_level "VIGILANT")
+       (list 0.30 0.40 0.30))
+      ((string=? cri_threat_level "CAUTIOUS")
+       (list 0.35 0.40 0.25))
+      (true
+       (list 0.45 0.35 0.20))))    ;; Emergency rebalancing
+
+  ;; EXPANSION: Infrastructure focus with CRI adaptation
+  (define expansion_allocation
+    (cond
+      ((and (string=? cri_threat_level "OPTIMAL") (> power_kwh 150))
+       (list 0.20 0.45 0.35))      ;; Food stockpiling phase
+      ((string=? cri_threat_level "VIGILANT")
+       (list 0.25 0.40 0.35))
+      ((string=? cri_threat_level "CAUTIOUS")
+       (list 0.30 0.40 0.30))
+      ((string=? cri_threat_level "ELEVATED")
+       (list 0.40 0.35 0.25))
+      (true
+       (list 0.50 0.30 0.20))))    ;; Crisis oxygen focus
+
+  ;; FORTIFICATION: Multi-repair bay compound damage mitigation
+  (define fortification_allocation
+    (cond
+      ((and (< colony_risk_index 25) (> compound_damage_resistance 3.0))
+       (list 0.20 0.50 0.30))      ;; Maximum food production
+      ((< colony_risk_index 35)
+       (list 0.25 0.45 0.30))
+      ((< colony_risk_index 50)
+       (list 0.30 0.40 0.30))
+      ((< colony_risk_index 65)
+       (list 0.40 0.35 0.25))
+      (true
+       (list 0.55 0.25 0.20))))    ;; Emergency life support
+
+  ;; OPTIMIZATION: Fine-tuned for late-game stability
+  (define optimization_allocation
+    (cond
+      ((and (> resource_safety_margin 0.7) (< colony_risk_index 20))
+       (list 0.15 0.55 0.30))      ;; Food abundance strategy
+      ((< colony_risk_index 30)
+       (list 0.20 0.50 0.30))
+      ((< colony_risk_index 45)
+       (list 0.25 0.45 0.30))
+      ((< colony_risk_index 60)
+       (list 0.35 0.40 0.25))
+      (true
+       (list 0.50 0.30 0.20))))
+
+  ;; ENDURANCE: Proven survival ratios for 400+ sols
+  (define endurance_allocation
+    (cond
+      ((< colony_risk_index 25)
+       (list 0.20 0.50 0.30))
+      ((< colony_risk_index 40)
+       (list 0.25 0.45 0.30))
+      ((< colony_risk_index 55)
+       (list 0.35 0.40 0.25))
+      ((< colony_risk_index 70)
+       (list 0.45 0.35 0.20))
+      (true
+       (list 0.60 0.25 0.15))))    ;; Maximum life support
+
+  ;; TRANSCENDENCE: Beyond all previous records
+  (define transcendence_allocation
+    (cond
+      ((< colony_risk_index 20)
+       (list 0.15 0.55 0.30))      ;; Abundance mode
+      ((< colony_risk_index 35)
+       (list 0.20 0.50 0.30))
+      ((< colony_risk_index 50)
+       (list 0.30 0.45 0.25))
+      ((< colony_risk_index 65)
+       (list 0.40 0.40 0.20))
+      (true
+       (list 0.55 0.30 0.15))))    ;; Ultimate survival
+
+  ;; ═══ ADAPTIVE ALLOCATION SELECTION ═══
+  (define current_allocation
+    (cond
+      ((string=? mission_phase "BOOTSTRAP") bootstrap_allocation)
+      ((string=? mission_phase "FOUNDATION") foundation_allocation)
+      ((string=? mission_phase "EXPANSION") expansion_allocation)
+      ((string=? mission_phase "FORTIFICATION") fortification_allocation)
+      ((string=? mission_phase "OPTIMIZATION") optimization_allocation)
+      ((string=? mission_phase "ENDURANCE") endurance_allocation)
+      (true transcendence_allocation)))
+
+  ;; Apply the adaptive allocation
+  (set! isru_alloc (car current_allocation))
+  (set! greenhouse_alloc (car (cdr current_allocation)))
+  (set! heating_alloc (car (cdr (cdr current_allocation))))
+
+  ;; ═══ ADAPTIVE FOOD RATIONING SYSTEM ═══
+  ;; Advanced rationing based on phase and compound damage resistance
+  (define phase_ration_base
+    (cond
+      ((string=? mission_phase "BOOTSTRAP") 0.75)      ;; Conservative early game
+      ((string=? mission_phase "FOUNDATION") 0.80)     ;; Building safety margin
+      ((string=? mission_phase "EXPANSION") 0.85)      ;; Growth phase confidence
+      ((string=? mission_phase "FORTIFICATION") 0.90)  ;; Infrastructure confidence
+      ((string=? mission_phase "OPTIMIZATION") 0.90)   ;; Fine-tuned efficiency
+      ((string=? mission_phase "ENDURANCE") 0.85)      ;; Late-game conservation
+      (true 0.80)))                                    ;; Transcendence caution
+
+  ;; CRI-based ration adjustment
+  (define cri_ration_modifier
+    (cond
+      ((string=? cri_threat_level "EXTINCTION") 0.25)  ;; Emergency rationing
+      ((string=? cri_threat_level "CRITICAL") 0.40)    ;; Severe rationing
+      ((string=? cri_threat_level "ELEVATED") 0.60)    ;; Moderate rationing
+      ((string=? cri_threat_level "CAUTIOUS") 0.80)    ;; Cautious rationing
+      ((string=? cri_threat_level "VIGILANT") 0.95)    ;; Normal operations
+      (true 1.0)))                                     ;; Optimal conditions
+
+  ;; Resource-based ration adjustment
+  (define resource_ration_modifier
+    (cond
+      ((< food_days 3) 0.20)       ;; Emergency starvation prevention
+      ((< food_days 6) 0.35)       ;; Crisis rationing
+      ((< food_days 10) 0.50)      ;; Severe rationing
+      ((< food_days 15) 0.65)      ;; Conservative rationing
+      ((< food_days 25) 0.80)      ;; Cautious rationing
+      (true 1.0)))                 ;; Normal operations
+
+  ;; Compound damage resistance bonus for rationing
+  (define resistance_ration_bonus
+    (if (> compound_damage_resistance 2.0)
+        (min 1.2 (max 1.0 compound_damage_resistance 0.1))
+        1.0))
+
+  ;; Final adaptive food ration calculation
+  (set! food_ration 
+    (max 0.15 
+         (min 1.0 
+              (* phase_ration_base 
+                 cri_ration_modifier 
+                 resource_ration_modifier 
+                 resistance_ration_bonus))))
+
+  ;; ═══ STATUS LOGGING & MONITORING ═══
+  (log (concat "  Phase: " mission_phase " | Threat: " cri_threat_level " | Resistance: " (string (round (* compound_damage_resistance 100))) "%"))
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Greenhouse:" (string (round (* greenhouse_alloc 100))) "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Infrastructure — Solar:" (string estimated_solar) " | Repair:" (string estimated_repair) " | Density:" (string (round (* infrastructure_density 1000)))))
+  (log (concat "  Survival — Ration:" (string (round (* food_ration 100))) "% | O2:" (string o2_days) "d | Food:" (string food_days) "d | Power:" (string (round power_kwh)) "kWh"))
+
+  ;; ═══ OUTPUT SUMMARY ═══
+  (concat "Ultra-Adaptive v1 Sol " (string sol) 
+    " | " mission_phase " phase"
+    " | " cri_threat_level " threat"
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | Resistance:" (string (round (* compound_damage_resistance 100))) "%"))
