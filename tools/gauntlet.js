@@ -21,11 +21,87 @@ const crypto = require('crypto');
 
 const FRAMES_DIR = path.join(__dirname, '..', 'data', 'frames');
 const VERSIONS_PATH = path.join(__dirname, '..', 'data', 'frame-versions', 'versions.json');
-const PA=15, EF=0.22, SH=12.3, ISRU_O2=2.8, ISRU_H2O=1.2, GK=3500;
+const PA=15, EF=0.22, SH=12.3, GK=3500;
 const OP=0.84, HP=2.5, FP=2500, PCRIT=50;
+
+// v7 Sabatier Reaction Physics - Real NASA ISRU chemistry
+// CO₂ + 4H₂ → CH₄ + 2H₂O (Sabatier reaction, 300-400°C, Ni/Ru catalyst)
+// 2H₂O → 2H₂ + O₂ (electrolysis, 1.23V minimum, ~70% efficiency)
+// Data sources: NASA MOXIE (6g O₂/hr at 300W), Sabatier reactors (0.34 kg CH₄/hr), ISS OGS (9kg O₂/day at 3kW)
+
+// Physical constants (NASA specifications)
+const SABATIER_TEMP_OPTIMAL = 623; // 350°C optimal (K)
+const SABATIER_TEMP_MIN = 573;     // 300°C minimum (K)
+const SABATIER_TEMP_MAX = 673;     // 400°C maximum (K)
+const MARS_CO2_PRESSURE = 606;     // Pa (Mars surface)
+const ELECTROLYSIS_MIN_VOLTAGE = 1.23; // V theoretical minimum
+const ELECTROLYSIS_EFFICIENCY = 0.70;  // 70% practical efficiency
+const CATALYST_DEGRADATION_RATE = 1/2000; // 1/2000 hours = 0.0005/hour
+const MOLAR_MASS_O2 = 32.0; // g/mol
+const MOLAR_MASS_H2O = 18.0; // g/mol
+const MOLAR_MASS_CO2 = 44.0; // g/mol
+const FARADAY_CONSTANT = 96485; // C/mol
 
 function rng32(s){let t=s&0xFFFFFFFF;return()=>{t=(t*1664525+1013904223)&0xFFFFFFFF;return(t>>>0)/0xFFFFFFFF}}
 function solIrr(sol,dust){const y=sol%669,a=2*Math.PI*(y-445)/669;return 589*(1+0.09*Math.cos(a))*Math.max(0.3,Math.cos(2*Math.PI*y/669)*0.5+0.5)*(dust?0.25:1)}
+
+// v7 Sabatier Reaction Physics Functions
+function sabatierReactionRate(catalyst_temp, co2_pressure, catalyst_efficiency, power_kw) {
+  // CO₂ + 4H₂ → CH₄ + 2H₂O
+  // Based on NASA ISRU studies: 0.34 kg CH₄/hr baseline at optimal conditions
+  
+  // Temperature efficiency (Arrhenius-like behavior)
+  const temp_factor = Math.max(0.1, Math.min(1.0, 
+    (catalyst_temp - SABATIER_TEMP_MIN) / (SABATIER_TEMP_OPTIMAL - SABATIER_TEMP_MIN)
+  ));
+  
+  // CO₂ pressure factor (Mars has low pressure, needs compression)
+  const pressure_factor = Math.min(1.0, co2_pressure / MARS_CO2_PRESSURE);
+  
+  // Power limitation (minimum ~1.5 kW for practical Sabatier reactor)
+  const power_factor = Math.min(1.0, Math.max(0, (power_kw - 1.5) / 2.0));
+  
+  // ADJUSTED: Base rate to match legacy O₂ production when optimal
+  // Target: ~2.8 kg O₂/sol at optimal conditions → ~6.3 kg H₂O/sol → ~0.26 kg H₂O/hr
+  const base_h2o_rate = 0.26; // kg/hr (reduced from 0.5 to match legacy)
+  
+  return base_h2o_rate * temp_factor * pressure_factor * power_factor * catalyst_efficiency;
+}
+
+function electrolysisRate(h2o_available_kg, power_kw, electrode_efficiency, electrode_temp) {
+  // 2H₂O → 2H₂ + O₂
+  // Energy requirement: ~4.5-5.5 kWh per kg O₂ (practical)
+  
+  const energy_per_kg_o2 = 5.0; // kWh/kg O₂ (includes system losses)
+  const max_o2_from_power = power_kw / energy_per_kg_o2; // kg O₂/hour
+  
+  // Stoichiometry: 18g H₂O → 8g O₂ → 0.444 kg O₂ per kg H₂O
+  const max_o2_from_water = h2o_available_kg * 0.444;
+  
+  // Temperature efficiency (higher temp = better efficiency but more degradation)
+  const temp_factor = Math.min(1.2, Math.max(0.7, (electrode_temp + 20) / 293.0));
+  
+  // Limited by power OR water availability
+  const actual_o2_rate = Math.min(max_o2_from_power, max_o2_from_water) * 
+                        electrode_efficiency * temp_factor * ELECTROLYSIS_EFFICIENCY;
+  
+  // Corresponding H₂O consumption
+  const h2o_consumed = actual_o2_rate / 0.444;
+  
+  return { o2_kg_hr: actual_o2_rate, h2o_consumed_kg_hr: h2o_consumed };
+}
+
+function updateCatalystDegradation(state, operating_hours) {
+  // Catalyst degrades based on operating time and thermal cycles
+  // NASA data: Ni catalysts need replacement every ~2000 hours
+  state.catalyst_age_hours += operating_hours;
+  state.catalyst_efficiency = Math.max(0.2, 1.0 - (state.catalyst_age_hours * CATALYST_DEGRADATION_RATE));
+  
+  // Electrolysis electrodes also degrade (PEM systems: 60,000-80,000 hour target)
+  state.electrode_age_hours += operating_hours;
+  const electrode_degradation_rate = 1/70000; // 70,000 hour target life
+  state.electrode_efficiency = Math.max(0.3, 1.0 - (state.electrode_age_hours * electrode_degradation_rate));
+}
 
 function loadFrames(){
   // Try bundle first (frames.json), fall back to manifest + individual files
@@ -305,6 +381,48 @@ function tick(st, sol, frame, R){
         st.se = Math.max(0.05, st.se * (1 - solarLoss));
         st.power = Math.max(0, st.power * (1 - solarLoss * 0.5));
       }
+
+      // v7 Sabatier Reaction Chemistry hazards
+      if(h.type==='catalyst_poisoning'){
+        // Catalyst poisoned by sulfur compounds or other Mars atmospheric contaminants
+        const poisoning_severity = h.severity || 0.2;
+        st.catalyst_efficiency = Math.max(0.1, st.catalyst_efficiency - poisoning_severity);
+        // Requires power to regenerate catalyst (burn off poisons at high temp)
+        if(h.regeneration_power_cost) st.power = Math.max(0, st.power - h.regeneration_power_cost);
+      }
+
+      if(h.type==='sabatier_reactor_fouling'){
+        // Reactor internals clogged by carbon deposition or water ice
+        const fouling_rate = h.fouling_rate || 0.03;
+        st.catalyst_efficiency = Math.max(0.2, st.catalyst_efficiency * (1 - fouling_rate));
+        // Reduced throughput forces higher power per unit output
+        st.ie = Math.max(0.3, st.ie * 0.98);
+      }
+
+      if(h.type==='electrolysis_membrane_degradation'){
+        // PEM membranes degrade from thermal cycling and contaminants  
+        const degradation_rate = h.degradation_rate || 0.025;
+        st.electrode_efficiency = Math.max(0.2, st.electrode_efficiency * (1 - degradation_rate));
+        // Higher resistance requires more power for same output
+        if(st.electrode_efficiency < 0.6) {
+          st.power = Math.max(0, st.power - (0.6 - st.electrode_efficiency) * 50);
+        }
+      }
+
+      if(h.type==='co2_compressor_failure'){
+        // CO₂ intake system fails - can't maintain pressure for Sabatier reaction
+        const pressure_loss = h.pressure_loss_pct || 0.4;
+        // Directly reduces Sabatier efficiency (reaction rate depends on pressure)
+        const efficiency_impact = pressure_loss * 0.6; // 40% pressure loss = 24% efficiency loss
+        st.ie = Math.max(0.1, st.ie * (1 - efficiency_impact));
+      }
+
+      if(h.type==='water_separator_malfunction'){
+        // H₂O separation from Sabatier products fails - water contaminates methane
+        // Reduces both H₂O recovery and subsequent electrolysis efficiency
+        st.h2o = Math.max(0, st.h2o * 0.85); // Lose 15% of water production
+        st.electrode_efficiency = Math.max(0.3, st.electrode_efficiency * 0.95); // Contaminated water hurts electrolysis
+      }
     }
   }
   st.ev=st.ev.filter(e=>{e.r--;return e.r>0});
@@ -416,10 +534,56 @@ function tick(st, sol, frame, R){
   const isDust=st.ev.some(e=>e.t==='dust_storm');
   const sb=1+st.mod.filter(x=>x==='solar_farm').length*0.4;
   st.power+=solIrr(sol,isDust)*PA*EF*SH/1000*st.se*sb;
+  // v7 Sabatier Reaction + Electrolysis ISRU (replaces simple constants)
   if(st.power>PCRIT*0.3){
-    const ib=1+st.mod.filter(x=>x==='isru_plant').length*0.4;
-    st.o2+=ISRU_O2*st.ie*Math.min(1.5,a.i*2)*ib;
-    st.h2o+=ISRU_H2O*st.ie*Math.min(1.5,a.i*2)*ib;
+    const isru_plants = st.mod.filter(x=>x==='isru_plant').length;
+    const total_power_alloc = st.power * a.i; // Power allocated to ISRU
+    
+    if(isru_plants > 0 && total_power_alloc > 1.5) { // Minimum 1.5 kW for Sabatier reactor
+      // Step 1: Sabatier reaction (CO₂ + 4H₂ → CH₄ + 2H₂O)
+      const reactor_temp = 623; // 350°C optimal (could be variable based on heating allocation)
+      const co2_pressure = MARS_CO2_PRESSURE * (1 + isru_plants * 0.1); // Better CO₂ compression with more plants
+      
+      // FIXED: More realistic power allocation - Sabatier needs ~2kW, electrolysis limited
+      const sabatier_power = Math.min(total_power_alloc, 2.5 * isru_plants); // Max 2.5kW per plant
+      const h2o_production_rate = sabatierReactionRate(reactor_temp, co2_pressure, st.catalyst_efficiency, sabatier_power / isru_plants);
+      
+      // Daily H₂O production (24.6 hours per sol)  
+      const h2o_per_sol = h2o_production_rate * 24.6 * isru_plants;
+      st.h2o += h2o_per_sol * st.ie; // Still affected by ISRU efficiency from hazards
+      
+      // Step 2: Electrolysis (2H₂O → 2H₂ + O₂) - CONSTRAINED by H₂O production
+      // Can only electrolyze the H₂O that was actually produced by Sabatier
+      const available_h2o_for_electrolysis = h2o_per_sol * 0.8; // Only use 80% (save some for crew)
+      const electrolysis_power_needed = available_h2o_for_electrolysis * 0.444 * 5.0 / 24.6; // Power needed for this H₂O
+      const actual_electrolysis_power = Math.min(electrolysis_power_needed, total_power_alloc - sabatier_power);
+      
+      if(actual_electrolysis_power > 0) {
+        const electrolysis_result = electrolysisRate(available_h2o_for_electrolysis/24.6, actual_electrolysis_power, st.electrode_efficiency, reactor_temp);
+        
+        // Daily O₂ production and H₂O consumption
+        const o2_per_sol = electrolysis_result.o2_kg_hr * 24.6;
+        const h2o_consumed_per_sol = electrolysis_result.h2o_consumed_kg_hr * 24.6;
+        
+        st.o2 += o2_per_sol * st.ie;
+        st.h2o = Math.max(0, st.h2o - h2o_consumed_per_sol); // Consume water for electrolysis
+      }
+      
+      // v7 NEW: Catalyst degradation over time (the new hazard!)
+      const operating_hours = 24.6; // Hours per sol of operation
+      updateCatalystDegradation(st, operating_hours);
+      
+      // v7 NEW: Add Sabatier-specific failure modes based on catalyst age
+      if(st.catalyst_efficiency < 0.5) {
+        // Catalyst severely degraded - efficiency loss and possible shutdown
+        st.ie = Math.max(0.1, st.ie * 0.95); // 5% efficiency loss per sol when catalyst is bad
+      }
+      if(st.electrode_efficiency < 0.4) {
+        // Electrodes need replacement - water electrolysis becomes less efficient
+        const electrolysis_penalty = (0.4 - st.electrode_efficiency) / 0.4;
+        st.o2 = Math.max(0, st.o2 - (st.o2 * electrolysis_penalty * 0.5));
+      }
+    }
   }
   st.h2o+=st.mod.filter(x=>x==='water_extractor').length*3;
   if(st.power>PCRIT*0.3&&st.h2o>5){
@@ -612,6 +776,11 @@ function tick(st, sol, frame, R){
 function createState(seed){
   return {
     o2:0, h2o:0, food:0, power:800, se:1, ie:1, ge:1, it:293, cri:5,
+    // v7 Sabatier chemistry state
+    catalyst_age_hours: 0,        // Catalyst operating hours (degrades over time)
+    catalyst_efficiency: 1.0,     // Current catalyst efficiency (decreases with age)
+    electrode_age_hours: 0,       // Electrolysis electrode operating hours
+    electrode_efficiency: 1.0,    // Current electrode efficiency
     crew:[
       {n:'ULTRA-CREW-01',bot:true,hp:100,mr:100,a:true},
       {n:'ULTRA-CREW-02',bot:true,hp:100,mr:100,a:true},

@@ -1,0 +1,315 @@
+;; V6 ROBOT DEATH CRUSHER — SCORE TARGET: 120,000+
+;; Strategy: ZERO tolerance for robot death in v6 autonomous period 
+;; Innovation: Preventive over-repair + thermal shock immunity + power redundancy
+;; Target: Demolish 105,840 → Achieve 120,000+ (perfect robot preservation)
+;; Focus: 10% robot death rate → 0% death rate through extreme measures
+
+(begin
+  (define _agent_name "V6 Robot Death Crusher")
+  (define _agent_desc "ZERO robot death tolerance for v6 autonomous period - Target: 120,000+")
+  
+  (log (concat "💀🤖⚡ V6 ROBOT DEATH CRUSHER — Sol " (string sol) " — CRI:" (string colony_risk_index) " — MinHP:" (string crew_min_hp) " — Alive:" (string crew_count)))
+  
+  ;; ═══ ROBOT DEATH ANALYSIS AND PREVENTION ═══
+  ;; MISSION: Convert 10% robot death rate to 0% through extreme measures
+  ;; DEATH MODES TO CRUSH:
+  ;; 1. Thermal shock: -120°C to +20°C daily (140°C swing) → component death
+  ;; 2. Wheel degradation: gradual wear → mobility loss → isolation → death
+  ;; 3. Power brownout: battery capacity loss → power death
+  ;; 4. Sensor blindness: dust/UV damage → operational failure → death
+  ;; 5. Actuator seizure: joint freezing → immobilization → death
+  ;; 6. Regolith entrapment: bad navigation → stuck → death
+  ;; 7. Cable wear: perchlorate corrosion → system failure → death
+  ;; 8. Logic failure: bad autonomous decisions → compound errors → death
+  ;; 9. Dust storm immobilization: power loss during storms → death
+  ;; 10. Software watchdog trips: state loss → recovery failure → death
+  ;; 11. Navigation error: GPS-free dead reckoning → lost robots → death
+  
+  ;; ═══ DEATH PREVENTION HEALTH THRESHOLDS ═══
+  ;; Extremely aggressive - prevent ANY decline that could lead to death
+  (define crew_perfect (>= crew_min_hp 99))           ;; Perfect condition - no tolerance
+  (define crew_excellent (>= crew_min_hp 95))         ;; Excellent condition
+  (define crew_good (>= crew_min_hp 88))              ;; Good condition - early intervention
+  (define crew_acceptable (>= crew_min_hp 80))        ;; Acceptable condition - moderate intervention
+  (define crew_concerning (>= crew_min_hp 70))        ;; Concerning - high intervention
+  (define crew_danger (>= crew_min_hp 60))            ;; Danger zone - massive intervention
+  (define crew_crisis (>= crew_min_hp 50))            ;; Crisis - maximum intervention
+  (define crew_emergency (>= crew_min_hp 40))         ;; Emergency - all-out preservation
+  (define crew_critical (< crew_min_hp 40))           ;; Critical - death prevention mode
+
+  ;; ═══ DEATH PREVENTION PHASE SYSTEM ═══
+  ;; Start death prevention MUCH earlier
+  (define death_prep_1 (and (>= sol 400) (< sol 600)))           ;; Phase 1: Early death prep
+  (define death_prep_2 (and (>= sol 600) (< sol 720)))           ;; Phase 2: Moderate death prep  
+  (define death_prep_3 (and (>= sol 720) (< sol 778)))           ;; Phase 3: Intensive death prep
+  (define v6_death_zone_1 (and (>= sol 778) (< sol 800)))        ;; V6 Death Zone 1 (extreme danger)
+  (define v6_death_zone_2 (and (>= sol 800) (< sol 830)))        ;; V6 Death Zone 2 (maximum danger)
+  (define v6_death_zone_3 (and (>= sol 830) (< sol 847)))        ;; V6 Death Zone 3 (critical survival)
+  (define death_recovery (>= sol 847))                           ;; Post-death zone recovery
+
+  ;; ═══ DEATH PREVENTION REPAIR SYSTEM ═══
+  ;; MASSIVE repair allocation - prevent ANY robot degradation
+  (define death_prevention_repair_base
+    (cond
+      (crew_critical 300.0)           ;; DEATH PREVENTION MODE - maximum possible
+      (crew_emergency 250.0)          ;; EMERGENCY LIFE SUPPORT  
+      (crew_crisis 200.0)             ;; CRISIS PREVENTION
+      (crew_danger 150.0)             ;; DANGER MITIGATION
+      (crew_concerning 110.0)         ;; CONCERNING INTERVENTION
+      (crew_acceptable 80.0)          ;; ACCEPTABLE MAINTENANCE
+      (crew_good 55.0)                ;; GOOD PREVENTIVE
+      (crew_excellent 35.0)           ;; EXCELLENT OPTIMIZATION
+      (crew_perfect 25.0)             ;; PERFECT BASELINE
+      (true 20.0)))                   ;; DEFAULT
+
+  ;; Death prevention phase multipliers - EXPONENTIAL during death zones
+  (define death_prevention_phase_multiplier
+    (cond
+      (v6_death_zone_3 12.0)          ;; ABSOLUTE MAXIMUM - final death zone
+      (v6_death_zone_2 10.0)          ;; MAXIMUM - peak death zone  
+      (v6_death_zone_1 8.0)           ;; ULTRA HIGH - initial death zone
+      (death_prep_3 5.0)              ;; HIGH - intensive preparation
+      (death_prep_2 3.0)              ;; MODERATE - moderate preparation
+      (death_prep_1 2.0)              ;; LIGHT - early preparation
+      (death_recovery 1.5)            ;; LIGHT - recovery
+      (true 1.2)))                    ;; ENHANCED baseline
+
+  ;; Death prevention crew multiplier - exponential when robots start dying
+  (define death_prevention_crew_multiplier
+    (cond
+      ((<= current_crew_count 3) 6.0) ;; EXTREME boost - death spiral prevention
+      ((<= current_crew_count 4) 5.0) ;; MASSIVE boost - critical threshold
+      ((<= current_crew_count 5) 4.0) ;; HIGH boost - scoring threshold at risk
+      ((<= current_crew_count 6) 3.0) ;; MODERATE boost - buffer zone
+      ((<= current_crew_count 7) 2.5) ;; LIGHT boost - early intervention
+      (true 2.0)))                    ;; ENHANCED baseline
+
+  ;; Final death prevention repair calculation - can reach 20,000+ in extreme cases
+  (define death_crusher_repair_allocation (* death_prevention_repair_base 
+                                             death_prevention_phase_multiplier 
+                                             death_prevention_crew_multiplier))
+
+  ;; ═══ THERMAL SHOCK IMMUNITY SYSTEM ═══
+  ;; 140°C daily thermal shock is the #1 robot killer - CRUSH IT
+  (define thermal_shock_immunity_base
+    (cond
+      (crew_critical 0.55)            ;; THERMAL SHOCK IMMUNITY - maximum
+      (crew_emergency 0.48)           ;; ULTRA HIGH thermal protection
+      (crew_crisis 0.42)              ;; HIGH thermal protection
+      (crew_danger 0.36)              ;; MODERATE HIGH thermal protection
+      (crew_concerning 0.30)          ;; MODERATE thermal protection
+      (crew_acceptable 0.24)          ;; LIGHT thermal protection
+      (crew_good 0.18)                ;; MINIMAL thermal protection
+      (crew_excellent 0.12)           ;; BASELINE thermal protection
+      (true 0.08)))                   ;; DEFAULT thermal protection
+
+  ;; Thermal shock immunity phase multipliers - maximum during death zones
+  (define thermal_shock_phase_multiplier
+    (cond
+      ((and v6_death_zone_3 crew_critical) 2.5)      ;; ABSOLUTE thermal immunity
+      ((and v6_death_zone_2 crew_emergency) 2.3)     ;; MAXIMUM thermal immunity
+      (v6_death_zone_3 2.0)                          ;; HIGH thermal immunity
+      (v6_death_zone_2 1.8)                          ;; MODERATE HIGH thermal immunity
+      (v6_death_zone_1 1.6)                          ;; MODERATE thermal immunity
+      (death_prep_3 1.4)                             ;; PREPARATION thermal immunity
+      (death_prep_2 1.2)                             ;; LIGHT thermal immunity
+      (true 1.0)))                                   ;; BASELINE
+
+  (define total_thermal_shock_immunity (* thermal_shock_immunity_base thermal_shock_phase_multiplier))
+
+  ;; ═══ POWER DEATH PREVENTION SYSTEM ═══
+  ;; Power loss = robot death - ensure MASSIVE power redundancy
+  (define power_death_prevention_target
+    (cond
+      (v6_death_zone_3 2000)          ;; MAXIMUM power redundancy
+      (v6_death_zone_2 1800)          ;; ULTRA HIGH power redundancy
+      (v6_death_zone_1 1600)          ;; HIGH power redundancy  
+      (death_prep_3 1400)             ;; MODERATE HIGH power redundancy
+      (death_prep_2 1200)             ;; MODERATE power redundancy
+      (death_prep_1 1000)             ;; LIGHT power redundancy
+      ((> sol 200) 800)               ;; MID-GAME enhanced
+      (true 700)))                    ;; ENHANCED baseline
+
+  ;; ═══ AGGRESSIVE CRI DEATH PREVENTION ═══
+  ;; High CRI = higher death probability - CRUSH IT
+  (define death_prevention_cri_factor
+    (cond
+      ((< colony_risk_index 15) 0.85) ;; EXCELLENT range - reward low CRI
+      ((< colony_risk_index 20) 0.92) ;; GOOD range - minor reward
+      ((< colony_risk_index 25) 1.0)  ;; TARGET range - no penalty
+      ((< colony_risk_index 30) 1.2)  ;; ACCEPTABLE range - light penalty
+      ((< colony_risk_index 35) 1.45) ;; CONCERNING range - moderate penalty
+      ((< colony_risk_index 40) 1.7)  ;; DANGEROUS range - high penalty
+      (true 2.2)))                    ;; CRITICAL range - maximum penalty
+
+  ;; ═══ DEATH CRUSHER ALLOCATION STRATEGY ═══
+  ;; Optimized for ZERO robot death during autonomous period
+  
+  ;; Heating allocation: thermal shock immunity + power security
+  (define death_crusher_heating_base
+    (cond
+      (crew_critical 0.92)            ;; DEATH PREVENTION MODE - maximum heating
+      (crew_emergency 0.87)           ;; EMERGENCY - ultra high heating
+      (crew_crisis 0.82)              ;; CRISIS - high heating
+      (crew_danger 0.76)              ;; DANGER - moderate high heating
+      ((<= power power_death_prevention_target) 0.70) ;; POWER BUILDING mode
+      (crew_concerning 0.65)          ;; CONCERNING - moderate heating
+      (v6_death_zone_3 0.60)          ;; HIGH for death zone 3
+      (v6_death_zone_2 0.57)          ;; MODERATE HIGH for death zone 2
+      (v6_death_zone_1 0.54)          ;; MODERATE for death zone 1
+      (death_prep_3 0.50)             ;; PREPARATION - moderate
+      (true 0.47)))                   ;; DEFAULT
+
+  ;; Enhanced heating with thermal shock immunity
+  (define total_death_crusher_heating (+ death_crusher_heating_base total_thermal_shock_immunity))
+
+  ;; ISRU allocation: minimal for robots - focus on death prevention
+  (define death_crusher_isru_allocation
+    (cond
+      ((< o2_days 3.0) 0.35)          ;; O2 critical emergency
+      ((< h2o_days 5.0) 0.30)         ;; H2O critical emergency
+      ((< o2_days 10.0) 0.25)         ;; O2 moderate building
+      ((< h2o_days 12.0) 0.22)        ;; H2O moderate building
+      (v6_death_zone_3 0.15)          ;; Minimal during death zone 3
+      (v6_death_zone_2 0.17)          ;; Minimal during death zone 2
+      (v6_death_zone_1 0.19)          ;; Low during death zone 1
+      (death_prep_3 0.21)             ;; Low during intensive prep
+      (true 0.24)))                   ;; DEFAULT
+
+  ;; Greenhouse allocation: minimal for robots - focus on death prevention
+  (define death_crusher_greenhouse_allocation
+    (cond
+      ((< food_days 3.0) 0.12)        ;; Food critical emergency
+      ((< food_days 8.0) 0.09)        ;; Food moderate
+      (v6_death_zone_3 0.04)          ;; Minimal during death zone 3
+      (v6_death_zone_2 0.05)          ;; Minimal during death zone 2  
+      (v6_death_zone_1 0.06)          ;; Low during death zone 1
+      (death_prep_3 0.07)             ;; Low during intensive prep
+      (true 0.08)))                   ;; DEFAULT
+
+  ;; ═══ ENHANCED EVENT DEATH PREVENTION ═══
+  (define event_count (length events))
+  (define death_prevention_event_response
+    (cond
+      ((and v6_death_zone_3 (>= event_count 4)) 5.0)   ;; MAXIMUM for death zone + many events
+      ((and v6_death_zone_2 (>= event_count 4)) 4.5)   ;; ULTRA HIGH for death zone + many events
+      ((and v6_death_zone_1 (>= event_count 3)) 4.0)   ;; HIGH for death zone + events
+      ((>= event_count 5) 3.5)                         ;; MASSIVE event response
+      ((>= event_count 4) 3.2)                         ;; HIGH event response
+      ((>= event_count 3) 2.8)                         ;; MODERATE event response
+      ((>= event_count 2) 2.2)                         ;; LIGHT event response
+      ((>= event_count 1) 1.8)                         ;; MINIMAL event response
+      (true 1.0)))                                     ;; NO events
+
+  ;; ═══ FINAL DEATH CRUSHER ALLOCATIONS ═══
+  (define calc_heating (* total_death_crusher_heating death_prevention_event_response death_prevention_cri_factor))
+  (define calc_isru (* death_crusher_isru_allocation death_prevention_event_response))
+  (define calc_greenhouse (* death_crusher_greenhouse_allocation death_prevention_event_response))
+
+  ;; Normalize to ensure total = 1.0
+  (define total_calc (+ calc_heating calc_isru calc_greenhouse))
+  (define norm_factor (/ 1.0 total_calc))
+
+  (define final_heating (* calc_heating norm_factor))
+  (define final_isru (* calc_isru norm_factor))
+  (define final_greenhouse (* calc_greenhouse norm_factor))
+
+  ;; ═══ DEATH PREVENTION OVERRIDE PROTOCOLS ═══
+  (cond
+    ;; CRITICAL: Death imminent - DEATH PREVENTION MODE
+    (crew_critical
+     (set! heating_alloc 0.98)
+     (set! isru_alloc 0.015)
+     (set! greenhouse_alloc 0.005)
+     (set! building_alloc 0.0)
+     (log "💀🚨⚡ DEATH PREVENTION MODE: All systems to robot survival"))
+    
+    ;; EMERGENCY: Emergency state - maximum death prevention
+    (crew_emergency
+     (set! heating_alloc 0.94)
+     (set! isru_alloc 0.05)
+     (set! greenhouse_alloc 0.01)
+     (set! building_alloc 0.0)
+     (log "💀🔥⚡ EMERGENCY: Maximum death prevention"))
+    
+    ;; CRISIS: Crisis state - high death prevention
+    (crew_crisis
+     (set! heating_alloc 0.88)
+     (set! isru_alloc 0.10)
+     (set! greenhouse_alloc 0.02)
+     (set! building_alloc 0.0)
+     (log "💀⚠️⚡ CRISIS: High death prevention"))
+    
+    ;; V6 DEATH ZONES: Special robot death prevention mode
+    ((or v6_death_zone_1 v6_death_zone_2 v6_death_zone_3)
+     (set! heating_alloc (max 0.55 (min 0.92 final_heating)))
+     (set! isru_alloc (max 0.04 (min 0.35 final_isru)))
+     (set! greenhouse_alloc (max 0.01 (min 0.20 final_greenhouse)))
+     (set! building_alloc 0.0)
+     (log "💀🤖🛡️ DEATH ZONE MODE: Robot death prevention active"))
+    
+    ;; DEATH PREPARATION: Prepare for death zones
+    ((or death_prep_1 death_prep_2 death_prep_3)
+     (set! heating_alloc (max 0.45 (min 0.85 final_heating)))
+     (set! isru_alloc (max 0.08 (min 0.40 final_isru)))
+     (set! greenhouse_alloc (max 0.02 (min 0.25 final_greenhouse)))
+     (set! building_alloc 0.0)
+     (log "💀🔧🛠️ DEATH PREP MODE: Preparing for robot death zones"))
+    
+    ;; NORMAL: Optimized allocation for robot survival + scoring
+    (true
+     (set! heating_alloc (max 0.40 (min 0.80 final_heating)))
+     (set! isru_alloc (max 0.12 (min 0.45 final_isru)))
+     (set! greenhouse_alloc (max 0.04 (min 0.28 final_greenhouse)))
+     (set! building_alloc 0.0)))
+
+  ;; Apply death crusher repair allocation (THE KEY TO ZERO ROBOT DEATH)
+  (set! repair_alloc death_crusher_repair_allocation)
+
+  ;; ═══ DEATH PREVENTION STATUS MONITORING ═══
+  (define current_crew_count crew_count)
+  (define crew_health_status
+    (if crew_perfect "PERFECT"
+    (if crew_excellent "EXCELLENT"
+    (if crew_good "GOOD"
+    (if crew_acceptable "ACCEPTABLE"
+    (if crew_concerning "CONCERNING"
+    (if crew_danger "DANGER"
+    (if crew_crisis "CRISIS"
+    (if crew_emergency "EMERGENCY" "CRITICAL")))))))))
+
+  (define death_phase_status
+    (if v6_death_zone_3 "DEATH-ZONE-3"
+    (if v6_death_zone_2 "DEATH-ZONE-2"
+    (if v6_death_zone_1 "DEATH-ZONE-1"
+    (if death_prep_3 "DEATH-PREP-3"
+    (if death_prep_2 "DEATH-PREP-2"
+    (if death_prep_1 "DEATH-PREP-1" 
+    (if death_recovery "RECOVERY" "NORMAL"))))))))
+
+  (define scoring_status
+    (if (>= current_crew_count 8) "💎 PERFECTION(8+)"
+    (if (>= current_crew_count 7) "🏆 MAXIMUM(7+)"
+    (if (>= current_crew_count 6) "🌟 BUFFER(6+)"
+    (if (>= current_crew_count 5) "🎯 TARGET(5+)"
+    "💀 DEATH_RISK(<5)")))))
+
+  ;; ═══ DETAILED DEATH PREVENTION MONITORING ═══
+  (log (concat "  💀 Death Prevention: " (string current_crew_count) " alive | MinHP:" (string crew_min_hp) " | " crew_health_status " | " death_phase_status))
+  (log (concat "  🎯 Scoring: " scoring_status " | Repair:" (string (round death_crusher_repair_allocation 1)) "x | ThermalImmunity:" (string (round (* total_thermal_shock_immunity 100))) "%"))
+  (log (concat "  ⚡ Power: " (string (round power)) "/" (string power_death_prevention_target) " | CRI:" (string colony_risk_index) " | Events:" (string event_count)))
+  (log (concat "  🔧 Allocation: H:" (string (round (* heating_alloc 100))) "% I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "% R:" (string (round repair_alloc 1)) "x"))
+
+  ;; ═══ DEATH CRUSHER SCORE PROJECTION ═══
+  (if (> sol 400)
+    (let ((proj_crew (max current_crew_count 6))  ;; Optimistic crew estimate with death prevention
+          (proj_cri (if (< colony_risk_index 25) 20 28))  ;; Optimistic CRI estimate
+          (proj_score (+ 87000 (* proj_crew 500) 1200 20000 (* proj_cri -10))))
+      (log (concat "  🏆 PROJECTION: " (string proj_score) " (crew:" (string proj_crew) " cri:" (string proj_cri) ") | TARGET: 120,000+ | Beat: 105,840"))))
+
+  ;; ═══ DEATH CRUSHER OUTPUT ═══
+  (concat "DEATH-CRUSHER Sol " (string sol)
+    " | " (string current_crew_count) "/" crew_health_status  
+    " | " death_phase_status " | " scoring_status
+    " | CRI:" (string colony_risk_index)
+    " | TARGET: 120,000+ | ZERO_DEATH_TOLERANCE"))

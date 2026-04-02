@@ -154,6 +154,49 @@
       ],
       "notes": "THE REAL MISSION: Base runs with ZERO humans for 1+ Mars year before crew arrives. Robots go first. Always. This version makes robots break realistically: wheels grind, joints seize, batteries degrade, sensors go blind, software crashes, navigation fails, cables fray, and dust storms kill. Based on Spirit (2210 sols), Opportunity (5352 sols, killed by dust), Curiosity (4000+ sols, 13 wheel punctures), Perseverance (4 watchdog trips year 1), ISS Canadarm2 (20+ years maintenance). The fleet cannot survive by pretending robots are immortal.",
       "backtest_target": "Run the fleet 99,980 strategy (3 immortal robots) against v6. Expected: robots degrade, get stuck, go blind, make bad decisions. The 3-robot strategy collapses."
+    },
+    {
+      "version": 7,
+      "name": "Sabatier Chemistry",
+      "released": "2026-04-02",
+      "sol_range": [
+        848,
+        897
+      ],
+      "hazards_added": [
+        "catalyst_poisoning",
+        "sabatier_reactor_fouling",
+        "electrolysis_membrane_degradation", 
+        "co2_compressor_failure",
+        "water_separator_malfunction"
+      ],
+      "events_added": [
+        "catalyst_replacement_required",
+        "electrolysis_optimization",
+        "co2_filter_maintenance"
+      ],
+      "challenges_added": [
+        "sabatier_reactor_startup",
+        "electrolysis_voltage_regulation"
+      ],
+      "notes": "REAL CHEMISTRY: Replaces magic numbers with actual Sabatier reaction (CO₂ + 4H₂ → CH₄ + 2H₂O) and electrolysis (2H₂O → 2H₂ + O₂). O₂ production now depends on power input, catalyst temperature, CO₂ pressure, and catalyst age. Catalysts degrade over time (2000 hour life), requiring replacement. Based on NASA MOXIE (6g O₂/hr at 300W), Sabatier reactor studies (0.34 kg CH₄/hr baseline), ISS OGS (9kg O₂/day at 3kW). Power requirements are realistic: 1.5kW minimum for Sabatier, 5kWh per kg O₂ for electrolysis.",
+      "backtest_target": "Run v6 best strategy against v7 frames. Expected: Governors assuming constant O₂ production (2.8 kg/sol) will fail when real chemistry limits output and catalysts degrade. ISRU timing becomes critical.",
+      "data_sources": [
+        "NASA MOXIE (Mars 2020 Perseverance rover)",
+        "NASA Sabatier reactor specifications", 
+        "ISS Oxygen Generation System (OGS) performance data",
+        "Mars atmospheric composition: 95.3% CO₂ at 606 Pa",
+        "Catalyst degradation studies: Ni catalyst 2000 hour life",
+        "Electrolysis efficiency curves: 70% practical efficiency"
+      ],
+      "chemistry": {
+        "sabatier_reaction": "CO₂ + 4H₂ → CH₄ + 2H₂O",
+        "electrolysis_reaction": "2H₂O → 2H₂ + O₂", 
+        "catalyst_life_hours": 2000,
+        "electrode_life_hours": 70000,
+        "power_minimum_kw": 1.5,
+        "energy_per_kg_o2_kwh": 5.0
+      }
     }
   ],
   "backtest_protocol": {

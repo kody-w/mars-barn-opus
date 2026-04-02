@@ -1,0 +1,40 @@
+{
+  "sol": 872,
+  "version": 7,
+  "name": "Sabatier Chemistry",
+  "environment": {
+    "temperature_k": 244.9,
+    "pressure_pa": 700.4,
+    "solar_irradiance": 571.5,
+    "dust_storm": false
+  },
+  "hazards": [
+    {
+      "type": "catalyst_poisoning",
+      "severity": 0.382,
+      "regeneration_power_cost": 38.2,
+      "description": "Catalyst poisoned by atmospheric sulfur compounds (38.2% efficiency loss)"
+    }
+  ],
+  "events": [],
+  "chemistry": {
+    "catalyst_age_hours": 615.0,
+    "catalyst_efficiency_baseline": 0.7048,
+    "co2_pressure_pa": 667.4812,
+    "electrolysis_efficiency_baseline": 0.9915657142857143
+  },
+  "challenges": [
+    {
+      "type": "sabatier_reactor_startup",
+      "description": "Sabatier reactor requires 2-3 hours to reach operating temperature",
+      "power_cost_kw": 2.5,
+      "duration_hours": 2.5
+    },
+    {
+      "type": "electrolysis_voltage_regulation",
+      "description": "Electrolysis voltage must be maintained above 1.23V minimum",
+      "min_voltage": 1.23,
+      "optimal_voltage": 1.8
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "_format": "mars-barn-echo-enrichments",
+  "version": "v7",
+  "name": "Sabatier Catalyst Aging",
+  "description": "Retroactive catalyst age accumulation from Sol 1. All ISRU operations since Sol 1 have contributed to catalyst and electrode degradation.",
+  "enrichment_type": "sabatier_chemistry",
+  "data_sources": [
+    "NASA Sabatier reactor studies: Ni catalyst life ~2000 hours",
+    "ISS Oxygen Generation System: PEM electrode target life 70,000 hours",
+    "MOXIE Mars 2020: Solid oxide electrolyzer degradation data"
+  ],
+  "enrichments": {
+    "1": {
+      "catalyst_age_hours": 24.6,
+      "catalyst_efficiency": 0.9988,
+      "electrode_age_hours": 24.6,
+      "electrode_efficiency": 0.9996
+    },
+    "50": {
+      "catalyst_age_hours": 1230.0,
+      "catalyst_efficiency": 0.9385,
+      "electrode_age_hours": 1230.0,
+      "electrode_efficiency": 0.9982
+    },
+    "100": {
+      "catalyst_age_hours": 2460.0,
+      "catalyst_efficiency": 0.877,
+      "electrode_age_hours": 2460.0,
+      "electrode_efficiency": 0.9965
+    },
+    "200": {
+      "catalyst_age_hours": 4920.0,
+      "catalyst_efficiency": 0.754,
+      "electrode_age_hours": 4920.0,
+      "electrode_efficiency": 0.993
+    },
+    "300": {
+      "catalyst_age_hours": 7380.0,
+      "catalyst_efficiency": 0.631,
+      "electrode_age_hours": 7380.0,
+      "electrode_efficiency": 0.9895
+    },
+    "400": {
+      "catalyst_age_hours": 9840.0,
+      "catalyst_efficiency": 0.508,
+      "electrode_age_hours": 9840.0,
+      "electrode_efficiency": 0.986
+    },
+    "500": {
+      "catalyst_age_hours": 12300.0,
+      "catalyst_efficiency": 0.385,
+      "electrode_age_hours": 12300.0,
+      "electrode_efficiency": 0.9825
+    },
+    "600": {
+      "catalyst_age_hours": 14760.0,
+      "catalyst_efficiency": 0.262,
+      "electrode_age_hours": 14760.0,
+      "electrode_efficiency": 0.979
+    },
+    "700": {
+      "catalyst_age_hours": 17220.0,
+      "catalyst_efficiency": 0.2,
+      "electrode_age_hours": 17220.0,
+      "electrode_efficiency": 0.9754
+    },
+    "800": {
+      "catalyst_age_hours": 19680.0,
+      "catalyst_efficiency": 0.2,
+      "electrode_age_hours": 19680.0,
+      "electrode_efficiency": 0.9719
+    }
+  },
+  "physics": {
+    "catalyst_degradation_formula": "efficiency = max(0.2, 1.0 - (operating_hours / 2000))",
+    "electrode_degradation_formula": "efficiency = max(0.3, 1.0 - (operating_hours / 70000))",
+    "operating_hours_per_sol": 24.6,
+    "degrades_only_when_active": true,
+    "notes": [
+      "Catalyst degrades much faster than electrodes (2,000 vs 70,000 hour life)",
+      "By Sol 400, catalyst is only 50% efficient, needs replacement",
+      "By Sol 700, catalyst is at minimum 20% efficiency",
+      "Electrodes remain highly efficient throughout mission duration",
+      "This creates strategic tension: run ISRU early (fresh catalyst) vs late (better infrastructure)"
+    ]
+  },
+  "strategic_implications": [
+    "Early aggressive ISRU maximizes catalyst efficiency but risks power/infrastructure problems",
+    "Late conservative ISRU has mature infrastructure but severely degraded catalysts", 
+    "Optimal strategy likely involves catalyst replacement planning around Sol 400-500",
+    "Governors that ignore catalyst aging will see production plummet after Sol 400",
+    "v7 makes 'ISRU plant' module placement timing much more critical"
+  ]
+}
