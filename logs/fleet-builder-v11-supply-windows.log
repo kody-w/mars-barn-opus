@@ -656,3 +656,20 @@ I see there are some extra log files and governor changes. Let me revert the unr
   │ data/frames/sol-1057.json
   └ 1 line...
 
+● Commit v11 implementation with detailed message (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && git commit -m "feat: implement v11
+  │ Earth-Mars Transfer Windows physics
+  │
+  │ Add realistic orbital mechanics and cargo supply chain physics:…
+  └ 46 lines...
+
+
+Execution failed: CAPIError: 400 400 Bad Request
+ (Request ID: FD36:4CA28:5686F:63D30:69CEC928)
+
+Total usage est:        1 Premium request
+API time spent:         13m 20s
+Total session time:     17m 0s
+Total code changes:     +637 -214
+Breakdown by AI model:
+ claude-sonnet-4          6.8m in, 40.8k out, 6.6m cached (Est. 1 Premium request)
