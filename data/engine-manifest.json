@@ -58,6 +58,27 @@
     "conflict_resolution": "First valid push wins (fast-forward). Conflicting pushes require PR review. Chain nodes verify the winning frame."
   },
 
+  "attestation": {
+    "description": "On-chain attestation protocol. Frame hashes are posted to a distributed ledger, creating a trustless bridge between virtual and physical worlds. The blockchain carries trust, not money.",
+    "contract": "contracts/MarsFrameAttestation.sol",
+    "chain": "Base L2 (EVM-compatible, chain ID 8453)",
+    "contract_address": "0x0000000000000000000000000000000000000000",
+    "what_goes_on_chain": "~200 bytes per sol: frame hash + sol number + engine signature + prev hash + timestamp",
+    "what_stays_off_chain": "Full frame JSON files (git). Anyone can verify by hashing and comparing to on-chain attestation.",
+    "verification": "Physical twin calls verify(sol, hash) — a free view function. No gas cost to verify.",
+    "engine_protocol_extension": {
+      "after_step_12_commit": {
+        "13_build_attestation": "hash_frame(content) → FrameAttestation with prevHash chain link",
+        "14_post_attestation": "Send attest() transaction to the contract via JSON-RPC",
+        "15_confirm_attestation": "Wait for block confirmation, log attestation tx hash"
+      }
+    },
+    "twin_verification_gate": {
+      "description": "The physical twin verifies every frame before driving actuators. If verification fails, twin enters safe mode (all actuators to nominal defaults).",
+      "protocol": "Load frame → hash locally → call verify(sol, hash) on-chain → if valid, apply to actuators"
+    }
+  },
+
   "what_stays_private": [
     "Frame generation algorithms (the HOW)",
     "Canonical LisPy VM implementation",

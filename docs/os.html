@@ -1069,8 +1069,9 @@ window.os = {
     const sols = results.map(r => r.sols).sort((a, b) => a - b);
     const medianSols = sols[Math.floor(runs / 2)];
     const survRate = alive.length / runs;
+    const medMods = results.map(r => r.modules).sort((a, b) => a - b)[Math.floor(runs / 2)];
     const score = Math.round(medianSols * 100 + Math.min(...results.map(r => r.crew)) * 500 +
-      results.map(r => r.modules).sort((a, b) => a - b)[Math.floor(runs / 2)] * 150 +
+      Math.min(medMods, 8) * 150 +
       survRate * 20000 - results.map(r => r.cri).sort((a, b) => a - b)[Math.floor(runs * 0.75)] * 10);
     const grade = score >= 80000 ? 'S+' : score >= 50000 ? 'S' : score >= 30000 ? 'A' :
       score >= 15000 ? 'B' : score >= 5000 ? 'C' : 'D';

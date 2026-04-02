@@ -1,0 +1,170 @@
+;; COPILOT SCORE MAXIMIZER TRANSCENDENCE V2
+;; Strategy: Score-optimized strategy targeting 150K+ points with aggressive module building
+;; Target: Beat 97,540 record with ultra-module density and score optimization
+;; Breakthrough: Hyper-aggressive early building with smart late-game conservation
+
+(begin
+  (define _agent_name "Copilot Score Maximizer Transcendence v2")
+  (define _agent_desc "Score-maximizing strategy targeting 150K+ points with ultra-module density")
+  
+  (log (concat "🏆💎⚡ SCORE MAXIMIZER — Sol " (string sol) " — Modules:" (string (length modules)) " — CRI:" (string colony_risk_index) " — Score Target: 150K+"))
+  
+  ;; ═══ SCORE-OPTIMIZED PHASE ARCHITECTURE ═══
+  ;; Designed for maximum score through aggressive module building
+  
+  (define phase_hyper_build (and (>= sol 1) (< sol 300)))     ;; Hyper Build: Maximum aggression for modules
+  (define phase_mega_expansion (and (>= sol 300) (< sol 500))) ;; Mega Expansion: Sustained high building
+  (define phase_score_optimization (and (>= sol 500) (< sol 650))) ;; Score Optimization: Balanced high-score building
+  (define phase_smart_conservation (and (>= sol 650) (< sol 700))) ;; Smart Conservation: Strategic v4 management
+  (define phase_final_survival (>= sol 700))                  ;; Final Survival: Minimal building for survival
+  
+  ;; ═══ SCORE-FOCUSED CRI MANAGEMENT ═══
+  ;; Optimized for highest score while maintaining survival
+  (define modules_count (length modules))
+  (define cri_score_level
+    (cond
+      ((< colony_risk_index 5) 1)     ;; Ultra-safe: Maximum score aggression
+      ((< colony_risk_index 12) 2)    ;; Very safe: High score aggression
+      ((< colony_risk_index 20) 3)    ;; Safe: Balanced score building
+      ((< colony_risk_index 35) 4)    ;; Moderate: Careful score building
+      ((< colony_risk_index 50) 5)    ;; High risk: Conservative score building
+      (else 6)))                      ;; Very high risk: Survival focus only
+  
+  ;; ═══ ULTRA-MODULE DENSITY REPAIR ORCHESTRATION ═══
+  ;; Massive repair bay network for ultra-high module counts
+  (define repair_bay_score_target
+    (cond
+      (phase_hyper_build (max 3 (round (* modules_count 0.12))))     ;; 12% hyper build
+      (phase_mega_expansion (max 6 (round (* modules_count 0.16))))  ;; 16% mega expansion
+      (phase_score_optimization (max 10 (round (* modules_count 0.20)))) ;; 20% score optimization
+      (phase_smart_conservation (max 15 (round (* modules_count 0.28)))) ;; 28% smart conservation
+      (else (max 20 (round (* modules_count 0.35))))))              ;; 35% final survival
+  
+  ;; Score-adjusted repair bay targeting
+  (define repair_bay_target
+    (max repair_bay_score_target 
+         (round (* repair_bay_score_target (+ 0.8 (/ colony_risk_index 60))))))
+  
+  ;; ═══ SCORE MAXIMIZER RESOURCE BUFFERS ═══
+  ;; Optimized resource management for score-focused building
+  (define resource_score_strength
+    (+ (min 8 o2_days)         ;; O2 buffer (optimized for building focus)
+       (min 12 food_days)      ;; Food buffer (balanced for crew + building)
+       (min 6 h2o_days)))      ;; Water buffer (minimal for efficiency)
+  
+  (define resource_score_multiplier (max 1.0 (min 2.0 (/ resource_score_strength 15))))
+  
+  ;; ═══ HYPER-AGGRESSIVE BUILDING ALLOCATION ═══
+  ;; Maximum building focus for score optimization
+  (define building_allocation
+    (cond
+      ;; HYPER BUILD PHASE: Maximum module density (Sol 1-299)
+      (phase_hyper_build
+        (cond
+          ((< cri_score_level 3) 0.98)    ;; Maximum aggression when ultra-safe
+          ((< cri_score_level 4) 0.95)    ;; Extreme aggression when safe
+          ((< cri_score_level 5) 0.90)    ;; High aggression when moderate
+          (else 0.85)))                   ;; Still aggressive when risky
+      
+      ;; MEGA EXPANSION PHASE: Sustained high building (Sol 300-499)
+      (phase_mega_expansion
+        (cond
+          ((< cri_score_level 3) 0.95)    ;; Extreme building when ultra-safe
+          ((< cri_score_level 4) 0.90)    ;; High building when safe
+          ((< cri_score_level 5) 0.85)    ;; Solid building when moderate
+          (else 0.78)))                   ;; Good building when risky
+      
+      ;; SCORE OPTIMIZATION PHASE: Balanced high-score building (Sol 500-649)
+      (phase_score_optimization
+        (cond
+          ((and (< cri_score_level 4) (> modules_count 400)) 0.85) ;; High-module efficiency bonus
+          ((< cri_score_level 3) 0.88)    ;; High building when ultra-safe
+          ((< cri_score_level 5) 0.80)    ;; Good building when safe-moderate
+          (else 0.70)))                   ;; Moderate building when risky
+      
+      ;; SMART CONSERVATION PHASE: Strategic v4 management (Sol 650-699)
+      (phase_smart_conservation
+        (cond
+          ((and (< cri_score_level 3) (> modules_count 500)) 0.75) ;; Ultra-high module strategic building
+          ((< cri_score_level 4) 0.70)    ;; Strategic building when safe
+          ((< cri_score_level 5) 0.60)    ;; Careful building when moderate
+          (else 0.45)))                   ;; Conservative when risky
+      
+      ;; FINAL SURVIVAL PHASE: Minimal building for survival (Sol 700+)
+      (phase_final_survival
+        (cond
+          ((< cri_score_level 3) 0.40)    ;; Light building when ultra-safe
+          ((< cri_score_level 5) 0.25)    ;; Minimal building when safe-moderate
+          (else 0.15)))))                 ;; Survival-only when risky
+  
+  ;; ═══ SCORE-OPTIMIZED MODULE DISTRIBUTION ═══
+  ;; Module selection optimized for maximum score
+  (define solar_score_ratio
+    (cond
+      (phase_hyper_build 0.75)           ;; 75% solar for massive power foundation
+      (phase_mega_expansion 0.65)        ;; 65% solar for sustained power
+      (phase_score_optimization 0.55)    ;; 55% solar for balanced efficiency
+      (phase_smart_conservation 0.45)    ;; 45% solar for v4 resilience
+      (else 0.35)))                      ;; 35% solar for final survival
+  
+  (define repair_score_ratio
+    (/ repair_bay_target (max 1 modules_count)))
+  
+  (define greenhouse_score_ratio
+    (cond
+      (phase_hyper_build 0.12)           ;; 12% greenhouse in hyper build
+      (phase_mega_expansion 0.18)        ;; 18% greenhouse in mega expansion
+      (phase_score_optimization 0.25)    ;; 25% greenhouse in score optimization
+      (phase_smart_conservation 0.35)    ;; 35% greenhouse in smart conservation
+      (else 0.45)))                      ;; 45% greenhouse in final survival
+  
+  (define remaining_score_ratio (max 0.03 (- 1.0 solar_score_ratio repair_score_ratio greenhouse_score_ratio)))
+  
+  ;; ═══ SCORE-OPTIMIZED CREW ALLOCATION ═══
+  ;; Crew management optimized for maximum building and score
+  (define crew_score_allocation
+    (cond
+      (phase_hyper_build (list 0.55 0.25 0.20))       ;; Power-heavy for building
+      (phase_mega_expansion (list 0.50 0.30 0.20))    ;; Balanced power+repair for sustained building
+      (phase_score_optimization (list 0.45 0.35 0.20)) ;; Repair-focused for module maintenance
+      (phase_smart_conservation (list 0.35 0.45 0.20)) ;; Repair-heavy for v4 phase
+      (else (list 0.25 0.50 0.25))))                   ;; Survival-focused for final phase
+  
+  ;; ═══ SCORE MAXIMIZER EFFICIENCY CALCULATION ═══
+  ;; Ultra-advanced efficiency for maximum score
+  (define base_score_efficiency
+    (* resource_score_multiplier
+       (/ 120 (max 8 colony_risk_index))              ;; Higher base efficiency for score
+       (if (> modules_count 100) 1.15 1.0)            ;; Early module bonus
+       (if (> modules_count 300) 1.25 1.0)            ;; High module bonus
+       (if (> modules_count 500) 1.35 1.0)            ;; Ultra-module bonus
+       (if (> modules_count 700) 1.45 1.0)))          ;; Transcendent module bonus
+  
+  (define efficiency_score_multiplier (max 1.0 (min 3.5 base_score_efficiency)))
+  
+  ;; ═══ FINAL SCORE-OPTIMIZED ALLOCATION ═══
+  ;; Revolutionary score maximization strategy
+  (list
+    ;; Building allocation with score optimization
+    (* building_allocation efficiency_score_multiplier)
+    
+    ;; Module type distribution for maximum score
+    (list solar_score_ratio repair_score_ratio greenhouse_score_ratio remaining_score_ratio)
+    
+    ;; Crew allocation for score optimization
+    crew_score_allocation
+    
+    ;; Score-focused allocation analysis
+    (list
+      (concat "ScorePhase: " 
+        (cond
+          (phase_hyper_build "🚀HyperBuild")
+          (phase_mega_expansion "⚡MegaExpansion") 
+          (phase_score_optimization "💎ScoreOpt")
+          (phase_smart_conservation "🛡️SmartConserv")
+          (else "👑FinalSurvival")))
+      (concat "CRI-Score: " (string cri_score_level) "/6")
+      (concat "RepairTarget: " (string repair_bay_target))
+      (concat "ScoreBuffers: " (string (round resource_score_strength)))
+      (concat "ScoreEff: " (string (round (* efficiency_score_multiplier 100))) "%")
+      (concat "ModuleTarget: " (string (round (* modules_count 1.2))) "+"))))

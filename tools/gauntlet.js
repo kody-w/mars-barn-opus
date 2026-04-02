@@ -446,7 +446,7 @@ if(runs === 1){
   const result = runGauntlet(frames, totalSols, 42);
   console.log((result.alive?'🟢 ALIVE':'☠ DEAD: '+result.cause) + ' at sol ' + result.sols);
   console.log('Crew: '+result.crew+'/2 | HP:'+result.hp+' | Power:'+result.power+' | Solar:'+result.solarEff+'% | CRI:'+result.cri);
-  const score = result.sols*100 + result.crew*500 + result.modules*150 - result.cri*10;
+  const score = result.sols*100 + result.crew*500 + Math.min(result.modules,8)*150 - result.cri*10;
   console.log('Score: '+score);
 } else {
   // Monte Carlo
@@ -497,7 +497,7 @@ if(runs === 1){
   const officialScore = Math.round(
     medianSols * 100
     + minCrew * 500
-    + medianModules * 150
+    + Math.min(medianModules, 8) * 150
     + survivalRate * 200 * 100
     - p75CRI * 10
   );
@@ -522,7 +522,7 @@ if(runs === 1){
   console.log('╚══════════════════════════════════════════╝');
 
   // Per-run score distribution (for reference)
-  const perRunScores = results.map(r=>r.sols*100+r.crew*500+r.modules*150-r.cri*10);
+  const perRunScores = results.map(r=>r.sols*100+r.crew*500+Math.min(r.modules,8)*150-r.cri*10);
   perRunScores.sort((a,b)=>a-b);
   console.log('\nPer-run score distribution:');
   console.log('  Min: ' + perRunScores[0] + ' | P25: ' + perRunScores[Math.floor(runs*0.25)] +
