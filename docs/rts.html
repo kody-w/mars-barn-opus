@@ -658,10 +658,10 @@
     const my = getTerrainY(mx, mz);
 
     const tunnel = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.8, 1.8, length, 8),
+      new THREE.CylinderGeometry(1.2, 1.2, length, 8),
       tunnelMat
     );
-    tunnel.position.set(mx, my + 1.8, mz);
+    tunnel.position.set(mx, my + 1.2, mz);
     // Rotate cylinder Y-axis to lie along the XZ direction
     const dir = new THREE.Vector3(dx, 0, dz).normalize();
     tunnel.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
@@ -724,29 +724,77 @@
   unitData.forEach((ud, i) => {
     const grp = new THREE.Group();
 
-    // Body — capsule shape (cylinder + 2 half-spheres)
+    // Body — Tesla Optimus-style humanoid robot
     const bodyMat = new THREE.MeshStandardMaterial({
-      color: 0xdddddd, roughness: 0.4, metalness: 0.5
+      color: 0x222222, roughness: 0.3, metalness: 0.7
     });
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1.2, 8), bodyMat);
-    body.position.y = 1.2;
-    body.castShadow = true;
-    grp.add(body);
+    const whiteMat = new THREE.MeshStandardMaterial({
+      color: 0xeeeeee, roughness: 0.4, metalness: 0.5
+    });
 
-    const headGeo = new THREE.SphereGeometry(0.5, 8, 6);
-    const head = new THREE.Mesh(headGeo, bodyMat);
-    head.position.y = 2.0;
+    // Torso (tapered box)
+    const torso = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.7, 0.25), whiteMat);
+    torso.position.y = 1.15;
+    torso.castShadow = true;
+    grp.add(torso);
+
+    // Waist
+    const waist = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.2, 0.2), bodyMat);
+    waist.position.y = 0.75;
+    grp.add(waist);
+
+    // Head — smooth rounded screen face
+    const head = new THREE.Mesh(
+      new THREE.BoxGeometry(0.22, 0.25, 0.2),
+      bodyMat
+    );
+    head.position.y = 1.65;
     head.castShadow = true;
     grp.add(head);
 
-    // Visor
+    // Face screen (visor)
     const visor = new THREE.Mesh(
-      new THREE.SphereGeometry(0.35, 8, 4, 0, Math.PI),
-      new THREE.MeshStandardMaterial({ color: 0x112244, emissive: 0x112244, emissiveIntensity: 0.5, metalness: 0.9 })
+      new THREE.PlaneGeometry(0.18, 0.12),
+      new THREE.MeshStandardMaterial({
+        color: 0x0088ff, emissive: 0x0066cc, emissiveIntensity: 0.8, metalness: 0.9
+      })
     );
-    visor.position.y = 2.05;
-    visor.rotation.y = Math.PI;
+    visor.position.set(0, 1.67, 0.11);
     grp.add(visor);
+
+    // Arms (thin cylinders)
+    [-1, 1].forEach(side => {
+      const shoulder = new THREE.Mesh(
+        new THREE.SphereGeometry(0.06, 6, 4),
+        bodyMat
+      );
+      shoulder.position.set(side * 0.28, 1.4, 0);
+      grp.add(shoulder);
+
+      const upperArm = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.35, 6), bodyMat);
+      upperArm.position.set(side * 0.28, 1.18, 0);
+      grp.add(upperArm);
+
+      const forearm = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.3, 6), whiteMat);
+      forearm.position.set(side * 0.28, 0.88, 0);
+      grp.add(forearm);
+    });
+
+    // Legs (thicker cylinders)
+    [-1, 1].forEach(side => {
+      const upperLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.055, 0.4, 6), bodyMat);
+      upperLeg.position.set(side * 0.12, 0.5, 0);
+      grp.add(upperLeg);
+
+      const lowerLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.35, 6), whiteMat);
+      lowerLeg.position.set(side * 0.12, 0.18, 0);
+      grp.add(lowerLeg);
+
+      // Foot
+      const foot = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.04, 0.14), bodyMat);
+      foot.position.set(side * 0.12, 0.02, 0.02);
+      grp.add(foot);
+    });
 
     // Status light underneath
     const statusLight = new THREE.PointLight(ud.color, 1.0, 8);
@@ -755,11 +803,11 @@
 
     // small glowing disc under feet
     const disc = new THREE.Mesh(
-      new THREE.CircleGeometry(0.6, 12),
+      new THREE.CircleGeometry(0.4, 12),
       new THREE.MeshBasicMaterial({ color: ud.color, transparent: true, opacity: 0.4 })
     );
     disc.rotation.x = -Math.PI / 2;
-    disc.position.y = 0.05;
+    disc.position.y = 0.01;
     grp.add(disc);
 
     // Start position
@@ -779,7 +827,7 @@
     units.push({
       name: ud.name,
       group: grp,
-      body, head, visor, statusLight, disc,
+      torso, head, visor, statusLight, disc,
       label,
       hp: ud.hp,
       status: ud.status,
@@ -810,7 +858,7 @@
     { x: 15,  z: -15, r: 3 },   // COMMS-ARRAY
   ];
 
-  const UNIT_RADIUS = 1.2;
+  const UNIT_RADIUS = 0.5;
   const BUILDING_PUSH = 0.6;  // gentle repulsion from buildings
   const UNIT_PUSH = 0.4;      // gentle repulsion between units
 
@@ -1555,7 +1603,7 @@
 
       // Label with task indicator
       const screenPos = u.group.position.clone();
-      screenPos.y += 3;
+      screenPos.y += 2.2;
       screenPos.project(camera);
       if (screenPos.z < 1 && cameraMode !== 'fps') {
         u.label.style.display = 'block';
@@ -1655,7 +1703,7 @@
       // During fps transition, update end target to track unit
       if (cameraMode === 'transition_fps' && fpsUnit) {
         const up = fpsUnit.group.position;
-        transEndPos.set(up.x, up.y + 2, up.z);
+        transEndPos.set(up.x, up.y + 1.65, up.z);
       }
 
       if (t >= 1) {
@@ -1669,7 +1717,7 @@
     }
     else if (cameraMode === 'fps' && fpsUnit) {
       const up = fpsUnit.group.position;
-      camera.position.set(up.x, up.y + 2, up.z);
+      camera.position.set(up.x, up.y + 1.65, up.z);
 
       // Apply yaw/pitch
       const euler = new THREE.Euler(fpsPitch, fpsYaw, 0, 'YXZ');
