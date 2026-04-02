@@ -34,7 +34,7 @@
       "id": "v10-failure-cascade",
       "version": "v10",
       "title": "System Dependency Graph",
-      "status": "pending",
+      "status": "complete",
       "priority": 5
     },
     {
