@@ -1,0 +1,52 @@
+{
+  "sol": 1025,
+  "version": 11,
+  "name": "Earth-Mars Transfer Windows",
+  "environment": {
+    "temperature_k": 214.7,
+    "temperature_c": -58.4,
+    "pressure_pa": 584.9,
+    "solar_irradiance": 497.4,
+    "dust_storm": false,
+    "solar_longitude": 191.6,
+    "season": "Northern Autumn",
+    "wind_speed_ms": 24.5
+  },
+  "hazards": [
+    {
+      "type": "cargo_delivery_failure",
+      "severity": 0.7470357370048014,
+      "payload_loss_pct": 0.5513590030527342,
+      "recovery_power_cost": 119,
+      "description": "Mars EDL failure - cargo shipment lost during atmospheric entry",
+      "data_source": "Historical Mars mission EDL success rates (~50% for heavy payloads)"
+    }
+  ],
+  "events": [],
+  "challenges": [],
+  "supply_chain": {
+    "description": "v11 implements real Earth-Mars orbital mechanics and cargo logistics",
+    "window_phase": "inter_window_period",
+    "transfer_window_physics": {
+      "synodic_period_days": 779.9,
+      "transit_time_range_days": "180-270",
+      "cargo_capacity_tons": 100,
+      "landing_accuracy_km": "\u00b110",
+      "edl_success_rate": 0.5
+    },
+    "data_sources": [
+      "NASA Mars Design Reference Architecture 5.0",
+      "SpaceX Starship payload specifications",
+      "NASA Mars mission orbital mechanics studies",
+      "Historical Mars EDL success/failure rates",
+      "Hohmann transfer orbit calculations"
+    ]
+  },
+  "physics_constants": {
+    "earth_mars_synodic_period": "779.9 days (26 months)",
+    "hohmann_transfer_window": "Every 779.9 days when planets align for efficient transfer",
+    "cargo_transit_time": "180-270 days depending on trajectory optimization",
+    "landing_accuracy": "\u00b110km (requires rover retrieval operations)",
+    "supply_dependency": "Colony must plan 2-3 years ahead for Earth supplies"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "sol": 1053,
+  "version": 11,
+  "name": "Earth-Mars Transfer Windows",
+  "environment": {
+    "temperature_k": 182.5,
+    "temperature_c": -90.6,
+    "pressure_pa": 560.2,
+    "solar_irradiance": 504.6,
+    "dust_storm": false,
+    "solar_longitude": 206.6,
+    "season": "Northern Autumn",
+    "wind_speed_ms": 20.0
+  },
+  "hazards": [],
+  "events": [],
+  "challenges": [],
+  "supply_chain": {
+    "description": "v11 implements real Earth-Mars orbital mechanics and cargo logistics",
+    "window_phase": "inter_window_period",
+    "transfer_window_physics": {
+      "synodic_period_days": 779.9,
+      "transit_time_range_days": "180-270",
+      "cargo_capacity_tons": 100,
+      "landing_accuracy_km": "\u00b110",
+      "edl_success_rate": 0.5
+    },
+    "data_sources": [
+      "NASA Mars Design Reference Architecture 5.0",
+      "SpaceX Starship payload specifications",
+      "NASA Mars mission orbital mechanics studies",
+      "Historical Mars EDL success/failure rates",
+      "Hohmann transfer orbit calculations"
+    ]
+  },
+  "physics_constants": {
+    "earth_mars_synodic_period": "779.9 days (26 months)",
+    "hohmann_transfer_window": "Every 779.9 days when planets align for efficient transfer",
+    "cargo_transit_time": "180-270 days depending on trajectory optimization",
+    "landing_accuracy": "\u00b110km (requires rover retrieval operations)",
+    "supply_dependency": "Colony must plan 2-3 years ahead for Earth supplies"
+  }
+}

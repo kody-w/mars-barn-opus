@@ -86,6 +86,7 @@ runs ALL versions sequentially. State carries forward. Damage accumulates.
 | v8 Heat Transfer Model | 898-947 | Insulation degradation, thermal bridges, heating failures, thermal shock, condensation damage |
 | v9 Spatial Layout | 948-977 | Cable degradation, foundation settling, infrastructure overextension, thermal bridge formation, excavation hazard |
 | v10 System Dependencies | 978-1007 | System cascade failures, water recycler → humidity → greenhouse → O₂ → power → thermal dependencies, Apollo 13 style failures, micro-failure accumulation |
+| v11 Earth-Mars Supply Windows | 1008-1057 | Supply window missed, cargo delivery failure, cargo retrieval missions, manifest planning errors, ISRU dependency crisis |
 
 ### Retroactive echo enrichment:
 - Past frames get richer data layers WITHOUT changing (additive overlay files)
@@ -291,6 +292,56 @@ Legacy Impact:
 Strategies assuming independent resource buckets will fail when 
 water recycler cascade destroys greenhouse O₂ production and forces 
 emergency power allocation to backup life support systems.
+```
+
+### v11 Earth-Mars Supply Chain Physics (NEW):
+```
+# Real orbital mechanics and cargo logistics (Sol 1008+)
+
+Earth-Mars Transfer Windows:
+  Synodic period = 779.9 days (26 months between launch windows)
+  Transit time = 180-270 days (6-9 months cargo flight time)
+  Cargo capacity = 100 metric tons to Mars surface (SpaceX Starship class)
+  Landing accuracy = ±10km from target (requires rover retrieval missions)
+  EDL success rate = 50% (historical Mars landing success for heavy payloads)
+
+Supply Chain Dependencies:
+  Planning horizon = 2-3 years ahead for cargo manifest
+  Window missed = 26 more months until next launch opportunity
+  Self-sufficiency metric = % of needs met by ISRU vs Earth imports
+  
+Can Manufacture on Mars:
+  O₂ (from Sabatier + electrolysis)
+  H₂O (from subsurface ice)
+  Food (greenhouse agriculture)
+  Basic metals (iron from regolith)
+  Construction materials (sintered regolith bricks)
+  
+Must Import from Earth:
+  Electronics and semiconductors
+  Medical supplies and pharmaceuticals  
+  Specialized tools and replacement parts
+  Seeds and genetic diversity materials
+  Radiation shielding materials
+
+Supply Window Hazards:
+  supply_window_missed: Colony missed Earth launch window → 26 month delay
+  cargo_delivery_failure: EDL failure → 40-80% payload lost
+  cargo_retrieval_mission: Off-target landing → rover missions required
+  supply_manifest_shortage: Wrong cargo ordered 2 years ago
+  isru_dependency_crisis: Colony can't meet needs locally
+
+Data Sources:
+- NASA Mars Design Reference Architecture 5.0
+- SpaceX Starship payload capacity (100 metric tons)
+- Historical Mars EDL success rates (~50% for heavy cargo)
+- Hohmann transfer orbital mechanics (779.9 day synodic period)
+- NASA ISRU technology readiness assessments
+
+Real Physics Impact:
+Governors must balance Earth dependency vs ISRU self-sufficiency.
+Missing launch windows or EDL failures create multi-year supply gaps.
+Colony survival requires 20-year mission architecture planning, not just resource allocation.
 ```
 
 ### Consumption per sol:

@@ -337,6 +337,59 @@
         "apollo_13_scenario": "Oxygen failure → power failure → thermal failure → crew emergency",
         "repair_complexity": "Fixing cascades requires addressing root cause, not just symptoms"
       }
+    },
+    {
+      "version": 11,
+      "name": "Earth-Mars Transfer Windows",
+      "released": "2026-04-02",
+      "sol_range": [
+        1008,
+        1057
+      ],
+      "hazards_added": [
+        "supply_window_missed",
+        "cargo_delivery_failure",
+        "cargo_retrieval_mission",
+        "supply_manifest_shortage",
+        "isru_dependency_crisis"
+      ],
+      "events_added": [
+        "earth_launch_window",
+        "cargo_manifest_deadline",
+        "cargo_trajectory_update"
+      ],
+      "challenges_added": [
+        "isru_scaling_optimization",
+        "cargo_manifest_optimization",
+        "landing_site_preparation",
+        "emergency_supply_rationing"
+      ],
+      "notes": "EARTH-MARS SUPPLY CHAIN: Colony is no longer self-contained. Real Hohmann transfer windows every 779.9 days (26 months). Cargo takes 180-270 days transit time. Landing accuracy ±10km requires rover retrieval. EDL failure rate ~50% for heavy payloads. Colony must plan cargo manifests 2-3 years ahead. Missing a window means 26 more months without resupply. Self-sufficiency metric: % of needs met locally vs imported. Based on SpaceX Starship cargo capacity (100 metric tons to Mars surface), NASA Mars Design Reference Architecture 5.0, historical Mars EDL success rates.",
+      "backtest_target": "Run v10 best strategy against v11 frames. Expected: Governors assuming unlimited local resources will fail when supply windows create multi-year planning requirements and EDL failures cause critical shortages. Must balance Earth dependency vs ISRU self-sufficiency.",
+      "data_sources": [
+        "NASA Mars Design Reference Architecture 5.0",
+        "SpaceX Starship payload specifications (100 metric tons to Mars)",
+        "NASA Mars mission orbital mechanics studies",
+        "Historical Mars EDL success/failure rates (~50% for heavy cargo)",
+        "Hohmann transfer orbit calculations (779.9 day synodic period)",
+        "NASA ISRU technology readiness levels (TRL 1-9)",
+        "Mars landing accuracy specifications (±10km from target)"
+      ],
+      "supply_chain_physics": {
+        "synodic_period": "779.9 days between Earth-Mars launch windows",
+        "transit_time": "180-270 days depending on trajectory",
+        "cargo_capacity": "100 metric tons to Mars surface (Starship class)",
+        "landing_accuracy": "±10km from target (requires retrieval)",
+        "edl_success_rate": "50% historical average for heavy payloads",
+        "planning_horizon": "2-3 years ahead for cargo manifest"
+      },
+      "physics": {
+        "orbital_mechanics": "Real Earth-Mars Hohmann transfer windows every 26 months",
+        "cargo_logistics": "100 ton Starship delivers supplies with 50% EDL success rate",
+        "supply_planning": "Colony must order cargo 2+ years before delivery",
+        "self_sufficiency": "ISRU capacity vs Earth dependency trade-offs",
+        "mission_architecture": "Pre-positioned supplies vs continuous resupply strategy"
+      }
     }
   ],
   "backtest_protocol": {
