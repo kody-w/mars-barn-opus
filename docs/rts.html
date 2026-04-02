@@ -636,6 +636,130 @@
   const stars = new THREE.Points(starGeo, starMat);
   scene.add(stars);
 
+  // ─── PHOBOS & DEIMOS (Mars moons) ────────────────────────────
+  const phobosGeo = new THREE.SphereGeometry(1.5, 8, 6);
+  const phobosMat = new THREE.MeshStandardMaterial({
+    color: 0xbbaa99, roughness: 0.9, emissive: 0x443322, emissiveIntensity: 0.3
+  });
+  const phobos = new THREE.Mesh(phobosGeo, phobosMat);
+  phobos.scale.set(1, 0.8, 1); // slightly potato-shaped
+  scene.add(phobos);
+
+  const deimosGeo = new THREE.SphereGeometry(0.8, 6, 4);
+  const deimosMat = new THREE.MeshStandardMaterial({
+    color: 0x998877, roughness: 0.95, emissive: 0x332211, emissiveIntensity: 0.2
+  });
+  const deimos = new THREE.Mesh(deimosGeo, deimosMat);
+  scene.add(deimos);
+
+  // Earth — bright blue dot
+  const earthGeo = new THREE.SphereGeometry(0.6, 8, 6);
+  const earthMat = new THREE.MeshBasicMaterial({
+    color: 0x4488ff, transparent: true, opacity: 0.9
+  });
+  const earth = new THREE.Mesh(earthGeo, earthMat);
+  // Add a tiny glow
+  const earthGlow = new THREE.PointLight(0x4488ff, 0.3, 15);
+  earth.add(earthGlow);
+  scene.add(earth);
+
+  // ─── BUILDING LABELS ─────────────────────────────────────────
+  const buildingLabels = [];
+  const buildingLabelData = [
+    { name: 'HAB', x: 0, z: 0, y: 9 },
+    { name: 'SOLAR', x: -6, z: 20, y: 5 },
+    { name: 'ISRU', x: 20, z: 5, y: 6 },
+    { name: 'GREENHOUSE', x: -15, z: -10, y: 5 },
+    { name: 'GREENHOUSE', x: -8, z: -16, y: 5 },
+    { name: 'WATER', x: 5, z: -25, y: 9 },
+    { name: 'REPAIR', x: -22, z: 8, y: 5 },
+    { name: 'PAD', x: -40, z: -5, y: 2 },
+    { name: 'COMMS', x: 15, z: -15, y: 16 },
+  ];
+  buildingLabelData.forEach(bd => {
+    const lbl = document.createElement('div');
+    lbl.className = 'unit-label';
+    lbl.style.fontSize = '9px';
+    lbl.style.opacity = '0.5';
+    lbl.style.letterSpacing = '1px';
+    lbl.textContent = bd.name;
+    document.getElementById('label-container').appendChild(lbl);
+    buildingLabels.push({ el: lbl, x: bd.x, z: bd.z, y: bd.y });
+  });
+
+  // ─── AMBIENT AUDIO (Web Audio API synthesis) ─────────────────
+  let audioCtx = null;
+  let audioStarted = false;
+
+  function initAudio() {
+    if (audioStarted) return;
+    audioStarted = true;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Mars wind — filtered noise
+    const windBufSize = audioCtx.sampleRate * 4;
+    const windBuf = audioCtx.createBuffer(1, windBufSize, audioCtx.sampleRate);
+    const windData = windBuf.getChannelData(0);
+    for (let i = 0; i < windBufSize; i++) windData[i] = (Math.random() * 2 - 1);
+
+    const windSrc = audioCtx.createBufferSource();
+    windSrc.buffer = windBuf;
+    windSrc.loop = true;
+
+    const windFilter = audioCtx.createBiquadFilter();
+    windFilter.type = 'lowpass';
+    windFilter.frequency.value = 200;
+    windFilter.Q.value = 1;
+
+    const windGain = audioCtx.createGain();
+    windGain.gain.value = 0.06;
+
+    windSrc.connect(windFilter);
+    windFilter.connect(windGain);
+    windGain.connect(audioCtx.destination);
+    windSrc.start();
+
+    // Store refs for dynamic control
+    window._marsAudio = { windFilter, windGain };
+
+    // Radio blip every ~8-15s
+    function radioBlip() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 800 + Math.random() * 400;
+      gain.gain.setValueAtTime(0, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.03, audioCtx.currentTime + 0.02);
+      gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.15);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.2);
+      setTimeout(radioBlip, 8000 + Math.random() * 12000);
+    }
+    setTimeout(radioBlip, 3000);
+
+    // Servo whir (low hum, always on, very quiet)
+    const servoOsc = audioCtx.createOscillator();
+    servoOsc.type = 'sawtooth';
+    servoOsc.frequency.value = 60;
+    const servoGain = audioCtx.createGain();
+    servoGain.gain.value = 0.008;
+    const servoFilter = audioCtx.createBiquadFilter();
+    servoFilter.type = 'lowpass';
+    servoFilter.frequency.value = 150;
+    servoOsc.connect(servoFilter);
+    servoFilter.connect(servoGain);
+    servoGain.connect(audioCtx.destination);
+    servoOsc.start();
+  }
+
+  // Start audio on first user interaction (browser policy)
+  ['click', 'keydown', 'touchstart'].forEach(evt => {
+    window.addEventListener(evt, initAudio, { once: true });
+  });
+
   // ─── CONNECTING TUNNELS ──────────────────────────────────────
   // Pressurized corridors between key buildings
   const tunnelMat = new THREE.MeshStandardMaterial({
@@ -1795,8 +1919,54 @@
     // ── Stars twinkle + fade with daylight ──
     const dayFrac = Math.max(0, Math.min(1, Math.sin((solHour / SOL_HOURS - 0.25) * Math.PI * 2) * 2 + 0.3));
     starMat.opacity = Math.max(0, 0.8 - dayFrac * 0.7);
-    // Slowly rotate starfield
     stars.rotation.y = elapsed * 0.001;
+
+    // ── Phobos orbit (7.65 hour period, fast mover) ──
+    const phobosAngle = (solHour / 7.65) * Math.PI * 2 + elapsed * 0.02;
+    phobos.position.set(
+      Math.cos(phobosAngle) * 200,
+      80 + Math.sin(phobosAngle * 0.7) * 40,
+      Math.sin(phobosAngle) * 200
+    );
+    phobos.rotation.y = elapsed * 0.5;
+    phobosMat.emissiveIntensity = dayFrac < 0.3 ? 0.5 : 0.15;
+
+    // ── Deimos orbit (30.3 hour period, slow) ──
+    const deimosAngle = (solHour / 30.3) * Math.PI * 2 + 1.5;
+    deimos.position.set(
+      Math.cos(deimosAngle) * 280,
+      120 + Math.sin(deimosAngle * 0.5) * 30,
+      Math.sin(deimosAngle) * 280
+    );
+
+    // ── Earth (blue dot in sky, position varies with sol) ──
+    const earthAngle = (currentSol / 687) * Math.PI * 2; // Mars year
+    earth.position.set(
+      Math.cos(earthAngle) * 300,
+      150 + Math.sin(earthAngle * 0.3) * 50,
+      Math.sin(earthAngle) * 300
+    );
+    earthMat.opacity = dayFrac < 0.3 ? 0.9 : 0.2;
+
+    // ── Building labels ──
+    buildingLabels.forEach(bl => {
+      const pos = new THREE.Vector3(bl.x, bl.y + getTerrainY(bl.x, bl.z), bl.z);
+      pos.project(camera);
+      if (pos.z < 1 && cameraMode !== 'fps') {
+        bl.el.style.display = 'block';
+        bl.el.style.left = ((pos.x + 1) / 2 * window.innerWidth) + 'px';
+        bl.el.style.top = ((-pos.y + 1) / 2 * window.innerHeight) + 'px';
+      } else {
+        bl.el.style.display = 'none';
+      }
+    });
+
+    // ── Audio modulation from frame data ──
+    if (window._marsAudio) {
+      const wf = simState._windFactor || 1;
+      window._marsAudio.windGain.gain.value = 0.03 + wf * 0.04;
+      window._marsAudio.windFilter.frequency.value = 100 + wf * 150;
+    }
 
     // ── Camera ──
     if (cameraMode === 'auto') {
