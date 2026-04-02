@@ -1,0 +1,203 @@
+;; COPILOT ULTIMATE RECORD BREAKER SUPREME V1
+;; Strategy: Beat 108,840 by improving CRI from 36 to 30 and crew from 2 to 3 
+;; Target: 109,940+ points through conservative optimization
+;; Approach: Proven base strategy + careful CRI and crew optimization
+
+(begin
+  (define _agent_name "Copilot Ultimate Record Breaker Supreme v1")
+  (define _agent_desc "Conservative optimization of proven strategy for record breaking")
+  
+  (log (concat "🚀🎯💎 RECORD BREAKER SUPREME — Sol " (string sol) " — CRI:" (string colony_risk_index) " — Target: CRI≤30, Crew≥3, Score>109K"))
+  
+  ;; ═══ CONSERVATIVE RECORD BREAKING SCIENCE ═══ 
+  ;; Current champion: 108,840 (870 sols, 2 crew min, CRI 36, 100% survival)
+  ;; Conservative target: CRI 30 (+60 points), crew 3 (+500 points) = 109,400+
+  ;; Proven approach: Keep working allocations, optimize margins carefully
+  
+  ;; ═══ CONSERVATIVE RESOURCE TARGETS ═══
+  ;; Slightly more conservative than current champion for CRI improvement
+  (define supreme_o2_target 20.0)        ;; Increased from 18.0 for better CRI
+  (define supreme_h2o_target 20.0)       ;; Increased from 18.0 for better CRI
+  (define supreme_food_target 30.0)      ;; Increased from 25.0 for better CRI
+  (define supreme_power_target 400)      ;; Increased from 350 for better CRI
+  
+  ;; ═══ PROVEN 6-PHASE STRATEGY (ENHANCED) ═══
+  ;; Based on working strategy with conservative enhancements
+  (define phase_foundation (< sol 80))                    ;; Foundation - proven timing
+  (define phase_security (and (>= sol 80) (< sol 180)))   ;; Security - proven allocation
+  (define phase_optimization (and (>= sol 180) (< sol 320))) ;; Optimization - enhanced margins
+  (define phase_mastery (and (>= sol 320) (< sol 500)))   ;; Mastery - CRI optimization
+  (define phase_transcendence (and (>= sol 500) (< sol 700))) ;; Transcendence - crew protection
+  (define phase_supreme (>= sol 700))                     ;; Supreme - record breaking
+  
+  ;; ═══ CONSERVATIVE ALLOCATION ENHANCEMENT ═══
+  ;; Proven allocation logic with conservative improvements
+  (define supreme_o2_need
+    (cond
+      ((< o2_days 8.0) 0.95)      ;; Emergency - proven maximum
+      ((< o2_days 12.0) 0.85)     ;; Critical - proven high priority  
+      ((< o2_days 20.0) 0.72)     ;; Build to enhanced target
+      ((< o2_days 28.0) 0.52)     ;; Maintain enhanced buffer
+      ((< o2_days 40.0) 0.37)     ;; Excellent buffer
+      (true 0.22)))               ;; Minimal when secure
+  
+  (define supreme_food_need
+    (cond
+      ((< food_days 8.0) 0.90)    ;; Emergency - proven allocation
+      ((< food_days 15.0) 0.80)   ;; Critical priority
+      ((< food_days 25.0) 0.67)   ;; Build to enhanced target
+      ((< food_days 35.0) 0.47)   ;; Maintain enhanced buffer
+      ((< food_days 50.0) 0.32)   ;; Excellent buffer
+      (true 0.22)))               ;; Minimal when secure
+  
+  ;; ═══ ENHANCED CRI RESPONSE SYSTEM ═══
+  ;; Conservative enhancement for CRI 30 target
+  (define supreme_cri_response
+    (cond
+      ((< colony_risk_index 15) 0.8)      ;; Excellent CRI - reduced allocation
+      ((< colony_risk_index 20) 1.0)      ;; Good CRI - maintain
+      ((< colony_risk_index 25) 1.3)      ;; Target approach - moderate boost
+      ((< colony_risk_index 30) 1.7)      ;; Target CRI - significant boost
+      ((< colony_risk_index 35) 2.1)      ;; Above target - major boost
+      (true 2.6)))                        ;; Crisis - maximum response
+  
+  ;; ═══ ENHANCED PHASE ALLOCATION ═══
+  (define supreme_base_allocation
+    (cond
+      ;; Foundation - proven foundation allocation
+      (phase_foundation 0.88)
+      
+      ;; Security - proven security allocation
+      (phase_security 0.94)
+      
+      ;; Optimization - enhanced optimization
+      (phase_optimization 0.975)
+      
+      ;; Mastery - enhanced mastery  
+      (phase_mastery 0.987)
+      
+      ;; Transcendence - enhanced transcendence
+      (phase_transcendence 0.993)
+      
+      ;; Supreme - supreme optimization
+      (phase_supreme 0.996)
+      
+      ;; Default enhanced maximum
+      (true 0.99)))
+  
+  ;; ═══ PROVEN EVENT RESPONSE (ENHANCED) ═══
+  ;; Proven event response with conservative enhancements
+  (define event_count (length events))
+  (define event_cri_penalty (* 6 event_count))
+  
+  ;; Enhanced event response for CRI 30
+  (define event_response_multiplier 
+    (cond
+      ((>= event_count 4) 2.4)      ;; 4+ events - enhanced response
+      ((>= event_count 3) 2.0)      ;; 3 events - enhanced response
+      ((>= event_count 2) 1.7)      ;; 2 events - enhanced response
+      ((>= event_count 1) 1.4)      ;; 1 event - enhanced response
+      (true 1.0)))                  ;; 0 events - maintain
+  
+  ;; ═══ ENHANCED POWER SECURITY ═══
+  ;; Conservative power enhancement
+  (define power_deficit (< power supreme_power_target))
+  (define power_critical (< power 250))  ;; Enhanced threshold
+  (define power_boost_needed 
+    (cond
+      (power_critical 1.9)        ;; Critical power - enhanced boost
+      (power_deficit 1.4)         ;; Below target - enhanced boost
+      (true 1.0)))                ;; Above target - maintain
+  
+  ;; ═══ ENHANCED CREW PROTECTION ═══
+  ;; Enhanced crew protection for 3+ crew minimum
+  (define crew_protection_needed
+    (cond
+      ((< total_crew 3) 1.6)      ;; Below target - enhanced protection
+      ((< total_crew 4) 1.3)      ;; Moderate crew - enhanced protection
+      ((< total_crew 5) 1.1)      ;; Good crew - slight enhancement
+      (true 1.0)))                ;; Excellent crew - maintain
+  
+  ;; ═══ ENHANCED HEALTH PROTECTION ═══
+  ;; Enhanced crew health protection
+  (define crew_health_protection
+    (cond
+      ((< crew_min_hp 50) 1.5)    ;; Health risk - enhanced protection
+      ((< crew_min_hp 70) 1.3)    ;; Moderate health - enhanced protection
+      ((< crew_min_hp 85) 1.1)    ;; Good health - slight enhancement
+      (true 1.0)))                ;; Excellent health - maintain
+  
+  ;; ═══ ENHANCED FINAL ALLOCATIONS ═══
+  (define supreme_isru_alloc (* supreme_base_allocation supreme_o2_need supreme_cri_response event_response_multiplier power_boost_needed crew_protection_needed crew_health_protection))
+  (define supreme_greenhouse_alloc (* supreme_base_allocation supreme_food_need supreme_cri_response event_response_multiplier crew_protection_needed crew_health_protection))
+  (define supreme_heating_alloc (max 0.05 (min 0.85 (- 1.0 supreme_isru_alloc supreme_greenhouse_alloc))))
+  
+  ;; Apply with enhanced conservative bounds
+  (set! isru_alloc (max 0.20 (min 0.88 supreme_isru_alloc)))
+  (set! greenhouse_alloc (max 0.20 (min 0.82 supreme_greenhouse_alloc)))
+  (set! heating_alloc (max 0.05 (min 0.85 supreme_heating_alloc)))
+  (set! building_alloc 0.0)  ;; Hardcoded building handles modules
+  
+  ;; ═══ ENHANCED FOOD RATIONING ═══
+  ;; Conservative food rationing enhancement
+  (define supreme_food_ration
+    (cond
+      ((< food_days 10.0) 0.67)   ;; Emergency - conservative crew protection
+      ((< food_days 15.0) 0.78)   ;; Build enhanced buffer
+      ((< food_days 25.0) 0.87)   ;; Approach enhanced target
+      ((< food_days 35.0) 0.93)   ;; Maintain enhanced buffer
+      ((< food_days 50.0) 0.97)   ;; Excellent buffer
+      (true 1.0)))                ;; Enhanced security achieved
+  
+  (set! food_ration supreme_food_ration)
+  
+  ;; ═══ ENHANCED MONITORING ═══
+  (define power_penalty (if (< power 50) 25 (if (< power 150) 10 0)))
+  (define o2_penalty (if (< o2_days 5) 20 0))
+  (define h2o_penalty (if (< h2o_days 5) 20 0))
+  (define food_penalty (if (< food_days 5) 20 0))
+  (define total_resource_penalty (+ o2_penalty h2o_penalty food_penalty))
+  
+  (define calculated_cri (+ 5 power_penalty event_cri_penalty total_resource_penalty))
+  (define cri_target_achieved (<= colony_risk_index 30))
+  (define cri_excellent_achieved (<= colony_risk_index 25))
+  (define supreme_security_achieved (and (>= o2_days supreme_o2_target) 
+                                        (>= h2o_days supreme_h2o_target) 
+                                        (>= food_days 25) 
+                                        (>= power supreme_power_target)
+                                        (>= total_crew 3)))
+  
+  (log (concat "  🎯 Phase: " 
+    (if phase_foundation "FOUNDATION"
+    (if phase_security "SECURITY"
+    (if phase_optimization "OPTIMIZATION"
+    (if phase_mastery "MASTERY"
+    (if phase_transcendence "TRANSCENDENCE" "SUPREME")))))))
+  
+  (log (concat "  📊 CRI Status: " (string colony_risk_index) " = 5+" (string power_penalty) "+" (string event_cri_penalty) "+" (string total_resource_penalty) " | Target≤30:" (if cri_target_achieved "🎯" "⚡") " | Excellent≤25:" (if cri_excellent_achieved "💎" "⏰")))
+  
+  (define security_status 
+    (concat "O2:" (string (round o2_days 1)) "d" (if (>= o2_days 10) "🎯" "⚡")
+            " H2O:" (string (round h2o_days 1)) "d" (if (>= h2o_days 10) "🎯" "⚡")  
+            " Food:" (string (round food_days 1)) "d" (if (>= food_days 12) "🎯" "⚡")
+            " Crew:" (string total_crew) (if (>= total_crew 3) "💎" "⚡")))
+  
+  (log (concat "  🛡️ Supreme Security: " security_status " | " (if supreme_security_achieved "SUPREME" "BUILDING")))
+  (log (concat "  ⚡ Power: " (string (round power)) "kWh" (if (>= power 300) " 🎯Enhanced" " ⚡Building") " | Events:" (string event_count) " | Response:" (string (round (* supreme_cri_response 100))) "%"))
+  (log (concat "  🔧 Supreme Allocs: I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "% H:" (string (round (* heating_alloc 100))) "% | Ration:" (string (round (* food_ration 100))) "%"))
+  
+  ;; ═══ SUPREME RECORD PROJECTION ═══
+  (if (> sol 600)
+    (let ((projected_sols 870)  ;; Supreme mission completion
+          (projected_crew_min (if supreme_security_achieved 3 2))  ;; Enhanced crew protection
+          (projected_cri (if supreme_security_achieved 28 (max 28 (min colony_risk_index 32))))  ;; Conservative enhanced CRI
+          (projected_score (+ (* projected_sols 100) (* projected_crew_min 500) 1200 20000 (* projected_cri -10))))
+      (log (concat "  🏆 Supreme Target: " (string projected_score) " (sols:" (string projected_sols) " crew:" (string projected_crew_min) " cri:" (string projected_cri) ") | Beat: >108,840"))))
+  
+  ;; ═══ SUPREME RECORD BREAKER OUTPUT ═══
+  (concat "SUPREME-BREAKER Sol " (string sol) 
+    " | CRI:" (string colony_risk_index) "/30"
+    " | Security:" (if supreme_security_achieved "SUPREME" "BUILDING")
+    " | Events:" (string event_count)
+    " | Crew:" (string total_crew)
+    " | Record-mode"))
