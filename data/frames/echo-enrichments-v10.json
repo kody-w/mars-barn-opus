@@ -1,0 +1,83 @@
+{
+  "_format": "mars-barn-echo-enrichment",
+  "_version": "v10",
+  "_description": "Retroactive micro-failure accumulation from Sol 1 for System Dependency Graph physics. Based on Apollo 13 precursor events: small failures build up toward major cascades.",
+  "_generated": "2026-04-02T19:19:39.437Z",
+  "_data_sources": [
+    "Apollo 13 Detailed Chronology of Events Surrounding the Accident (NASA)",
+    "ISS ECLSS failure mode and effects analysis (FMEA) database", 
+    "Space station environmental control system dependency documentation",
+    "NASA Marshall ECLSS system integration studies"
+  ],
+  "enrichment_type": "cumulative_micro_failure_stress",
+  "retroactive_range": {
+    "start_sol": 1,
+    "end_sol": 977,
+    "description": "Add cumulative micro-failure stress to all previous sols"
+  },
+  "physics_model": {
+    "description": "Real space systems don't fail suddenly - small failures accumulate over time until they cascade into major system failures. Apollo 13 had multiple precursor events before the oxygen tank explosion.",
+    "accumulation_rate": "0.001 stress units per sol base rate + equipment age factor",
+    "threshold": "1.0 stress units triggers major cascade failure",
+    "reset_condition": "Stress resets to 0 after major cascade event"
+  },
+  "enrichment_formula": {
+    "micro_failure_stress": "base_rate * (1 + sol/1000) * equipment_age_factor * random_variation",
+    "base_rate": 0.001,
+    "equipment_age_factor": "1.0 + (sol - 1) * 0.0002",
+    "random_seed": "sol * 31 + 123",
+    "stress_sources": [
+      "Thermal cycling stress (Mars daily temperature swings)",
+      "Radiation-induced component degradation",
+      "Mechanical wear from dust infiltration",
+      "Software/firmware glitches accumulating",
+      "Seal degradation and micro-leaks",
+      "Electrical contact corrosion"
+    ]
+  },
+  "sample_enrichment": {
+    "sol_100": {
+      "micro_failure_stress": 0.120,
+      "explanation": "100 sols of thermal cycling + equipment aging = 12% stress accumulation"
+    },
+    "sol_500": {
+      "micro_failure_stress": 0.650,
+      "explanation": "500 sols shows significant stress buildup approaching cascade threshold"
+    },
+    "sol_800": {
+      "micro_failure_stress": 0.890,
+      "explanation": "By Sol 800, system is near critical failure point (90% of threshold)"
+    },
+    "sol_900": {
+      "micro_failure_stress": 0.050,
+      "explanation": "Stress reset after Sol 875 cascade event, building up again"
+    }
+  },
+  "cascade_triggers": {
+    "description": "When enriched micro-failure stress reaches 1.0, a major cascade is triggered",
+    "trigger_probability_distribution": {
+      "water_recycler_cascade": 0.25,
+      "power_grid_cascade": 0.20,
+      "isru_system_cascade": 0.25,
+      "thermal_control_cascade": 0.20,
+      "oxygen_system_cascade": 0.10
+    },
+    "severity_correlation": "Higher accumulated stress = more severe cascade (0.3-0.9 severity range)"
+  },
+  "apollo_13_correlation": {
+    "description": "Apollo 13's oxygen tank explosion was preceded by months of micro-failures",
+    "precursor_events": [
+      "Oxygen tank #2 quantity sensor anomalies (months before)",
+      "Electrical short in tank heater element (ground testing)",
+      "Tank internal fan wiring degradation",
+      "Teflon insulation stress cracking"
+    ],
+    "lesson": "No single failure caused Apollo 13 - it was accumulation of small problems that cascaded when triggered by routine tank stir operation"
+  },
+  "enrichment_implementation": {
+    "description": "Gauntlet retroactively applies this stress to all sols 1-977",
+    "when_applied": "Every time gauntlet runs v10+ frames",
+    "cannot_opt_out": "This enrichment is mandatory - represents real physics",
+    "breaks_old_strategies": "Strategies that worked in v9 may fail in v10 due to cascade accumulation from early mission phases"
+  }
+}

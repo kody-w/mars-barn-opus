@@ -1,0 +1,67 @@
+{
+  "sol": 992,
+  "version": 10,
+  "name": "System Dependency Graph",
+  "environment": {
+    "temperature_k": 223.2,
+    "temperature_c": -49.9,
+    "pressure_pa": 626.4,
+    "solar_irradiance": 601.9,
+    "dust_storm": false,
+    "solar_longitude": 173.8,
+    "season": "Northern Summer",
+    "wind_speed_ms": 3.2746332817185966
+  },
+  "hazards": [
+    {
+      "type": "system_dependency_cascade",
+      "cascade_type": "power_grid_failure",
+      "severity": 0.37073767437473315,
+      "duration_sols": 5,
+      "description": "Power grid overload affects all electrical systems",
+      "data_source": "ISS ECLSS FMEA database, Apollo 13 failure timeline"
+    }
+  ],
+  "events": [],
+  "challenges": [],
+  "system_dependencies": {
+    "description": "v10 implements real system interdependencies based on ISS ECLSS",
+    "dependency_graph": {
+      "water_recycler": [
+        "humidity_control",
+        "greenhouse_irrigation"
+      ],
+      "humidity_control": [
+        "greenhouse_transpiration",
+        "crew_comfort"
+      ],
+      "greenhouse": [
+        "o2_production_biological",
+        "food_production"
+      ],
+      "power_grid": [
+        "all_systems"
+      ],
+      "isru": [
+        "o2_production_chemical",
+        "h2o_production"
+      ],
+      "thermal": [
+        "crew_life_support",
+        "equipment_efficiency"
+      ]
+    },
+    "data_sources": [
+      "ISS Environmental Control and Life Support System (ECLSS)",
+      "NASA FMEA database for space systems",
+      "Apollo 13 failure cascade timeline",
+      "ISS maintenance logs and failure reports"
+    ]
+  },
+  "physics_constants": {
+    "cascade_propagation_delay": "1-3 sols (realistic system response time)",
+    "micro_failure_threshold": "1.0 accumulated stress units",
+    "system_interdependency": "Binary dependency graph with severity multipliers",
+    "repair_complexity": "Scales with number of affected systems"
+  }
+}
