@@ -732,7 +732,7 @@
       color: 0xeeeeee, roughness: 0.4, metalness: 0.5
     });
 
-    // Torso (tapered box)
+    // Torso
     const torso = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.7, 0.25), whiteMat);
     torso.position.y = 1.15;
     torso.castShadow = true;
@@ -743,16 +743,13 @@
     waist.position.y = 0.75;
     grp.add(waist);
 
-    // Head — smooth rounded screen face
-    const head = new THREE.Mesh(
-      new THREE.BoxGeometry(0.22, 0.25, 0.2),
-      bodyMat
-    );
+    // Head
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.25, 0.2), bodyMat);
     head.position.y = 1.65;
     head.castShadow = true;
     grp.add(head);
 
-    // Face screen (visor)
+    // Face screen
     const visor = new THREE.Mesh(
       new THREE.PlaneGeometry(0.18, 0.12),
       new THREE.MeshStandardMaterial({
@@ -762,46 +759,55 @@
     visor.position.set(0, 1.67, 0.11);
     grp.add(visor);
 
-    // Arms (thin cylinders)
+    // Arms — pivot at shoulder for swing animation
+    const arms = [];
     [-1, 1].forEach(side => {
-      const shoulder = new THREE.Mesh(
-        new THREE.SphereGeometry(0.06, 6, 4),
-        bodyMat
-      );
-      shoulder.position.set(side * 0.28, 1.4, 0);
-      grp.add(shoulder);
+      const armPivot = new THREE.Group();
+      armPivot.position.set(side * 0.28, 1.4, 0);
+      grp.add(armPivot);
+
+      const shoulder = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 4), bodyMat);
+      armPivot.add(shoulder);
 
       const upperArm = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.35, 6), bodyMat);
-      upperArm.position.set(side * 0.28, 1.18, 0);
-      grp.add(upperArm);
+      upperArm.position.y = -0.22;
+      armPivot.add(upperArm);
 
       const forearm = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.3, 6), whiteMat);
-      forearm.position.set(side * 0.28, 0.88, 0);
-      grp.add(forearm);
+      forearm.position.y = -0.52;
+      armPivot.add(forearm);
+
+      arms.push(armPivot);
     });
 
-    // Legs (thicker cylinders)
+    // Legs — pivot at hip for walk animation
+    const legs = [];
     [-1, 1].forEach(side => {
+      const legPivot = new THREE.Group();
+      legPivot.position.set(side * 0.12, 0.65, 0);
+      grp.add(legPivot);
+
       const upperLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.055, 0.4, 6), bodyMat);
-      upperLeg.position.set(side * 0.12, 0.5, 0);
-      grp.add(upperLeg);
+      upperLeg.position.y = -0.15;
+      legPivot.add(upperLeg);
 
       const lowerLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.35, 6), whiteMat);
-      lowerLeg.position.set(side * 0.12, 0.18, 0);
-      grp.add(lowerLeg);
+      lowerLeg.position.y = -0.47;
+      legPivot.add(lowerLeg);
 
-      // Foot
       const foot = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.04, 0.14), bodyMat);
-      foot.position.set(side * 0.12, 0.02, 0.02);
-      grp.add(foot);
+      foot.position.set(0, -0.63, 0.02);
+      legPivot.add(foot);
+
+      legs.push(legPivot);
     });
 
-    // Status light underneath
+    // Status light
     const statusLight = new THREE.PointLight(ud.color, 1.0, 8);
     statusLight.position.y = 0.3;
     grp.add(statusLight);
 
-    // small glowing disc under feet
+    // Glowing disc under feet
     const disc = new THREE.Mesh(
       new THREE.CircleGeometry(0.4, 12),
       new THREE.MeshBasicMaterial({ color: ud.color, transparent: true, opacity: 0.4 })
@@ -828,6 +834,7 @@
       name: ud.name,
       group: grp,
       torso, head, visor, statusLight, disc,
+      arms, legs,
       label,
       hp: ud.hp,
       status: ud.status,
@@ -877,11 +884,96 @@
   scene.add(dust);
 
   // ─── CAMERA SYSTEM ───────────────────────────────────────────
-  let cameraMode = 'rts'; // 'rts' | 'transition_fps' | 'fps' | 'transition_rts'
+  let cameraMode = 'auto'; // 'auto' | 'rts' | 'transition_fps' | 'fps' | 'transition_rts'
   const rtsTarget = new THREE.Vector3(0, 0, 0);
   let rtsHeight = 80;
-  let rtsAngle = Math.PI / 4; // rotation around Y
-  let rtsPitch = 0.8; // ~45°
+  let rtsAngle = Math.PI / 4;
+  let rtsPitch = 0.8;
+
+  // ─── AUTO-CAMERA (cinematic orbit) ────────────────────────────
+  let autoTarget = new THREE.Vector3(0, 0, 0);
+  let autoHeight = 60;
+  let autoAngle = 0;
+  let autoPitch = 0.7;
+  let autoPhase = 'orbit';  // 'orbit' | 'tracking' | 'closeup'
+  let autoTimer = 0;
+  let autoPhaseDuration = 20;
+  let autoTrackUnit = null;
+
+  const autoCameraPoints = [
+    { x: 0, z: 0, h: 60, label: 'colony overview' },
+    { x: -40, z: -5, h: 35, label: 'landing pad' },
+    { x: 20, z: 5, h: 30, label: 'ISRU plant' },
+    { x: 5, z: -25, h: 35, label: 'water extraction' },
+    { x: -15, z: -10, h: 30, label: 'greenhouses' },
+  ];
+  let autoCamIdx = 0;
+
+  function updateAutoCamera(dt) {
+    autoTimer += dt;
+    autoAngle += dt * 0.06; // slow orbit
+
+    if (autoTimer > autoPhaseDuration) {
+      autoTimer = 0;
+      // Cycle through phases
+      if (autoPhase === 'orbit') {
+        // Pick a unit to track
+        autoTrackUnit = units[Math.floor(Math.random() * units.length)];
+        autoPhase = 'tracking';
+        autoPhaseDuration = 12 + Math.random() * 8;
+        autoHeight = 25 + Math.random() * 15;
+      } else if (autoPhase === 'tracking') {
+        // Go to a point of interest
+        autoCamIdx = (autoCamIdx + 1) % autoCameraPoints.length;
+        autoPhase = 'closeup';
+        autoPhaseDuration = 10 + Math.random() * 10;
+        autoHeight = autoCameraPoints[autoCamIdx].h;
+      } else {
+        autoPhase = 'orbit';
+        autoPhaseDuration = 15 + Math.random() * 10;
+        autoHeight = 50 + Math.random() * 30;
+      }
+    }
+
+    // Determine target position
+    let goalX, goalZ, goalH;
+    if (autoPhase === 'tracking' && autoTrackUnit) {
+      goalX = autoTrackUnit.group.position.x;
+      goalZ = autoTrackUnit.group.position.z;
+      goalH = autoHeight;
+    } else if (autoPhase === 'closeup') {
+      const poi = autoCameraPoints[autoCamIdx];
+      goalX = poi.x;
+      goalZ = poi.z;
+      goalH = poi.h;
+    } else {
+      goalX = Math.sin(autoAngle * 0.3) * 15;
+      goalZ = Math.cos(autoAngle * 0.3) * 15;
+      goalH = autoHeight;
+    }
+
+    // Smooth lerp
+    autoTarget.x += (goalX - autoTarget.x) * dt * 0.8;
+    autoTarget.z += (goalZ - autoTarget.z) * dt * 0.8;
+    autoTarget.y = getTerrainY(autoTarget.x, autoTarget.z);
+    rtsHeight += (goalH - rtsHeight) * dt * 0.5;
+
+    // Zoom in on events
+    if (frameData && frameData.hazards && frameData.hazards.length > 1) {
+      rtsHeight += (Math.max(25, rtsHeight - 10) - rtsHeight) * dt * 2;
+    }
+
+    rtsAngle = autoAngle;
+    rtsTarget.copy(autoTarget);
+
+    const offset = new THREE.Vector3(
+      Math.sin(rtsAngle) * rtsHeight * Math.cos(autoPitch),
+      rtsHeight * Math.sin(autoPitch),
+      Math.cos(rtsAngle) * rtsHeight * Math.cos(autoPitch)
+    );
+    camera.position.copy(rtsTarget).add(offset);
+    camera.lookAt(rtsTarget);
+  }
 
   function updateRTSCamera() {
     const offset = new THREE.Vector3(
@@ -910,6 +1002,15 @@
     keys[e.key.toLowerCase()] = true;
     if (e.key === 'Escape' && (cameraMode === 'fps' || cameraMode === 'transition_fps')) {
       exitFPS();
+    }
+    if (e.key === 'c' || e.key === 'C') {
+      if (cameraMode === 'auto') {
+        cameraMode = 'rts';
+        showToast('📷 Manual camera', 'info');
+      } else if (cameraMode === 'rts') {
+        cameraMode = 'auto';
+        showToast('🎬 Auto camera', 'info');
+      }
     }
     if (e.key === 'f' || e.key === 'F') toggleFullscreen();
     // Speed controls: +/- or ]/[
@@ -1590,8 +1691,32 @@
       }
       u.direction.set(Math.sin(u.group.rotation.y), 0, Math.cos(u.group.rotation.y));
 
-      // Bob
-      u.group.position.y = ty + Math.sin(elapsed * 3 + ui) * 0.08;
+      // Walking animation — legs and arms swing when moving
+      const speed2 = moveX * moveX + moveZ * moveZ;
+      const isMoving = speed2 > 0.00001;
+      const walkCycle = elapsed * 8 + ui * 2; // phase offset per unit
+      const walkAmplitude = isMoving ? 0.4 : 0;
+
+      // Legs: opposite phase
+      if (u.legs) {
+        u.legs[0].rotation.x = Math.sin(walkCycle) * walkAmplitude;
+        u.legs[1].rotation.x = Math.sin(walkCycle + Math.PI) * walkAmplitude;
+      }
+      // Arms: opposite to legs (natural gait)
+      if (u.arms) {
+        u.arms[0].rotation.x = Math.sin(walkCycle + Math.PI) * walkAmplitude * 0.6;
+        u.arms[1].rotation.x = Math.sin(walkCycle) * walkAmplitude * 0.6;
+      }
+      // Subtle torso sway
+      if (u.torso && isMoving) {
+        u.torso.rotation.z = Math.sin(walkCycle) * 0.02;
+      }
+      // Head slight look-around when idle
+      if (u.head && !isMoving) {
+        u.head.rotation.y = Math.sin(elapsed * 0.5 + ui * 3) * 0.3;
+      } else if (u.head) {
+        u.head.rotation.y *= 0.9; // smoothly face forward when walking
+      }
 
       // Status light: flash during high CRI, amber when on task
       const cri = simState.cri || 0.3;
@@ -1674,7 +1799,16 @@
     stars.rotation.y = elapsed * 0.001;
 
     // ── Camera ──
-    if (cameraMode === 'rts') {
+    if (cameraMode === 'auto') {
+      updateAutoCamera(dt);
+      // Any user input switches to manual RTS
+      if (keys['w'] || keys['s'] || keys['a'] || keys['d'] ||
+          keys['arrowup'] || keys['arrowdown'] || keys['arrowleft'] || keys['arrowright']) {
+        cameraMode = 'rts';
+        showToast('📷 Manual camera — press C for auto', 'info');
+      }
+    }
+    else if (cameraMode === 'rts') {
       const panSpeed = rtsHeight * 0.6 * dt;
       const forward = new THREE.Vector3(-Math.sin(rtsAngle), 0, -Math.cos(rtsAngle));
       const right = new THREE.Vector3(Math.cos(rtsAngle), 0, -Math.sin(rtsAngle));
