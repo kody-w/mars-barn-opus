@@ -1,0 +1,161 @@
+;; ULTRA EARLY MEGA BUILD TRANSCENDENCE V1
+;; Innovation: Explosive early infrastructure + predictive scaling + mathematical precision
+;; Goal: Build so much infrastructure early that late-game compound damage becomes irrelevant
+;; Approach: Risk everything on massive early infrastructure investment
+
+(begin
+  (define _agent_name "Ultra Early Mega Build Transcendence v1")
+  (define _agent_desc "Explosive early infrastructure with mathematical precision to overwhelm any late-game challenge")
+
+  (log (concat "🏗️⚡💥 Mega Build — Sol " (string sol)))
+
+  ;; ═══ MATHEMATICAL INFRASTRUCTURE MODELING ═══
+  ;; Precise mathematical approach to infrastructure deployment
+  (define mission_progress (/ sol 649))
+  (define optimal_infrastructure_curve
+    (+ 12  ;; Base infrastructure
+       (* 28 (pow mission_progress 0.6))  ;; Early exponential growth
+       (* 15 mission_progress)))          ;; Linear late growth
+  
+  ;; Early mega-build phase (first 150 sols)
+  (define mega_build_phase (< sol 150))
+  (define mega_build_intensity (if mega_build_phase 3.2 1.0))
+  (define current_infrastructure_target (* optimal_infrastructure_curve mega_build_intensity))
+  
+  ;; Infrastructure density bonuses
+  (define infrastructure_density (if (> modules_built 0) (/ modules_built 1) 0))
+  (define density_bonus_factor
+    (cond
+      ((> infrastructure_density 35) 2.8)   ;; Mega density bonus
+      ((> infrastructure_density 25) 2.2)   ;; High density bonus  
+      ((> infrastructure_density 18) 1.6)   ;; Medium density bonus
+      ((> infrastructure_density 12) 1.2)   ;; Low density bonus
+      (true 1.0)))                          ;; No bonus
+  
+  ;; ═══ PREDICTIVE THREAT NEUTRALIZATION ═══ 
+  ;; Predict and overwhelm threats before they manifest
+  (define late_game_threat_prediction
+    (* (+ colony_risk_index 10)             ;; Base threat
+       (max 1 (pow (/ sol 300) 1.8))        ;; Exponential late-game scaling
+       (- 1.2 (/ infrastructure_density 40)))) ;; Infrastructure protection
+  
+  ;; Infrastructure immunity calculation
+  (define infrastructure_immunity
+    (* infrastructure_density 
+       density_bonus_factor
+       (+ 1.5 (* mission_progress 0.8))))   ;; Growing immunity over time
+  
+  (define threat_neutralization_ratio (/ infrastructure_immunity late_game_threat_prediction))
+  (define threat_status
+    (cond
+      ((> threat_neutralization_ratio 3.0) "IMMUNE")
+      ((> threat_neutralization_ratio 2.0) "PROTECTED") 
+      ((> threat_neutralization_ratio 1.5) "RESISTANT")
+      ((> threat_neutralization_ratio 1.0) "DEFENDED")
+      (true "VULNERABLE")))
+  
+  (log (concat "  Infrastructure: " (string infrastructure_density) " modules | Immunity: " (string (round (* threat_neutralization_ratio 100))) "% | Status: " threat_status))
+
+  ;; ═══ ULTRA REPAIR BAY ARCHITECTURE ═══
+  ;; Massive repair bay deployment for ultimate protection
+  (define mega_repair_ratio 0.50)  ;; 50% of infrastructure = repair bays
+  (define estimated_repair_bays (max 4 (round (* infrastructure_density mega_repair_ratio))))
+  
+  ;; Ultra repair scaling with base 5.2 (maximum tested)
+  (define ultra_repair_base 5.2)
+  (define ultra_repair_effect (pow ultra_repair_base estimated_repair_bays))
+  
+  ;; Mega infrastructure repair synergy  
+  (define repair_infrastructure_synergy (* ultra_repair_effect density_bonus_factor))
+  (define total_protection (* repair_infrastructure_synergy (+ 1 (* mission_progress 0.4))))
+  
+  ;; ═══ PRECISION RESOURCE ALLOCATION ═══
+  ;; Mathematical optimization of resource allocation
+  
+  ;; Base allocations optimized for mega-build
+  (define precision_isru_base
+    (cond
+      ((< o2_days 4) 0.70)                                   ;; Emergency O2
+      ((< o2_days 8) 0.55)                                   ;; High O2
+      (mega_build_phase 0.12)                                ;; Minimal during mega-build
+      ((> threat_neutralization_ratio 2.5) 0.18)             ;; Minimal when immune  
+      ((> threat_neutralization_ratio 1.5) 0.25)             ;; Reduced when protected
+      (true 0.32)))                                          ;; Standard allocation
+
+  (define precision_greenhouse_base
+    (cond
+      ((< food_days 5) 0.65)                                 ;; Emergency food
+      ((< food_days 10) 0.50)                                ;; High food
+      (mega_build_phase 0.18)                                ;; Minimal during mega-build
+      ((> threat_neutralization_ratio 2.5) 0.22)             ;; Minimal when immune
+      ((> threat_neutralization_ratio 1.5) 0.30)             ;; Reduced when protected  
+      (true 0.38)))                                          ;; Standard allocation
+
+  ;; Infrastructure scaling adjustments
+  (define infrastructure_efficiency_bonus (min 1.4 (+ 0.8 (* density_bonus_factor 0.15))))
+  (define adjusted_isru (* precision_isru_base infrastructure_efficiency_bonus))
+  (define adjusted_greenhouse (* precision_greenhouse_base infrastructure_efficiency_bonus))
+  
+  ;; Heating gets remainder with minimum constraint
+  (define raw_heating (- 1.0 adjusted_isru adjusted_greenhouse))
+  (define constrained_heating (max 0.20 raw_heating))
+  
+  ;; Perfect normalization 
+  (define total_allocation (+ adjusted_isru adjusted_greenhouse constrained_heating))
+  (define norm_factor (/ 1.0 total_allocation))
+  
+  (set! isru_alloc (* adjusted_isru norm_factor))
+  (set! greenhouse_alloc (* adjusted_greenhouse norm_factor))
+  (set! heating_alloc (* constrained_heating norm_factor))
+
+  ;; ═══ MATHEMATICAL HEALTH OPTIMIZATION ═══
+  ;; Precise health targeting for maximum efficiency
+  
+  (define target_hp_per_crew 70)  ;; High health target
+  (define current_avg_hp (/ crew_hp crew_count))
+  (define hp_efficiency_ratio (/ current_avg_hp target_hp_per_crew))
+  
+  ;; Mathematical rationing optimization
+  (define optimal_ration_factor
+    (cond
+      ((< current_avg_hp 45) 1.0)                           ;; Full recovery rations
+      ((< hp_efficiency_ratio 0.85) 0.95)                   ;; Near-full rations
+      ((> food_days 30) 1.0)                                ;; Full when abundant  
+      ((> food_days 20) 0.90)                               ;; High when sufficient
+      ((> threat_neutralization_ratio 2.0) 0.85)            ;; Conservative when protected
+      (mega_build_phase 0.75)                               ;; Reduced during mega-build
+      (true 0.80)))                                         ;; Standard operations
+
+  ;; Emergency overrides
+  (define emergency_ration
+    (cond
+      ((< food_days 3) 0.30)
+      ((< food_days 6) 0.50)
+      ((< food_days 12) 0.70)
+      (true optimal_ration_factor)))
+
+  (set! food_ration emergency_ration)
+
+  ;; ═══ MEGA BUILD STATUS ═══
+  (define build_phase
+    (cond
+      (mega_build_phase "MEGA-BUILD")
+      ((< sol 300) "EXPANSION") 
+      ((< sol 500) "FORTIFICATION")
+      (true "TRANSCENDENCE")))
+      
+  (log (concat "  Phase: " build_phase " | Target Infrastructure: " (string (round current_infrastructure_target))))
+  (log (concat "  Repair Bays: " (string estimated_repair_bays) " | Protection: " (string (round (* total_protection 100))) "%"))
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Greenhouse:" (string (round (* greenhouse_alloc 100))) "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Health: " (string (round current_avg_hp)) " HP/crew | Ration: " (string (round (* food_ration 100))) "% | O2=" (string o2_days) "d Food=" (string food_days) "d"))
+
+  ;; ═══ OUTPUT SUMMARY ═══
+  (concat "Mega Build Sol " (string sol) " — " build_phase
+    " | Infra:" (string infrastructure_density) 
+    " | " threat_status
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | HP:" (string (round current_avg_hp))
+    " O2:" (string o2_days) "d F:" (string food_days) "d"))

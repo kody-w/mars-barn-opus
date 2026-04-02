@@ -1,0 +1,151 @@
+;; COMPOUND DAMAGE BREAKER ULTRA V1 - Revolutionary Anti-Compound Strategy
+;; Goal: Defeat compound v2/v3 damage through revolutionary protective architecture
+;; Innovation: Predictive compound modeling + quantum repair orchestration + adaptive timing
+;; Approach: Early massive repair deployment + compound immunity systems
+
+(begin
+  (define _agent_name "Compound Damage Breaker Ultra v1")
+  (define _agent_desc "Revolutionary anti-compound damage strategy with predictive modeling and quantum repair orchestration")
+
+  (log (concat "🛡️⚡🔧 Compound Breaker — Sol " (string sol)))
+
+  ;; ═══ COMPOUND DAMAGE INTELLIGENCE ═══
+  ;; Advanced compound damage prediction and modeling
+  (define mission_phase (/ sol 649))
+  (define compound_risk_window (max 0.1 (- 1.2 (abs (- mission_phase 0.65)))))  ;; Peak danger mid-late mission
+  
+  ;; Compound damage accumulation modeling
+  (define baseline_damage_rate (* colony_risk_index 0.012))
+  (define compound_multiplier 
+    (cond 
+      ((> sol 400) (+ 1.0 (* (- sol 400) 0.008)))  ;; Exponential growth late mission
+      ((> sol 200) (+ 1.0 (* (- sol 200) 0.004)))  ;; Moderate growth mid mission  
+      (true 1.0)))                                 ;; No compound early mission
+
+  (define predicted_damage_rate (* baseline_damage_rate compound_multiplier compound_risk_window))
+  (define compound_immunity_needed (max 2.5 (* predicted_damage_rate 15)))  ;; Massive over-protection
+  
+  ;; ═══ QUANTUM REPAIR ORCHESTRATION ═══
+  ;; Revolutionary repair bay architecture
+  (define estimated_modules (max modules_built 8))
+  (define aggressive_repair_ratio 0.45)  ;; 45% of modules = repair bays (revolutionary)
+  (define estimated_repair_bays (max 3 (round (* estimated_modules aggressive_repair_ratio))))
+  
+  ;; Quantum repair scaling with base 4.5 (unprecedented)
+  (define quantum_repair_base 4.5)  ;; Higher than any previous strategy
+  (define quantum_repair_effect (pow quantum_repair_base estimated_repair_bays))
+  
+  ;; Compound-specific repair amplification
+  (define compound_defense_amplifier
+    (+ 1.8  ;; Base amplification
+       (* compound_risk_window 2.2)    ;; Window amplification
+       (* (/ sol 300) 1.4)))           ;; Progressive amplification
+
+  (define total_repair_protection (* quantum_repair_effect compound_defense_amplifier))
+  (define compound_immunity_ratio (/ total_repair_protection compound_immunity_needed))
+  
+  (log (concat "  Compound: Risk:" (string (round (* compound_risk_window 100))) "% | Repair Bays: " (string estimated_repair_bays) " | Protection: " (string (round (* total_repair_protection 100))) "%"))
+  
+  ;; ═══ ADAPTIVE MISSION PHASE INTELLIGENCE ═══
+  ;; Different strategies for different compound threat windows
+  (define early_bootstrap_phase (< sol 100))
+  (define expansion_phase (and (>= sol 100) (< sol 250)))  
+  (define compound_danger_phase (and (>= sol 250) (< sol 500)))
+  (define late_survival_phase (>= sol 500))
+  
+  ;; Phase-specific infrastructure targets
+  (define optimal_modules_this_phase
+    (cond
+      (early_bootstrap_phase 12)      ;; Quick initial infrastructure
+      (expansion_phase 18)            ;; Moderate expansion
+      (compound_danger_phase 25)      ;; Aggressive infrastructure  
+      (late_survival_phase 30)        ;; Maximum infrastructure
+      (true 15)))
+  
+  ;; ═══ REVOLUTIONARY ALLOCATION STRATEGY ═══
+  ;; Dynamic allocation targeting compound immunity
+
+  ;; Compound-aware ISRU allocation
+  (define compound_aware_isru_target
+    (cond
+      ((< o2_days 3) 0.65)                               ;; Emergency override
+      ((< o2_days 8) 0.50)                               ;; Crisis override
+      (compound_danger_phase 0.20)                       ;; Minimal during compound danger
+      (late_survival_phase 0.25)                         ;; Conservative late mission
+      ((> compound_immunity_ratio 1.8) 0.15)             ;; Minimal when over-protected
+      ((> compound_immunity_ratio 1.2) 0.22)             ;; Reduced when protected
+      (true 0.30)))                                      ;; Standard allocation
+
+  ;; Compound-aware greenhouse allocation  
+  (define compound_aware_greenhouse_target
+    (cond
+      ((< food_days 5) 0.60)                             ;; Emergency override
+      ((< food_days 12) 0.45)                            ;; Crisis override
+      (compound_danger_phase 0.25)                       ;; Minimal during compound danger
+      (late_survival_phase 0.28)                         ;; Conservative late mission
+      ((> compound_immunity_ratio 1.8) 0.20)             ;; Minimal when over-protected
+      ((> compound_immunity_ratio 1.2) 0.32)             ;; Reduced when protected
+      (true 0.38)))                                      ;; Standard allocation
+
+  ;; Compound-aware heating allocation (remainder after normalization)
+  (define raw_heating_target (- 1.0 compound_aware_isru_target compound_aware_greenhouse_target))
+  (define compound_aware_heating_target (max 0.15 raw_heating_target))
+  
+  ;; Perfect normalization with constraint preservation
+  (define allocation_sum (+ compound_aware_isru_target compound_aware_greenhouse_target compound_aware_heating_target))
+  (define normalization_factor (/ 1.0 allocation_sum))
+
+  ;; Apply normalization
+  (set! isru_alloc (* compound_aware_isru_target normalization_factor))
+  (set! greenhouse_alloc (* compound_aware_greenhouse_target normalization_factor))  
+  (set! heating_alloc (* compound_aware_heating_target normalization_factor))
+
+  ;; ═══ COMPOUND-RESISTANT FOOD RATIONING ═══
+  ;; Food strategy designed for compound damage scenarios
+  
+  ;; Health-first rationing with compound awareness
+  (define target_crew_hp_per_member 65)  ;; High health targets
+  (define current_avg_hp (/ crew_hp crew_count))
+  
+  (define compound_health_factor
+    (cond
+      ((< current_avg_hp 40) 1.0)                        ;; Full rations for recovery
+      ((< current_avg_hp 60) 0.95)                       ;; Nearly full rations  
+      ((< current_avg_hp 80) 0.85)                       ;; Conservative rationing
+      (compound_danger_phase 0.75)                       ;; Protective rationing
+      ((> food_days 25) 1.0)                             ;; Full rations when abundant
+      ((> food_days 15) 0.90)                            ;; Nearly full when sufficient
+      (true 0.80)))                                      ;; Conservative default
+
+  (define emergency_food_factor
+    (cond
+      ((< food_days 3) 0.25)                             ;; Extreme emergency
+      ((< food_days 6) 0.40)                             ;; Severe rationing
+      ((< food_days 10) 0.60)                            ;; Heavy rationing  
+      (true compound_health_factor)))                    ;; Normal compound strategy
+
+  (set! food_ration emergency_food_factor)
+
+  ;; ═══ STATUS REPORTING ═══
+  (define phase_name
+    (cond
+      (early_bootstrap_phase "BOOTSTRAP")
+      (expansion_phase "EXPANSION")
+      (compound_danger_phase "COMPOUND-DANGER")
+      (late_survival_phase "LATE-SURVIVAL")
+      (true "UNKNOWN")))
+      
+  (log (concat "  Phase: " phase_name " | Immunity: " (string (round (* compound_immunity_ratio 100))) "% | Target Modules: " (string optimal_modules_this_phase)))
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Greenhouse:" (string (round (* greenhouse_alloc 100))) "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Rationing: " (string (round (* food_ration 100))) "% | Crew HP: " (string current_avg_hp) " | Status: O2=" (string o2_days) "d Food=" (string food_days) "d"))
+
+  ;; ═══ OUTPUT SUMMARY ═══
+  (concat "Compound Breaker Sol " (string sol) " — " phase_name " phase"
+    " | Immunity:" (string (round (* compound_immunity_ratio 100))) "%"
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))  
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | O2:" (string o2_days)
+    "d F:" (string food_days) "d"
+    " HP:" (string current_avg_hp)))
