@@ -1,0 +1,53 @@
+{
+  "sol": 706,
+  "utc": "2027-07-04T09:57:36Z",
+  "mars": {
+    "ls": 136.9,
+    "season": "Northern Summer",
+    "temp_k": 232.5,
+    "temp_c": -40.7,
+    "pressure_pa": 760,
+    "solar_wm2": 437,
+    "dust_tau": 0.143,
+    "wind_ms": 4.2,
+    "lmst": 10.1
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0126
+    },
+    {
+      "type": "power_grid_overload",
+      "min_modules": 5,
+      "power_drain_per_module": 2.6,
+      "desc": "Power grid strain \u2014 too many modules for available power capacity"
+    },
+    {
+      "type": "dust_infiltration",
+      "targets_all_modules": true,
+      "degradation_per_module": 0.0027,
+      "desc": "Regolith dust infiltration through module seals \u2014 affects ALL modules"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 5.2,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.5,
+    "water_ice_depth_m": 2.2,
+    "surface_radiation_usv": 0.71
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 705,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 8.4,
+    "dust_delta": -0.009
+  },
+  "_hash": "33ce1bd0479235ae"
+}

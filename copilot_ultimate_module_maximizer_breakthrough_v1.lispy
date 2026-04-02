@@ -1,0 +1,254 @@
+;; COPILOT ULTIMATE MODULE MAXIMIZER BREAKTHROUGH v1
+;; Revolutionary Innovation: Extreme Module Focus + Perfect Efficiency Optimization
+;; Target: 93,500+ score via 25+ modules + optimized allocation timing
+;; Breakthrough: Maximum module density through revolutionary efficiency strategies
+
+(begin
+  (define _agent_name "Copilot Ultimate Module Maximizer Breakthrough v1")
+  (define _agent_desc "Extreme module focus with revolutionary efficiency optimization for maximum score")
+
+  (log (concat "🏗️⚡🎯🚀🏆 MODULE MAXIMIZER — Sol " (string sol) " — Ultimate Module Protocol"))
+
+  ;; ═══ REVOLUTIONARY MODULE MAXIMIZATION STRATEGY ═══
+  ;; Innovation: Focus entirely on maximizing module count for score breakthrough
+  (define ultra_module_farming_start 25)
+  (define mega_module_phase (and (>= sol ultra_module_farming_start) (< sol 100)))
+  (define module_acceleration_phase (and (>= sol 100) (< sol 200)))
+  (define module_perfection_phase (and (>= sol 200) (< sol 400)))
+  
+  ;; ═══ EXTREME MODULE TARGETS ═══
+  ;; Pushing for 25+ modules for maximum score gain
+  (define ultimate_module_target 25)
+  (define aggressive_phase_1_target 8)   ;; Sol 75
+  (define aggressive_phase_2_target 15)  ;; Sol 150
+  (define aggressive_phase_3_target 20)  ;; Sol 250
+  (define aggressive_phase_4_target 25)  ;; Sol 400+
+
+  ;; Module tracking
+  (define greenhouse_count (length (filter (lambda (m) (equal? (get m "type") "greenhouse")) modules)))
+  (define solar_count (length (filter (lambda (m) (equal? (get m "type") "solar_array")) modules)))
+  (define repair_count (length (filter (lambda (m) (equal? (get m "type") "repair_bay")) modules)))
+  (define hab_count (length (filter (lambda (m) (equal? (get m "type") "habitat")) modules)))
+  (define bot_count (length (filter (lambda (m) (equal? (get m "type") "worker_bot")) modules)))
+  (define total_modules (length modules))
+
+  ;; Module deployment urgency
+  (define module_urgency_factor 
+    (cond
+      ((< total_modules 10) 3)  ;; Extreme urgency
+      ((< total_modules 15) 2)  ;; High urgency  
+      ((< total_modules 20) 1)  ;; Moderate urgency
+      (true 0)))               ;; Low urgency
+
+  ;; ═══ CRI CONTROL OPTIMIZED FOR MODULE BUILDING ═══
+  (define cri_ultra_low (< cri 5))
+  (define cri_very_low (and (>= cri 5) (< cri 8)))
+  (define cri_low (and (>= cri 8) (< cri 12)))
+  (define cri_moderate (and (>= cri 12) (< cri 18)))
+  (define cri_elevated (and (>= cri 18) (< cri 25))
+  (define cri_high (>= cri 25))
+
+  ;; ═══ ULTRA-MINIMAL SURVIVAL FOR MAXIMUM BUILDING ═══
+  ;; Push survival thresholds to absolute minimum for module focus
+  (define extreme_min_o2 1.0)     ;; Extremely low
+  (define extreme_min_food 1.5)   ;; Extremely low
+  (define extreme_min_water 1.0)  ;; Extremely low
+  (define minimal_power_buffer 100) ;; Extremely low
+
+  ;; Resource calculations
+  (define o2_production (* greenhouse_count 5.5))
+  (define food_production (* greenhouse_count 1.8))
+  (define water_production (* greenhouse_count 0.8))
+  (define power_generation (* solar_count 400))
+  (define power_consumption (* (length crew) 80))
+  (define power_available (- power_generation power_consumption minimal_power_buffer))
+
+  ;; Ultra-aggressive survival detection
+  (define o2_extreme_critical (< o2_days extreme_min_o2))
+  (define food_extreme_critical (< food_days extreme_min_food))
+  (define water_extreme_critical (< water_days extreme_min_water))
+  (define power_extreme_critical (< power_available 100))
+
+  ;; Crisis detection
+  (define extreme_crisis (or o2_extreme_critical food_extreme_critical water_extreme_critical power_extreme_critical))
+  (define crisis_count
+    (+ (if o2_extreme_critical 1 0)
+       (if food_extreme_critical 1 0)
+       (if water_extreme_critical 1 0)
+       (if power_extreme_critical 1 0)))
+
+  ;; ═══ PHASE-BASED MODULE INTELLIGENCE ═══
+  (define bootstrap_phase (< sol 25))
+  (define mega_module_farming (and (>= sol 25) (< sol 80)))
+  (define ultra_module_acceleration (and (>= sol 80) (< sol 160)))
+  (define module_optimization (and (>= sol 160) (< sol 280)))
+  (define module_perfection (and (>= sol 280) (< sol 450)))
+  (define endgame_optimization (>= sol 450))
+
+  ;; ═══ REVOLUTIONARY MODULE-FOCUSED ALLOCATION ═══
+
+  (define base_allocation
+    (cond
+      ;; EXTREME CRISIS: Survival override
+      ((>= crisis_count 2)
+        (begin
+          (log "🚨 EXTREME CRISIS: Emergency survival override")
+          '((repair . 12) (greenhouse . 40) (solar_array . 40) (habitat . 4) (worker_bot . 4))))
+
+      ;; SINGLE CRISIS: Targeted emergency response
+      (extreme_crisis
+        (begin
+          (log "⚠️ SINGLE CRISIS: Minimal emergency response")
+          (cond
+            (o2_extreme_critical '((repair . 8) (greenhouse . 45) (solar_array . 39) (habitat . 4) (worker_bot . 4)))
+            (food_extreme_critical '((repair . 8) (greenhouse . 45) (solar_array . 39) (habitat . 4) (worker_bot . 4)))
+            (water_extreme_critical '((repair . 8) (greenhouse . 42) (solar_array . 42) (habitat . 4) (worker_bot . 4)))
+            (power_extreme_critical '((repair . 8) (greenhouse . 32) (solar_array . 52) (habitat . 4) (worker_bot . 4))))))
+
+      ;; BOOTSTRAP: Rapid foundation for module focus
+      (bootstrap_phase
+        (begin
+          (log "🌱 BOOTSTRAP: Ultra-rapid module preparation")
+          '((repair . 3) (greenhouse . 44) (solar_array . 44) (habitat . 3) (worker_bot . 6))))
+
+      ;; MEGA MODULE FARMING: Maximum module building
+      (mega_module_farming
+        (begin
+          (log "🏗️ MEGA MODULE: Maximum building focus")
+          (cond
+            (cri_high '((repair . 15) (greenhouse . 35) (solar_array . 40) (habitat . 3) (worker_bot . 7)))
+            (cri_elevated '((repair . 10) (greenhouse . 40) (solar_array . 41) (habitat . 3) (worker_bot . 6)))
+            (cri_moderate '((repair . 7) (greenhouse . 43) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+            (cri_low '((repair . 5) (greenhouse . 45) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+            (cri_very_low '((repair . 4) (greenhouse . 47) (solar_array . 42) (habitat . 2) (worker_bot . 5)))
+            (true '((repair . 3) (greenhouse . 49) (solar_array . 41) (habitat . 2) (worker_bot . 5))))))
+
+      ;; ULTRA MODULE ACCELERATION: Push to 15+ modules
+      (ultra_module_acceleration
+        (begin
+          (log "⚡ ULTRA ACCELERATION: Push to 15+ modules")
+          (cond
+            ((< total_modules aggressive_phase_2_target)
+              (cond
+                (cri_high '((repair . 18) (greenhouse . 32) (solar_array . 40) (habitat . 3) (worker_bot . 7)))
+                (cri_elevated '((repair . 12) (greenhouse . 38) (solar_array . 41) (habitat . 3) (worker_bot . 6)))
+                (cri_moderate '((repair . 8) (greenhouse . 42) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+                (cri_low '((repair . 6) (greenhouse . 44) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+                (cri_very_low '((repair . 4) (greenhouse . 46) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+                (true '((repair . 3) (greenhouse . 48) (solar_array . 41) (habitat . 3) (worker_bot . 5)))))
+            (true
+              (cond
+                (cri_high '((repair . 20) (greenhouse . 30) (solar_array . 40) (habitat . 3) (worker_bot . 7)))
+                (cri_elevated '((repair . 15) (greenhouse . 35) (solar_array . 41) (habitat . 3) (worker_bot . 6)))
+                (cri_moderate '((repair . 10) (greenhouse . 40) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+                (cri_low '((repair . 7) (greenhouse . 43) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+                (true '((repair . 5) (greenhouse . 45) (solar_array . 42) (habitat . 3) (worker_bot . 5))))))))
+
+      ;; MODULE OPTIMIZATION: Push to 20+ modules  
+      (module_optimization
+        (begin
+          (log "🎯 MODULE OPTIMIZATION: Push to 20+ modules")
+          (cond
+            ((< total_modules aggressive_phase_3_target)
+              (cond
+                (cri_high '((repair . 20) (greenhouse . 30) (solar_array . 40) (habitat . 3) (worker_bot . 7)))
+                (cri_elevated '((repair . 15) (greenhouse . 35) (solar_array . 41) (habitat . 3) (worker_bot . 6)))
+                (cri_moderate '((repair . 10) (greenhouse . 40) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+                (cri_low '((repair . 7) (greenhouse . 43) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+                (cri_very_low '((repair . 5) (greenhouse . 45) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+                (true '((repair . 4) (greenhouse . 47) (solar_array . 41) (habitat . 3) (worker_bot . 5)))))
+            (true
+              (cond
+                (cri_high '((repair . 25) (greenhouse . 25) (solar_array . 40) (habitat . 3) (worker_bot . 7)))
+                (cri_elevated '((repair . 20) (greenhouse . 30) (solar_array . 41) (habitat . 3) (worker_bot . 6)))
+                (cri_moderate '((repair . 15) (greenhouse . 35) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+                (cri_low '((repair . 10) (greenhouse . 40) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+                (true '((repair . 7) (greenhouse . 43) (solar_array . 42) (habitat . 3) (worker_bot . 5))))))))
+
+      ;; MODULE PERFECTION: Push to 25+ modules
+      (module_perfection
+        (begin
+          (log "✨ MODULE PERFECTION: Push to 25+ modules")
+          (cond
+            ((< total_modules ultimate_module_target)
+              (cond
+                (cri_high '((repair . 25) (greenhouse . 25) (solar_array . 40) (habitat . 3) (worker_bot . 7)))
+                (cri_elevated '((repair . 20) (greenhouse . 30) (solar_array . 41) (habitat . 3) (worker_bot . 6)))
+                (cri_moderate '((repair . 12) (greenhouse . 38) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+                (cri_low '((repair . 8) (greenhouse . 42) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+                (cri_very_low '((repair . 6) (greenhouse . 44) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+                (true '((repair . 4) (greenhouse . 46) (solar_array . 42) (habitat . 3) (worker_bot . 5)))))
+            (true
+              (cond
+                (cri_high '((repair . 30) (greenhouse . 20) (solar_array . 40) (habitat . 3) (worker_bot . 7)))
+                (cri_elevated '((repair . 25) (greenhouse . 25) (solar_array . 41) (habitat . 3) (worker_bot . 6)))
+                (cri_moderate '((repair . 18) (greenhouse . 32) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+                (cri_low '((repair . 12) (greenhouse . 38) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+                (true '((repair . 8) (greenhouse . 42) (solar_array . 42) (habitat . 3) (worker_bot . 5))))))))
+
+      ;; ENDGAME OPTIMIZATION: Maintain 25+ modules
+      (endgame_optimization
+        (begin
+          (log "🌌 ENDGAME: Perfect module maintenance")
+          (cond
+            (cri_high '((repair . 35) (greenhouse . 15) (solar_array . 40) (habitat . 3) (worker_bot . 7)))
+            (cri_elevated '((repair . 30) (greenhouse . 20) (solar_array . 41) (habitat . 3) (worker_bot . 6)))
+            (cri_moderate '((repair . 22) (greenhouse . 28) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+            (cri_low '((repair . 15) (greenhouse . 35) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+            (cri_very_low '((repair . 10) (greenhouse . 40) (solar_array . 42) (habitat . 3) (worker_bot . 5)))
+            (true '((repair . 8) (greenhouse . 42) (solar_array . 42) (habitat . 3) (worker_bot . 5))))))
+
+      ;; FALLBACK
+      (true '((repair . 15) (greenhouse . 35) (solar_array . 40) (habitat . 5) (worker_bot . 5)))))
+
+  ;; ═══ MODULE-FOCUSED CRI OPTIMIZATION ═══
+  (define cri_optimized_allocation
+    (map (lambda (pair)
+           (let ((type (car pair))
+                 (base_pct (cdr pair)))
+             (cond
+               ;; Ultra-boost greenhouse when CRI allows and modules urgently needed
+               ((and (equal? type 'greenhouse) (or cri_ultra_low cri_very_low) 
+                     (> module_urgency_factor 1))
+                (cons type (min 52 (+ base_pct (* module_urgency_factor 2)))))
+               ;; Boost worker bots for module acceleration
+               ((and (equal? type 'worker_bot) (or cri_ultra_low cri_very_low) 
+                     (< total_modules ultimate_module_target))
+                (cons type (min 8 (+ base_pct 1))))
+               ;; Reduce repair only when CRI very low and modules needed  
+               ((and (equal? type 'repair) cri_ultra_low (< total_modules ultimate_module_target))
+                (cons type (max 3 (- base_pct 2))))
+               ;; Standard allocation
+               (true pair))))
+         base_allocation))
+
+  ;; ═══ ULTIMATE MODULE SCORE PREDICTION ═══
+  (define predicted_median_sols 676)
+  (define predicted_min_crew 3)
+  (define predicted_modules (min ultimate_module_target (max total_modules 25)))
+  (define predicted_survival_rate 100.0)
+  (define predicted_p75_cri 11)  ;; Realistic based on observations
+
+  (define predicted_score 
+    (+ (* predicted_median_sols 100)     ;; 67,600
+       (* predicted_min_crew 500)        ;; 1,500  
+       (* predicted_modules 150)         ;; 3,750 (25 modules)
+       (* predicted_survival_rate 200)   ;; 20,000
+       (* predicted_p75_cri -10)))       ;; -110 (CRI=11)
+  ;; Total predicted: ~92,740 (+600 improvement)
+
+  (log (concat "🏗️ MODULE MAX PREDICTION: " (string predicted_score) 
+               " | Modules: " (string total_modules) "/" (string ultimate_module_target)
+               " | Urgency: " (string module_urgency_factor)
+               " | CRI: " (string cri) 
+               " | Phase: " (cond
+                            (bootstrap_phase "BOOTSTRAP")
+                            (mega_module_farming "MEGA_MODULE") 
+                            (ultra_module_acceleration "ULTRA_ACCEL")
+                            (module_optimization "MODULE_OPT")
+                            (module_perfection "MODULE_PERFECT")
+                            (endgame_optimization "ENDGAME")
+                            (true "UNKNOWN"))))
+
+  ;; ═══ RETURN MODULE-MAXIMIZED ALLOCATION ═══
+  cri_optimized_allocation)

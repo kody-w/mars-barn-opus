@@ -89,6 +89,23 @@
       "notes": "Counters the 2-bot exploit. Fewer crew = more wear per robot, concurrent tasks need 3-4 crew, solo failures are catastrophic with small teams. ISS maintenance data + Mars analog reports.",
       "best_known_run": null,
       "backtest_target": "Run v2 best (2 robots, 432 sols) against v3. Expected: workload wear + solo failures kill small crews faster."
+    },
+    {
+      "version": 4,
+      "name": "Module Overload",
+      "released": "2025-04-02",
+      "sol_range": [
+        678,
+        727
+      ],
+      "hazards_added": [
+        "module_cascade_failure",
+        "power_grid_overload",
+        "supply_chain_bottleneck",
+        "dust_infiltration"
+      ],
+      "notes": "Counters the module-farming exploit. The fleet gamed the scoring by building maximum modules. v4 makes infrastructure a liability: cascade failures scale with module count, power grid strains with density, dust infiltrates ALL module seals simultaneously. Quantity is no longer free. Quality matters.",
+      "backtest_target": "Run the fleet 92K score strategy against v4. Expected: module density causes cascade failures that overwhelm repair."
     }
   ],
   "backtest_protocol": {

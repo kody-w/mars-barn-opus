@@ -1,0 +1,47 @@
+{
+  "sol": 711,
+  "utc": "2027-07-09T13:15:36Z",
+  "mars": {
+    "ls": 139.6,
+    "season": "Northern Summer",
+    "temp_k": 232.7,
+    "temp_c": -40.4,
+    "pressure_pa": 759,
+    "solar_wm2": 454,
+    "dust_tau": 0.098,
+    "wind_ms": 9.0,
+    "lmst": 6.9
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0141
+    },
+    {
+      "type": "dust_infiltration",
+      "targets_all_modules": true,
+      "degradation_per_module": 0.0012,
+      "desc": "Regolith dust infiltration through module seals \u2014 affects ALL modules"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 4.8,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.63,
+    "water_ice_depth_m": 1.0,
+    "surface_radiation_usv": 0.54
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 710,
+    "global_dust_trend": "falling",
+    "solar_efficiency_trend": "improving",
+    "temp_delta": 2.6,
+    "dust_delta": 0.03
+  },
+  "_hash": "170576139fa4df58"
+}

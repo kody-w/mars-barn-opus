@@ -1,0 +1,68 @@
+{
+  "sol": 680,
+  "utc": "2027-06-07T16:48:00Z",
+  "mars": {
+    "ls": 123.3,
+    "season": "Northern Summer",
+    "temp_k": 226.2,
+    "temp_c": -47.0,
+    "pressure_pa": 765,
+    "solar_wm2": 412,
+    "dust_tau": 0.169,
+    "wind_ms": 6.7,
+    "lmst": 2.8
+  },
+  "events": [
+    {
+      "type": "system_redundancy_check",
+      "severity": 0.7,
+      "duration_sols": 1,
+      "min_crew": 4,
+      "desc": "Safety audit \u2014 all critical systems need simultaneous monitoring (4 crew min)"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0091
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "wheel_assembly",
+      "degradation": 0.0021
+    },
+    {
+      "type": "dust_infiltration",
+      "targets_all_modules": true,
+      "degradation_per_module": 0.0027,
+      "desc": "Regolith dust infiltration through module seals \u2014 affects ALL modules"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 7.4,
+    "window_open": false,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.62,
+    "water_ice_depth_m": 2.1,
+    "surface_radiation_usv": 0.87
+  },
+  "challenge": {
+    "id": "sol680_actuator_calibration",
+    "type": "actuator_calibration",
+    "params": {
+      "joint": "wrist",
+      "drift_deg": 4.5,
+      "torque_loss_pct": 27
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 679,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 9.1,
+    "dust_delta": 0.103
+  },
+  "_hash": "8f2aa88193f9e0f8"
+}

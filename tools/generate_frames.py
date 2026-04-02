@@ -219,6 +219,35 @@ def generate_hazards(sol, mars, rng):
                         'target': rng.choice(['solar_array', 'isru_unit', 'hab_structure']),
                         'desc': 'Multi-point maintenance — requires 3-4 crew working simultaneously'})
 
+
+    # v4: Module Overload (counters the module-farming exploit)
+    # Source: ISS experience — more modules = more maintenance, more points of failure
+    # More infrastructure = exponentially more failure modes
+    if rng.next() < 0.15:
+        hazards.append({'type': 'module_cascade_failure',
+                        'min_modules': 4,
+                        'severity_per_module': round(0.003 + rng.next() * 0.005, 4),
+                        'desc': 'Cascade failure — each additional module increases systemic risk'})
+
+    if rng.next() < 0.08:
+        hazards.append({'type': 'power_grid_overload',
+                        'min_modules': 5,
+                        'power_drain_per_module': round(2 + rng.next() * 4, 1),
+                        'desc': 'Power grid strain — too many modules for available power capacity'})
+
+    if rng.next() < 0.06:
+        hazards.append({'type': 'supply_chain_bottleneck',
+                        'min_crew': 3,
+                        'min_modules': 3,
+                        'efficiency_penalty': round(0.01 + rng.next() * 0.02, 4),
+                        'desc': 'Supply chain bottleneck — insufficient crew to maintain module density'})
+
+    if rng.next() < 0.10:
+        hazards.append({'type': 'dust_infiltration',
+                        'targets_all_modules': True,
+                        'degradation_per_module': round(0.001 + rng.next() * 0.002, 4),
+                        'desc': 'Regolith dust infiltration through module seals — affects ALL modules'})
+
     return hazards
 
 
@@ -380,3 +409,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# v4 hazards added at the bottom of generate_hazards
+# These are appended to the function by the frame generator
+# when --v4 flag is used

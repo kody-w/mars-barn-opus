@@ -1,0 +1,65 @@
+{
+  "sol": 714,
+  "utc": "2027-07-12T15:14:24Z",
+  "mars": {
+    "ls": 141.1,
+    "season": "Northern Summer",
+    "temp_k": 223.8,
+    "temp_c": -49.4,
+    "pressure_pa": 759,
+    "solar_wm2": 465,
+    "dust_tau": 0.146,
+    "wind_ms": 5.5,
+    "lmst": 5.0
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0158
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "isru_unit",
+      "degradation": 0.0046
+    },
+    {
+      "type": "electrostatic_dust",
+      "target": "solar_array",
+      "degradation": 0.0024,
+      "desc": "Electrostatic dust adhesion \u2014 charged particles cling to surfaces"
+    },
+    {
+      "type": "workload_wear",
+      "target": "hab_seal",
+      "degradation_per_missing_crew": 0.0023,
+      "baseline_crew": 4,
+      "desc": "Accelerated wear from understaffing \u2014 fewer crew = more cycles per robot"
+    },
+    {
+      "type": "module_cascade_failure",
+      "min_modules": 4,
+      "severity_per_module": 0.0064,
+      "desc": "Cascade failure \u2014 each additional module increases systemic risk"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 4.5,
+    "window_open": false,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.78,
+    "water_ice_depth_m": 1.0,
+    "surface_radiation_usv": 0.3
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 713,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -10.1,
+    "dust_delta": 0.064
+  },
+  "_hash": "40b0f15a4718a5c8"
+}

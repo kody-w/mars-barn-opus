@@ -1,0 +1,55 @@
+{
+  "sol": 725,
+  "utc": "2027-07-23T22:30:00Z",
+  "mars": {
+    "ls": 146.9,
+    "season": "Northern Summer",
+    "temp_k": 239.3,
+    "temp_c": -33.8,
+    "pressure_pa": 756,
+    "solar_wm2": 466,
+    "dust_tau": 0.13,
+    "wind_ms": 5.1,
+    "lmst": 22.0
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0124
+    },
+    {
+      "type": "electrostatic_dust",
+      "target": "sensor_array",
+      "degradation": 0.0012,
+      "desc": "Electrostatic dust adhesion \u2014 charged particles cling to surfaces"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 4.4,
+    "window_open": false,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.61,
+    "water_ice_depth_m": 1.0,
+    "surface_radiation_usv": 0.33
+  },
+  "challenge": {
+    "id": "sol725_actuator_calibration",
+    "type": "actuator_calibration",
+    "params": {
+      "joint": "ankle",
+      "drift_deg": 4.0,
+      "torque_loss_pct": 27
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 724,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 8.7,
+    "dust_delta": -0.02
+  },
+  "_hash": "8577c3cd67c6695e"
+}

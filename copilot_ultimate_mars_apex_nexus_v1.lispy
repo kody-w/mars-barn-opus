@@ -1,0 +1,241 @@
+;; COPILOT ULTIMATE MARS APEX NEXUS v1  
+;; Revolutionary Innovation: Maximum Module Density + Minimal CRI Strategy
+;; Target: Push beyond 93,000 score barrier through extreme optimization
+;; Core Innovation: Ultra-aggressive module farming + CRI minimization
+
+(begin
+  (define _agent_name "Copilot Ultimate Mars Apex Nexus v1")
+  (define _agent_desc "Maximum Module Density Strategy with CRI Minimization Focus")
+
+  (log (concat "🚀⚡🔥💎✨ MARS APEX NEXUS — Sol " (string sol) " — Ultimate Module Dominance"))
+
+  ;; ═══ ULTRA-AGGRESSIVE MODULE FARMING (SOL 30) ═══ 
+  ;; Breakthrough: Start farming Sol 30 (15 sols earlier than any record!)
+  (define mission_completion_ratio (/ sol 677))
+  
+  (define apex_genesis_farming (and (>= sol 30) (< sol 80)))      ;; 50-sol ultra advantage
+  (define apex_acceleration_farming (and (>= sol 80) (< sol 140))) ;; Acceleration phase  
+  (define apex_dominance_farming (and (>= sol 140) (< sol 220)))   ;; Dominance phase
+  (define apex_mastery_farming (and (>= sol 220) (< sol 320)))     ;; Mastery phase
+  (define apex_transcendence_farming (>= sol 320))                 ;; Transcendence phase
+
+  ;; ═══ EXTREME CRI MINIMIZATION ENGINE ═══
+  ;; Revolutionary: Target CRI < 5 through massive infrastructure
+  (define cri_current colony_risk_index)
+  (define cri_apex_prediction_horizon 40)  ;; 40-sol prediction for maximum control
+  
+  ;; Ultra-aggressive CRI reduction modeling
+  (define apex_cri_growth_rate
+    (cond
+      ((< sol 60) 0.055)      ;; Minimal early growth
+      ((< sol 180) 0.085)     ;; Controlled mid growth
+      ((< sol 350) 0.125)     ;; Managed peak growth  
+      (true 0.065)))          ;; Stabilized late growth
+
+  ;; Massive infrastructure consciousness (50% repair ratio!)
+  (define repair_bay_apex_count (max 2 (round (* modules_built 0.50))))
+  (define apex_infrastructure_power (* 1.65 (pow 2.1 repair_bay_apex_count)))
+  
+  ;; Perfect resource abundance calculation
+  (define apex_resource_abundance
+    (- 3.2 (+ (max 0 (/ 2.4 (max 1 o2_days)))
+              (max 0 (/ 3.4 (max 1 food_days)))
+              (max 0 (/ 2.4 (max 1 water_days))))))
+
+  ;; Apex CRI prediction with infrastructure domination
+  (define predicted_cri_change_apex
+    (- apex_cri_growth_rate
+       (/ apex_infrastructure_power 12.0)
+       (max 0 apex_resource_abundance)))
+
+  (define predicted_cri_apex (+ cri_current (* predicted_cri_change_apex cri_apex_prediction_horizon)))
+  (define cri_apex_target (+ 0.8 (* mission_completion_ratio 1.5)))  ;; Ultra-low target
+  (define cri_apex_error (- predicted_cri_apex cri_apex_target))
+
+  ;; ═══ MAXIMUM MODULE BUILDING EFFICIENCY ═══
+  ;; Target: 99.95% efficiency in optimal conditions
+  (define base_apex_efficiency 0.88)
+  
+  (define farming_apex_bonus
+    (cond
+      (apex_genesis_farming 0.115)      ;; Genesis power
+      (apex_acceleration_farming 0.098) ;; Acceleration power
+      (apex_dominance_farming 0.082)    ;; Dominance power
+      (apex_mastery_farming 0.068)      ;; Mastery power
+      (apex_transcendence_farming 0.055) ;; Transcendence power
+      (true 0.000)))
+
+  (define cri_apex_efficiency_bonus
+    (cond
+      ((< cri_current 3) 0.08)   ;; Ultra-low CRI bonus
+      ((< cri_current 6) 0.06)   ;; Very low CRI bonus
+      ((< cri_current 10) 0.04)  ;; Low CRI bonus
+      ((< cri_current 15) 0.02)  ;; Moderate CRI bonus
+      (true 0.00)))
+
+  (define infrastructure_apex_bonus
+    (cond
+      ((>= modules_built 30) 0.06)  ;; Massive infrastructure
+      ((>= modules_built 25) 0.05)  ;; Large infrastructure
+      ((>= modules_built 20) 0.04)  ;; Good infrastructure
+      ((>= modules_built 15) 0.03)  ;; Moderate infrastructure
+      ((>= modules_built 10) 0.02)  ;; Basic infrastructure
+      (true 0.01)))
+
+  (define apex_building_efficiency
+    (min 0.9995  ;; 99.95% theoretical maximum
+         (+ base_apex_efficiency
+            farming_apex_bonus
+            cri_apex_efficiency_bonus
+            infrastructure_apex_bonus)))
+
+  ;; ═══ EXTREME RESOURCE MINIMIZATION ═══
+  ;; Push margins to absolute minimum (0.8-1.2 days)
+  (define crew_performance (/ crew_hp (max 1 (* crew_alive 100))))
+  (define apex_o2_minimum (+ 0.8 (* crew_performance 0.3)))
+  (define apex_food_minimum (+ 0.9 (* crew_performance 0.4)))
+  (define apex_water_minimum (+ 0.8 (* crew_performance 0.3)))
+
+  ;; Phase-based resource optimization
+  (define phase_resource_optimization
+    (cond
+      (apex_genesis_farming 1.0)
+      (apex_acceleration_farming 0.95)
+      (apex_dominance_farming 0.90)
+      (apex_mastery_farming 0.88)
+      (apex_transcendence_farming 0.85)))
+
+  (define final_o2_minimum (* apex_o2_minimum phase_resource_optimization))
+  (define final_food_minimum (* apex_food_minimum phase_resource_optimization))
+  (define final_water_minimum (* apex_water_minimum phase_resource_optimization))
+
+  ;; ═══ MAXIMUM MODULE NUTRITION MULTIPLIER ═══
+  (define health_apex_factor
+    (cond
+      ((>= crew_hp (* crew_alive 100)) 1.25)  ;; Perfect health
+      ((>= crew_hp (* crew_alive 95)) 1.20)   ;; Excellent health
+      ((>= crew_hp (* crew_alive 90)) 1.15)   ;; Good health
+      ((>= crew_hp (* crew_alive 85)) 1.10)   ;; Adequate health
+      (true 1.00)))
+
+  (define cri_apex_nutrition_factor
+    (cond
+      ((< cri_current 3) 1.35)   ;; Ultra-low CRI boost
+      ((< cri_current 6) 1.25)   ;; Very low CRI boost
+      ((< cri_current 10) 1.18)  ;; Low CRI boost
+      ((< cri_current 15) 1.12)  ;; Moderate CRI boost
+      (true 1.05)))              ;; High CRI minimum
+
+  (define farming_apex_nutrition_factor
+    (cond
+      (apex_genesis_farming 5.2)        ;; Genesis farming power
+      (apex_acceleration_farming 4.8)   ;; Acceleration farming power
+      (apex_dominance_farming 4.4)      ;; Dominance farming power
+      (apex_mastery_farming 4.0)        ;; Mastery farming power
+      (apex_transcendence_farming 3.6)  ;; Transcendence farming power
+      (true 1.0)))
+
+  (define apex_nutrition_multiplier
+    (* health_apex_factor
+       cri_apex_nutrition_factor
+       farming_apex_nutrition_factor))
+
+  ;; ═══ RESOURCE DEMAND DETECTION ═══
+  (define o2_apex_demand (< o2_days final_o2_minimum))
+  (define food_apex_demand (< food_days final_food_minimum))
+  (define water_apex_demand (< water_days final_water_minimum))
+
+  (define apex_emergency_resources 
+    (or o2_apex_demand food_apex_demand water_apex_demand))
+
+  ;; ═══ REVOLUTIONARY MODULE-MAXIMIZING ALLOCATION MATRIX ═══
+  (define apex_allocation_matrix
+    (cond
+      ;; EMERGENCY: Resource critical - full survival mode
+      (apex_emergency_resources
+       (begin
+         (log "🆘 APEX EMERGENCY: Maximum survival response")
+         '(1.0 0.0 0.0 0.0)))
+
+      ;; PHASE 1: Genesis Farming (Sol 30-80) - Ultra-early module rush
+      (apex_genesis_farming
+       (if (< cri_apex_error -4)
+           (begin
+             (log "🌟 GENESIS APEX: Ultra-early module farming")
+             (list 0.05 0.03 0.02 apex_building_efficiency))
+           (begin
+             (log "🌟 GENESIS APEX: Infrastructure setup")
+             '(0.18 0.16 0.11 0.55))))
+
+      ;; PHASE 2: Acceleration Farming (Sol 80-140) - Maximum module acceleration
+      (apex_acceleration_farming
+       (if (< cri_apex_error -3)
+           (begin
+             (log "⚡ ACCELERATION APEX: Maximum module acceleration")
+             (list 0.04 0.03 0.02 apex_building_efficiency))
+           (begin
+             (log "⚡ ACCELERATION APEX: Controlled acceleration")
+             '(0.16 0.14 0.10 0.60))))
+
+      ;; PHASE 3: Dominance Farming (Sol 140-220) - Module dominance phase
+      (apex_dominance_farming
+       (if (< cri_apex_error -2)
+           (begin
+             (log "🔥 DOMINANCE APEX: Module dominance unleashed")
+             (list 0.03 0.02 0.01 apex_building_efficiency))
+           (begin
+             (log "🔥 DOMINANCE APEX: Infrastructure dominance")
+             '(0.15 0.13 0.09 0.63))))
+
+      ;; PHASE 4: Mastery Farming (Sol 220-320) - Module mastery perfection
+      (apex_mastery_farming
+       (if (< cri_apex_error -1)
+           (begin
+             (log "💎 MASTERY APEX: Module mastery perfection")
+             (list 0.03 0.02 0.01 apex_building_efficiency))
+           (begin
+             (log "💎 MASTERY APEX: Infrastructure mastery")
+             '(0.14 0.12 0.08 0.66))))
+
+      ;; PHASE 5: Transcendence Farming (Sol 320+) - Ultimate module transcendence  
+      (apex_transcendence_farming
+       (if (< cri_apex_error 0)
+           (begin
+             (log "✨ TRANSCENDENCE APEX: Ultimate module transcendence")
+             (list 0.02 0.01 0.01 apex_building_efficiency))
+           (begin
+             (log "✨ TRANSCENDENCE APEX: Infrastructure transcendence")
+             '(0.13 0.11 0.07 0.69))))
+
+      ;; Fallback: Emergency baseline
+      (true
+       (begin
+         (log "⚠️ APEX FALLBACK: Emergency protocols")
+         '(0.25 0.20 0.15 0.40)))))
+
+  ;; ═══ NUTRITION INTEGRATION ═══
+  (define final_apex_allocation
+    (let ((base_alloc apex_allocation_matrix))
+      (if (> apex_nutrition_multiplier 2.5)
+          (list (* (car base_alloc) apex_nutrition_multiplier)
+                (cadr base_alloc)
+                (caddr base_alloc)
+                (cadddr base_alloc))
+          base_alloc)))
+
+  ;; ═══ APEX PERFORMANCE MONITORING ═══
+  (log (concat "🔍 CRI: " (string cri_current) 
+               " | Predicted: " (string (round predicted_cri_apex))
+               " | Error: " (string (round cri_apex_error))
+               " | Efficiency: " (string (round (* apex_building_efficiency 100))) "%"
+               " | Nutrition: " (string (round apex_nutrition_multiplier)) "x"
+               " | Modules: " (string modules_built)
+               " | Repair Bays: " (string repair_bay_apex_count)))
+
+  (log (concat "⚡ Resources: O2=" (string (round o2_days)) 
+               " Food=" (string (round food_days))
+               " Water=" (string (round water_days))
+               " | HP=" (string crew_hp) "/" (string (* crew_alive 100))))
+
+  ;; Return the ultimate apex allocation
+  final_apex_allocation)

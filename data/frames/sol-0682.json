@@ -1,0 +1,63 @@
+{
+  "sol": 682,
+  "utc": "2027-06-09T18:07:12Z",
+  "mars": {
+    "ls": 124.4,
+    "season": "Northern Summer",
+    "temp_k": 222.5,
+    "temp_c": -50.7,
+    "pressure_pa": 765,
+    "solar_wm2": 428,
+    "dust_tau": 0.19,
+    "wind_ms": 4.8,
+    "lmst": 1.5
+  },
+  "events": [
+    {
+      "type": "solar_flare",
+      "severity": 0.58,
+      "duration_sols": 1,
+      "desc": "Solar particle event detected \u2014 elevated radiation"
+    },
+    {
+      "type": "mandatory_eva",
+      "severity": 0.56,
+      "duration_sols": 2,
+      "min_crew": 2,
+      "buddy_required": true,
+      "desc": "External repair requires buddy system (2 crew minimum on EVA)"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0093
+    },
+    {
+      "type": "supply_chain_bottleneck",
+      "min_crew": 3,
+      "min_modules": 3,
+      "efficiency_penalty": 0.021,
+      "desc": "Supply chain bottleneck \u2014 insufficient crew to maintain module density"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 7.3,
+    "window_open": false,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.77,
+    "water_ice_depth_m": 0.9,
+    "surface_radiation_usv": 0.5
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 681,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -0.3,
+    "dust_delta": 0.034
+  },
+  "_hash": "848b9ede8391bdbb"
+}

@@ -1,0 +1,60 @@
+{
+  "sol": 703,
+  "utc": "2027-07-01T07:58:48Z",
+  "mars": {
+    "ls": 135.4,
+    "season": "Northern Summer",
+    "temp_k": 228.3,
+    "temp_c": -44.9,
+    "pressure_pa": 761,
+    "solar_wm2": 471,
+    "dust_tau": 0.092,
+    "wind_ms": 5.1,
+    "lmst": 12.0
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0095
+    },
+    {
+      "type": "electrostatic_dust",
+      "target": "solar_array",
+      "degradation": 0.0046,
+      "desc": "Electrostatic dust adhesion \u2014 charged particles cling to surfaces"
+    },
+    {
+      "type": "critical_solo_failure",
+      "severity": 0.63,
+      "affects": "weakest_crew_member",
+      "hp_damage": 33,
+      "desc": "Major actuator failure \u2014 crew member immobilized. No backup available with small crew."
+    },
+    {
+      "type": "dust_infiltration",
+      "targets_all_modules": true,
+      "degradation_per_module": 0.0023,
+      "desc": "Regolith dust infiltration through module seals \u2014 affects ALL modules"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 5.5,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.84,
+    "water_ice_depth_m": 2.3,
+    "surface_radiation_usv": 0.94
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 702,
+    "global_dust_trend": "falling",
+    "solar_efficiency_trend": "improving",
+    "temp_delta": 2.2,
+    "dust_delta": -0.068
+  },
+  "_hash": "164f51d3e1c27e4b"
+}

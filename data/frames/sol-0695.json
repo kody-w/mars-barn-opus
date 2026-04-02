@@ -1,0 +1,63 @@
+{
+  "sol": 695,
+  "utc": "2027-06-23T02:42:00Z",
+  "mars": {
+    "ls": 131.2,
+    "season": "Northern Summer",
+    "temp_k": 233.2,
+    "temp_c": -40.0,
+    "pressure_pa": 763,
+    "solar_wm2": 502,
+    "dust_tau": 0.15,
+    "wind_ms": 8.1,
+    "lmst": 17.2
+  },
+  "events": [
+    {
+      "type": "system_redundancy_check",
+      "severity": 0.47,
+      "duration_sols": 1,
+      "min_crew": 4,
+      "desc": "Safety audit \u2014 all critical systems need simultaneous monitoring (4 crew min)"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0168
+    },
+    {
+      "type": "module_cascade_failure",
+      "min_modules": 4,
+      "severity_per_module": 0.0057,
+      "desc": "Cascade failure \u2014 each additional module increases systemic risk"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 6.2,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.59,
+    "water_ice_depth_m": 1.5,
+    "surface_radiation_usv": 0.88
+  },
+  "challenge": {
+    "id": "sol695_software_watchdog_reset",
+    "type": "software_watchdog_reset",
+    "params": {
+      "subsystem": "comm",
+      "reboot_count": 4,
+      "memory_errors": 6
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 694,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 0.7,
+    "dust_delta": 0.015
+  },
+  "_hash": "2f4e8b50f2340917"
+}

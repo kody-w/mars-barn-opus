@@ -1,0 +1,63 @@
+{
+  "sol": 705,
+  "utc": "2027-07-03T09:18:00Z",
+  "mars": {
+    "ls": 136.4,
+    "season": "Northern Summer",
+    "temp_k": 224.1,
+    "temp_c": -49.0,
+    "pressure_pa": 761,
+    "solar_wm2": 437,
+    "dust_tau": 0.152,
+    "wind_ms": 3.3,
+    "lmst": 10.8
+  },
+  "events": [
+    {
+      "type": "system_redundancy_check",
+      "severity": 0.67,
+      "duration_sols": 1,
+      "min_crew": 4,
+      "desc": "Safety audit \u2014 all critical systems need simultaneous monitoring (4 crew min)"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.018
+    },
+    {
+      "type": "workload_wear",
+      "target": "solar_gimbal",
+      "degradation_per_missing_crew": 0.003,
+      "baseline_crew": 4,
+      "desc": "Accelerated wear from understaffing \u2014 fewer crew = more cycles per robot"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 5.3,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.72,
+    "water_ice_depth_m": 1.0,
+    "surface_radiation_usv": 0.82
+  },
+  "challenge": {
+    "id": "sol705_co2_scrubber_saturation",
+    "type": "co2_scrubber_saturation",
+    "params": {
+      "saturation_pct": 74,
+      "co2_ppm": 1221
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 704,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 7.6,
+    "dust_delta": 0.086
+  },
+  "_hash": "b9598ec0c3a23f9f"
+}

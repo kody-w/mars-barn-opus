@@ -1,0 +1,54 @@
+{
+  "sol": 709,
+  "utc": "2027-07-07T11:56:24Z",
+  "mars": {
+    "ls": 138.5,
+    "season": "Northern Summer",
+    "temp_k": 235.9,
+    "temp_c": -37.3,
+    "pressure_pa": 760,
+    "solar_wm2": 462,
+    "dust_tau": 0.118,
+    "wind_ms": 7.0,
+    "lmst": 8.2
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.73,
+      "duration_sols": 18,
+      "desc": "Regional dust storm approaching from the north"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0083
+    },
+    {
+      "type": "electrostatic_dust",
+      "target": "thermal_radiator",
+      "degradation": 0.0019,
+      "desc": "Electrostatic dust adhesion \u2014 charged particles cling to surfaces"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 5.0,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.67,
+    "water_ice_depth_m": 2.2,
+    "surface_radiation_usv": 0.81
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 708,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 9.6,
+    "dust_delta": -0.047
+  },
+  "_hash": "25a99d8cdce1b9b4"
+}
