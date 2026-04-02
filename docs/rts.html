@@ -55,6 +55,36 @@
   #speed-control span:hover { background: rgba(255,120,40,0.2); }
   #speed-control span.active { color: #ff8844; font-weight: bold; }
 
+  /* Comms interference overlay */
+  #comms-interference {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 98; opacity: 0;
+    background: repeating-linear-gradient(0deg,
+      transparent 0px, transparent 2px,
+      rgba(100,180,255,0.03) 2px, rgba(100,180,255,0.03) 4px);
+    mix-blend-mode: screen;
+    transition: opacity 2s;
+  }
+  #comms-interference.active {
+    opacity: 1;
+    animation: staticFlicker 0.15s infinite;
+  }
+  @keyframes staticFlicker {
+    0% { opacity: 0.6; }
+    25% { opacity: 0.8; }
+    50% { opacity: 0.5; }
+    75% { opacity: 0.9; }
+    100% { opacity: 0.7; }
+  }
+
+  /* Radiation warning overlay */
+  #radiation-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 97; opacity: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(140,40,200,0.15) 100%);
+    transition: opacity 1.5s;
+  }
+
   /* HUD panels */
   .hud {
     position: fixed; z-index: 50; pointer-events: none;
@@ -125,6 +155,8 @@
 <!-- CRT overlays -->
 <div id="vignette"></div>
 <div id="scanlines"></div>
+<div id="comms-interference"></div>
+<div id="radiation-overlay"></div>
 
 <!-- HUD: Top-left -->
 <div class="hud" id="hud-top-left">
@@ -321,12 +353,14 @@
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     scene.add(mesh);
+    let pl = null;
     if (lightColor) {
-      const pl = new THREE.PointLight(lightColor, 1.2, 30);
+      pl = new THREE.PointLight(lightColor, 1.2, 30);
       pl.position.set(x, ty + 4, z);
       scene.add(pl);
     }
-    modules.push({ name, mesh, light: lightColor });
+    const mod = { name, mesh, pointLight: pl, lightColor, health: 1.0, x, z };
+    modules.push(mod);
     return mesh;
   }
 
@@ -377,7 +411,7 @@
       scene.add(grp);
       solarPanels.push(grp);
     }
-    modules.push({ name: 'SOLAR-ARRAY', mesh: solarPanels[0] });
+    modules.push({ name: 'SOLAR-ARRAY', mesh: solarPanels[0], pointLight: null, lightColor: null, health: 1.0, x: -6, z: 20 });
   })();
 
   // ISRU Plant — box + chimney
@@ -401,10 +435,10 @@
     const ty = getTerrainY(px, pz);
     grp.position.set(px, ty, pz);
     scene.add(grp);
-    const pl = new THREE.PointLight(0x00cccc, 1.5, 20);
-    pl.position.set(px, ty + 3, pz);
-    scene.add(pl);
-    modules.push({ name: 'ISRU-PLANT', mesh: grp });
+    const isruLight = new THREE.PointLight(0x00cccc, 1.5, 20);
+    isruLight.position.set(px, ty + 3, pz);
+    scene.add(isruLight);
+    modules.push({ name: 'ISRU-PLANT', mesh: grp, pointLight: isruLight, lightColor: 0x00cccc, health: 1.0, x: px, z: pz });
   })();
 
   // Greenhouse Domes x2
@@ -420,11 +454,11 @@
       dome.position.set(gx, ty, gz);
       dome.castShadow = true;
       scene.add(dome);
-      const pl = new THREE.PointLight(0x44cc66, 0.8, 15);
-      pl.position.set(gx, ty + 3, gz);
-      scene.add(pl);
+      const ghLight = new THREE.PointLight(0x44cc66, 0.8, 15);
+      ghLight.position.set(gx, ty + 3, gz);
+      scene.add(ghLight);
       greenhouses.push(dome);
-      modules.push({ name: 'GREENHOUSE', mesh: dome });
+      modules.push({ name: 'GREENHOUSE', mesh: dome, pointLight: ghLight, lightColor: 0x44cc66, health: 1.0, x: gx, z: gz });
     });
   })();
 
@@ -465,10 +499,10 @@
     ice.position.set(px, ty + 0.05, pz);
     scene.add(ice);
 
-    const pl = new THREE.PointLight(0x2299ff, 1.2, 20);
-    pl.position.set(px, ty + 5, pz);
-    scene.add(pl);
-    modules.push({ name: 'WATER-EXTRACT', mesh: grp });
+    const waterLight = new THREE.PointLight(0x2299ff, 1.2, 20);
+    waterLight.position.set(px, ty + 5, pz);
+    scene.add(waterLight);
+    modules.push({ name: 'WATER-EXTRACT', mesh: grp, pointLight: waterLight, lightColor: 0x2299ff, health: 1.0, x: px, z: pz });
   })();
 
   // Repair Bay — open box
@@ -486,10 +520,10 @@
     const ty = getTerrainY(px, pz);
     grp.position.set(px, ty, pz);
     scene.add(grp);
-    const pl = new THREE.PointLight(0xff8833, 1.0, 18);
-    pl.position.set(px, ty + 3, pz);
-    scene.add(pl);
-    modules.push({ name: 'REPAIR-BAY', mesh: grp });
+    const repairLight = new THREE.PointLight(0xff8833, 1.0, 18);
+    repairLight.position.set(px, ty + 3, pz);
+    scene.add(repairLight);
+    modules.push({ name: 'REPAIR-BAY', mesh: grp, pointLight: repairLight, lightColor: 0xff8833, health: 1.0, x: px, z: pz });
   })();
 
   // Landing Pad — flat circle west
@@ -540,7 +574,7 @@
       scene.add(pl);
       padLights.push({ light: pl, phase: a });
     }
-    modules.push({ name: 'LANDING-PAD', mesh: pad });
+    modules.push({ name: 'LANDING-PAD', mesh: pad, pointLight: null, lightColor: null, health: 1.0, x: px, z: pz });
   })();
 
   // Comms Array — tall cylinder + dish
@@ -566,10 +600,10 @@
     const ty = getTerrainY(px, pz);
     grp.position.set(px, ty, pz);
     scene.add(grp);
-    const pl = new THREE.PointLight(0xaa44ff, 1.0, 25);
-    pl.position.set(px, ty + 14, pz);
-    scene.add(pl);
-    modules.push({ name: 'COMMS-ARRAY', mesh: grp });
+    const commsLight = new THREE.PointLight(0xaa44ff, 1.0, 25);
+    commsLight.position.set(px, ty + 14, pz);
+    scene.add(commsLight);
+    modules.push({ name: 'COMMS-ARRAY', mesh: grp, pointLight: commsLight, lightColor: 0xaa44ff, health: 1.0, x: px, z: pz });
   })();
 
   // ─── UNITS ────────────────────────────────────────────────────
@@ -1099,6 +1133,196 @@
     simState._windFactor = (simState.wind_ms || 7) / 7;
   }
 
+  // ─── MODULE HEALTH VISUALIZATION ────────────────────────────
+  // Maps frame hazard targets to module names
+  const HAZARD_MODULE_MAP = {
+    'solar_array': 'SOLAR-ARRAY',
+    'isru_unit': 'ISRU-PLANT',
+    'greenhouse': 'GREENHOUSE',
+    'water_extract': 'WATER-EXTRACT',
+    'hab': 'HAB-CENTRAL',
+    'comms': 'COMMS-ARRAY',
+  };
+
+  function updateModuleHealth(elapsed) {
+    // Apply degradation from current frame hazards
+    if (frameData && frameData.hazards) {
+      frameData.hazards.forEach(h => {
+        const modName = HAZARD_MODULE_MAP[h.target];
+        if (!modName) return;
+        modules.forEach(m => {
+          if (m.name === modName) {
+            m.health = Math.max(0.2, m.health - (h.degradation || 0.005) * 0.01);
+          }
+        });
+      });
+    }
+
+    // Slowly recover health when not under attack
+    modules.forEach(m => {
+      m.health = Math.min(1.0, m.health + 0.0005);
+
+      // Visual: dim light based on health
+      if (m.pointLight) {
+        const baseIntensity = m.name === 'COMMS-ARRAY' ? 1.0 :
+                              m.name === 'ISRU-PLANT' ? 1.5 : 1.2;
+        m.pointLight.intensity = baseIntensity * m.health;
+
+        // Flicker when health is low
+        if (m.health < 0.5) {
+          const flicker = Math.sin(elapsed * 15 + m.x * 3) > 0.3 ? 1 : 0.3;
+          m.pointLight.intensity *= flicker;
+        }
+      }
+
+      // Mesh emissive dims with health
+      if (m.mesh && m.mesh.material && m.mesh.material.emissiveIntensity !== undefined) {
+        m.mesh.material.emissiveIntensity = 0.1 + m.health * 0.3;
+      }
+    });
+  }
+
+  // ─── COMMS INTERFERENCE ─────────────────────────────────────
+  const commsOverlay = document.getElementById('comms-interference');
+  let commsBlackout = false;
+
+  function updateCommsEffects() {
+    if (!frameData || !frameData.comms) return;
+    const comms = frameData.comms;
+    const highDelay = (comms.earth_delay_min || 4) > 10;
+    const windowClosed = !comms.window_open;
+    const hasBlackoutEvent = frameData.events &&
+      frameData.events.some(e => e.type === 'comms_blackout' || e.type === 'solar_conjunction');
+
+    const shouldBlackout = hasBlackoutEvent || (highDelay && windowClosed);
+
+    if (shouldBlackout && !commsBlackout) {
+      commsBlackout = true;
+      commsOverlay.classList.add('active');
+      document.getElementById('conn-dot').textContent = '📡';
+    } else if (!shouldBlackout && commsBlackout) {
+      commsBlackout = false;
+      commsOverlay.classList.remove('active');
+    }
+  }
+
+  // ─── RADIATION EFFECTS ──────────────────────────────────────
+  const radiationOverlay = document.getElementById('radiation-overlay');
+
+  function updateRadiationEffects() {
+    if (!frameData || !frameData.terrain) return;
+    const rad = frameData.terrain.surface_radiation_usv || 0.5;
+    // Radiation above 0.7 starts showing purple vignette
+    if (rad > 0.7) {
+      const intensity = Math.min(1, (rad - 0.7) * 3);
+      radiationOverlay.style.opacity = intensity * 0.6;
+    } else {
+      radiationOverlay.style.opacity = '0';
+    }
+  }
+
+  // ─── TERRAIN TEMPERATURE TINTING ────────────────────────────
+  function updateTerrainTint() {
+    const temp = simState.temp_c || -47;
+    // Colder → bluer/whiter, warmer → redder
+    if (temp < -60) {
+      // Deep cold: frost tint
+      const frost = Math.min(1, (-60 - temp) / 30);
+      terrainMat.color.setRGB(
+        0.55 - frost * 0.1,
+        0.27 + frost * 0.15,
+        0.08 + frost * 0.25
+      );
+    } else if (temp > -30) {
+      // Warm: reddish
+      const warm = Math.min(1, (temp + 30) / 20);
+      terrainMat.color.setRGB(
+        0.55 + warm * 0.15,
+        0.27 - warm * 0.05,
+        0.08
+      );
+    } else {
+      // Normal Mars brown
+      terrainMat.color.setRGB(0.55, 0.27, 0.08);
+    }
+  }
+
+  // ─── SUPPLY SHIP ───────────────────────────────────────────
+  let supplyShip = null;
+  let supplyShipState = 'gone'; // 'gone' | 'approaching' | 'landed' | 'departing'
+  let supplyShipTimer = 0;
+
+  (function createSupplyShip() {
+    const grp = new THREE.Group();
+    // Capsule body
+    const body = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.5, 2, 8, 8),
+      new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.7, roughness: 0.3 })
+    );
+    body.castShadow = true;
+    grp.add(body);
+    // Nose cone
+    const nose = new THREE.Mesh(
+      new THREE.ConeGeometry(1.5, 3, 8),
+      new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.6 })
+    );
+    nose.position.y = 5.5;
+    grp.add(nose);
+    // Engine glow
+    const engine = new THREE.PointLight(0xff4400, 2, 30);
+    engine.position.y = -5;
+    grp.add(engine);
+    grp.visible = false;
+    grp.position.set(-40, 100, -5); // above landing pad
+    scene.add(grp);
+    supplyShip = { group: grp, engine };
+  })();
+
+  function updateSupplyShip(dt) {
+    if (!frameData) return;
+
+    // Trigger landing during comms windows (supply arrives!)
+    const commsOpen = frameData.comms && frameData.comms.window_open;
+    if (commsOpen && supplyShipState === 'gone' && Math.random() < 0.002) {
+      supplyShipState = 'approaching';
+      supplyShipTimer = 0;
+      supplyShip.group.visible = true;
+      supplyShip.group.position.set(-40, 120, -5);
+      showToast('🚀 SUPPLY SHIP INCOMING', 'event');
+    }
+
+    supplyShipTimer += dt;
+
+    if (supplyShipState === 'approaching') {
+      const t = Math.min(1, supplyShipTimer / 8);
+      const ease = t * t * (3 - 2 * t);
+      const padY = getTerrainY(-40, -5);
+      supplyShip.group.position.y = 120 - (120 - padY - 5) * ease;
+      supplyShip.engine.intensity = 2 + Math.sin(supplyShipTimer * 10) * 0.5;
+      if (t >= 1) {
+        supplyShipState = 'landed';
+        supplyShipTimer = 0;
+        supplyShip.engine.intensity = 0;
+        showToast('📦 Supply ship landed — unloading cargo', 'info');
+      }
+    } else if (supplyShipState === 'landed') {
+      if (supplyShipTimer > 15) {
+        supplyShipState = 'departing';
+        supplyShipTimer = 0;
+        showToast('🚀 Supply ship departing', 'event');
+      }
+    } else if (supplyShipState === 'departing') {
+      const t = Math.min(1, supplyShipTimer / 6);
+      const padY = getTerrainY(-40, -5);
+      supplyShip.group.position.y = padY + 5 + t * t * 150;
+      supplyShip.engine.intensity = 3 - t * 2;
+      if (t >= 1) {
+        supplyShipState = 'gone';
+        supplyShip.group.visible = false;
+      }
+    }
+  }
+
   function updateHUD() {
     const s = twinConnected ? twinState : simState;
 
@@ -1135,6 +1359,11 @@
     advanceSol(dt);
     updateDayNight();
     updateDustEffects();
+    updateModuleHealth(elapsed);
+    updateCommsEffects();
+    updateRadiationEffects();
+    updateTerrainTint();
+    updateSupplyShip(dt);
 
     // ── Update units (frame-driven tasks + patrol) ──
     units.forEach((u, ui) => {
