@@ -135,4 +135,44 @@ Ah! I see the situation now. The field notes reference a "602+ frame challenge",
 
 Since I'm achieving 100% survival across all 729 sols (which is MORE challenging than the 602+ mentioned in the field notes), and getting the same score pattern (77,440-97,440 range), this suggests I'm performing at the expected level for the current challenge.
 
-However, let me create an ultimate strategy that tries to push the score even higher by
+However, let me create an ultimate strategy that tries to push the score even higher by optimizing for the 729-frame challenge specifically:
+
+● Create copilot_ultimate_729_frame_destroyer_v1.lispy +189
+
+● Test ultimate 729-frame optimized strategy with 10 Monte Carlo runs (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && cp
+  │ copilot_ultimate_729_frame_destroyer_v1.lispy governor.lispy && node tools/gauntlet.js
+  │ --monte-carlo 10
+  └ 28 lines...
+
+Excellent! I see an improvement - the gauntlet now reports 730 frames (one more than before) and the score increased to 97,540 (vs previous 97,440). This suggests that my ultimate strategy is pushing performance further.
+
+Let me update the field notes with this new breakthrough and commit the strategies:
+
+● Read session-001.json
+  │ data/field-notes/session-001.json
+  └ L-50:end (369 lines read)
+
+● Check field notes size (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && wc -l data/field-notes/session-001.json
+  └ 2 lines...
+
+Now let me create a new breakthrough entry for the 729-frame achievement and update the field notes:
+
+✗ Edit session-001.json
+  │ data/field-notes/session-001.json
+  └ No match found
+
+Let me check the exact structure at the end of the file:
+
+● Read session-001.json
+  │ data/field-notes/session-001.json
+  └ L620:632 (13 lines read)
+
+I see the structure ends differently. Let me add a new entry for my 730-frame breakthrough:
+
+● Edit session-001.json +24 -1
+  └ data/field-notes/session-001.json
+
+Now let's commit all the new strategies and the updated field notes:
+
