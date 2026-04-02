@@ -777,6 +777,127 @@ function tick(st, sol, frame, R){
           st.se = Math.max(0.1, st.se - dust_contamination);
         }
       }
+
+      // ═══ v11 EARTH-MARS TRANSFER WINDOWS hazards ═══
+      // Real orbital mechanics: Hohmann transfer windows every 779.9 days (26 months)
+      // Transit time: 180-270 days depending on trajectory
+      // Cargo capacity: ~100 metric tons to Mars surface (Starship class)
+      // Landing accuracy: ±10km from target (requires retrieval operations)
+      // Data sources: NASA Mars Design Reference Architecture 5.0, SpaceX specifications
+
+      if(h.type==='supply_window_missed'){
+        // Colony missed a launch window - next resupply delayed by 26 months (~780 sols)
+        const cargo_shortfall = h.cargo_shortfall || 0.3;
+        const next_window_delay = h.delay_sols || 780;
+        
+        // Immediate resource stress from insufficient supplies
+        st.food = Math.max(0, st.food * (1 - cargo_shortfall * 0.4));
+        st.power = Math.max(0, st.power - cargo_shortfall * 100);
+        
+        // Schedule next supply window (track for planning)
+        if(!st.next_supply_window) {
+          st.next_supply_window = sol + next_window_delay;
+        }
+        
+        // Increased CRI due to supply chain stress
+        st.cri = Math.min(100, st.cri + cargo_shortfall * 20);
+      }
+
+      if(h.type==='cargo_delivery_failure'){
+        // EDL (Entry, Descent, Landing) failure - cargo lost during Mars landing
+        // Historical Mars landing success rate ~50% for heavy payloads
+        const payload_loss = h.payload_loss_pct || 0.6; // 60% cargo loss typical for EDL failure
+        const recovery_cost = h.recovery_power_cost || 80; // Power cost to retrieve scattered cargo
+        
+        // Lose expected supplies
+        st.food = Math.max(0, st.food * (1 - payload_loss * 0.3));
+        st.power = Math.max(0, st.power - recovery_cost);
+        st.h2o = Math.max(0, st.h2o * (1 - payload_loss * 0.2));
+        
+        // Equipment damage from failed landing
+        st.se = Math.max(0.1, st.se * (1 - payload_loss * 0.15));
+        st.ie = Math.max(0.1, st.ie * (1 - payload_loss * 0.15));
+      }
+
+      if(h.type==='cargo_retrieval_mission'){
+        // Cargo landed off-target (±10km accuracy) - requires rover missions to retrieve
+        const distance_km = h.landing_distance || (5 + R() * 15); // 5-20km from colony
+        const retrieval_sols = Math.ceil(distance_km / 2); // 2km/sol rover speed with cargo
+        const power_per_sol = 25; // Power cost per sol for rover operations
+        
+        // Power cost scales with distance and time
+        const total_retrieval_cost = retrieval_sols * power_per_sol;
+        st.power = Math.max(0, st.power - total_retrieval_cost);
+        
+        // Some supplies may be damaged/lost during retrieval
+        const damage_factor = Math.min(0.2, distance_km / 100); // 0-20% loss based on distance
+        st.food = Math.max(0, st.food * (1 - damage_factor));
+        
+        // Crew stress from extended EVA operations
+        const crew = st.crew.filter(c => c.a && !c.bot);
+        for(const member of crew) {
+          member.hp = Math.max(0, member.hp - retrieval_sols * 2);
+        }
+      }
+
+      if(h.type==='supply_manifest_shortage'){
+        // Colony failed to plan ahead - ordered wrong supplies for current needs
+        // Based on NASA Mars mission architecture: must plan 2-3 years ahead
+        const planning_error = h.planning_error || 0.4;
+        const shortage_type = h.shortage_type || 'mixed';
+        
+        switch(shortage_type) {
+          case 'electronics':
+            // Electronic component shortage - affects efficiency
+            st.se = Math.max(0.1, st.se * (1 - planning_error * 0.3));
+            st.ie = Math.max(0.1, st.ie * (1 - planning_error * 0.3));
+            break;
+          case 'medical':
+            // Medical supply shortage - affects crew health
+            const crew = st.crew.filter(c => c.a);
+            for(const member of crew) {
+              member.hp = Math.max(0, member.hp - planning_error * 25);
+            }
+            break;
+          case 'tools':
+            // Tool shortage - affects repair and construction capability
+            st.se = Math.max(0.1, st.se * (1 - planning_error * 0.2));
+            st.power = Math.max(0, st.power - planning_error * 50);
+            break;
+          case 'mixed':
+          default:
+            // General supply shortage
+            st.food = Math.max(0, st.food * (1 - planning_error * 0.2));
+            st.ie = Math.max(0.1, st.ie * (1 - planning_error * 0.2));
+            st.power = Math.max(0, st.power - planning_error * 30);
+            break;
+        }
+      }
+
+      if(h.type==='isru_dependency_crisis'){
+        // Colony too dependent on Earth supplies - ISRU systems can't meet needs
+        // Self-sufficiency failure when resupply is delayed/lost
+        const dependency_ratio = h.dependency_ratio || 0.7; // 70% Earth-dependent
+        const isru_gap = h.isru_capacity_gap || 0.5; // ISRU can only provide 50% of needs
+        
+        // Resource shortage when Earth supplies unavailable
+        const shortage_severity = dependency_ratio * isru_gap;
+        st.o2 = Math.max(0, st.o2 * (1 - shortage_severity * 0.4));
+        st.h2o = Math.max(0, st.h2o * (1 - shortage_severity * 0.3));
+        st.food = Math.max(0, st.food * (1 - shortage_severity * 0.6));
+        
+        // Emergency power usage to maximize ISRU output
+        st.power = Math.max(0, st.power - shortage_severity * 150);
+        
+        // Stress on ISRU systems from overuse
+        st.ie = Math.max(0.1, st.ie * (1 - shortage_severity * 0.3));
+        
+        // Crew stress from resource scarcity
+        const crew = st.crew.filter(c => c.a);
+        for(const member of crew) {
+          member.hp = Math.max(0, member.hp - shortage_severity * 15);
+        }
+      }
     }
   }
   st.ev=st.ev.filter(e=>{e.r--;return e.r>0});
@@ -1257,6 +1378,12 @@ function createState(seed){
     cable_network: [],           // [{from: {x,y}, to: {x,y}, length_m, resistance_ohm}]
     plumbing_network: [],        // [{from: {x,y}, to: {x,y}, length_m, pump_cost_kw}]
     foundation_prep_queue: [],   // [{x, y, sols_remaining}] - site prep takes 3 sols
+    // v11 Earth-Mars supply chain state
+    next_supply_window: 780,     // Sol when next Earth-Mars launch window opens (every 779.9 days)
+    cargo_in_transit: [],        // [{departure_sol, arrival_sol, manifest, edl_success_prob}]
+    supply_dependency: 0.8,      // Colony's dependency on Earth supplies (0.0=fully independent, 1.0=fully dependent)
+    isru_capacity: 0.3,          // Colony's ISRU production as fraction of total needs
+    planned_cargo_orders: [],    // [{order_sol, delivery_sol, supplies}] - orders placed 2+ years ahead
     crew:[
       // 8-robot configuration for maximum survival and scoring (113,170 point record)
       {n:'Robot-01',bot:true,hp:100,mr:100,a:true},
