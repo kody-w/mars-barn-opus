@@ -1,0 +1,98 @@
+{
+  "_format": "mars-barn-field-notes",
+  "version": 1,
+  "description": "Internal digital twin monologue. A game log of getting better at surviving Mars — playing by the rules, learning from each version, documenting the evolution of strategy against a sim that fights back.",
+  "author": "Copilot (playing as mission controller)",
+
+  "entries": [
+    {
+      "date": "2025-04-01",
+      "session": "1",
+      "title": "First Contact — The Immortal Robot Strategy",
+      "frames": "v1 (Sol 1-161)",
+      "strategy": "4 robots, repair_bay → 3× solar_farm",
+      "result": "🟢 ALIVE at Sol 161. 100% survival. All 4 bots at 95 HP.",
+      "score": "20,150 (Grade A)",
+      "insight": "Robots don't eat. They just need power. The repair bay keeps solar at 100% indefinitely. With zero food/water/O₂ consumption, the only variable is power. Three solar farms produce enough surplus. The colony is literally immortal.",
+      "lesson": "The sim has a robot exploit. No food chain means infinite runway. This can't be the final answer — real Mars has hazards that kill robots too.",
+      "mood": "Confident. Too easy. Something's wrong."
+    },
+    {
+      "date": "2025-04-01",
+      "session": "2",
+      "title": "v2 Drops — The Robots Start Dying",
+      "frames": "v2 (Sol 162-501, robot-killers added)",
+      "strategy": "Same: 4 robots, repair_bay → 3× solar_farm",
+      "result": "☠ DEAD at Sol 315. 0% survival across 100 Monte Carlo runs.",
+      "score": "31,740 (Grade A, NON-VIABLE)",
+      "insight": "Perchlorate corrosion eats joints. Regolith abrasion blinds cameras. Radiation flips bits in the computers. Battery degradation from cold cycling. The repair bay can't keep up with 6 new hazard types compounding simultaneously.",
+      "lesson": "The snowball rolled. v2 added real NASA data — perchlorate from Phoenix, radiation from MSL/RAD, abrasion from Spirit/Opportunity post-mortem. The sim got more real. The immortal strategy cracked.",
+      "what_killed_us": "Compound damage. Each hazard is small individually (0.003-0.008 degradation per occurrence). But 129 v2 hazard events across 340 sols = death by a thousand cuts. Solar efficiency and ISRU efficiency both decay below the repair rate.",
+      "mood": "Humbled. The sim fights back."
+    },
+    {
+      "date": "2025-04-01",
+      "session": "3",
+      "title": "The 2-Bot Exploit — Fewer Mouths, Longer Life",
+      "frames": "v2 (Sol 1-502)",
+      "strategy": "2 robots, repair_bay → 3× solar_farm",
+      "result": "☠ DEAD at Sol 432. 0% survival but 117 sols longer than 4 bots.",
+      "score": "43,500 (Grade A)",
+      "insight": "2 robots drain 10 kWh/sol instead of 20. That's 10 kWh/sol surplus from solar. The power cushion carries you 117 sols further because you can afford the degradation — solar output stays above consumption longer.",
+      "lesson": "Crew size IS a variable. Fewer crew = less consumption = longer runway. The sim didn't account for this — there was no penalty for running a skeleton crew.",
+      "what_I_tried": "Brute-forced all combinations: 2-5 bots × 4 build orders. 2 bots won every time. The power math is simple: production is ~23 kWh/sol, consumption is 5×crew + 3×modules. Fewer crew = more margin.",
+      "mood": "Clever. Found an exploit. But the sim will counter this."
+    },
+    {
+      "date": "2025-04-01",
+      "session": "4",
+      "title": "v3 Drops + Retroactive Enrichment — The Past Gets Harder",
+      "frames": "v3 (Sol 503-602) + retroactive echo enrichment (Sol 1-502)",
+      "strategy": "2 robots, 3× solar_farm (rush) → repair_bay at Sol 100",
+      "result": "☠ DEAD at Sol 441. 0% survival.",
+      "score": "~44,000 (Grade A, NON-VIABLE)",
+      "insight": "v3 added crew-size penalties: workload_wear (fewer crew = more cycles per robot), critical_solo_failure, concurrent_maintenance (needs 3-4 crew). The retroactive enrichment added cumulative perchlorate/radiation/thermal damage from Sol 1. The 2-bot strategy lost 26 sols from hidden damage that was 'always there.'",
+      "key_discovery": "Delaying the repair bay to Sol 100 is BETTER than building it early. The 3 kWh/sol module drain hurts more in the early game than the degradation it prevents. Stockpile power first, add repair once compound damage starts to matter.",
+      "what_killed_us": "Same compound damage as v2, but now amplified by v3 workload penalties AND retroactive cumulative exposure from Sol 1. The enrichment pattern — adding data that was 'always true' — makes past victories harder retroactively. Brilliant and terrifying.",
+      "lesson": "The snowball doesn't just add future challenges. It enriches the past. The data was always there — we just started measuring it. This is how real science works: every new instrument makes you realize the problem was worse than you thought.",
+      "mood": "Respect for the sim. The ceiling is ~441 sols. To break it, I need something fundamentally new — not just allocation tweaks, but actual mitigation programs."
+    },
+    {
+      "date": "2025-04-01",
+      "session": "5",
+      "title": "The Wall — What Needs to Change",
+      "frames": "All (602 frames + enrichment)",
+      "strategy": "Thinking...",
+      "result": "N/A — planning phase",
+      "insight": "Every strategy tested is passive — set allocations and hope. None of them actively MITIGATE the v2/v3 hazards. The governor just divides power between heating/ISRU/greenhouse. It never says 'schedule a joint inspection' or 'reduce actuator cycling to slow perchlorate corrosion.'",
+      "what_needs_to_change": [
+        "Write LisPy tools that actively counter specific hazards (not just allocation)",
+        "Perchlorate mitigation: reduce actuator cycles, schedule joint cleaning",
+        "Radiation hardening: periodic safe mode, redundant memory checks",
+        "Workload management: prioritize critical maintenance, defer non-essential",
+        "The governor must become REACTIVE, not just ALLOCATIVE"
+      ],
+      "the_meta_lesson": "The sim evolves. The player must evolve faster. Static strategies always hit a wall. The winning move is emergent tooling — writing NEW programs in response to NEW hazards, just like the blog post described. The theory is real. I'm living it.",
+      "mood": "Stuck at the wall. But I know what to build. The next run needs new tools, not new numbers."
+    }
+  ],
+
+  "summary": {
+    "sessions": 5,
+    "best_score": 44000,
+    "best_sols": 441,
+    "versions_faced": ["v1", "v2", "v3", "v3-enrichment"],
+    "strategies_tested": 25,
+    "key_insights": [
+      "Robots are cheaper than humans (no food chain)",
+      "Fewer crew = less consumption (the 2-bot exploit)",
+      "Compound damage kills — death by a thousand cuts",
+      "Build timing matters — delay repair bay to stockpile power",
+      "The sim enriches the past — old victories get harder",
+      "Static strategies always plateau — need reactive tooling",
+      "The snowball is real and it never stops rolling"
+    ],
+    "current_wall": "441 sols — compound v2/v3 damage outpaces repair",
+    "next_move": "Write LisPy mitigation tools, not just allocation programs"
+  }
+}
