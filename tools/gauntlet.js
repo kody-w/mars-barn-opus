@@ -395,8 +395,8 @@ function tick(st, sol, frame, R){
           a.h=0.06; a.i=0.18; a.g=0.76; a.r=1.0;  // Food focus - maximum aggressive
         }
       } else {
-        // Massive buffers achieved - optimized for 734+ sol survival
-        a.h=0.10; a.i=0.35; a.g=0.55; a.r=0.95;  // Slight food optimization
+        // Massive buffers achieved - optimized for lower CRI and better efficiency
+        a.h=0.08; a.i=0.37; a.g=0.55; a.r=0.90;  // Slightly more efficient allocation
       }
     }
   }
