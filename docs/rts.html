@@ -604,7 +604,104 @@
     commsLight.position.set(px, ty + 14, pz);
     scene.add(commsLight);
     modules.push({ name: 'COMMS-ARRAY', mesh: grp, pointLight: commsLight, lightColor: 0xaa44ff, health: 1.0, x: px, z: pz });
+    // Store dish ref for rotation
+    grp.userData.dish = dish;
   })();
+
+  // ─── STARFIELD SKYBOX ────────────────────────────────────────
+  const starCount = 2000;
+  const starGeo = new THREE.BufferGeometry();
+  const starPositions = new Float32Array(starCount * 3);
+  const starColors = new Float32Array(starCount * 3);
+  for (let i = 0; i < starCount; i++) {
+    // Distribute on sphere shell
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const r = 350;
+    starPositions[i*3]   = r * Math.sin(phi) * Math.cos(theta);
+    starPositions[i*3+1] = Math.abs(r * Math.cos(phi)); // only upper hemisphere
+    starPositions[i*3+2] = r * Math.sin(phi) * Math.sin(theta);
+    // Subtle color variation (white, blue-white, yellow)
+    const tint = Math.random();
+    starColors[i*3]   = 0.8 + tint * 0.2;
+    starColors[i*3+1] = 0.8 + tint * 0.15;
+    starColors[i*3+2] = 0.9 + tint * 0.1;
+  }
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+  starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+  const starMat = new THREE.PointsMaterial({
+    size: 0.8, vertexColors: true, transparent: true, opacity: 0.7,
+    depthWrite: false, sizeAttenuation: false
+  });
+  const stars = new THREE.Points(starGeo, starMat);
+  scene.add(stars);
+
+  // ─── CONNECTING TUNNELS ──────────────────────────────────────
+  // Pressurized corridors between key buildings
+  const tunnelMat = new THREE.MeshStandardMaterial({
+    color: 0x889999, metalness: 0.5, roughness: 0.6,
+    transparent: true, opacity: 0.7
+  });
+  const tunnelRoutes = [
+    // [from_x, from_z, to_x, to_z]
+    [0, 0, -15, -10],      // HAB → GREENHOUSE-1
+    [0, 0, -8, -16],       // HAB → GREENHOUSE-2
+    [0, 0, 20, 5],         // HAB → ISRU
+    [0, 0, -22, 8],        // HAB → REPAIR-BAY
+    [-8, -16, 5, -25],     // GREENHOUSE-2 → WATER-EXTRACT
+    [20, 5, 15, -15],      // ISRU → COMMS
+  ];
+  tunnelRoutes.forEach(([x1, z1, x2, z2]) => {
+    const dx = x2 - x1, dz = z2 - z1;
+    const length = Math.sqrt(dx * dx + dz * dz);
+    const angle = Math.atan2(dx, dz);
+    const mx = (x1 + x2) / 2, mz = (z1 + z2) / 2;
+    const my = getTerrainY(mx, mz);
+
+    const tunnel = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.6, 0.6, length, 6),
+      tunnelMat
+    );
+    tunnel.rotation.z = Math.PI / 2;
+    tunnel.rotation.y = -angle;
+    // Lay flat
+    tunnel.position.set(mx, my + 0.6, mz);
+    tunnel.rotation.order = 'YZX';
+    tunnel.rotation.set(0, angle, Math.PI / 2);
+    tunnel.castShadow = true;
+    scene.add(tunnel);
+
+    // Small lights along tunnel every ~10 units
+    const steps = Math.floor(length / 10);
+    for (let s = 1; s <= steps; s++) {
+      const t = s / (steps + 1);
+      const lx = x1 + dx * t;
+      const lz = z1 + dz * t;
+      const ly = getTerrainY(lx, lz);
+      const tl = new THREE.PointLight(0x446688, 0.3, 6);
+      tl.position.set(lx, ly + 1.2, lz);
+      scene.add(tl);
+    }
+  });
+
+  // ─── ISRU CHIMNEY SMOKE ──────────────────────────────────────
+  const smokeCount = 60;
+  const smokeGeo = new THREE.BufferGeometry();
+  const smokePos = new Float32Array(smokeCount * 3);
+  const smokeSizes = new Float32Array(smokeCount);
+  for (let i = 0; i < smokeCount; i++) {
+    smokePos[i*3]   = 22 + (Math.random() - 0.5) * 1.5; // near ISRU chimney
+    smokePos[i*3+1] = 8 + Math.random() * 12;
+    smokePos[i*3+2] = 6 + (Math.random() - 0.5) * 1.5;
+    smokeSizes[i] = 1 + Math.random() * 2;
+  }
+  smokeGeo.setAttribute('position', new THREE.BufferAttribute(smokePos, 3));
+  const smokeMat = new THREE.PointsMaterial({
+    color: 0x998877, size: 2, transparent: true, opacity: 0.2,
+    depthWrite: false, sizeAttenuation: true
+  });
+  const smoke = new THREE.Points(smokeGeo, smokeMat);
+  scene.add(smoke);
 
   // ─── UNITS ────────────────────────────────────────────────────
   const units = [];
@@ -1504,6 +1601,32 @@
       const blink = Math.sin(elapsed * 3 + pl.phase * 0.8) > 0.3;
       pl.light.intensity = blink ? 1.2 : 0.1;
     });
+
+    // ── Comms dish rotation (slowly tracks) ──
+    const commsModule = modules.find(m => m.name === 'COMMS-ARRAY');
+    if (commsModule && commsModule.mesh.userData.dish) {
+      commsModule.mesh.userData.dish.rotation.y = Math.sin(elapsed * 0.08) * 0.5;
+      commsModule.mesh.userData.dish.rotation.z = Math.PI + Math.sin(elapsed * 0.05) * 0.15;
+    }
+
+    // ── ISRU chimney smoke ──
+    const sPos = smoke.geometry.attributes.position;
+    const isruHealth = (modules.find(m => m.name === 'ISRU-PLANT') || {}).health || 1;
+    smokeMat.opacity = 0.1 + isruHealth * 0.15;
+    for (let i = 0; i < smokeCount; i++) {
+      let y = sPos.getY(i) + dt * (2 + Math.sin(i) * 0.5);
+      let x = sPos.getX(i) + dt * (simState._windFactor || 1) * 0.3;
+      if (y > 22) { y = 8 + Math.random() * 2; x = 22 + (Math.random() - 0.5) * 1.5; }
+      sPos.setX(i, x);
+      sPos.setY(i, y);
+    }
+    sPos.needsUpdate = true;
+
+    // ── Stars twinkle + fade with daylight ──
+    const dayFrac = Math.max(0, Math.min(1, Math.sin((solHour / SOL_HOURS - 0.25) * Math.PI * 2) * 2 + 0.3));
+    starMat.opacity = Math.max(0, 0.8 - dayFrac * 0.7);
+    // Slowly rotate starfield
+    stars.rotation.y = elapsed * 0.001;
 
     // ── Camera ──
     if (cameraMode === 'rts') {
