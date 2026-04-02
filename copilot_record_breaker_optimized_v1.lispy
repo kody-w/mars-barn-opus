@@ -1,0 +1,146 @@
+;; COPILOT RECORD BREAKER OPTIMIZED V1
+;; Target: Beat 95,590 through CRI optimization and crew survival
+;; Strategy: Accept module building, focus on minimizing P75 CRI and maximizing crew survival
+;; Key insight: Modules capped at 8 in scoring, so optimize what actually affects score
+
+(begin
+  (define _agent_name "Copilot Record Breaker Optimized v1")
+  (define _agent_desc "CRI and crew optimization for score maximization beyond 95,590")
+  
+  (log (concat "🎯💎⚡ RECORD BREAKER — Sol " (string sol) " — Modules:" (string (length modules)) " — CRI:" (string colony_risk_index) " — Crew:" (string (length crew))))
+  
+  ;; ═══ SCORING OPTIMIZATION FOCUS ═══
+  ;; Current: 731×100 + 3×500 + 8×150 + 100%×20000 - 11×10 = 95,690
+  ;; Target:  731×100 + 4×500 + 8×150 + 100%×20000 - 8×10  = 96,420 (+730 points)
+  ;; Opportunities: +1 crew alive = +500, -3 CRI = +30, total = +530 potential
+  
+  ;; ═══ ADVANCED CRI PREDICTION & CONTROL ═══
+  ;; Ultra-precise CRI management targeting P75 CRI < 8
+  (define cri_current colony_risk_index)
+  (define cri_critical (> cri_current 15))
+  (define cri_high (> cri_current 10))  
+  (define cri_target_excellent (< cri_current 8))  ;; Target zone
+  (define cri_target_good (< cri_current 12))
+  
+  ;; Enhanced CRI stability factors
+  (define mission_maturity (/ sol 731))
+  (define late_game_phase (> sol 500))
+  (define v4_overload_zone (>= sol 678))
+  
+  ;; ═══ CREW SURVIVAL MAXIMIZATION ═══
+  ;; Focus on keeping 4+ crew alive instead of minimum 3
+  (define crew_count (length crew))
+  (define crew_alive (length (filter (lambda (c) (> (get c 'hp) 0)) crew)))
+  (define crew_health_critical (< crew_alive 4))
+  (define crew_emergency_mode (< crew_alive 3))
+  
+  ;; Crew health buffer optimization
+  (define crew_protection_factor
+    (cond 
+      (crew_emergency_mode 3.0)    ;; Emergency: maximum protection
+      (crew_health_critical 2.0)   ;; Critical: high protection  
+      ((< crew_alive 5) 1.5)      ;; Moderate: enhanced protection
+      (else 1.0)))                 ;; Good: normal protection
+  
+  ;; ═══ ULTRA-CONSERVATIVE RESOURCE MANAGEMENT ═══
+  ;; Larger buffers for stability and CRI reduction
+  (define resource_buffer_target_o2 10)    ;; 10-day O2 buffer
+  (define resource_buffer_target_food 15)  ;; 15-day food buffer
+  (define resource_buffer_target_h2o 8)    ;; 8-day water buffer
+  
+  (define resource_safety_score
+    (+ (min resource_buffer_target_o2 o2_days)
+       (min resource_buffer_target_food food_days)  
+       (min resource_buffer_target_h2o h2o_days)))
+  
+  (define resource_stability_factor (/ resource_safety_score 33))  ;; Max 33 points
+  
+  ;; ═══ ENHANCED TEMPERATURE CONTROL ═══
+  ;; Precise temperature management for crew health and CRI stability
+  (define temp_optimal_range (and (> interior_temp 285) (< interior_temp 295)))
+  (define temp_good_range (and (> interior_temp 275) (< interior_temp 305))) 
+  (define temp_critical (< interior_temp 270))
+  
+  (define heating_urgency_factor
+    (cond
+      (temp_critical 3.0)
+      ((< interior_temp 275) 2.0)
+      (temp_optimal_range 0.8)
+      (temp_good_range 1.0)
+      (else 1.5)))
+  
+  ;; ═══ PRECISION ALLOCATION LOGIC ═══
+  ;; Ultra-refined allocation for CRI and crew optimization
+  
+  ;; Heating allocation with crew protection focus
+  (define heating_allocation
+    (cond
+      ;; Emergency heating for crew survival
+      ((or temp_critical crew_emergency_mode) (* 0.60 heating_urgency_factor crew_protection_factor))
+      ;; Enhanced heating for crew health in v4 zone
+      ((and v4_overload_zone (< interior_temp 280)) (* 0.50 crew_protection_factor))
+      ;; CRI-optimized heating for stability
+      ((and cri_high (< interior_temp 285)) (* 0.45 resource_stability_factor))
+      ;; Standard heating with crew consideration
+      ((< interior_temp 285) (* 0.35 (max 1.0 crew_protection_factor)))
+      ;; Minimal heating when optimal
+      (temp_optimal_range 0.20)
+      (else 0.25)))
+  
+  ;; ISRU allocation with buffer building focus  
+  (define isru_allocation
+    (cond
+      ;; Emergency O2/H2O production
+      ((or (< o2_days 4) (< h2o_days 4)) (* 0.50 crew_protection_factor))
+      ;; Buffer building mode for CRI stability
+      ((and (< o2_days resource_buffer_target_o2) (< h2o_days resource_buffer_target_h2o)) 
+       (* 0.40 resource_stability_factor))
+      ;; CRI-responsive production  
+      (cri_critical (* 0.35 crew_protection_factor))
+      (cri_high (* 0.30 resource_stability_factor))
+      ;; Optimal zone production
+      (cri_target_excellent 0.25)
+      (else 0.28)))
+  
+  ;; Greenhouse allocation with food security focus
+  (define greenhouse_allocation  
+    (cond
+      ;; Emergency food production
+      ((< food_days 6) (* 0.45 crew_protection_factor))
+      ;; Food buffer building for crew health
+      ((< food_days resource_buffer_target_food) (* 0.35 resource_stability_factor))
+      ;; Late game food security with crew focus  
+      ((and late_game_phase (< food_days 12)) (* 0.30 crew_protection_factor))
+      ;; CRI-aware food production
+      (cri_high (* 0.25 resource_stability_factor))
+      ;; Optimal production
+      (cri_target_excellent 0.20)
+      (else 0.22)))
+  
+  ;; Enhanced repair bay allocation for v4 protection and CRI management
+  (define repair_allocation
+    (cond
+      ;; v4 zone enhanced repair for stability
+      (v4_overload_zone (max 3 (round (* (length modules) 0.30))))
+      ;; CRI crisis repair boost
+      (cri_critical (max 4 (round (* (length modules) 0.35))))
+      ;; CRI management repair
+      (cri_high (max 2 (round (* (length modules) 0.25))))
+      ;; Standard maintenance for CRI stability
+      (else (max 1 (round (* (length modules) 0.20))))))
+  
+  ;; ═══ NORMALIZATION & FINAL OUTPUT ═══
+  ;; Ensure allocations sum to ≤ 1.0
+  (define total_allocation (+ heating_allocation isru_allocation greenhouse_allocation))
+  (define normalization_factor (if (> total_allocation 1.0) (/ 1.0 total_allocation) 1.0))
+  
+  ;; No building control - let gauntlet handle it, focus on allocation optimization
+  (define build_decision 0)  ;; Let gauntlet's hardcoded schedule build modules
+  
+  ;; Final optimized allocation
+  (list
+    (* heating_allocation normalization_factor)      ;; Heating  
+    (* isru_allocation normalization_factor)         ;; ISRU
+    (* greenhouse_allocation normalization_factor)   ;; Greenhouse
+    build_decision                                    ;; Building (0 = let gauntlet decide)
+    repair_allocation))                               ;; Repair bays

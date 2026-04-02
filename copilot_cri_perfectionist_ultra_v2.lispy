@@ -1,0 +1,165 @@
+;; COPILOT CRI PERFECTIONIST ULTRA V2
+;; Strategy: CRI-optimized strategy targeting sub-5 CRI for maximum score
+;; Target: Beat 97,540 by achieving P75 CRI < 5 (current is 11)
+;; Focus: Build exactly 8 modules efficiently, minimize CRI, maximize crew survival
+
+(begin
+  (define _agent_name "Copilot CRI Perfectionist Ultra v2")
+  (define _agent_desc "CRI-optimized strategy for sub-5 P75 CRI targeting 100K+ score")
+  
+  (log (concat "🎯🧠💎 CRI PERFECTIONIST — Sol " (string sol) " — Modules:" (string (length modules)) " — CRI:" (string colony_risk_index) " — Target: Sub-5 CRI"))
+  
+  ;; ═══ CRI-FOCUSED PHASE ARCHITECTURE ═══
+  ;; Optimized specifically for maintaining ultra-low CRI throughout mission
+  
+  (define phase_foundation (and (>= sol 1) (< sol 120)))     ;; Foundation: Slow stable build
+  (define phase_controlled_growth (and (>= sol 120) (< sol 300))) ;; Controlled Growth: Careful expansion
+  (define phase_optimization (and (>= sol 300) (< sol 500))) ;; Optimization: Efficiency focus
+  (define phase_maintenance (and (>= sol 500) (< sol 650)))  ;; Maintenance: CRI protection
+  (define phase_preservation (>= sol 650))                   ;; Preservation: Survival with minimal CRI
+  
+  ;; ═══ ULTRA-CONSERVATIVE CRI MANAGEMENT ═══
+  ;; Revolutionary CRI control for sub-5 target
+  (define modules_count (length modules))
+  (define target_modules 8)  ;; Exactly 8 modules for maximum score (cap limit)
+  
+  (define cri_threat_analysis
+    (cond
+      ((< colony_risk_index 3) 1)     ;; Perfect: Maximum controlled building
+      ((< colony_risk_index 5) 2)     ;; Excellent: High controlled building  
+      ((< colony_risk_index 8) 3)     ;; Good: Moderate controlled building
+      ((< colony_risk_index 12) 4)    ;; Warning: Conservative building
+      ((< colony_risk_index 18) 5)    ;; Alert: Minimal building
+      (else 6)))                      ;; Crisis: No building, focus on CRI reduction
+  
+  ;; ═══ INTELLIGENT MODULE CAP BUILDING ═══
+  ;; Build exactly 8 modules efficiently with perfect CRI control
+  (define modules_remaining (max 0 (- target_modules modules_count)))
+  (define build_urgency (if (> modules_remaining 0) 1 0))
+  
+  (define repair_bay_ultra_conservative (max 2 (round (* modules_count 0.40))))  ;; 40% repair for ultra-stability
+  
+  ;; ═══ EXTREME RESOURCE BUFFER PROTECTION ═══
+  ;; Massive resource buffers for CRI protection
+  (define resource_ultra_buffer
+    (+ (min 15 o2_days)        ;; Ultra O2 buffer
+       (min 25 food_days)      ;; Ultra food buffer
+       (min 12 h2o_days)))     ;; Ultra water buffer
+  
+  (define resource_protection_factor (max 1.5 (min 4.0 (/ resource_ultra_buffer 25))))
+  
+  ;; ═══ CRI-MINIMIZING BUILDING ALLOCATION ═══
+  ;; Ultra-conservative building to maintain sub-5 CRI
+  (define building_allocation
+    (cond
+      ;; Only build if we haven't reached 8 modules AND CRI is safe
+      ((and (< modules_count target_modules) (< colony_risk_index 8))
+        (cond
+          ;; FOUNDATION PHASE: Very slow start
+          (phase_foundation
+            (cond
+              ((< cri_threat_analysis 2) 0.60)    ;; Slow build when perfect CRI
+              ((< cri_threat_analysis 3) 0.45)    ;; Slower when good CRI
+              (else 0.25)))                       ;; Minimal when CRI warning
+          
+          ;; CONTROLLED GROWTH: Careful expansion
+          (phase_controlled_growth
+            (cond
+              ((< cri_threat_analysis 2) 0.55)    ;; Moderate build when perfect CRI
+              ((< cri_threat_analysis 3) 0.40)    ;; Careful when good CRI
+              (else 0.20)))                       ;; Very careful when CRI warning
+          
+          ;; OPTIMIZATION: Efficiency-focused building
+          (phase_optimization
+            (cond
+              ((< cri_threat_analysis 2) 0.50)    ;; Controlled build when perfect CRI
+              ((< cri_threat_analysis 3) 0.35)    ;; Conservative when good CRI
+              (else 0.15)))                       ;; Minimal when CRI warning
+          
+          ;; MAINTENANCE: Protection mode
+          (phase_maintenance
+            (cond
+              ((< cri_threat_analysis 2) 0.40)    ;; Light build when perfect CRI
+              ((< cri_threat_analysis 3) 0.25)    ;; Minimal when good CRI
+              (else 0.10)))                       ;; Almost none when CRI warning
+          
+          ;; PRESERVATION: Minimal building only
+          (phase_preservation
+            (cond
+              ((< cri_threat_analysis 2) 0.20)    ;; Rare build when perfect CRI
+              (else 0.05)))))                     ;; Nearly zero otherwise
+      
+      ;; If we have 8 modules, focus only on repair and maintenance
+      (else
+        (cond
+          ((< cri_threat_analysis 3) 0.15)        ;; Minimal maintenance when safe
+          (else 0.05)))))                         ;; Nearly zero maintenance when risky
+  
+  ;; ═══ CRI-OPTIMIZED MODULE DISTRIBUTION ═══
+  ;; Module types optimized for stability and low CRI
+  (define solar_cri_ratio
+    (cond
+      (phase_foundation 0.65)         ;; 65% solar for stable power base
+      (phase_controlled_growth 0.60)  ;; 60% solar for controlled growth
+      (phase_optimization 0.55)       ;; 55% solar for efficiency
+      (phase_maintenance 0.50)        ;; 50% solar for balance
+      (else 0.45)))                   ;; 45% solar for preservation
+  
+  (define repair_cri_ratio (/ repair_bay_ultra_conservative (max 1 modules_count)))
+  
+  (define greenhouse_cri_ratio
+    (cond
+      (phase_foundation 0.20)         ;; 20% greenhouse in foundation
+      (phase_controlled_growth 0.25)  ;; 25% greenhouse in controlled growth
+      (phase_optimization 0.30)       ;; 30% greenhouse in optimization
+      (phase_maintenance 0.35)        ;; 35% greenhouse in maintenance
+      (else 0.40)))                   ;; 40% greenhouse in preservation
+  
+  (define remaining_cri_ratio (max 0.05 (- 1.0 solar_cri_ratio repair_cri_ratio greenhouse_cri_ratio)))
+  
+  ;; ═══ CRI-PROTECTIVE CREW ALLOCATION ═══
+  ;; Crew management for maximum CRI protection
+  (define crew_cri_allocation
+    (cond
+      (phase_foundation (list 0.50 0.30 0.20))       ;; Balanced foundation
+      (phase_controlled_growth (list 0.45 0.35 0.20)) ;; Repair-focused growth
+      (phase_optimization (list 0.40 0.40 0.20))     ;; Heavy repair for stability
+      (phase_maintenance (list 0.35 0.45 0.20))      ;; Maximum repair focus
+      (else (list 0.30 0.50 0.20))))                 ;; Survival + repair
+  
+  ;; ═══ CRI PERFECTIONIST EFFICIENCY ═══
+  ;; Conservative efficiency for CRI protection
+  (define base_cri_efficiency
+    (* resource_protection_factor
+       (/ 150 (max 5 colony_risk_index))              ;; Higher efficiency at low CRI
+       (if (< modules_count 4) 1.0 0.9)               ;; Penalty for early building
+       (if (> colony_risk_index 5) 0.7 1.0)))         ;; Penalty for high CRI
+  
+  (define efficiency_cri_multiplier (max 0.5 (min 2.0 base_cri_efficiency)))
+  
+  ;; ═══ FINAL CRI-OPTIMIZED ALLOCATION ═══
+  ;; Ultra-conservative allocation for sub-5 CRI target
+  (list
+    ;; Building allocation with CRI protection
+    (* building_allocation efficiency_cri_multiplier)
+    
+    ;; Module type distribution for CRI optimization
+    (list solar_cri_ratio repair_cri_ratio greenhouse_cri_ratio remaining_cri_ratio)
+    
+    ;; Crew allocation for CRI protection
+    crew_cri_allocation
+    
+    ;; CRI-focused allocation analysis
+    (list
+      (concat "CRIPhase: " 
+        (cond
+          (phase_foundation "🛡️Foundation")
+          (phase_controlled_growth "📈ControlGrowth") 
+          (phase_optimization "⚡Optimization")
+          (phase_maintenance "🔧Maintenance")
+          (else "💎Preservation")))
+      (concat "CRI-Analysis: " (string cri_threat_analysis) "/6")
+      (concat "ModulesTarget: " (string modules_count) "/" (string target_modules))
+      (concat "RepairRatio: " (string (round (* repair_cri_ratio 100))) "%")
+      (concat "BufferStr: " (string (round resource_ultra_buffer)))
+      (concat "CRIProtection: " (string (round (* efficiency_cri_multiplier 100))) "%"))))

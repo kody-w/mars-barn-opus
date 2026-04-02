@@ -182,7 +182,8 @@ class TestLocalChainVerification:
             frame["_hash"] = "deadbeefdeadbeef"  # Wrong hash
             _write_frame(Path(tmpdir), frame)
 
-            results = verify_local_chain(Path(tmpdir), 1, 1)
+            results = verify_local_chain(Path(tmpdir), 1, 1,
+                                         check_stored_hash=True)
             assert not results[0].valid
             assert "mismatch" in results[0].error.lower()
 

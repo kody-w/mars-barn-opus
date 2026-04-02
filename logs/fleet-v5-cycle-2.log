@@ -1,0 +1,51 @@
+● Read RULES.md
+  └ 181 lines read
+
+● List directory .
+  └ 237 files found
+
+Now let me check the V4 Module Overload achievement doc to understand the new hazards, and look at the existing field notes to understand the current record and strategies:
+
+● Read temp_field_notes.json
+  └ 1 line read
+
+● Read V4_MODULE_OVERLOAD_ACHIEVEMENT_2026-04-02.md
+  └ 77 lines read
+
+● Verify current working directory (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && pwd
+  └ 2 lines...
+
+Let me see what's currently in the field notes and check the gauntlet tool:
+
+● Read temp_field_notes.json
+  └ L1:50 (50 lines read)
+
+● List directory tools
+  └ 62 files found
+
+● Check gauntlet tool help (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --help
+  └ 8 lines...
+
+Perfect! I can see the current record is 95,690, but the field notes show it's with the old v4 challenge. Let me run the gauntlet with Monte Carlo to establish the current baseline:
+
+● Run current baseline with Monte Carlo 10 (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 10
+  └ 28 lines...
+
+Excellent! The current setup is already achieving 95,690 (which matches the target record mentioned). However, I see a discrepancy - the final score shows as 95,690 but the per-run distribution shows 75,690. Let me examine the current governor strategy and see if I can optimize it further:
+
+● Read governor.lispy
+  └ 164 lines read
+
+● Find v4-related or top strategies (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && ls *.lispy | grep -E
+  │ "(v4|module|record|champion)" | head -10
+  └ 11 lines...
+
+I can see the current governor is attempting to build 502+ modules, but the RULES.md clearly states that only 8 modules count toward the score (min(modules,8)×150). This is inefficient! Let me create a new strategy focused on the scoring cap and try to beat the current record by optimizing what actually matters:
+
+1. **Module scoring is capped at 8** - no point building beyond this for score
+2. Focus on **survival rate**, **sols survived**, **crew alive**, and **low CRI**
+3. The current strategy was

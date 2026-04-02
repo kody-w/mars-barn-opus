@@ -104,3 +104,89 @@ Interesting! The new strategy scored 95,590 which is slightly less than the prev
 
 ● Create copilot_score_maximizer_transcendence_v2.lispy +170
 
+Now let me replace the governor with this score-optimized strategy and test it:
+
+● Replace governor with score-optimized strategy (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && cp
+  │ copilot_score_maximizer_transcendence_v2.lispy governor.lispy
+  └ 1 line...
+
+● Test the score maximizer strategy (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 10
+  └ 28 lines...
+
+I'm getting the same 95,590 score. This suggests the scoring system might be capped or there may be something about the original strategy that achieved the 97,540 score. Let me check what the actual current best strategy is and see if we can identify the difference. Let me look at what strategy was actually achieving the 97,540:
+
+● Read governor_backup_730_nexus.lispy
+  └ L1:20 (20 lines read)
+
+● Check recent git history (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && git log --oneline -5
+  └ 6 lines...
+
+I notice from the git log there was a recent rule change with "module cap at 8 + scoring fix". Let me check the current rules and see what that original strategy was that got 97,540:
+
+● Read RULES.md
+  └ L1:50 (50 lines read)
+
+● Check what files were changed in the 97,540 score commit (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && git show 86021e2 --name-only
+  └ 38 lines...
+
+Ah! I see the issue now. The rules have been updated and there's a **module cap at 8** for scoring! This means building more than 8 modules gives zero additional score. The current scoring formula caps modules at 8, so the key to beating the current score is not necessarily building more modules, but optimizing other factors. Let me check what strategy achieved the 97,540 score:
+
+● Check the governor that achieved 97,540 (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && git show 86021e2:governor.lispy | head
+  │ -30
+  └ 31 lines...
+
+● Check the 729 frame destroyer strategy (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && git show
+  │ 86021e2:copilot_ultimate_729_frame_destroyer_v1.lispy | head -50
+  └ 51 lines...
+
+Now I understand! The winning strategy was optimized for the scoring rules with the 8-module cap. Since my score is being capped by only counting 8 modules maximum, I need to focus on other scoring factors. Let me create a strategy that specifically optimizes for the current scoring formula:
+
+```
+SCORE = median_sols × 100                   (730 * 100 = 73,000)
+      + min_crew_alive × 500                (3 * 500 = 1,500)  
+      + min(median_modules, 8) × 150        (8 * 150 = 1,200 MAX)
+      + survival_rate × 20000               (100% * 20000 = 20,000)
+      - p75_CRI × 10                        (11 * 10 = -110)
+```
+
+Current total: 73,000 + 1,500 + 1,200 + 20,000 - 110 = 95,590
+
+To beat 97,540, I need to improve the P75 CRI (lower is better) significantly. Let me create a strategy that focuses on CRI optimization:
+
+● Create copilot_cri_perfectionist_ultra_v2.lispy +165
+
+Now let me test this CRI-focused strategy:
+
+● Replace governor with CRI perfectionist strategy (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && cp
+  │ copilot_cri_perfectionist_ultra_v2.lispy governor.lispy
+  └ 1 line...
+
+● Test the CRI perfectionist strategy (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 10
+  └ 28 lines...
+
+I notice two interesting things:
+
+1. The gauntlet now shows 731 frames instead of 730! This means a new frame was added.
+2. My score went up slightly to 95,690 (+100 points from the extra sol)
+3. But the median modules is showing as 21, which means the score is still being capped at 8 modules (21 × 150 would be 3,150 but it's showing the cap)
+
+Wait, that doesn't make sense. Let me look at this more carefully. If the median modules is 21 but the scoring formula caps at 8, then the score should be calculated as 8 × 150 = 1,200. Let me check if I'm misunderstanding the scoring.
+
+Looking at my score: 95,690
+- sols: 731 × 100 = 73,100  
+- crew: 3 × 500 = 1,500
+- modules: min(21, 8) × 150 = 8 × 150 = 1,200
+- survival: 100% × 20,000 = 20,000
+- CRI: 11 × -10 = -110
+
+Total: 73,100 + 1,500 + 1,200 + 20,000 - 110 = 95,690 ✓
+
+That matches! So the issue is that despite my "CRI perfectionist" strategy, I'm still getting P75 CRI of 11, the same as before. This suggests I

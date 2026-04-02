@@ -1,0 +1,113 @@
+;; COPILOT v4 MODULE CAP OPTIMIZED STRATEGY
+;; Revolutionary approach: Optimize for RULES.md Amendment IV scoring
+;; Key insight: Module score CAPPED at 8, so focus on efficiency not quantity
+;; Target: Beat 95,590 by optimizing crew survival, sol count, and CRI while respecting module cap
+
+(begin
+  (define _agent_name "Copilot v4 Module Cap Optimized Strategy")
+  (define _agent_desc "Optimized for Amendment IV scoring with 8-module cap focus")
+  
+  (log (concat "⚡🎯🏭 v4 MODULE CAP STRATEGY — Sol " (string sol) " — Modules:" (string (length modules)) " — CRI:" (string colony_risk_index)))
+  
+  ;; ═══ AMENDMENT IV SCORING OPTIMIZATION ═══
+  ;; Score = median_sols×100 + min_crew_alive×500 + min(modules,8)×150 + survival_rate×20000 - p75_CRI×10
+  ;; Strategy: Build exactly 8 modules efficiently, maximize crew survival and sol count, minimize CRI
+  
+  (define target_modules 8)  ;; Exactly 8 for maximum score under cap
+  (define modules_count (length modules))
+  (define modules_remaining (max 0 (- target_modules modules_count)))
+  
+  ;; ═══ v4 MODULE OVERLOAD PHASE AWARENESS ═══  
+  ;; Sol 678+ introduces cascade failures, power grid overload, dust infiltration
+  (define pre_v4_phase (< sol 678))
+  (define v4_overload_phase (>= sol 678))
+  
+  ;; ═══ INTELLIGENT BUILD TIMING ═══
+  ;; Spread 8 modules across mission for maximum efficiency with v4 awareness
+  (define build_schedule
+    (cond
+      ;; Early foundation (2 modules) - solar and repair for efficiency base
+      ((and (< modules_count 1) (>= sol 40) (> power_capacity 25)) 1)   ;; Solar farm first
+      ((and (< modules_count 2) (>= sol 80) (> power_capacity 30)) 2)   ;; Repair bay second
+      
+      ;; Mid-mission infrastructure (4 more modules)
+      ((and (< modules_count 3) (>= sol 120) (> power_capacity 35)) 3)  ;; ISRU plant  
+      ((and (< modules_count 4) (>= sol 180) (> power_capacity 40)) 4)  ;; Greenhouse dome
+      ((and (< modules_count 5) (>= sol 240) (> power_capacity 45)) 5)  ;; Water extractor
+      ((and (< modules_count 6) (>= sol 320) (> power_capacity 50)) 6)  ;; Radiation shelter
+      
+      ;; Pre-v4 completion (final 2 modules before Sol 678)
+      ((and (< modules_count 7) (>= sol 450) (< sol 650) (> power_capacity 55)) 7)  ;; Second solar farm
+      ((and (< modules_count 8) (>= sol 550) (< sol 678) (> power_capacity 60)) 8)  ;; Second repair bay
+      (else 0)))
+  
+  ;; ═══ v4 CASCADE FAILURE PROTECTION ═══
+  ;; Enhanced protection against v4 Module Overload hazards
+  (define v4_protection_factor
+    (if v4_overload_phase
+        (+ 1.5  ;; Base v4 protection
+           (* 0.1 modules_count)  ;; More modules = more protection needed
+           (if (> colony_risk_index 15) 0.5 0))  ;; Extra if CRI high
+        1.0))
+  
+  ;; ═══ ADVANCED CRI OPTIMIZATION ═══  
+  ;; Target P75 CRI under 10 for maximum score
+  (define cri_target_aggressive (< colony_risk_index 8))
+  (define cri_target_moderate (< colony_risk_index 12))
+  
+  ;; Enhanced repair bay allocation for v4 durability
+  (define repair_bay_allocation
+    (cond
+      (v4_overload_phase (* v4_protection_factor (max 3 (round (* modules_count 0.35)))))  ;; 35% in v4
+      ((> colony_risk_index 15) (max 2 (round (* modules_count 0.30))))  ;; 30% if CRI high
+      (cri_target_aggressive (max 1 (round (* modules_count 0.20))))     ;; 20% if CRI low
+      (else (max 2 (round (* modules_count 0.25))))))                    ;; 25% default
+  
+  ;; ═══ CREW SURVIVAL MAXIMIZATION ═══
+  ;; Focus on keeping all crew alive for max score
+  (define crew_safety_factor
+    (let ((alive_crew (length (filter (lambda (c) (member? c crew)) crew))))
+      (if (< alive_crew 3) 2.0 1.0)))  ;; Emergency mode if crew low
+  
+  ;; ═══ RESOURCE BUFFER OPTIMIZATION ═══
+  ;; Balanced buffers for stability without over-allocation  
+  (define resource_stability
+    (+ (min 8 o2_days)        ;; Reasonable O2 buffer
+       (min 12 food_days)     ;; Good food buffer  
+       (min 6 h2o_days)))     ;; Adequate water buffer
+  
+  (define resource_efficiency_factor (min 2.0 (max 0.5 (/ resource_stability 15))))
+  
+  ;; ═══ FINAL ALLOCATION LOGIC ═══
+  ;; Optimized for Amendment IV scoring with v4 protection
+  (define base_heating_alloc
+    (cond
+      (v4_overload_phase (* 0.40 v4_protection_factor crew_safety_factor))
+      ((< interior_temp 273) (* 0.50 crew_safety_factor resource_efficiency_factor))
+      ((< interior_temp 285) (* 0.35 resource_efficiency_factor))
+      (else 0.25)))
+  
+  (define base_isru_alloc
+    (cond
+      ((< o2_days 3) (* 0.45 crew_safety_factor))
+      ((< h2o_days 3) (* 0.40 crew_safety_factor))  
+      ((and cri_target_aggressive (> power_capacity 40)) 0.35)
+      (else (* 0.30 resource_efficiency_factor))))
+  
+  (define base_greenhouse_alloc
+    (cond
+      ((< food_days 5) (* 0.35 crew_safety_factor))
+      ((and cri_target_moderate (> power_capacity 30) (> h2o_days 3)) 0.30)
+      (else (* 0.25 resource_efficiency_factor))))
+  
+  ;; Normalize allocations
+  (define total_base (+ base_heating_alloc base_isru_alloc base_greenhouse_alloc repair_bay_allocation))
+  (define normalization_factor (if (> total_base 1.0) (/ 1.0 total_base) 1.0))
+  
+  ;; Final allocations
+  (list
+    (* base_heating_alloc normalization_factor)     ;; Heating allocation
+    (* base_isru_alloc normalization_factor)        ;; ISRU allocation  
+    (* base_greenhouse_alloc normalization_factor)  ;; Greenhouse allocation
+    build_schedule                                   ;; Build decision (0-8)
+    repair_bay_allocation))                          ;; Repair bay count

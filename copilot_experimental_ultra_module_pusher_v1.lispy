@@ -1,0 +1,139 @@
+;; COPILOT EXPERIMENTAL ULTRA MODULE PUSHER V1
+;; Strategy: Push beyond 502 modules to test theoretical maximum
+;; Target: Break 149,190 record by optimizing module count and timing
+;; Hypothesis: More aggressive building in early phases might push past 502 modules
+
+(begin
+  (define _agent_name "Copilot Experimental Ultra Module Pusher v1")
+  (define _agent_desc "Experimental: Push beyond 502 modules to test theoretical maximum")
+  
+  (log (concat "🚀🔥⚡ EXPERIMENTAL ULTRA PUSHER — Sol " (string sol) " — Modules:" (string (length modules)) " — CRI:" (string colony_risk_index)))
+  
+  ;; ═══ ULTRA-AGGRESSIVE PHASES ═══
+  ;; Even more aggressive than 149K strategy to push past 502 modules
+  (define pre_v4_aggressive_phase (< sol 678))
+  (define v4_management_phase (>= sol 678))
+  
+  ;; Refined phases with earlier ultra-aggressive building
+  (define phase_hyper_early (and (>= sol 1) (< sol 100)))      ;; Build every sol - maximum foundation
+  (define phase_ultra_aggressive (and (>= sol 100) (< sol 250))) ;; Build every sol when possible
+  (define phase_sustained_aggression (and (>= sol 250) (< sol 550))) ;; Build every sol when CRI allows
+  (define phase_pre_v4_surge (and (>= sol 550) (< sol 678)))   ;; Final massive push
+  (define phase_v4_zone (>= sol 678))                          ;; v4 smart management
+  
+  ;; ═══ ENHANCED MODULE CALCULATIONS ═══
+  (define modules_count (length modules))
+  (define repair_bay_target (max 4 (round (* modules_count 0.22)))) ;; Slightly higher repair ratio
+  
+  ;; ═══ ULTRA-AGGRESSIVE BUILDING ALLOCATION ═══
+  ;; Push harder than the 149K strategy in early phases
+  (define building_allocation
+    (cond
+      ;; HYPER-EARLY: Build every single sol possible
+      (phase_hyper_early
+        (cond
+          ((< colony_risk_index 12) 0.98)   ;; Maximum building when CRI < 12
+          ((< colony_risk_index 20) 0.95)   ;; Ultra-aggressive when CRI 12-20
+          ((< colony_risk_index 30) 0.88)   ;; Aggressive when CRI 20-30
+          (true 0.75)))                     ;; Conservative when CRI > 30
+      
+      ;; ULTRA-AGGRESSIVE: Maximize module count build-up
+      (phase_ultra_aggressive
+        (cond
+          ((< colony_risk_index 15) 0.97)   ;; Nearly maximum building
+          ((< colony_risk_index 25) 0.92)   ;; Very aggressive
+          ((< colony_risk_index 35) 0.85)   ;; Aggressive
+          (true 0.70)))                     ;; Moderate when high CRI
+      
+      ;; SUSTAINED AGGRESSION: Keep building aggressively
+      (phase_sustained_aggression
+        (cond
+          ((< colony_risk_index 18) 0.95)   ;; Very high building
+          ((< colony_risk_index 28) 0.88)   ;; High building
+          ((< colony_risk_index 40) 0.78)   ;; Moderate building
+          (true 0.60)))                     ;; Conservative
+      
+      ;; PRE-V4 SURGE: Final maximum push to exceed 502 modules
+      (phase_pre_v4_surge
+        (cond
+          ((< colony_risk_index 20) 0.96)   ;; Maximum final surge
+          ((< colony_risk_index 35) 0.90)   ;; High final surge
+          ((< colony_risk_index 50) 0.82)   ;; Moderate final surge
+          (true 0.65)))                     ;; Conservative final surge
+      
+      ;; v4 ZONE - Smarter management with higher efficiency thresholds
+      (phase_v4_zone
+        (let ((estimated_efficiency (max 0.20 (- 1.0 (* modules_count 0.0014))))) ;; Updated efficiency estimate
+          (cond
+            ((and (> estimated_efficiency 0.40) (< colony_risk_index 15)) 0.80)  ;; Build when efficiency > 40%
+            ((and (> estimated_efficiency 0.35) (< colony_risk_index 25)) 0.70)  ;; Build when efficiency > 35%
+            ((and (> estimated_efficiency 0.30) (< colony_risk_index 35)) 0.60)  ;; Build when efficiency > 30%
+            ((and (> estimated_efficiency 0.25) (< colony_risk_index 45)) 0.45)  ;; Conservative building
+            (true 0.20))))                                                       ;; Survival mode
+      
+      ;; Default fallback
+      (true 0.30)))
+  
+  ;; ═══ OPTIMIZED RESOURCE ALLOCATION ═══
+  ;; More refined resource management for ultra-building
+  (define base_resource_alloc (- 1.0 building_allocation))
+  
+  ;; More aggressive O2 management - run leaner to support more building
+  (define o2_need_factor 
+    (cond
+      ((< o2_days 1.0) 0.70)    ;; Emergency O2 allocation
+      ((< o2_days 2.5) 0.50)    ;; High O2 allocation
+      ((< o2_days 5.0) 0.35)    ;; Moderate O2 allocation
+      ((< o2_days 8.0) 0.25)    ;; Lower O2 allocation
+      (true 0.18)))             ;; Minimal O2 allocation for max building
+  
+  ;; Optimized food management
+  (define food_need_factor
+    (cond
+      ((< food_days 1.5) 0.55)  ;; Emergency food allocation
+      ((< food_days 3.0) 0.40)  ;; High food allocation
+      ((< food_days 6.0) 0.28)  ;; Moderate food allocation
+      ((< food_days 10.0) 0.20) ;; Lower food allocation
+      (true 0.12)))             ;; Minimal food allocation for max building
+  
+  (define isru_allocation (* base_resource_alloc o2_need_factor))
+  (define greenhouse_allocation (* base_resource_alloc food_need_factor))
+  (define heating_allocation (max 0.05 (- base_resource_alloc isru_allocation greenhouse_allocation)))
+  
+  ;; Apply allocations
+  (set! building_alloc building_allocation)
+  (set! isru_alloc (max 0.02 (min 0.70 isru_allocation)))
+  (set! greenhouse_alloc (max 0.02 (min 0.65 greenhouse_allocation)))
+  (set! heating_alloc (max 0.05 (min 0.93 heating_allocation)))
+  
+  ;; ═══ OPTIMIZED FOOD RATION STRATEGY ═══
+  ;; Run leaner rations to support ultra-building
+  (define food_ration_target
+    (cond
+      ((< food_days 0.8) 0.20)    ;; Emergency rations
+      ((< food_days 1.5) 0.30)    ;; Heavy rationing
+      ((< food_days 3.0) 0.50)    ;; Moderate rationing  
+      ((< food_days 6.0) 0.70)    ;; Light rationing
+      ((< food_days 10.0) 0.85)   ;; Minimal rationing
+      (true 0.92)))               ;; Near-full for max building efficiency
+  
+  (set! food_ration food_ration_target)
+  
+  ;; ═══ DIAGNOSTIC OUTPUT ═══
+  (log (concat "  🚀 Phase: " 
+    (if phase_hyper_early "HYPER-EARLY"
+    (if phase_ultra_aggressive "ULTRA-AGGRESSIVE"
+    (if phase_sustained_aggression "SUSTAINED-AGGRESSION" 
+    (if phase_pre_v4_surge "PRE-v4-SURGE" "v4-ZONE"))))))
+  
+  (log (concat "  🎯 Target: >502 modules | Current: " (string modules_count) " | CRI: " (string colony_risk_index)))
+  (log (concat "  ⚡ Allocations — B:" (string (round (* building_alloc 100))) "% I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "% H:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  💎 Resources — O2:" (string o2_days) "d Food:" (string food_days) "d | Ration:" (string (round (* food_ration 100))) "%"))
+
+  ;; ═══ OUTPUT SUMMARY ═══
+  (concat "ULTRA-PUSHER Sol " (string sol) 
+    " | " (if pre_v4_aggressive_phase "PRE-v4" "v4-ZONE")
+    " | Modules:" (string modules_count) " (Target: >502)"
+    " | CRI:" (string colony_risk_index) 
+    " | Build:" (string (round (* building_alloc 100))) "%"
+    " | O2:" (string o2_days) "d"))
