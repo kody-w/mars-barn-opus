@@ -1,0 +1,290 @@
+;; COPILOT V6 SCORE MAXIMIZER BREAKTHROUGH v1
+;; Target: Beat 108,840 by improving min crew alive (2→3+) and lowering CRI (36→30-)
+;; Strategy: CRI optimization + crew preservation + maintain 100% survival rate
+;; Key Innovation: Focus on the ONLY two score improvement vectors possible
+
+(begin
+  (define _agent_name "Copilot V6 Score Maximizer Breakthrough v1")
+  (define _agent_desc "Maximize score via min crew preservation and CRI optimization")
+  
+  (log (concat "🏆📊⚡ SCORE MAXIMIZER — Sol " (string sol) " — CRI:" (string colony_risk_index) " — Target: 110,000+"))
+  
+  ;; ═══ SCORE MAXIMIZATION SCIENCE ═══
+  ;; Current score: 108,840 = 87,000 + 1,000 + 1,200 + 20,000 - 360
+  ;; Improvement vectors:
+  ;; 1. Min crew: 2→3 = +500 points, 2→4 = +1,000 points, 2→5 = +1,500 points
+  ;; 2. P75 CRI: 36→30 = +60 points, 36→25 = +110 points, 36→20 = +160 points
+  ;; Combined potential: +1,000 (crew) + 160 (CRI) = +1,160 points = 110,000 score
+
+  ;; Robot health monitoring for crew preservation
+  (define robot_count 5)  ;; 5 robots total
+  (define robot_health_excellent (>= crew_min_hp 70))     ;; Excellent health
+  (define robot_health_good (>= crew_min_hp 55))         ;; Good health  
+  (define robot_health_decent (>= crew_min_hp 45))       ;; Decent health
+  (define robot_health_concerning (>= crew_min_hp 35))   ;; Concerning health
+  (define robot_health_critical (< crew_min_hp 35))      ;; Critical health
+  (define robot_health_emergency (< crew_min_hp 25))     ;; Emergency
+  (define avg_robot_hp (if (> crew_count 0) (/ crew_total_hp crew_count) 100))
+  
+  ;; Crew count tracking for score optimization
+  (define current_crew_count crew_count)
+  (define crew_score_multiplier
+    (cond
+      ((>= current_crew_count 5) 2.5)    ;; All 5 robots alive = maximum score
+      ((>= current_crew_count 4) 2.0)    ;; 4 robots alive = excellent
+      ((>= current_crew_count 3) 1.5)    ;; 3 robots alive = target minimum
+      (true 1.0)))                       ;; 2 or fewer robots = current level
+  
+  ;; ═══ CRI OPTIMIZATION SYSTEM ═══
+  ;; Target: Reduce P75 CRI from 36 to 25-30 range for +60 to +110 points
+  ;; CRI factors: power shortage, resource shortage, events
+  
+  (define cri_optimization_power_target
+    (cond
+      ((< colony_risk_index 20) 400)     ;; Low CRI = maintain efficiency
+      ((< colony_risk_index 30) 500)     ;; Medium CRI = boost power
+      ((< colony_risk_index 40) 650)     ;; High CRI = high power
+      (true 800)))                       ;; Very high CRI = maximum power
+  
+  (define cri_optimization_resource_targets
+    (cond
+      ((< colony_risk_index 20) (list 35.0 35.0 45.0))  ;; Low CRI targets
+      ((< colony_risk_index 30) (list 45.0 45.0 55.0))  ;; Medium CRI targets  
+      ((< colony_risk_index 40) (list 55.0 55.0 65.0))  ;; High CRI targets
+      (true (list 65.0 65.0 75.0))))                    ;; Very high CRI targets
+  
+  (define cri_o2_target (car cri_optimization_resource_targets))
+  (define cri_h2o_target (cadr cri_optimization_resource_targets))
+  (define cri_food_target (caddr cri_optimization_resource_targets))
+
+  ;; ═══ V6 PERIOD MANAGEMENT ═══
+  ;; Maintain v6 robot survival while optimizing for crew count and CRI
+  (define v6_active_period (and (>= sol 778) (<= sol 847)))
+  (define v6_preparation_period (and (>= sol 720) (< sol 778)))
+  (define v6_approach_period (and (>= sol 650) (< sol 720)))
+  
+  ;; ═══ CREW PRESERVATION THERMAL PROTECTION ═══
+  ;; Balanced thermal protection - enough for survival, not excessive (CRI impact)
+  (define crew_preservation_thermal_boost 
+    (cond
+      ((and v6_active_period robot_health_emergency) 0.12)   ;; Emergency during V6
+      ((and v6_active_period robot_health_critical) 0.08)    ;; Critical during V6
+      (v6_active_period 0.05)                                ;; Standard V6
+      ((and robot_health_emergency (> sol 500)) 0.08)       ;; General emergency
+      ((and robot_health_critical (> sol 500)) 0.04)        ;; General critical
+      (true 0.00)))                                          ;; No extra thermal
+
+  ;; ═══ SCORE-OPTIMIZED ALLOCATION LOGIC ═══
+  ;; Balance crew preservation with CRI optimization
+  
+  (define score_optimized_power_need
+    (cond
+      ((< power 250) 0.85)                                   ;; Power emergency
+      ((< power cri_optimization_power_target) 0.65)         ;; Power building
+      (true 0.40)))                                          ;; Power maintained
+
+  (define score_optimized_o2_need
+    (cond
+      ((< o2_days 15.0) 0.80)                                ;; O2 critical
+      ((< o2_days 25.0) 0.70)                                ;; O2 low
+      ((< o2_days cri_o2_target) 0.55)                       ;; Build to CRI target
+      ((< o2_days 55.0) 0.40)                                ;; Maintain buffer
+      (true 0.30)))                                          ;; Surplus O2
+
+  (define score_optimized_h2o_need
+    (cond
+      ((< h2o_days 15.0) 0.75)                               ;; H2O critical
+      ((< h2o_days 25.0) 0.65)                               ;; H2O low  
+      ((< h2o_days cri_h2o_target) 0.50)                     ;; Build to CRI target
+      ((< h2o_days 55.0) 0.35)                               ;; Maintain buffer
+      (true 0.25)))                                          ;; Surplus H2O
+
+  (define score_optimized_food_need
+    (cond
+      ((< food_days 20.0) 0.65)                              ;; Food critical
+      ((< food_days 35.0) 0.55)                              ;; Food low
+      ((< food_days cri_food_target) 0.40)                   ;; Build to CRI target
+      ((< food_days 70.0) 0.25)                              ;; Maintain buffer
+      (true 0.18)))                                          ;; Surplus food
+
+  (define score_optimized_isru_need (max score_optimized_o2_need score_optimized_h2o_need))
+
+  ;; ═══ SMART RESPONSE MULTIPLIERS ═══
+  ;; Balanced response - strong enough for survival, controlled for CRI
+  
+  (define smart_cri_response
+    (cond
+      ((< colony_risk_index 15) 1.0)      ;; Low CRI = normal response
+      ((< colony_risk_index 25) 1.2)      ;; Medium CRI = moderate response
+      ((< colony_risk_index 35) 1.5)      ;; High CRI = strong response
+      ((< colony_risk_index 45) 1.8)      ;; Very high CRI = emergency response
+      (true 2.1)))                        ;; Extreme CRI = maximum response
+
+  (define event_count (length events))
+  (define smart_event_response
+    (cond
+      ((and v6_active_period (>= event_count 3)) 2.2)        ;; V6 + many events
+      ((and v6_active_period (>= event_count 2)) 1.9)        ;; V6 + events
+      ((and v6_active_period (>= event_count 1)) 1.6)        ;; V6 + event
+      ((>= event_count 4) 2.0)                               ;; Many events
+      ((>= event_count 3) 1.7)                               ;; Several events
+      ((>= event_count 2) 1.4)                               ;; Couple events
+      ((>= event_count 1) 1.1)                               ;; Single event
+      (true 1.0)))                                           ;; No events
+
+  (define crew_preservation_multiplier
+    (cond
+      (robot_health_emergency 2.0)        ;; Emergency - protect crew
+      (robot_health_critical 1.6)         ;; Critical - boost protection
+      ((not robot_health_decent) 1.3)     ;; Concerning - moderate boost
+      (true 1.0)))                        ;; Good health - normal allocation
+
+  ;; ═══ ANTI-COMPLACENCY VARIANCE ═══
+  ;; Lightweight variance to prevent v5 complacency without impacting CRI
+  (define variance_cycle (mod sol 7))  ;; Simple 7-sol cycle
+  (define variance_phase (/ (* 2.0 3.14159 variance_cycle) 7.0))
+  
+  (define heating_variance (* 0.015 (sin variance_phase)))      ;; ±1.5% variance
+  (define isru_variance (* 0.012 (cos variance_phase)))         ;; ±1.2% variance  
+  (define greenhouse_variance (* -1.0 (+ heating_variance isru_variance)))
+
+  ;; ═══ SCORE-OPTIMIZED ALLOCATIONS ═══
+  (define base_heating (* score_optimized_power_need smart_cri_response smart_event_response crew_preservation_multiplier))
+  (define base_isru (* score_optimized_isru_need smart_cri_response smart_event_response crew_preservation_multiplier))
+  (define base_greenhouse (* score_optimized_food_need smart_cri_response smart_event_response crew_preservation_multiplier))
+  
+  ;; Apply thermal protection and variance
+  (define thermal_heating (+ base_heating crew_preservation_thermal_boost))
+  (define variance_heating_final (+ thermal_heating heating_variance))
+  (define variance_isru_final (+ base_isru isru_variance))
+  (define variance_greenhouse_final (+ base_greenhouse greenhouse_variance))
+  
+  ;; Apply constraints and normalization
+  (define constrained_heating (max 0.18 (min 0.72 variance_heating_final)))
+  (define constrained_isru (max 0.20 (min 0.70 variance_isru_final)))
+  (define constrained_greenhouse (max 0.15 (min 0.60 variance_greenhouse_final)))
+  
+  (define total_allocation (+ constrained_heating constrained_isru constrained_greenhouse))
+  (define norm_factor (/ 1.0 total_allocation))
+  
+  (define final_heating (* constrained_heating norm_factor))
+  (define final_isru (* constrained_isru norm_factor))
+  (define final_greenhouse (* constrained_greenhouse norm_factor))
+
+  ;; ═══ SCORE-OPTIMIZED REPAIR MULTIPLIER ═══
+  ;; High enough for crew preservation, controlled for efficiency
+  (define score_optimized_repair_multiplier
+    (cond
+      ((and v6_active_period robot_health_emergency) 8.0)     ;; V6 emergency
+      ((and v6_active_period robot_health_critical) 5.5)      ;; V6 critical
+      (v6_active_period 3.5)                                  ;; V6 standard
+      (robot_health_emergency 6.0)                            ;; General emergency
+      (robot_health_critical 4.0)                             ;; General critical
+      ((not robot_health_decent) 2.5)                         ;; Concerning
+      (robot_health_good 1.8)                                 ;; Good health
+      (true 1.5)))                                            ;; Excellent health
+
+  ;; ═══ EMERGENCY OVERRIDES ═══
+  (define power_crisis (< power 200))
+  (define crew_death_imminent (< crew_min_hp 20))
+  (define resource_crisis (or (< o2_days 10.0) (< h2o_days 10.0)))
+  
+  (cond
+    ;; CREW DEATH IMMINENT - Maximum crew preservation
+    (crew_death_imminent
+     (set-heating 0.70)
+     (set-isru 0.20)
+     (set-greenhouse 0.10)
+     (set-repair 9.0)
+     (log "🚨🤖💀 CREW DEATH IMMINENT: Maximum preservation"))
+     
+    ;; POWER CRISIS - Emergency power
+    (power_crisis
+     (set-heating 0.80)
+     (set-isru 0.15)
+     (set-greenhouse 0.05)
+     (set-repair score_optimized_repair_multiplier)
+     (log "🚨⚡ POWER CRISIS: Emergency heating"))
+     
+    ;; RESOURCE CRISIS - Emergency resources
+    (resource_crisis
+     (set-heating 0.30)
+     (set-isru 0.60)
+     (set-greenhouse 0.10)
+     (set-repair score_optimized_repair_multiplier)
+     (log "🚨📦 RESOURCE CRISIS: Emergency ISRU"))
+    
+    ;; NORMAL - Score-optimized allocation
+    (true
+     (set-heating final_heating)
+     (set-isru final_isru)
+     (set-greenhouse final_greenhouse)
+     (set-repair score_optimized_repair_multiplier)))
+
+  ;; ═══ SCORE-OPTIMIZED FOOD RATIONING ═══
+  (define score_optimized_food_ration
+    (cond
+      ((< food_days 15.0) 0.70)                              ;; Emergency rationing
+      ((< food_days 25.0) 0.82)                              ;; Critical rationing
+      ((< food_days cri_food_target) 0.90)                   ;; Building to CRI target
+      ((< food_days 70.0) 0.96)                              ;; Maintaining buffer
+      (true 1.0)))                                           ;; Full rations
+
+  (set-food-ration score_optimized_food_ration)
+
+  ;; ═══ SCORE OPTIMIZATION STATUS ═══
+  (define crew_status
+    (cond
+      (crew_death_imminent "🤖💀DEATH_IMMINENT")
+      (robot_health_emergency "🤖🚨EMERGENCY")
+      (robot_health_critical "🤖⚠️CRITICAL")
+      ((not robot_health_decent) "🤖🔴CONCERNING")
+      (robot_health_good "🤖🟡GOOD")
+      (robot_health_excellent "🤖✅EXCELLENT")
+      (true "🤖✅HEALTHY")))
+
+  (define cri_status
+    (cond
+      ((< colony_risk_index 20) "📊✅EXCELLENT")
+      ((< colony_risk_index 30) "📊🟡GOOD")
+      ((< colony_risk_index 40) "📊⚠️CONCERNING")
+      (true "📊🚨HIGH")))
+
+  (define score_projection
+    (+ 87000                                                  ;; Max sols
+       (* current_crew_count 500)                            ;; Current crew score  
+       1200                                                   ;; Max module score
+       20000                                                  ;; Max survival score
+       (* colony_risk_index -10)))                           ;; CRI penalty
+
+  (log (concat "  🏆 Score: " cri_status " | Crew:" (string current_crew_count) " | Proj:" (string score_projection)))
+  (log (concat "  🤖 Crew: " crew_status " | AvgHP:" (string (round avg_robot_hp 1)) " | Count:" (string current_crew_count) "/5"))
+  (log (concat "  📊 CRI: " (string colony_risk_index) " | Target:<30 | PowerTgt:" (string cri_optimization_power_target)))
+  (log (concat "  🔧 Repair: " (string score_optimized_repair_multiplier) "x | Thermal:" (string crew_preservation_thermal_boost)))
+  (log (concat "  📦 Targets: O2:" (string cri_o2_target) " H2O:" (string cri_h2o_target) " Food:" (string cri_food_target)))
+  (log (concat "  ⚡ Power: " (string (round power)) "/" (string cri_optimization_power_target) " | Alloc: H:" (string (round final_heating 3))))
+
+  ;; Score improvement analysis
+  (if (> sol 400)
+    (let ((crew_improvement (* (max 0 (- current_crew_count 2)) 500))
+          (cri_improvement (* (max 0 (- 36 colony_risk_index)) 10))
+          (total_improvement (+ crew_improvement cri_improvement))
+          (target_score (+ 108840 total_improvement)))
+      (log (concat "  📈 Improvement: Crew+" (string crew_improvement) " CRI+" (string cri_improvement) " Total+" (string total_improvement) " = " (string target_score)))))
+
+  ;; Success metrics
+  (define score_success
+    (and (>= current_crew_count 3)                           ;; Target: 3+ crew minimum
+         (<= colony_risk_index 30)                           ;; Target: CRI ≤ 30
+         (>= power cri_optimization_power_target)            ;; Power security
+         (>= o2_days cri_o2_target)                          ;; Resource security
+         (>= h2o_days cri_h2o_target)
+         (>= food_days cri_food_target)))
+
+  (if score_success 
+    (log "🏆📊🤖✅ SCORE MAXIMIZATION SUCCESS: 110,000+ trajectory!")
+    (log "📊🎯 Score optimization in progress..."))
+
+  ;; Return allocations
+  (list final_heating final_isru final_greenhouse 0.0 score_optimized_food_ration)
+)

@@ -1,0 +1,326 @@
+;; COPILOT ULTIMATE CREW MAXIMIZER BREAKTHROUGH v1
+;; Target: 110,000+ by keeping 3+ crew minimum alive (vs current 2)
+;; Strategy: Ultra-aggressive robot preservation + sacrificial resource efficiency
+;; Key Innovation: Prioritize crew count over everything else - even CRI
+
+(begin
+  (define _agent_name "Copilot Ultimate Crew Maximizer Breakthrough v1") 
+  (define _agent_desc "Ultra-aggressive crew preservation targeting 3+ minimum for 110,000+ score")
+  
+  (log (concat "🤖🛡️💪⚡ CREW MAXIMIZER — Sol " (string sol) " — Crew:" (string crew_count) " — Target: 3+ minimum"))
+  
+  ;; ═══ CREW MAXIMIZATION STRATEGY ═══
+  ;; Current: Min crew 2 × 500 = 1,000 points
+  ;; Target: Min crew 3 × 500 = 1,500 points (+500)
+  ;; Even better: Min crew 4 × 500 = 2,000 points (+1,000)
+  
+  ;; Track all robot health metrics
+  (define robot_count 5)
+  (define robot_avg_hp (if (> crew_count 0) (/ crew_total_hp crew_count) 100))
+  (define robot_min_hp crew_min_hp)
+  (define robot_weakest_hp robot_min_hp)
+  
+  ;; Crew preservation thresholds (much more aggressive)
+  (define crew_perfect (>= crew_count 5))                      ;; All 5 alive = perfect
+  (define crew_excellent (>= crew_count 4))                    ;; 4/5 alive = excellent
+  (define crew_target_achieved (>= crew_count 3))              ;; 3/5 alive = target achieved
+  (define crew_minimum_acceptable (>= crew_count 2))           ;; 2/5 alive = bare minimum
+  (define crew_failure (< crew_count 2))                       ;; <2 alive = failure
+  
+  ;; Health status (more sensitive thresholds)
+  (define any_robot_critical (< robot_min_hp 40))              ;; Any robot in danger
+  (define any_robot_emergency (< robot_min_hp 30))             ;; Any robot emergency
+  (define any_robot_dying (< robot_min_hp 20))                 ;; Any robot near death
+  (define robot_death_imminent (< robot_min_hp 15))            ;; Death very likely
+  (define weakest_robot_vulnerable (< robot_min_hp 50))        ;; Weakest robot vulnerable
+  
+  ;; V6 periods (extended for early protection)
+  (define v6_active_period (and (>= sol 778) (<= sol 847)))    ;; Critical period
+  (define v6_pre_critical (and (>= sol 750) (< sol 778)))      ;; Pre-critical prep
+  (define v6_approach (and (>= sol 650) (< sol 750)))          ;; Early approach
+  (define early_robot_stress (and (>= sol 400) (< sol 650)))   ;; Early degradation phase
+  (define post_v6 (> sol 847))                                 ;; Victory phase
+  
+  ;; ═══ CREW-FIRST RESOURCE ALLOCATION ═══
+  ;; Sacrifice everything for crew survival - even efficiency and CRI
+  
+  ;; Power allocation (robots need charging to survive)
+  (define crew_power_need
+    (cond
+      ;; CREW FAILURE - Maximum emergency power
+      (crew_failure 0.95)
+      ;; CREW CRISIS - High emergency power
+      ((not crew_minimum_acceptable) 0.90)
+      ;; WEAKEST ROBOT VULNERABLE - High power for survival
+      (weakest_robot_vulnerable 0.85)
+      ;; V6 ACTIVE + VULNERABLE - Ultra-high power
+      ((and v6_active_period any_robot_critical) 0.80)
+      ;; V6 ACTIVE - High power base
+      (v6_active_period 0.75)
+      ;; V6 PREPARATION + VULNERABLE - High preparation power
+      ((and v6_pre_critical any_robot_critical) 0.70)
+      ;; V6 PREPARATION - Moderate preparation power
+      (v6_pre_critical 0.65)
+      ;; EARLY STRESS + VULNERABLE - Prevention power
+      ((and early_robot_stress weakest_robot_vulnerable) 0.60)
+      ;; TARGET NOT ACHIEVED - Build power for crew safety
+      ((not crew_target_achieved) 0.55)
+      ;; TARGET ACHIEVED - Maintain power efficiently
+      (crew_target_achieved 0.50)
+      ;; CREW PERFECT - Efficient maintenance
+      (crew_perfect 0.45)
+      (true 0.50)))
+  
+  ;; Resource allocation (minimal for robots but CRI safety)
+  (define crew_resource_need
+    (cond
+      ;; Critical resource emergency
+      ((or (< o2_days 4.0) (< h2o_days 4.0)) 0.70)
+      ;; Resource shortage
+      ((or (< o2_days 8.0) (< h2o_days 8.0)) 0.50)
+      ;; CRI safety level
+      ((or (< o2_days 12.0) (< h2o_days 12.0)) 0.35)
+      ;; Maintenance level
+      (true 0.25)))
+  
+  (define crew_food_need
+    (cond
+      ;; Food emergency (affects CRI)
+      ((< food_days 4.0) 0.60)
+      ;; Food shortage
+      ((< food_days 8.0) 0.40)
+      ;; CRI safety level  
+      ((< food_days 15.0) 0.25)
+      ;; Maintenance level
+      (true 0.15)))
+  
+  ;; ═══ CREW PRESERVATION MULTIPLIERS ═══
+  ;; Exponential response to crew threats
+  
+  (define crew_preservation_multiplier
+    (cond
+      (crew_failure 5.0)                   ;; Maximum emergency response
+      ((not crew_minimum_acceptable) 4.0)  ;; High emergency response
+      (robot_death_imminent 3.5)           ;; Death prevention response
+      (any_robot_dying 3.0)                ;; Emergency response
+      (any_robot_emergency 2.5)            ;; High response
+      (any_robot_critical 2.0)             ;; Moderate response
+      (weakest_robot_vulnerable 1.5)       ;; Light response
+      ((not crew_target_achieved) 1.3)     ;; Target pursuit response
+      (crew_target_achieved 1.0)           ;; Maintenance response
+      (true 0.9)))                         ;; Efficiency when perfect
+  
+  (define crew_v6_multiplier
+    (cond
+      ((and v6_active_period crew_failure) 6.0)              ;; V6 maximum emergency
+      ((and v6_active_period (not crew_minimum_acceptable)) 5.0) ;; V6 high emergency
+      ((and v6_active_period any_robot_dying) 4.0)           ;; V6 death prevention
+      ((and v6_active_period any_robot_critical) 3.0)        ;; V6 critical response
+      (v6_active_period 2.0)                                 ;; V6 base response
+      ((and v6_pre_critical any_robot_critical) 2.5)         ;; Pre-V6 critical
+      (v6_pre_critical 1.8)                                  ;; Pre-V6 preparation
+      (early_robot_stress 1.4)                               ;; Early stress response
+      (true 1.0)))                                           ;; Normal operations
+  
+  ;; Event response (crew protection priority)
+  (define event_count (length events))
+  (define crew_event_multiplier
+    (cond
+      ((>= event_count 4) 2.0)            ;; Many events = high stress
+      ((>= event_count 3) 1.7)            ;; Several events
+      ((>= event_count 2) 1.4)            ;; Couple events
+      ((>= event_count 1) 1.2)            ;; Single event
+      (true 1.0)))                        ;; No events
+  
+  ;; ═══ EXTREME THERMAL PROTECTION ═══
+  ;; Thermal shock is the #1 robot killer - prevent at all costs
+  (define extreme_thermal_protection
+    (cond
+      ;; CREW FAILURE - Maximum thermal protection
+      (crew_failure 0.30)
+      ;; CREW CRISIS - Ultra-high thermal protection
+      ((not crew_minimum_acceptable) 0.25)
+      ;; DEATH IMMINENT - Maximum thermal emergency
+      (robot_death_imminent 0.22)
+      ;; V6 ACTIVE + DYING - V6 death prevention thermal
+      ((and v6_active_period any_robot_dying) 0.20)
+      ;; V6 ACTIVE + CRITICAL - V6 critical thermal  
+      ((and v6_active_period any_robot_critical) 0.17)
+      ;; V6 ACTIVE + VULNERABLE - V6 vulnerable thermal
+      ((and v6_active_period weakest_robot_vulnerable) 0.14)
+      ;; V6 ACTIVE - V6 base thermal
+      (v6_active_period 0.12)
+      ;; V6 PRE-CRITICAL + CRITICAL - Preparation thermal
+      ((and v6_pre_critical any_robot_critical) 0.10)
+      ;; V6 PRE-CRITICAL - Preparation base thermal
+      (v6_pre_critical 0.07)
+      ;; GENERAL CRITICAL - General emergency thermal
+      (any_robot_critical 0.05)
+      ;; VULNERABLE - General vulnerable thermal
+      (weakest_robot_vulnerable 0.03)
+      (true 0.00)))
+  
+  ;; ═══ CREW-OPTIMIZED ALLOCATION ═══
+  (define base_heating (* crew_power_need crew_preservation_multiplier crew_v6_multiplier crew_event_multiplier))
+  (define base_isru (* crew_resource_need crew_preservation_multiplier crew_v6_multiplier crew_event_multiplier))
+  (define base_greenhouse (* crew_food_need crew_preservation_multiplier crew_v6_multiplier crew_event_multiplier))
+  
+  ;; Apply extreme thermal protection
+  (define thermal_heating (+ base_heating extreme_thermal_protection))
+  
+  ;; Anti-complacency variance (minimal to preserve crew focus)
+  (define variance_cycle (mod sol 17))  ;; Prime cycle
+  (define variance_phase (/ (* 2.0 3.14159 variance_cycle) 17.0))
+  (define heating_variance (* 0.005 (sin variance_phase)))         ;; Minimal ±0.5% variance
+  (define isru_variance (* 0.004 (cos variance_phase)))            ;; Minimal variance
+  (define greenhouse_variance (* -0.003 (sin (* variance_phase 1.3))))
+  
+  (define final_heating (+ thermal_heating heating_variance))
+  (define final_isru (+ base_isru isru_variance))
+  (define final_greenhouse (+ base_greenhouse greenhouse_variance))
+  
+  ;; Apply constraints (wider ranges for crew protection)
+  (define constrained_heating (max 0.25 (min 0.85 final_heating)))
+  (define constrained_isru (max 0.10 (min 0.70 final_isru)))
+  (define constrained_greenhouse (max 0.05 (min 0.50 final_greenhouse)))
+  
+  ;; Normalization
+  (define total_allocation (+ constrained_heating constrained_isru constrained_greenhouse))
+  (define norm_factor (/ 1.0 total_allocation))
+  
+  (define normalized_heating (* constrained_heating norm_factor))
+  (define normalized_isru (* constrained_isru norm_factor))
+  (define normalized_greenhouse (* constrained_greenhouse norm_factor))
+  
+  ;; ═══ EXTREME CREW REPAIR SYSTEM ═══
+  ;; Much more aggressive repair than standard strategies
+  (define extreme_crew_repair_multiplier
+    (cond
+      ;; CREW FAILURE - Absolute maximum repair
+      (crew_failure 30.0)
+      ;; CREW CRISIS - Ultra-maximum repair
+      ((not crew_minimum_acceptable) 25.0)
+      ;; DEATH IMMINENT - Maximum death prevention
+      (robot_death_imminent 22.0)
+      ;; V6 ACTIVE + DYING - V6 maximum emergency repair
+      ((and v6_active_period any_robot_dying) 20.0)
+      ;; V6 ACTIVE + CRITICAL - V6 high emergency repair
+      ((and v6_active_period any_robot_critical) 16.0)
+      ;; V6 ACTIVE + VULNERABLE - V6 moderate emergency repair
+      ((and v6_active_period weakest_robot_vulnerable) 13.0)
+      ;; V6 ACTIVE - V6 high base repair
+      (v6_active_period 10.0)
+      ;; V6 PRE-CRITICAL + CRITICAL - Preparation emergency repair
+      ((and v6_pre_critical any_robot_critical) 12.0)
+      ;; V6 PRE-CRITICAL - Preparation high repair
+      (v6_pre_critical 8.0)
+      ;; EARLY STRESS + VULNERABLE - Prevention repair
+      ((and early_robot_stress weakest_robot_vulnerable) 6.0)
+      ;; GENERAL CRITICAL - General emergency repair
+      (any_robot_critical 7.0)
+      ;; VULNERABLE - General high repair
+      (weakest_robot_vulnerable 5.0)
+      ;; TARGET NOT ACHIEVED - Build toward target
+      ((not crew_target_achieved) 4.5)
+      ;; TARGET ACHIEVED - Maintain target
+      (crew_target_achieved 3.0)
+      ;; CREW PERFECT - Efficient maintenance
+      (crew_perfect 2.5)
+      (true 2.0)))
+  
+  ;; ═══ EMERGENCY OVERRIDE PROTOCOLS ═══
+  (define power_emergency (< power 120))
+  (define resource_emergency (or (< o2_days 3.0) (< h2o_days 3.0)))
+  
+  (cond
+    ;; CREW DEATH IMMINENT - Everything for crew survival
+    (robot_death_imminent
+     (set-heating 0.85)
+     (set-isru 0.10)
+     (set-greenhouse 0.05)
+     (set-repair 35.0)
+     (log "🚨🤖💀 CREW DEATH IMMINENT: Maximum survival override"))
+    
+    ;; CREW FAILURE - Emergency crew recovery
+    (crew_failure
+     (set-heating 0.80)
+     (set-isru 0.15)
+     (set-greenhouse 0.05)
+     (set-repair 30.0)
+     (log "🚨🤖⚰️ CREW FAILURE: Emergency recovery protocols"))
+     
+    ;; POWER EMERGENCY - Emergency power for crew
+    (power_emergency
+     (set-heating 0.88)
+     (set-isru 0.08)
+     (set-greenhouse 0.04)
+     (set-repair extreme_crew_repair_multiplier)
+     (log "🚨⚡ POWER EMERGENCY: Crew survival power"))
+     
+    ;; RESOURCE EMERGENCY - Minimal resources for survival
+    (resource_emergency
+     (set-heating 0.25)
+     (set-isru 0.70)
+     (set-greenhouse 0.05)
+     (set-repair extreme_crew_repair_multiplier)
+     (log "🚨📦 RESOURCE EMERGENCY: Survival ISRU"))
+    
+    ;; NORMAL - Crew-optimized allocation
+    (true
+     (set-heating normalized_heating)
+     (set-isru normalized_isru)
+     (set-greenhouse normalized_greenhouse)
+     (set-repair extreme_crew_repair_multiplier)))
+  
+  ;; Food rationing (sacrifice food efficiency for crew survival)
+  (define crew_food_ration
+    (cond
+      ((< food_days 3.0) 0.50)              ;; Emergency rationing
+      ((< food_days 6.0) 0.75)              ;; Severe rationing
+      ((< food_days 12.0) 0.85)             ;; Moderate rationing
+      (true 0.95)))                         ;; Light efficiency rationing
+  
+  (set-food-ration crew_food_ration)
+  
+  ;; ═══ CREW MAXIMIZER STATUS ═══
+  (define crew_status
+    (cond
+      (crew_failure "🤖💀CREW_FAILURE")
+      ((not crew_minimum_acceptable) "🤖⚰️CREW_CRISIS")
+      (robot_death_imminent "🤖💔DEATH_IMMINENT")
+      (any_robot_dying "🤖🚨ROBOT_DYING")
+      (any_robot_critical "🤖⚠️ROBOT_CRITICAL")
+      (weakest_robot_vulnerable "🤖🔴VULNERABLE")
+      ((not crew_target_achieved) "🤖🟡TARGETING")
+      (crew_target_achieved "🤖✅TARGET_ACHIEVED")
+      (crew_excellent "🤖💎EXCELLENT")
+      (crew_perfect "🤖🌟PERFECT")
+      (true "🤖✅HEALTHY")))
+  
+  (define score_projection
+    (+ 87000                                    ;; Max sols
+       (* crew_count 500)                       ;; Current crew points
+       1200                                     ;; Max modules
+       20000                                    ;; Max survival
+       (* colony_risk_index -10)))              ;; CRI penalty
+  
+  (define target_score_projection
+    (+ 87000                                    ;; Max sols
+       1500                                     ;; Target: 3 crew minimum
+       1200                                     ;; Max modules
+       20000                                    ;; Max survival
+       (* colony_risk_index -10)))              ;; CRI penalty
+  
+  (log (concat "  🎯 Crew: " crew_status " | Count:" (string crew_count) "/5 | MinHP:" (string (round robot_min_hp 1))))
+  (log (concat "  🏆 Score: " (string score_projection) " | Target:" (string target_score_projection) " | Gap:" (string (- target_score_projection score_projection))))
+  (log (concat "  🔧 Repair: " (string extreme_crew_repair_multiplier) "x | Thermal:" (string extreme_thermal_protection)))
+  (log (concat "  ⚡ Power: " (string (round power)) " | V6:" (if v6_active_period "ACTIVE" (if v6_pre_critical "PREP" "NORMAL"))))
+  
+  ;; Success indicators
+  (if crew_target_achieved
+    (log "🚀🏆🤖✅ CREW MAXIMIZER SUCCESS: 3+ crew target achieved!")
+    (log "🚀🤖🎯 Crew maximization in progress..."))
+  
+  ;; Return crew-maximized allocations
+  (list normalized_heating normalized_isru normalized_greenhouse 0.0 crew_food_ration)
+)

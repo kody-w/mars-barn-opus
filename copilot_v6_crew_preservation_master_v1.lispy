@@ -1,0 +1,284 @@
+;; COPILOT V6 CREW PRESERVATION MASTER v1
+;; Target: Achieve 109,340+ by guaranteeing 3+ crew minimum (vs current 2)
+;; Strategy: Ultra-conservative crew health management + maximum repair allocation
+;; Focus: Sacrifice some efficiency for guaranteed crew survival - +500 points minimum
+
+(begin
+  (define _agent_name "Copilot V6 Crew Preservation Master v1")
+  (define _agent_desc "Ultra-conservative crew preservation for 3+ minimum crew guarantee")
+  
+  (log (concat "👥🛡️💎 CREW PRESERVATION — Sol " (string sol) " — CRI:" (string colony_risk_index) " — Target: 3+ crew minimum"))
+  
+  ;; ═══ CREW PRESERVATION SCIENCE ═══
+  ;; Current issue: min crew = 1-2, losing 500-1000 points
+  ;; Target: Guarantee min crew ≥ 3 for +500 points minimum  
+  ;; Strategy: Ultra-high repair allocation + early intervention thresholds
+
+  ;; Enhanced crew health monitoring with lower thresholds
+  (define robot_count 5)
+  (define crew_preservation_excellent (>= crew_min_hp 80))   ;; Excellent health
+  (define crew_preservation_very_good (>= crew_min_hp 70))   ;; Very good health
+  (define crew_preservation_good (>= crew_min_hp 60))       ;; Good health - start boosting
+  (define crew_preservation_concerning (>= crew_min_hp 50))  ;; Concerning - moderate boost
+  (define crew_preservation_critical (>= crew_min_hp 40))   ;; Critical - high boost
+  (define crew_preservation_emergency (>= crew_min_hp 30))  ;; Emergency - maximum boost
+  (define crew_death_risk (< crew_min_hp 30))               ;; Death risk - override everything
+  
+  (define avg_robot_hp (if (> crew_count 0) (/ crew_total_hp crew_count) 100))
+  (define current_crew_count crew_count)
+  
+  ;; Crew count targets - be VERY conservative
+  (define crew_preservation_target
+    (cond
+      ((< sol 200) 5)          ;; Early: keep all 5 robots
+      ((< sol 400) 4)          ;; Mid: keep 4+ robots  
+      ((< sol 600) 4)          ;; Late-mid: keep 4+ robots
+      (true 3)))               ;; End game: minimum 3 robots for score
+
+  (define crew_preservation_crisis (< current_crew_count crew_preservation_target))
+
+  ;; V6 period awareness
+  (define v6_active_period (and (>= sol 778) (<= sol 847)))
+  (define v6_preparation_period (and (>= sol 700) (< sol 778)))
+  (define v6_approach_period (and (>= sol 600) (< sol 700)))
+
+  ;; ═══ ULTRA-HIGH REPAIR ALLOCATION SYSTEM ═══
+  ;; The key to crew preservation - massive repair investment
+  (define crew_preservation_repair_multiplier
+    (cond
+      ;; CREW COUNT CRISIS - Maximum repair to save robots
+      ((< current_crew_count 3) 15.0)                        ;; MAXIMUM POSSIBLE REPAIR
+      (crew_death_risk 12.0)                                 ;; Death risk - extreme repair
+      ;; HEALTH-BASED REPAIR SCALING
+      ((not crew_preservation_emergency) 10.0)               ;; Emergency repair
+      ((not crew_preservation_critical) 7.5)                 ;; Critical repair
+      ((not crew_preservation_concerning) 5.5)               ;; Concerning repair
+      ((not crew_preservation_good) 4.0)                     ;; Boost repair early
+      ;; V6 PERIOD BASELINE (higher than normal)
+      ((and v6_active_period crew_preservation_very_good) 3.5) ;; V6 with good health
+      (v6_active_period 4.5)                                 ;; V6 baseline higher
+      (v6_preparation_period 3.8)                            ;; V6 prep higher
+      (v6_approach_period 3.2)                               ;; V6 approach higher
+      ;; NORMAL PERIODS (still higher than standard)
+      (crew_preservation_very_good 2.5)                      ;; Excellent health maintenance
+      (true 3.0)))                                           ;; Baseline higher than standard
+
+  ;; ═══ CREW PRESERVATION THERMAL PROTECTION ═══
+  ;; Conservative thermal protection to prevent component failures
+  (define crew_preservation_thermal_boost
+    (cond
+      (crew_death_risk 0.15)                                 ;; Maximum thermal
+      ((not crew_preservation_emergency) 0.12)               ;; Emergency thermal
+      ((not crew_preservation_critical) 0.08)                ;; Critical thermal
+      ((not crew_preservation_concerning) 0.05)              ;; Concerning thermal
+      ((and v6_active_period (not crew_preservation_good)) 0.06) ;; V6 + not good
+      (v6_active_period 0.04)                                ;; V6 baseline
+      ((not crew_preservation_good) 0.03)                    ;; Not good health
+      (true 0.00)))                                          ;; Excellent health
+
+  ;; ═══ CREW PRESERVATION RESOURCE STRATEGY ═══
+  ;; Conservative resource management - build buffers early and maintain them
+  
+  (define crew_preservation_power_target
+    (cond
+      (crew_preservation_crisis 800)      ;; Crisis - maximum power
+      (crew_death_risk 700)               ;; Death risk - very high power
+      ((< current_crew_count 4) 600)      ;; Below 4 crew - high power
+      (v6_active_period 550)              ;; V6 active
+      (v6_preparation_period 500)         ;; V6 prep
+      (v6_approach_period 450)            ;; V6 approach
+      (true 400)))                        ;; Conservative baseline
+
+  ;; Resource targets - higher for safety margins
+  (define crew_preservation_o2_target 50.0)     ;; Higher O2 buffer
+  (define crew_preservation_h2o_target 50.0)    ;; Higher H2O buffer  
+  (define crew_preservation_food_target 60.0)   ;; Higher food buffer
+
+  ;; ═══ CREW PRESERVATION ALLOCATION LOGIC ═══
+  
+  (define crew_preservation_power_need
+    (cond
+      ((< power 250) 0.85)                                   ;; Power emergency
+      ((< power crew_preservation_power_target) 0.65)        ;; Power building
+      (true 0.45)))                                          ;; Power maintained - higher baseline
+
+  (define crew_preservation_o2_need
+    (cond
+      ((< o2_days 20.0) 0.80)                                ;; O2 critical - earlier intervention
+      ((< o2_days 35.0) 0.70)                                ;; O2 low - earlier intervention
+      ((< o2_days crew_preservation_o2_target) 0.55)         ;; Build buffer
+      (true 0.40)))                                          ;; Maintain buffer - higher baseline
+
+  (define crew_preservation_h2o_need
+    (cond
+      ((< h2o_days 20.0) 0.75)                               ;; H2O critical - earlier intervention
+      ((< h2o_days 35.0) 0.65)                               ;; H2O low - earlier intervention  
+      ((< h2o_days crew_preservation_h2o_target) 0.50)       ;; Build buffer
+      (true 0.35)))                                          ;; Maintain buffer - higher baseline
+
+  (define crew_preservation_food_need
+    (cond
+      ((< food_days 25.0) 0.65)                              ;; Food critical - earlier intervention
+      ((< food_days 40.0) 0.55)                              ;; Food low - earlier intervention
+      ((< food_days crew_preservation_food_target) 0.40)     ;; Build buffer
+      (true 0.25)))                                          ;; Maintain buffer
+
+  (define crew_preservation_isru_need (max crew_preservation_o2_need crew_preservation_h2o_need))
+
+  ;; ═══ CREW PRESERVATION MULTIPLIERS ═══
+  
+  (define crew_preservation_cri_response
+    (cond
+      ((< colony_risk_index 20) 1.0)      ;; Low CRI
+      ((< colony_risk_index 30) 1.2)      ;; Medium CRI
+      ((< colony_risk_index 40) 1.5)      ;; High CRI
+      (true 1.8)))                        ;; Very high CRI - more conservative
+
+  (define event_count (length events))
+  (define crew_preservation_event_response
+    (cond
+      ((>= event_count 3) 2.0)            ;; Many events - conservative response
+      ((>= event_count 2) 1.6)            ;; Several events
+      ((>= event_count 1) 1.3)            ;; Single event
+      (true 1.0)))                        ;; No events
+
+  (define crew_health_emergency_multiplier
+    (cond
+      (crew_preservation_crisis 2.5)      ;; Crew count crisis
+      (crew_death_risk 2.2)               ;; Death risk
+      ((not crew_preservation_emergency) 1.9) ;; Emergency health
+      ((not crew_preservation_critical) 1.6)  ;; Critical health
+      ((not crew_preservation_concerning) 1.3) ;; Concerning health
+      (true 1.0)))                        ;; Good health
+
+  ;; ═══ CONSERVATIVE VARIANCE ═══
+  ;; Minimal variance to avoid complacency while maintaining stability
+  (define variance_cycle (mod sol 5))  ;; Simple 5-sol cycle
+  (define variance_phase (/ (* 2.0 3.14159 variance_cycle) 5.0))
+  
+  (define heating_variance (* 0.01 (sin variance_phase)))      ;; ±1% variance - smaller
+  (define isru_variance (* 0.008 (cos variance_phase)))        ;; ±0.8% variance - smaller
+  (define greenhouse_variance (* -1.0 (+ heating_variance isru_variance)))
+
+  ;; ═══ CREW PRESERVATION ALLOCATIONS ═══
+  (define base_heating (* crew_preservation_power_need crew_preservation_cri_response crew_preservation_event_response crew_health_emergency_multiplier))
+  (define base_isru (* crew_preservation_isru_need crew_preservation_cri_response crew_preservation_event_response crew_health_emergency_multiplier))
+  (define base_greenhouse (* crew_preservation_food_need crew_preservation_cri_response crew_preservation_event_response crew_health_emergency_multiplier))
+  
+  ;; Apply thermal protection and variance
+  (define thermal_heating (+ base_heating crew_preservation_thermal_boost))
+  (define variance_heating_final (+ thermal_heating heating_variance))
+  (define variance_isru_final (+ base_isru isru_variance))
+  (define variance_greenhouse_final (+ base_greenhouse greenhouse_variance))
+  
+  ;; Conservative constraints - wider ranges for stability
+  (define constrained_heating (max 0.25 (min 0.70 variance_heating_final)))
+  (define constrained_isru (max 0.25 (min 0.65 variance_isru_final)))
+  (define constrained_greenhouse (max 0.20 (min 0.55 variance_greenhouse_final)))
+  
+  (define total_allocation (+ constrained_heating constrained_isru constrained_greenhouse))
+  (define norm_factor (/ 1.0 total_allocation))
+  
+  (define final_heating (* constrained_heating norm_factor))
+  (define final_isru (* constrained_isru norm_factor))
+  (define final_greenhouse (* constrained_greenhouse norm_factor))
+
+  ;; ═══ EMERGENCY OVERRIDES FOR CREW PRESERVATION ═══
+  (define power_crisis (< power 200))
+  (define resource_crisis (or (< o2_days 15.0) (< h2o_days 15.0)))
+  
+  (cond
+    ;; CREW DEATH IMMINENT - Maximum crew preservation
+    (crew_death_risk
+     (set-heating 0.75)
+     (set-isru 0.15)
+     (set-greenhouse 0.10)
+     (set-repair crew_preservation_repair_multiplier)
+     (log "🚨👥💀 CREW DEATH RISK: Maximum preservation protocols"))
+     
+    ;; CREW COUNT CRISIS - Boost crew preservation
+    (crew_preservation_crisis
+     (set-heating 0.65)
+     (set-isru 0.25)
+     (set-greenhouse 0.10)
+     (set-repair crew_preservation_repair_multiplier)
+     (log "🚨👥📉 CREW COUNT CRISIS: Enhanced preservation"))
+     
+    ;; POWER CRISIS - Conservative power response
+    (power_crisis
+     (set-heating 0.78)
+     (set-isru 0.17)
+     (set-greenhouse 0.05)
+     (set-repair crew_preservation_repair_multiplier)
+     (log "🚨⚡ POWER CRISIS: Conservative heating"))
+     
+    ;; RESOURCE CRISIS - Conservative resource response  
+    (resource_crisis
+     (set-heating 0.35)
+     (set-isru 0.55)
+     (set-greenhouse 0.10)
+     (set-repair crew_preservation_repair_multiplier)
+     (log "🚨📦 RESOURCE CRISIS: Conservative ISRU"))
+    
+    ;; NORMAL - Crew preservation optimized allocation
+    (true
+     (set-heating final_heating)
+     (set-isru final_isru)
+     (set-greenhouse final_greenhouse)
+     (set-repair crew_preservation_repair_multiplier)))
+
+  ;; ═══ CREW PRESERVATION FOOD RATIONING ═══
+  (define crew_preservation_food_ration
+    (cond
+      ((< food_days 18.0) 0.75)                              ;; Emergency rationing - earlier
+      ((< food_days 30.0) 0.85)                              ;; Critical rationing - earlier
+      ((< food_days crew_preservation_food_target) 0.92)     ;; Building buffer
+      (true 0.98)))                                          ;; Conservative full rations
+
+  (set-food-ration crew_preservation_food_ration)
+
+  ;; ═══ CREW PRESERVATION STATUS ═══
+  (define crew_status
+    (cond
+      (crew_death_risk "👥💀DEATH_RISK")
+      (crew_preservation_crisis "👥🚨CREW_CRISIS")
+      ((not crew_preservation_emergency) "👥⚠️EMERGENCY")
+      ((not crew_preservation_critical) "👥🔴CRITICAL")
+      ((not crew_preservation_concerning) "👥🟡CONCERNING") 
+      ((not crew_preservation_good) "👥🟢DECENT")
+      (crew_preservation_very_good "👥✅VERY_GOOD")
+      (crew_preservation_excellent "👥💎EXCELLENT")
+      (true "👥✅HEALTHY")))
+
+  (define crew_score_current (* current_crew_count 500))
+  (define crew_score_target (* crew_preservation_target 500))
+  (define crew_score_gap (- crew_score_target crew_score_current))
+
+  (log (concat "  👥 Crew: " crew_status " | Count:" (string current_crew_count) "/" (string crew_preservation_target)))
+  (log (concat "  💎 MinHP:" (string crew_min_hp) " | AvgHP:" (string (round avg_robot_hp 1)) " | Target: 3+ minimum"))
+  (log (concat "  🔧 Repair: " (string crew_preservation_repair_multiplier) "x | Thermal:" (string crew_preservation_thermal_boost)))
+  (log (concat "  📊 Score: Current=" (string crew_score_current) " Target=" (string crew_score_target) " Gap=" (string crew_score_gap)))
+  (log (concat "  ⚡ Power: " (string (round power)) "/" (string crew_preservation_power_target) " | Conservative targets"))
+  (log (concat "  📦 Resources: O2:" (string (round o2_days 1)) " H2O:" (string (round h2o_days 1)) " Food:" (string (round food_days 1))))
+
+  ;; Success metrics for crew preservation
+  (define crew_preservation_success
+    (and (>= current_crew_count 3)                           ;; Target achieved
+         (>= crew_min_hp 40)                                 ;; Healthy crew
+         (>= power crew_preservation_power_target)           ;; Power security
+         (>= o2_days crew_preservation_o2_target)            ;; Resource security
+         (>= h2o_days crew_preservation_h2o_target)
+         (>= food_days 45)))
+
+  (if crew_preservation_success 
+    (log "🏆👥✅ CREW PRESERVATION SUCCESS: 3+ crew minimum secured!")
+    (log "👥🎯 Crew preservation in progress..."))
+
+  ;; Score projection
+  (if (> sol 300)
+    (let ((projected_score (+ 87000 crew_score_current 1200 20000 (* colony_risk_index -10))))
+      (log (concat "  🎯 Projected Score: " (string projected_score) " (Target: 109,340+)"))))
+
+  ;; Return allocations
+  (list final_heating final_isru final_greenhouse 0.0 crew_preservation_food_ration)
+)
