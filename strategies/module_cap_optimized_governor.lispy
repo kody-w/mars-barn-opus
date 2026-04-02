@@ -1,30 +1,31 @@
-;; PURE CRI OPTIMIZATION GOVERNOR v2.0 — Maximum Score via CRI Minimization
-;; Strategy: Since modules are hardcoded in gauntlet, focus purely on minimizing CRI
-;; Target: 150,000+ by achieving CRI ≤ 10 (gaining +130 points vs current CRI 23)
-;; Innovation: Accept hardcoded modules, optimize purely for lowest possible CRI
+;; MODULE CAP OPTIMIZED GOVERNOR v1.0 — Strategic Score Maximization
+;; Strategy: Build exactly 8 modules (scoring cap) then optimize CRI and survival
+;; Target: 150,000+ by eliminating wasted module building + perfect CRI management
+;; Innovation: Module count discipline + aggressive CRI optimization post-infrastructure
 
 (begin
-  (log (concat "🎯💎⚡ PURE CRI OPTIMIZATION — Sol " (string sol) " — CRI: " (string colony_risk_index) " | Target CRI ≤ 10 for +130 score"))
+  (log (concat "🎯📊💎 MODULE CAP OPTIMIZED — Sol " (string sol) " — Modules: " (string (length modules)) "/8 | CRI: " (string colony_risk_index) " | Target: 150k+"))
   
-  ;; ═══ PURE CRI OPTIMIZATION ═══ 
-  ;; Key insight: Modules are hardcoded in gauntlet.js, so focus purely on CRI
-  ;; Current CRI 23 costs -230 points. Target CRI 10 = gain +130 points
+  ;; ═══ MODULE BUILDING DISCIPLINE ═══ 
+  ;; Key insight: Only first 8 modules count for score
+  ;; After 8 modules, focus entirely on CRI optimization
   (define modules_count (length modules))
-  (define cri_target 10)  ;; Aggressive CRI target for maximum score
+  (define modules_complete (>= modules_count 8))
+  (define modules_nearly_complete (>= modules_count 6))
   
   ;; ═══ ENHANCED PHASE DETECTION ═══
-  (define cri_optimization_phase true)                          ;; Always optimize CRI since modules are hardcoded
+  (define infrastructure_build_phase (< modules_count 8))        ;; Phase 1: Build exactly 8 modules
+  (define cri_optimization_phase (>= modules_count 8))          ;; Phase 2: Optimize CRI + survival
   (define v4_transition_phase (and (>= sol 678) (< sol 728)))   ;; V4 transition
   (define entropy_phase (and (>= sol 728) (< sol 778)))         ;; V5 entropy collapse
   (define autonomous_ops_phase (and (>= sol 778) (< sol 848)))  ;; V6 autonomous ops
   (define v11_preparation_phase (and (>= sol 950) (< sol 1008))) ;; V11 prep
   (define v11_active_phase (>= sol 1008))                       ;; V11 supply windows
   
-  ;; Sub-phases for different CRI optimization strategies
-  (define ultra_early_cri (< sol 200))
-  (define early_cri (and (>= sol 200) (< sol 500)))
-  (define mid_cri (and (>= sol 500) (< sol 800)))
-  (define late_cri (>= sol 800))
+  ;; Sub-phases for infrastructure building (more aggressive early)
+  (define ultra_early_build (and infrastructure_build_phase (< sol 200)))
+  (define rapid_build (and infrastructure_build_phase (>= sol 200) (< sol 400)))
+  (define final_infrastructure (and infrastructure_build_phase (>= sol 400)))
   
   ;; ═══ CRI-OPTIMIZED RESOURCE TARGETS ═══
   ;; Aggressive during infrastructure, conservative during CRI optimization

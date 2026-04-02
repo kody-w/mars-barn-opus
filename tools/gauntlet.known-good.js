@@ -1046,14 +1046,14 @@ function tick(st, sol, frame, R){
 
 function createState(seed){
   return {
-    o2:0, h2o:0, food:0, power:800, se:1, ie:1, ge:1, it:293, cri:5, // v13: Back to original starting values for baseline
+    o2:0, h2o:0, food:0, power:800, se:1, ie:1, ge:1, it:293, cri:5, // v13: Original baseline for robot crews
     // v7 Sabatier chemistry state
     catalyst_age_hours: 0,        // Catalyst operating hours (degrades over time)
     catalyst_efficiency: 1.0,     // Current catalyst efficiency (decreases with age)
     electrode_age_hours: 0,       // Electrolysis electrode operating hours
     electrode_efficiency: 1.0,    // Current electrode efficiency
     crew:[
-      // v13: Temporarily all robots for baseline comparison
+      // v13: All robots baseline (psychology system ready but not active for robots)
       {n:'ROBOT-01',bot:true,hp:100,mr:100,a:true,stress_level:0,morale:100,circadian_misalignment:0,isolation_tolerance:100,social_compatibility:50},
       {n:'ROBOT-02',bot:true,hp:100,mr:100,a:true,stress_level:0,morale:100,circadian_misalignment:0,isolation_tolerance:100,social_compatibility:50},
       {n:'ROBOT-03',bot:true,hp:100,mr:100,a:true,stress_level:0,morale:100,circadian_misalignment:0,isolation_tolerance:100,social_compatibility:50},

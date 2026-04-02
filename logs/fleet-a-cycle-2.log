@@ -304,3 +304,158 @@ Based on my analysis of the current governor and the rules, I can see the key op
 3. **Resource Efficiency**: We can be more strategic about resource allocation once we have the 8 modules we need.
 
 Let me create an optimized governor that addresses these issues:
+
+● Create module_cap_optimized_governor.lispy +284
+  └ strategies/module_cap_optimized_governor.lispy
+
+Now let me update the main governor.lispy with this optimized strategy:
+
+● Copy optimized governor to main position (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && cp
+  │ strategies/module_cap_optimized_governor.lispy governor.lispy
+  └ 1 line...
+
+Now let's test our optimization with the Monte Carlo gauntlet:
+
+● Test optimized governor with 10 Monte Carlo runs (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 10
+  └ 28 lines...
+
+Interesting! The score is exactly the same (144,470) but I notice we're still building 15 modules. Let me check if there's an issue with my governor logic or if the module building is hardcoded somewhere else. Let me run a quick test to see what's happening:
+
+● Run single simulation to see module building behavior (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --single-run 0 |
+  │ grep -E "(MODULE|modules|Sol [0-9]+.*🏭|Building|Build)"
+  └ 1 line...
+
+● Run single simulation to see what's happening (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --single-run 0
+  └ 8 lines...
+
+Let me look at what controls module building. It might not be in the governor file:
+
+● Search (grep)
+  │ "module.*build|build.*module" in **/*.js
+  └ 1 file found
+
+● Read run_sim.js
+  │ tools/run_sim.js
+  └ L1:100 (99 lines read)
+
+Let me look for the module building logic:
+
+● Search (grep)
+  │ "build.*module|modules.*build" (tools)
+  └ 7 lines found
+
+Let me search more specifically:
+
+● Search for module building logic (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && grep -r -n "mission.*modules" tools/ ||
+  │ grep -r -n "modules.*push\|push.*modules" tools/ || grep -r -n "buildModules\|module.*build"
+  │ tools/
+  └ 2 lines...
+
+Found it! Let me look at this module building logic:
+
+● Read run_sim.js
+  │ tools/run_sim.js
+  └ L310:340 (30 lines read)
+
+Perfect! I found the issue. The module building is hardcoded in the simulation with an AUTO-BUILD system that builds modules every 40 sols regardless of the governor strategy. This explains why we always get 15+ modules.
+
+Looking at line 319: `if(sol % 40 === 0 && moduleIdx < MODULE_ORDER.length && state.power > 150)`
+
+The only way to control module building is to keep power ≤ 150. Let me check what MODULE_ORDER contains:
+
+● Search (grep)
+  │ "MODULE_ORDER" (tools/run_sim.js)
+  └ 35 lines found
+
+Now I understand! The simulation has hardcoded module building logic:
+
+1. There are 6 module types in MODULE_ORDER
+2. Every 40 sols, if power > 150, it builds the next module
+3. This means by sol 240 (6 × 40), we'll have built all 6 modules
+4. But the simulation continues building more modules beyond this apparently...
+
+Wait, let me check if there are more modules being built. Let me check if MODULE_ORDER gets extended or if there's another build system:
+
+● Extract module building information from sim output (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --single-run 0
+  │ | node -e "
+  │ const fs = require('fs');
+  │ let content = '';
+  │ process.stdin.on('data', chunk => content += chunk);…
+  └ 10 lines...
+
+Let me run a more verbose sim to see what's happening:
+
+● Read run_sim.js
+  └ tools/run_sim.js
+
+● Get total line count (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && wc -l tools/run_sim.js
+  └ 2 lines...
+
+● Read run_sim.js
+  │ tools/run_sim.js
+  └ L400:435 (36 lines read)
+
+Now I need to understand the discrepancy. Looking at the code, there are only 6 modules in MODULE_ORDER, but we're getting 15 modules built. Let me check if there's been a modification or if I'm reading the wrong simulation code. Let me check the gauntlet.js file:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L1:50 (49 lines read)
+
+Let me search for the actual module building logic in gauntlet.js:
+
+● Find module building logic in gauntlet.js (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && grep -n -A5 -B5
+  │ "modules.*push\|push.*modules\|auto.*build\|moduleIdx\|MODULE_ORDER" tools/gauntlet.js
+  └ 1 line...
+
+Let me search more broadly:
+
+● Find any module-related code in gauntlet.js (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && grep -n "module" tools/gauntlet.js |
+  │ head -20
+  └ 21 lines...
+
+This is helpful! Let me look at these specific scoring lines:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L980:1020 (41 lines read)
+
+FOUND IT! There's a hardcoded ultra-aggressive module building schedule in the gauntlet.js file starting around line 985. This explains why we're getting 15+ modules despite the governor strategy. The gauntlet has been modified with a "HYPERMAX SCORE OPTIMIZATION" system that builds many modules very early.
+
+However, according to the user's instructions, I'm NOT allowed to modify tools/gauntlet.js (Amendment VII says it's sacred). But let me see if there are more module builds:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L1020:1060 (41 lines read)
+
+I can see the gauntlet is hardcoded to build many modules, with conditions like `&&st.mod.length<12` to limit to 12 modules. Since I cannot modify the gauntlet.js file per Amendment VII, I need to work within this constraint.
+
+However, let me check if there's a strategic opportunity. Looking at the scoring formula from the Rules:
+`+ min(median_modules, 8) × 150`
+
+Since only 8 modules count toward score, and the gauntlet is building many more, the key insight is that **the median modules will always be above 8**, so we'll always get the full 1,200 points (8 × 150) from modules regardless of our governor strategy.
+
+This means our optimization should focus entirely on:
+1. **Maximizing survival rate** (20,000 points for 100%)
+2. **Minimizing CRI** (each point of CRI costs -10 points)
+3. **Maximizing crew alive** (500 points each)
+4. **Maximizing median sols survived** (100 points each)
+
+Since the modules are hardcoded, let me create a governor focused purely on CRI optimization and survival:
+
+● Edit governor.lispy +4 -4
+
+● Edit governor.lispy +1 -1
+
+● Edit governor.lispy +4 -5
+
+● Edit governor.lispy +6 -6
+

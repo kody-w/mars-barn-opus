@@ -579,3 +579,44 @@ Perfect! All 77 tests passed. Now let me commit the v13 crew psychology implemen
 
 Let me add the remaining log file and commit:
 
+● Add remaining log file (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && git add
+  │ logs/fleet-builder-v13-crew-psychology.log
+  └ 1 line...
+
+● Commit v13 implementation (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && git commit -m "Fleet B: Implement v13
+  │ Crew Psychology Model
+  │
+  │ ⚡ PHYSICS UPGRADE: Real NASA/Mars-500/HI-SEAS crew psychology physics…
+  └ 52 lines...
+
+Now let me push to both remotes as required:
+
+● Push to kody remote (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && git push kody main
+  └ 10 lines...
+
+● Switch auth and push to origin remote (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && gh auth switch --user rappter2-ux && gh
+  │ auth setup-git && git push origin main
+  └ 11 lines...
+
+● Switch back to kody-w auth (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && gh auth switch --user kody-w && gh auth
+  │ setup-git
+  └ 2 lines...
+
+Perfect! Now let me run one final validation to confirm everything is working correctly:
+
+● Final validation check (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && bash tools/validate-gauntlet.sh
+  └ 4 lines...
+
+
+Total usage est:        1 Premium request
+API time spent:         11m 55s
+Total session time:     14m 21s
+Total code changes:     +703 -62
+Breakdown by AI model:
+ claude-sonnet-4          7.9m in, 33.5k out, 7.7m cached (Est. 1 Premium request)
