@@ -239,6 +239,52 @@
         "thermal_mass": "8000 kg habitat × 1000 J/kg·K specific heat",
         "degradation": "Insulation efficiency decreases 0.01% per sol from cumulative damage"
       }
+    },
+    {
+      "version": 9,
+      "name": "Spatial Layout",
+      "released": "2026-04-02",
+      "sol_range": [
+        948,
+        977
+      ],
+      "hazards_added": [
+        "cable_degradation",
+        "foundation_settling",
+        "infrastructure_overextension",
+        "thermal_bridge_formation",
+        "excavation_hazard"
+      ],
+      "events_added": [
+        "site_survey_required",
+        "cable_routing_optimization", 
+        "foundation_reinforcement"
+      ],
+      "challenges_added": [
+        "module_placement_optimization",
+        "thermal_management",
+        "construction_scheduling"
+      ],
+      "notes": "SPATIAL INFRASTRUCTURE: Modules now exist on 16×16 grid (160m × 160m footprint). Distance matters: power loss = I²R × cable length, thermal bridges between adjacent modules, construction requires adjacency to existing infrastructure within 2 tiles, foundation preparation takes 3 sols. Based on NASA JSC Mars habitat architecture studies, power distribution specifications (copper cable resistance 1.68×10⁻⁸ Ω·m), EVA operational limits (~500m radius), and regolith bearing capacity (300-1000 kPa). Construction is no longer instantaneous - site preparation, adjacency constraints, and distance costs force strategic layout planning.",
+      "backtest_target": "Run v8 best strategy against v9 frames. Expected: Governors assuming instantaneous module construction will fail when spatial constraints require foundation prep time, adjacency planning, and infrastructure overhead costs.",
+      "data_sources": [
+        "NASA JSC Mars habitat thermal modeling (JSC-CN-33799)",
+        "Mars regolith bearing capacity studies (300-1000 kPa)",
+        "Copper cable resistivity at Mars temperature (1.68×10⁻⁸ Ω·m at 230K)",
+        "NASA EVA operational limits (~500m effective radius)",
+        "Mars habitat architecture studies (modular grid layouts)",
+        "Power distribution losses (I²R) for Mars surface power grids",
+        "Regolith excavation and foundation preparation time estimates"
+      ],
+      "physics": {
+        "grid_layout": "16×16 tiles, each 10m×10m (160m × 160m colony footprint)",
+        "cable_resistance": "R = ρL/A where ρ=1.68×10⁻⁸ Ω·m, typical 50mm² cable cross-section",
+        "power_loss": "P_loss = I²R where I = P/V, typical 400V distribution voltage",
+        "thermal_bridges": "Adjacent modules (1 tile apart) create 1-2 kW additional heating cost",
+        "foundation_prep": "3 sols site preparation per module (excavation, leveling, compaction)",
+        "adjacency_constraint": "New modules must connect within 2 tiles of existing infrastructure",
+        "operational_radius": "Efficient maintenance limited to 5 tiles (~50m) from habitat center"
+      }
     }
   ],
   "backtest_protocol": {
