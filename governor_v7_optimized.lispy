@@ -1,0 +1,88 @@
+;; V7 Optimized Governor - Compatible with Python LisPy
+;; Target: Beat 113,170 points with 6+ crew survival
+
+(begin
+  ;; ═══ CRISIS DETECTION ═══
+  (define o2_low (< o2_days 5))
+  (define h2o_low (< h2o_days 8))
+  (define food_low (< food_days 8))
+  (define power_low (< power_kwh 200))
+  (define temp_cold (< interior_temp_k 260))
+  (define crew_low (<= crew_count 5))
+  
+  ;; ═══ COMBINED CRISIS CONDITIONS ═══
+  (define resource_crisis (or o2_low h2o_low))
+  (define infrastructure_crisis (or power_low temp_cold))
+  (define crew_crisis (or crew_low resource_crisis))
+  
+  ;; ═══ PHASE DETECTION ═══
+  (define v6_phase (and (>= sol 778) (< sol 847)))
+  (define v6_prep (and (>= sol 600) (< sol 778)))
+  (define late_game (>= sol 400))
+  (define mid_game (and (>= sol 150) (< sol 400)))
+  
+  ;; ═══ ALLOCATION LOGIC ═══
+  (cond
+    ;; ABSOLUTE EMERGENCY: Critical crew or O2
+    ((or crew_low o2_low)
+     (set! heating_alloc 0.85)
+     (set! isru_alloc 0.13)
+     (set! greenhouse_alloc 0.02)
+     (set! food_ration 0.6)
+     (print "ABSOLUTE EMERGENCY"))
+    
+    ;; CRITICAL: Infrastructure crisis
+    (infrastructure_crisis
+     (set! heating_alloc 0.75)
+     (set! isru_alloc 0.20)
+     (set! greenhouse_alloc 0.05)
+     (set! food_ration 0.7)
+     (print "CRITICAL INFRASTRUCTURE"))
+    
+    ;; V6 AUTONOMOUS PHASE: Robot survival mode
+    (v6_phase
+     (set! heating_alloc 0.70)
+     (set! isru_alloc 0.20)
+     (set! greenhouse_alloc 0.10)
+     (set! food_ration 0.9)
+     (print "V6 AUTONOMOUS"))
+    
+    ;; V6 PREPARATION: Thermal buildup
+    (v6_prep
+     (set! heating_alloc 0.60)
+     (set! isru_alloc 0.25)
+     (set! greenhouse_alloc 0.15)
+     (set! food_ration 0.9)
+     (print "V6 PREPARATION"))
+    
+    ;; RESOURCE CRISIS: H2O or food low
+    ((or h2o_low food_low)
+     (set! heating_alloc 0.45)
+     (set! isru_alloc 0.35)
+     (set! greenhouse_alloc 0.20)
+     (set! food_ration 0.8)
+     (print "RESOURCE CRISIS"))
+    
+    ;; LATE GAME: Thermal focus
+    (late_game
+     (set! heating_alloc 0.55)
+     (set! isru_alloc 0.30)
+     (set! greenhouse_alloc 0.15)
+     (set! food_ration 1.0)
+     (print "LATE GAME"))
+    
+    ;; MID GAME: Balanced growth  
+    (mid_game
+     (set! heating_alloc 0.45)
+     (set! isru_alloc 0.35)
+     (set! greenhouse_alloc 0.20)
+     (set! food_ration 1.0)
+     (print "MID GAME"))
+    
+    ;; EARLY GAME: Power and resource building
+    (true
+     (set! heating_alloc 0.35)
+     (set! isru_alloc 0.45)
+     (set! greenhouse_alloc 0.20)
+     (set! food_ration 1.0)
+     (print "EARLY GAME"))))

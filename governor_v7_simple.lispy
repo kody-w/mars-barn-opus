@@ -1,0 +1,74 @@
+;; V7 Ultra Simple Governor - Optimized for Scoring
+;; Focus: 6+ crew survival, thermal protection, power security
+
+(begin
+  ;; ═══ CRISIS DETECTION ═══
+  (define o2_low (< o2_days 5))
+  (define h2o_low (< h2o_days 8))
+  (define food_low (< food_days 8))
+  (define power_low (< power_kwh 200))
+  (define temp_cold (< interior_temp_k 260))
+  (define crew_low (<= crew_count 5))
+
+  ;; ═══ PHASE DETECTION ═══
+  (define v6_phase (and (>= sol 778) (< sol 847)))
+  (define late_game (>= sol 600))
+  (define mid_game (and (>= sol 200) (< sol 600)))
+
+  ;; ═══ ALLOCATION LOGIC ═══
+  (cond
+    ;; EMERGENCY: Critical resources or crew
+    ((or o2_low h2o_low crew_low temp_cold)
+     (set! heating_alloc 0.80)
+     (set! isru_alloc 0.18)
+     (set! greenhouse_alloc 0.02)
+     (set! food_ration 0.7)
+     (print "EMERGENCY MODE"))
+    
+    ;; V6 AUTONOMOUS: Robot survival period
+    (v6_phase
+     (set! heating_alloc 0.70)
+     (set! isru_alloc 0.20)
+     (set! greenhouse_alloc 0.10)
+     (set! food_ration 0.9)
+     (print "V6 AUTONOMOUS"))
+    
+    ;; POWER BUILDING: Need more power
+    (power_low
+     (set! heating_alloc 0.60)
+     (set! isru_alloc 0.30)
+     (set! greenhouse_alloc 0.10)
+     (set! food_ration 0.8)
+     (print "POWER BUILDING"))
+    
+    ;; RESOURCE CRISIS: Low food
+    (food_low
+     (set! heating_alloc 0.40)
+     (set! isru_alloc 0.35)
+     (set! greenhouse_alloc 0.25)
+     (set! food_ration 0.8)
+     (print "RESOURCE CRISIS"))
+    
+    ;; LATE GAME: Thermal focus for v6 prep
+    (late_game
+     (set! heating_alloc 0.55)
+     (set! isru_alloc 0.30)
+     (set! greenhouse_alloc 0.15)
+     (set! food_ration 1.0)
+     (print "LATE GAME PREP"))
+    
+    ;; MID GAME: Balanced growth
+    (mid_game
+     (set! heating_alloc 0.45)
+     (set! isru_alloc 0.35)
+     (set! greenhouse_alloc 0.20)
+     (set! food_ration 1.0)
+     (print "MID GAME"))
+    
+    ;; EARLY GAME: Power focus
+    (true
+     (set! heating_alloc 0.40)
+     (set! isru_alloc 0.40)
+     (set! greenhouse_alloc 0.20)
+     (set! food_ration 1.0)
+     (print "EARLY GAME"))))

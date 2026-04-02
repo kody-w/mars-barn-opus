@@ -1,0 +1,182 @@
+;; ULTRA V7 AUTONOMOUS OPERATIONS GOVERNOR
+;; Strategy: Maximum robot survival using available Python LisPy variables
+;; Focus: Optimize for 6+ crew survival and low CRI
+;; Target: Beat current 113,170 points
+
+(begin
+  ;; ═══ AVAILABLE VARIABLES ═══
+  ;; sol, o2_days, h2o_days, food_days, power_kwh, crew_count, morale
+  ;; interior_temp_k, exterior_temp_k, irradiance, events_active
+
+  ;; ═══ CREW SURVIVAL THRESHOLDS ═══
+  (define crew_critical (<= crew_count 4))    ;; Below scoring minimum
+  (define crew_minimal (= crew_count 5))      ;; Current scoring minimum 
+  (define crew_target (= crew_count 6))       ;; Target for +500 points
+  (define crew_buffer (>= crew_count 7))      ;; Safe buffer zone
+
+  ;; ═══ RESOURCE CRISIS DETECTION ═══
+  (define o2_crisis (< o2_days 3))
+  (define h2o_crisis (< h2o_days 5))
+  (define food_crisis (< food_days 5))
+  (define power_crisis (< power_kwh 100))
+  (define temp_crisis (< interior_temp_k 260))
+
+  ;; ═══ V6 AUTONOMOUS OPERATIONS PHASES ═══
+  (define v6_ultra_prep (and (>= sol 400) (< sol 650)))
+  (define v6_early_prep (and (>= sol 650) (< sol 750)))
+  (define v6_immediate_prep (and (>= sol 750) (< sol 778)))
+  (define v6_initial (and (>= sol 778) (< sol 810)))
+  (define v6_middle (and (>= sol 810) (< sol 840)))
+  (define v6_final (and (>= sol 840) (< sol 847)))
+  (define v6_active (or v6_initial v6_middle v6_final))
+
+  ;; ═══ CRISIS DETECTION ═══
+  (define any_crisis (or o2_crisis h2o_crisis food_crisis power_crisis temp_crisis))
+  (define resource_crisis (or o2_crisis h2o_crisis food_crisis))
+  (define infrastructure_crisis (or power_crisis temp_crisis))
+
+  ;; ═══ EVENT RESPONSE MULTIPLIER ═══
+  (define event_multiplier
+    (cond
+      ((>= events_active 4) 2.5)  ;; Maximum event response
+      ((>= events_active 3) 2.0)  ;; High event response 
+      ((>= events_active 2) 1.6)  ;; Moderate event response
+      ((>= events_active 1) 1.3)  ;; Light event response
+      (true 1.0)))                ;; No events
+
+  ;; ═══ POWER SECURITY TARGETS ═══
+  (define power_target
+    (cond
+      (v6_final 1800)            ;; Maximum for final v6
+      (v6_middle 1600)           ;; Ultra high for middle v6
+      (v6_initial 1400)          ;; High for initial v6
+      (v6_immediate_prep 1200)   ;; Moderate for prep
+      ((> sol 400) 1000)         ;; Enhanced for mid-game
+      (true 800)))               ;; Base target
+
+  ;; ═══ THERMAL PROTECTION ═══
+  (define temp_c (- interior_temp_k 273.15))
+  (define thermal_boost
+    (cond
+      ((< temp_c -10) 0.30)      ;; Extreme cold
+      ((< temp_c 0) 0.20)        ;; Cold
+      ((< temp_c 10) 0.10)       ;; Cool
+      ((> temp_c 30) -0.05)      ;; Hot - reduce heating
+      (true 0.05)))              ;; Normal boost
+
+  ;; ═══ ALLOCATION STRATEGY ═══
+
+  ;; Base heating allocation with thermal protection
+  (define heating_base
+    (cond
+      ;; EMERGENCY: Critical crew count or temperature
+      ((or crew_critical temp_crisis) 0.85)
+      ;; HIGH: V6 autonomous period or infrastructure crisis
+      ((or v6_active infrastructure_crisis) 0.70)
+      ;; MODERATE: Power building or resource crisis
+      ((or (< power_kwh power_target) resource_crisis) 0.60)
+      ;; LIGHT: Normal operations with thermal adjustment
+      (true 0.45)))
+
+  ;; Enhanced heating with thermal protection
+  (define total_heating (+ heating_base thermal_boost))
+
+  ;; ISRU allocation - higher for robot-only operation
+  (define isru_base
+    (cond
+      ;; EMERGENCY: O2 or H2O crisis
+      ((or o2_crisis h2o_crisis) 0.45)
+      ;; HIGH: Low resources or crew crisis
+      ((or (< o2_days 10) (< h2o_days 15) crew_critical) 0.35)
+      ;; MODERATE: V6 period - robots need less O2/H2O
+      (v6_active 0.20)
+      ;; LIGHT: Normal building
+      (true 0.30)))
+
+  ;; Greenhouse allocation - minimal for robot-only
+  (define greenhouse_base
+    (cond
+      ;; EMERGENCY: Food crisis
+      (food_crisis 0.25)
+      ;; HIGH: Low food
+      ((< food_days 15) 0.20)
+      ;; MODERATE: Normal building
+      ((> sol 200) 0.15)
+      ;; MINIMAL: V6 period or early game
+      (true 0.10)))
+
+  ;; Apply event multiplier
+  (define calc_heating (* total_heating event_multiplier))
+  (define calc_isru (* isru_base event_multiplier))
+  (define calc_greenhouse (* greenhouse_base event_multiplier))
+
+  ;; Normalize to ensure total = 1.0
+  (define total_calc (+ calc_heating calc_isru calc_greenhouse))
+  (define norm_factor (/ 1.0 total_calc))
+
+  (define final_heating (* calc_heating norm_factor))
+  (define final_isru (* calc_isru norm_factor))
+  (define final_greenhouse (* calc_greenhouse norm_factor))
+
+  ;; ═══ EMERGENCY OVERRIDE PROTOCOLS ═══
+  (cond
+    ;; CRITICAL: Crew count below scoring minimum
+    (crew_critical
+     (set! heating_alloc 0.90)
+     (set! isru_alloc 0.08)
+     (set! greenhouse_alloc 0.02)
+     (set! food_ration 0.8)
+     (print "CRITICAL: All systems to crew preservation"))
+    
+    ;; EMERGENCY: Multiple crises active
+    ((and any_crisis (>= events_active 2))
+     (set! heating_alloc 0.80)
+     (set! isru_alloc 0.15)
+     (set! greenhouse_alloc 0.05)
+     (set! food_ration 0.7)
+     (print "EMERGENCY: Multiple crisis response"))
+    
+    ;; CRISIS: Single major crisis
+    (any_crisis
+     (set! heating_alloc 0.70)
+     (set! isru_alloc 0.25)
+     (set! greenhouse_alloc 0.05)
+     (set! food_ration 0.8)
+     (print "CRISIS: Emergency resource allocation"))
+    
+    ;; V6 AUTONOMOUS: Robot survival mode
+    (v6_active
+     (set! heating_alloc (max 0.55 (min 0.85 final_heating)))
+     (set! isru_alloc (max 0.10 (min 0.35 final_isru)))
+     (set! greenhouse_alloc (max 0.05 (min 0.20 final_greenhouse)))
+     (set! food_ration 0.9)
+     (print "V6 AUTONOMOUS: Robot survival mode"))
+    
+    ;; NORMAL: Optimized allocation
+    (true
+     (set! heating_alloc (max 0.35 (min 0.75 final_heating)))
+     (set! isru_alloc (max 0.15 (min 0.50 final_isru)))
+     (set! greenhouse_alloc (max 0.08 (min 0.30 final_greenhouse)))
+     (set! food_ration 1.0)))
+
+  ;; ═══ STATUS REPORTING ═══
+  (define crew_status
+    (if crew_critical "CRITICAL"
+    (if crew_minimal "MINIMAL"
+    (if crew_target "TARGET"
+    (if crew_buffer "BUFFER" "OPTIMAL")))))
+
+  (define phase_status
+    (if v6_final "V6-FINAL"
+    (if v6_middle "V6-MIDDLE"
+    (if v6_initial "V6-INITIAL"
+    (if v6_immediate_prep "V6-PREP"
+    (if v6_early_prep "EARLY-PREP"
+    (if v6_ultra_prep "ULTRA-PREP" "PRE-V6")))))))
+
+  ;; Output status
+  (concat "V7-ULTRA Sol " (string sol)
+    " | Crew:" (string crew_count) "/" crew_status
+    " | " phase_status
+    " | Temp:" (string (round temp_c 1)) "C"
+    " | Events:" (string events_active)))
