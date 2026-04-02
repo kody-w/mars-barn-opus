@@ -98,6 +98,7 @@ text-transform:uppercase;border-top:1px solid var(--border);margin-top:4px}
   <div class="desktop-icon" ondblclick="openApp('editor')"><div class="icon">📝</div><div class="label">LisPy Editor</div></div>
   <div class="desktop-icon" ondblclick="openApp('monitor')"><div class="icon">📡</div><div class="label">Colony Monitor</div></div>
   <div class="desktop-icon" ondblclick="openApp('browser')"><div class="icon">🌐</div><div class="label">Frame Browser</div></div>
+  <div class="desktop-icon" ondblclick="window.os.browser.open('about:blank')"><div class="icon">🔎</div><div class="label">Web Browser</div></div>
   <div class="desktop-icon" ondblclick="openApp('wallet')"><div class="icon">💰</div><div class="label">MARS Wallet</div></div>
   <div class="desktop-icon" ondblclick="openApp('help')"><div class="icon">📖</div><div class="label">LISPY.md</div></div>
   <div class="desktop-icon" ondblclick="openApp('sim')"><div class="icon">🔴</div><div class="label">Colony Sim</div></div>
@@ -366,7 +367,7 @@ setEnv(k,v){this.env[k]=v}
 tokenize(s){const t=[];let i=0;while(i<s.length){const c=s[i];if(' \t\n\r'.includes(c)){i++;continue}if(c===';'){while(i<s.length&&s[i]!=='\n')i++;continue}if('()'.includes(c)){t.push(c);i++;continue}if(c==='"'){let x='"';i++;while(i<s.length&&s[i]!=='"'){if(s[i]==='\\')x+=s[i++];x+=s[i++]}if(i<s.length)i++;t.push(x+'"');continue}let x='';while(i<s.length&&!' \t\n\r()'.includes(s[i])){x+=s[i++]}t.push(x)}return t}
 parse(t,p={i:0}){if(p.i>=t.length)throw new Error('EOF');const x=t[p.i++];if(x==='('){const l=[];while(p.i<t.length&&t[p.i]!==')')l.push(this.parse(t,p));if(p.i<t.length)p.i++;return l}if(x[0]==='"')return{__str:true,v:x.slice(1,-1)};const n=Number(x);return isNaN(n)?x:n}
 eval(e){if(++this.steps>this.maxSteps)throw new Error('Step limit');if(typeof e==='number')return e;if(e&&e.__str)return e.v;if(typeof e==='string'){if(e==='true')return true;if(e==='false')return false;if(e in this.env)return this.env[e];throw new Error('Undefined: '+e)}if(!Array.isArray(e)||!e.length)return e;const[o,...a]=e;if(o==='begin'){let r;for(const x of a)r=this.eval(x);return r}if(o==='define'){this.env[a[0]]=this.eval(a[1]);return this.env[a[0]]}if(o==='set!'){this.env[a[0]]=this.eval(a[1]);return this.env[a[0]]}if(o==='if')return this.eval(a[0])?this.eval(a[1]):(a.length>2?this.eval(a[2]):false);if(o==='cond'){for(const c of a){if(this.eval(c[0])){let r;for(const b of c.slice(1))r=this.eval(b);return r}}return false}if(o==='log'||o==='print'){const v=a.map(x=>this.eval(x)).join(' ');this.output.push(v);return v}if(o==='concat')return a.map(x=>String(this.eval(x))).join('');if(o==='string')return String(this.eval(a[0]));if(o==='number')return Number(this.eval(a[0]));if(o==='length'){const v=this.eval(a[0]);return typeof v==='string'?v.length:Array.isArray(v)?v.length:0}if(o==='list')return a.map(x=>this.eval(x));if(o==='nth'){const l=this.eval(a[0]);return Array.isArray(l)?l[this.eval(a[1])]||null:null}if(o==='range'){const x=this.eval(a[0]),y=a.length>1?this.eval(a[1]):null;const s=y!==null?x:0,end=y!==null?y:x;const r=[];for(let i=s;i<end;i++)r.push(i);return r}if(o==='repeat'){const n=this.eval(a[0]);let r;for(let i=0;i<n;i++){this.env['_i']=i;r=this.eval(a[1])}return r}if(o==='map'){const f=a[0],l=this.eval(a[1]);return Array.isArray(l)?l.map(x=>{this.env['_']=x;return this.eval(f)}):[]}if(o==='filter'){const f=a[0],l=this.eval(a[1]);return Array.isArray(l)?l.filter(x=>{this.env['_']=x;return this.eval(f)}):[]}if(o==='prompt-list')return Object.keys(PROMPTS);if(o==='help'){this.output.push('Commands: (help) (prompt-list) (browser-open "url") (browser-read ".sel") (browser-click "sel")');this.output.push('Browser: browser-open browser-read browser-read-all browser-click browser-type browser-html browser-url browser-eval browser-title browser-query');this.output.push('Math: + - * / % abs round floor ceil min max pow sqrt sin cos pi random');this.output.push('Logic: < > <= >= = != and or not');this.output.push('Data: list nth length range map filter repeat concat string number');this.output.push('I/O: log print');return'help displayed'}
-// ── LisPy Browser Builtins — drive a virtual browser from LisPy code ──
+// ── LisPy Browser Builtins — headless engine fetches, virtual DOM queries, GUI renders ──
 if(o==='browser-open'){const u=this.eval(a[0]);if(window.os?.browser){window.os.browser.open(u)}return'loading: '+u}
 if(o==='browser-read'){const s=this.eval(a[0]);return window.os?.browser?.read(s)||''}
 if(o==='browser-read-all'){const s=this.eval(a[0]);return window.os?.browser?.readAll(s)||[]}
@@ -378,6 +379,10 @@ if(o==='browser-title'){return window.os?.browser?.title()||''}
 if(o==='browser-eval'){const j=this.eval(a[0]);return window.os?.browser?.eval(j)||''}
 if(o==='browser-query'){const s=this.eval(a[0]),at=a.length>1?this.eval(a[1]):null;return window.os?.browser?.query(s,at)||null}
 if(o==='browser-query-all'){const s=this.eval(a[0]);return window.os?.browser?.queryAll(s)||[]}
+if(o==='browser-links'){return window.os?.browser?.links()||[]}
+if(o==='browser-images'){return window.os?.browser?.images()||[]}
+if(o==='browser-meta'){const n=this.eval(a[0]);return window.os?.browser?.meta(n)||''}
+if(o==='browser-status'){return window.os?.browser?.status()||0}
 const v=a.map(x=>this.eval(x));const ops={'+':()=>v.reduce((a,b)=>a+b,0),'-':()=>v.length===1?-v[0]:v[0]-v[1],'*':()=>v.reduce((a,b)=>a*b,1),'/':()=>v[0]/v[1],'%':()=>v[0]%v[1],'<':()=>v[0]<v[1],'>':()=>v[0]>v[1],'<=':()=>v[0]<=v[1],'>=':()=>v[0]>=v[1],'=':()=>v[0]===v[1],'!=':()=>v[0]!==v[1],'min':()=>Math.min(...v),'max':()=>Math.max(...v),'abs':()=>Math.abs(v[0]),'round':()=>Math.round(v[0]),'floor':()=>Math.floor(v[0]),'ceil':()=>Math.ceil(v[0]),'pow':()=>Math.pow(v[0],v[1]),'sqrt':()=>Math.sqrt(v[0]),'sin':()=>Math.sin(v[0]),'cos':()=>Math.cos(v[0]),'pi':()=>Math.PI,'random':()=>Math.random(),'mod':()=>v[0]%v[1],'and':()=>v.every(Boolean),'or':()=>v.some(Boolean),'not':()=>!v[0]};if(o in ops)return ops[o]();throw new Error('Unknown: '+o)}
 run(s){this.steps=0;this.output=[];try{const t=this.tokenize(s);const a=this.parse(t);return{ok:true,result:this.eval(a),output:this.output,steps:this.steps}}catch(e){return{ok:false,error:e.message,output:this.output,steps:this.steps}}}}
 
@@ -1153,163 +1158,175 @@ window.os = {
   },
 
   // ═══════════════════════════════════════════════════════════
-  // LisPy HEADLESS BROWSER — A virtual browser inside vOS
-  // Controllable via: window.os.browser.*  or LisPy builtins
-  //   (browser-open "url")     → load URL in the vOS browser
-  //   (browser-read ".title")  → read text from CSS selector
-  //   (browser-click "button") → click element
-  //   (browser-type "input" "text") → type into field
-  //   (browser-html)           → get page HTML
-  //   (browser-url)            → current URL
-  //   (browser-eval "js")      → eval JS in page context
-  //   (browser-wait 1000)      → wait ms
-  //   (browser-screenshot)     → screenshot as data URL
+  // LisPy HEADLESS BROWSER ENGINE
+  // The engine fetches, parses, and extracts data.
+  // The GUI iframe is just a DISPLAY SURFACE.
+  // LisPy is the backend. The iframe renders what LisPy gives it.
   //
-  // Backed by a hidden iframe. Same-origin pages fully accessible.
-  // Cross-origin pages load but JS access is restricted (CORS).
-  // Playwright can drive this from CLI: page.evaluate(() => os.browser.open(...))
+  // Architecture:
+  //   (browser-open "url")
+  //     → fetch(url) returns HTML
+  //     → parse into _pageDOM (virtual DOM)
+  //     → inject into GUI iframe for visual rendering
+  //     → (browser-read "sel") queries the virtual DOM
+  //     → (browser-click "sel") dispatches on rendered iframe
+  //
+  // The headless engine works WITHOUT the iframe (CLI/headless mode).
+  // The iframe is optional eye candy.
   // ═══════════════════════════════════════════════════════════
   browser: {
-    _frame: null,
     _url: '',
     _history: [],
+    _html: '',       // Raw HTML from last fetch
+    _doc: null,       // Parsed DOMParser document (virtual DOM)
+    _status: 0,
+    _headers: {},
 
-    _getFrame() {
-      if (!this._frame) {
-        let f = document.getElementById('vos-browser-frame');
-        if (!f) {
-          f = document.createElement('iframe');
-          f.id = 'vos-browser-frame';
-          f.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1024px;height:768px;border:none;';
-          f.sandbox = 'allow-scripts allow-same-origin allow-forms';
-          document.body.appendChild(f);
-        }
-        this._frame = f;
-      }
-      return this._frame;
-    },
-
+    // ── Core: Fetch + Parse + Render ──
     async open(url) {
-      const frame = this._getFrame();
       this._url = url;
       this._history.push(url);
-      return new Promise((resolve) => {
-        frame.onload = () => resolve(`Loaded: ${url}`);
-        frame.onerror = () => resolve(`Error loading: ${url}`);
-        frame.src = url;
-        setTimeout(() => resolve(`Timeout loading: ${url}`), 10000);
-      });
+      try {
+        const resp = await fetch(url);
+        this._status = resp.status;
+        this._html = await resp.text();
+        // Parse into virtual DOM
+        const parser = new DOMParser();
+        this._doc = parser.parseFromString(this._html, 'text/html');
+        // Render into GUI window (visual display)
+        this._renderToGUI(url);
+        return 'Loaded: ' + url + ' (' + this._status + ', ' + this._html.length + ' bytes)';
+      } catch (e) {
+        // Cross-origin or network error — render error page
+        this._html = '<html><body><h1>⚠️ ' + e.message + '</h1><p>URL: ' + url + '</p></body></html>';
+        const parser = new DOMParser();
+        this._doc = parser.parseFromString(this._html, 'text/html');
+        this._renderToGUI(url);
+        return 'Error: ' + e.message;
+      }
+    },
+
+    _renderToGUI(url) {
+      // Create or update the visible browser window
+      const winId = 'win-iframe-vbrowser';
+      let win = document.getElementById(winId);
+      if (!win) {
+        openIframeApp('vbrowser', '🌐 ' + url, 'about:blank');
+        win = document.getElementById(winId);
+      }
+      if (win) {
+        // Update title
+        const titleEl = win.querySelector('.title');
+        if (titleEl) titleEl.textContent = '🌐 ' + (this._doc?.title || url);
+        // Inject fetched HTML into the iframe via srcdoc
+        const iframe = win.querySelector('iframe');
+        if (iframe) {
+          // Use srcdoc to render our fetched HTML — no network request needed
+          iframe.removeAttribute('src');
+          iframe.srcdoc = this._html;
+        }
+      }
     },
 
     url() { return this._url; },
     history() { return [...this._history]; },
+    status() { return this._status; },
+    rawHtml() { return this._html; },
 
+    // ── Read from virtual DOM (works headless, no iframe needed) ──
     read(selector) {
-      try {
-        const doc = this._getFrame().contentDocument;
-        if (!doc) return 'No document (cross-origin?)';
-        const el = doc.querySelector(selector);
-        return el ? el.textContent.trim() : `Not found: ${selector}`;
-      } catch (e) { return `Error: ${e.message}`; }
+      if (!this._doc) return 'No page loaded. Use (browser-open "url") first.';
+      const el = this._doc.querySelector(selector);
+      return el ? el.textContent.trim() : 'Not found: ' + selector;
     },
 
     readAll(selector) {
-      try {
-        const doc = this._getFrame().contentDocument;
-        if (!doc) return [];
-        return [...doc.querySelectorAll(selector)].map(el => el.textContent.trim());
-      } catch (e) { return [`Error: ${e.message}`]; }
-    },
-
-    click(selector) {
-      try {
-        const doc = this._getFrame().contentDocument;
-        if (!doc) return 'No document';
-        const el = doc.querySelector(selector);
-        if (!el) return `Not found: ${selector}`;
-        el.click();
-        return `Clicked: ${selector}`;
-      } catch (e) { return `Error: ${e.message}`; }
-    },
-
-    type(selector, text) {
-      try {
-        const doc = this._getFrame().contentDocument;
-        if (!doc) return 'No document';
-        const el = doc.querySelector(selector);
-        if (!el) return `Not found: ${selector}`;
-        el.value = text;
-        el.dispatchEvent(new Event('input', {bubbles: true}));
-        el.dispatchEvent(new Event('change', {bubbles: true}));
-        return `Typed into: ${selector}`;
-      } catch (e) { return `Error: ${e.message}`; }
-    },
-
-    html() {
-      try {
-        const doc = this._getFrame().contentDocument;
-        return doc ? doc.documentElement.outerHTML : 'No document';
-      } catch (e) { return `Error: ${e.message}`; }
+      if (!this._doc) return [];
+      return [...this._doc.querySelectorAll(selector)].map(el => el.textContent.trim());
     },
 
     title() {
-      try {
-        return this._getFrame().contentDocument?.title || '';
-      } catch (e) { return ''; }
+      return this._doc?.title || '';
     },
 
+    // ── Interact with rendered iframe (GUI only) ──
+    click(selector) {
+      const iframe = document.querySelector('#win-iframe-vbrowser iframe');
+      if (!iframe?.contentDocument) return 'No rendered page';
+      const el = iframe.contentDocument.querySelector(selector);
+      if (!el) return 'Not found: ' + selector;
+      el.click();
+      return 'Clicked: ' + selector;
+    },
+
+    type(selector, text) {
+      const iframe = document.querySelector('#win-iframe-vbrowser iframe');
+      if (!iframe?.contentDocument) return 'No rendered page';
+      const el = iframe.contentDocument.querySelector(selector);
+      if (!el) return 'Not found: ' + selector;
+      el.value = text;
+      el.dispatchEvent(new Event('input', {bubbles: true}));
+      el.dispatchEvent(new Event('change', {bubbles: true}));
+      return 'Typed into: ' + selector;
+    },
+
+    html() { return this._html; },
+
     eval(js) {
-      try {
-        const win = this._getFrame().contentWindow;
-        if (!win) return 'No window';
-        return String(win.eval(js));
-      } catch (e) { return `Error: ${e.message}`; }
+      // Eval in rendered iframe context if available
+      const iframe = document.querySelector('#win-iframe-vbrowser iframe');
+      if (iframe?.contentWindow) {
+        try { return String(iframe.contentWindow.eval(js)); }
+        catch (e) { return 'Error: ' + e.message; }
+      }
+      return 'No rendered page';
     },
 
     async wait(ms) {
       await new Promise(r => setTimeout(r, ms || 1000));
-      return `Waited ${ms}ms`;
+      return 'Waited ' + ms + 'ms';
     },
 
-    screenshot() {
-      // Returns a promise of data URL via html2canvas pattern
-      // For same-origin pages only
-      try {
-        const doc = this._getFrame().contentDocument;
-        if (!doc) return 'No document';
-        return `Screenshot not available in iframe mode. Use Playwright: page.screenshot()`;
-      } catch (e) { return `Error: ${e.message}`; }
-    },
-
-    // Visible mode — open browser as a vOS window instead of hidden iframe
-    async openVisible(url) {
-      window.os.iframe('vos-browser', '🌐 Browser — ' + url, url);
-      this._url = url;
-      this._history.push(url);
-      return `Opened visible: ${url}`;
-    },
-
-    // Query structured data from the page
+    // ── Structured queries on virtual DOM ──
     query(selector, attr) {
-      try {
-        const doc = this._getFrame().contentDocument;
-        if (!doc) return null;
-        const el = doc.querySelector(selector);
-        if (!el) return null;
-        if (attr) return el.getAttribute(attr);
-        return { tag: el.tagName, text: el.textContent.trim(), html: el.innerHTML.substring(0, 500) };
-      } catch (e) { return null; }
+      if (!this._doc) return null;
+      const el = this._doc.querySelector(selector);
+      if (!el) return null;
+      if (attr) return el.getAttribute(attr);
+      return { tag: el.tagName, text: el.textContent.trim().substring(0, 500), html: el.innerHTML.substring(0, 500) };
     },
 
     queryAll(selector) {
-      try {
-        const doc = this._getFrame().contentDocument;
-        if (!doc) return [];
-        return [...doc.querySelectorAll(selector)].map(el => ({
-          tag: el.tagName, text: el.textContent.trim().substring(0, 200)
-        }));
-      } catch (e) { return []; }
-    }
+      if (!this._doc) return [];
+      return [...this._doc.querySelectorAll(selector)].map(el => ({
+        tag: el.tagName, text: el.textContent.trim().substring(0, 200)
+      }));
+    },
+
+    // ── Extract links, images, meta ──
+    links() {
+      if (!this._doc) return [];
+      return [...this._doc.querySelectorAll('a[href]')].map(a => ({
+        text: a.textContent.trim().substring(0, 100), href: a.getAttribute('href')
+      }));
+    },
+
+    images() {
+      if (!this._doc) return [];
+      return [...this._doc.querySelectorAll('img')].map(img => ({
+        alt: img.getAttribute('alt') || '', src: img.getAttribute('src') || ''
+      }));
+    },
+
+    meta(name) {
+      if (!this._doc) return null;
+      const el = this._doc.querySelector('meta[name="' + name + '"]') ||
+                 this._doc.querySelector('meta[property="' + name + '"]');
+      return el ? el.getAttribute('content') : null;
+    },
+
+    // Backwards compat
+    async openVisible(url) { return this.open(url); },
   },
 
   // ── Help ──
