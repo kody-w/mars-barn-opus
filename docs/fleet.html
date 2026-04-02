@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fleet Telemetry — Mars Barn</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0a0a0f; color:#c8d6e5; font-family:'Courier New',monospace; overflow-x:hidden; }
+
+  /* Scanline overlay */
+  body::after {
+    content:''; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+    pointer-events:none; z-index:9999;
+  }
+
+  header {
+    background:linear-gradient(180deg, #0d1117 0%, #161b22 100%);
+    border-bottom:1px solid #f0883e44;
+    padding:12px 24px; display:flex; align-items:center; gap:16px;
+  }
+  header h1 { font-size:18px; color:#f0883e; text-transform:uppercase; letter-spacing:2px; }
+  header .status { margin-left:auto; display:flex; align-items:center; gap:8px; }
+  .pulse { width:10px; height:10px; border-radius:50%; background:#3fb950; animation:pulse 2s infinite; }
+  .pulse.dead { background:#f85149; animation:none; }
+  @keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 4px #3fb950} 50%{opacity:0.4;box-shadow:0 0 12px #3fb950} }
+
+  .grid { display:grid; grid-template-columns:320px 1fr; grid-template-rows:auto 1fr; height:calc(100vh - 52px); gap:1px; background:#21262d; }
+
+  /* Left sidebar: metrics */
+  .sidebar { background:#0d1117; padding:16px; overflow-y:auto; grid-row:1/3; }
+  .metric-card {
+    background:#161b22; border:1px solid #30363d; border-radius:6px;
+    padding:12px; margin-bottom:12px;
+  }
+  .metric-card h3 { font-size:11px; color:#8b949e; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+  .metric-val { font-size:28px; font-weight:bold; color:#58a6ff; }
+  .metric-val.gold { color:#f0883e; }
+  .metric-val.green { color:#3fb950; }
+  .metric-val.red { color:#f85149; }
+  .metric-sub { font-size:11px; color:#8b949e; margin-top:4px; }
+
+  /* Timeline bar */
+  .timeline-bar {
+    background:#0d1117; padding:12px 16px; border-bottom:1px solid #21262d;
+    display:flex; gap:8px; align-items:center; overflow-x:auto;
+  }
+  .cycle-pip {
+    width:24px; height:24px; border-radius:4px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:9px;
+    cursor:pointer; transition:transform 0.15s;
+  }
+  .cycle-pip:hover { transform:scale(1.3); }
+  .cycle-pip.success { background:#238636; color:#fff; }
+  .cycle-pip.fail { background:#da3633; color:#fff; }
+  .cycle-pip.running { background:#1f6feb; color:#fff; animation:pulse 1.5s infinite; }
+  .cycle-pip.selected { outline:2px solid #f0883e; outline-offset:2px; }
+
+  /* Main log area */
+  .log-area { background:#0d1117; overflow:hidden; display:flex; flex-direction:column; }
+  .log-tabs { display:flex; gap:0; border-bottom:1px solid #21262d; flex-shrink:0; }
+  .log-tab {
+    padding:8px 16px; font-size:12px; color:#8b949e; cursor:pointer;
+    border-bottom:2px solid transparent; background:transparent; border-top:none; border-left:none; border-right:none;
+    font-family:inherit;
+  }
+  .log-tab.active { color:#f0883e; border-bottom-color:#f0883e; }
+  .log-content {
+    flex:1; overflow-y:auto; padding:12px 16px; font-size:12px; line-height:1.6;
+    white-space:pre-wrap; word-break:break-all;
+  }
+  .log-content .line-tool { color:#7ee787; }
+  .log-content .line-shell { color:#79c0ff; }
+  .log-content .line-score { color:#f0883e; font-weight:bold; }
+  .log-content .line-error { color:#f85149; }
+  .log-content .line-info { color:#8b949e; }
+  .log-content .line-success { color:#3fb950; font-weight:bold; }
+
+  /* Score chart */
+  .chart-container { height:160px; padding:12px; background:#0d1117; border:1px solid #30363d; border-radius:6px; margin-bottom:12px; position:relative; }
+  .chart-container h3 { font-size:11px; color:#8b949e; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+  canvas { width:100%!important; height:120px!important; }
+
+  /* Strategy list */
+  .strat-list { max-height:200px; overflow-y:auto; }
+  .strat-item {
+    padding:6px 8px; border-bottom:1px solid #21262d; font-size:11px;
+    display:flex; justify-content:space-between; cursor:pointer;
+  }
+  .strat-item:hover { background:#161b22; }
+  .strat-item .name { color:#58a6ff; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .strat-item .score { color:#f0883e; font-weight:bold; }
+
+  /* Auto-refresh indicator */
+  .refresh-bar {
+    height:2px; background:#1f6feb; position:fixed; top:0; left:0; z-index:10000;
+    animation:refresh-sweep 10s linear infinite;
+  }
+  @keyframes refresh-sweep { 0%{width:0} 100%{width:100%} }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:#0d1117; }
+  ::-webkit-scrollbar-thumb { background:#30363d; border-radius:3px; }
+</style>
+</head>
+<body>
+<div class="refresh-bar"></div>
+<header>
+  <h1>🚀 Fleet Telemetry</h1>
+  <span style="font-size:12px;color:#8b949e">Mars Barn Autonomous Competition</span>
+  <div class="status">
+    <span id="statusText" style="font-size:12px">Connecting...</span>
+    <div id="statusDot" class="pulse dead"></div>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="metric-card">
+      <h3>🏆 Best Score</h3>
+      <div id="bestScore" class="metric-val gold">—</div>
+      <div id="bestGrade" class="metric-sub">Grade: —</div>
+    </div>
+    <div class="metric-card">
+      <h3>🔄 Total Cycles</h3>
+      <div id="totalCycles" class="metric-val">—</div>
+      <div id="cycleRate" class="metric-sub">— cycles/hr</div>
+    </div>
+    <div class="metric-card">
+      <h3>⏱ Fleet Uptime</h3>
+      <div id="uptime" class="metric-val green">—</div>
+      <div id="lastCycle" class="metric-sub">Last cycle: —</div>
+    </div>
+    <div class="metric-card">
+      <h3>📊 Survival Rate</h3>
+      <div id="survRate" class="metric-val">—</div>
+      <div id="medianSols" class="metric-sub">Median sols: —</div>
+    </div>
+
+    <!-- Score History Chart -->
+    <div class="chart-container">
+      <h3>Score Evolution</h3>
+      <canvas id="scoreChart"></canvas>
+    </div>
+
+    <div class="metric-card">
+      <h3>📝 Strategies Found</h3>
+      <div class="strat-list" id="stratList">
+        <div class="strat-item"><span class="name">Loading...</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline-bar" id="timeline"></div>
+
+  <!-- Log viewer -->
+  <div class="log-area">
+    <div class="log-tabs">
+      <button class="log-tab active" data-tab="live">🔴 LIVE</button>
+      <button class="log-tab" data-tab="fleet">📋 Fleet Log</button>
+      <button class="log-tab" data-tab="scores">🏆 Scores</button>
+      <button class="log-tab" data-tab="commits">📦 Commits</button>
+    </div>
+    <div class="log-content" id="logContent">Waiting for fleet data...</div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// FLEET TELEMETRY ENGINE
+// Reads logs from local filesystem via fetch (needs local server)
+// Falls back to static data if no server available
+// ═══════════════════════════════════════════════════════════
+
+const STATE = {
+  cycles: [],
+  fleetLog: '',
+  currentCycle: null,
+  bestScore: 0,
+  bestGrade: 'F',
+  scores: [],
+  strategies: [],
+  activeTab: 'live',
+  selectedCycle: null,
+  firstTimestamp: null,
+  lastTimestamp: null,
+};
+
+// ── Parse fleet.log ──
+function parseFleetLog(text) {
+  const lines = text.trim().split('\n').filter(Boolean);
+  const cycles = [];
+  let current = null;
+
+  for (const line of lines) {
+    const startMatch = line.match(/^(.+?) — (v5 )?Cycle (\d+) starting$/);
+    const completeMatch = line.match(/^(.+?) — (v5 )?Cycle (\d+) complete(?: \(exit=(\d+)\))?$/);
+
+    if (startMatch) {
+      const ts = new Date(startMatch[1]);
+      const num = parseInt(startMatch[3]);
+      const isV5 = !!startMatch[2];
+      current = { num, startTime: ts, endTime: null, exitCode: null, isV5, duration: null };
+      cycles.push(current);
+    }
+    if (completeMatch && current) {
+      const ts = new Date(completeMatch[1]);
+      const exitCode = completeMatch[4] ? parseInt(completeMatch[4]) : 0;
+      // Find matching cycle
+      const num = parseInt(completeMatch[3]);
+      const isV5 = !!completeMatch[2];
+      const match = [...cycles].reverse().find(c => c.num === num && c.isV5 === isV5 && !c.endTime);
+      if (match) {
+        match.endTime = ts;
+        match.exitCode = exitCode;
+        match.duration = (ts - match.startTime) / 1000;
+      }
+    }
+  }
+  return cycles;
+}
+
+// ── Parse cycle log for scores, strategies, key events ──
+function parseCycleLog(text) {
+  const result = {
+    score: null, grade: null, medianSols: null, survivalRate: null,
+    strategies: [], commits: [], lines: [], errors: [],
+  };
+
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Score detection
+    const scoreMatch = line.match(/SCORE:\s*(\d[\d,]*)/i);
+    if (scoreMatch) {
+      result.score = parseInt(scoreMatch[1].replace(/,/g, ''));
+    }
+    const gradeMatch = line.match(/GRADE:\s*(\S+)/i);
+    if (gradeMatch) result.grade = gradeMatch[1];
+
+    const solsMatch = line.match(/Median sols:\s*(\d+)/i);
+    if (solsMatch) result.medianSols = parseInt(solsMatch[1]);
+
+    const survMatch = line.match(/Survival rate:\s*([\d.]+)%/i);
+    if (survMatch) result.survivalRate = parseFloat(survMatch[1]);
+
+    // Strategy file creation
+    const stratMatch = line.match(/(?:Create|Edit|create)\s+([\w_-]+\.lispy)/);
+    if (stratMatch && !result.strategies.includes(stratMatch[1])) {
+      result.strategies.push(stratMatch[1]);
+    }
+
+    // Commits
+    const commitMatch = line.match(/git commit -m ["'](.+?)["']/);
+    if (commitMatch) result.commits.push(commitMatch[1].substring(0, 80));
+
+    // Errors
+    if (/error|Error|ERROR|failed|FAILED/.test(line) && !/grep|match/.test(line)) {
+      result.errors.push(line.trim().substring(0, 120));
+    }
+  }
+
+  result.lines = lines;
+  return result;
+}
+
+// ── Colorize log lines for display ──
+function colorize(text) {
+  const lines = text.split('\n');
+  return lines.map(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return '';
+
+    // Score lines
+    if (/SCORE:|GRADE:|points|record/i.test(trimmed))
+      return `<span class="line-score">${esc(trimmed)}</span>`;
+
+    // Tool/read operations
+    if (/^[●✓✗]/.test(trimmed) || /^Read |^Edit |^Create /.test(trimmed))
+      return `<span class="line-tool">${esc(trimmed)}</span>`;
+
+    // Shell commands
+    if (/^\│|^\s*cd |^\s*node |^\s*git |^\s*npm/.test(trimmed))
+      return `<span class="line-shell">${esc(trimmed)}</span>`;
+
+    // Errors
+    if (/error|Error|ERROR|failed|FAILED/.test(trimmed) && !/grep|match/.test(trimmed))
+      return `<span class="line-error">${esc(trimmed)}</span>`;
+
+    // Success
+    if (/beat|achievement|breakthrough|record|🚀|🏆|✅/.test(trimmed))
+      return `<span class="line-success">${esc(trimmed)}</span>`;
+
+    // Meta info
+    if (/^Total usage|^API time|^Breakdown|^Total session|^Total code/.test(trimmed))
+      return `<span class="line-info">${esc(trimmed)}</span>`;
+
+    return esc(trimmed);
+  }).join('\n');
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Draw score chart ──
+function drawChart() {
+  const canvas = document.getElementById('scoreChart');
+  const ctx = canvas.getContext('2d');
+  const scores = STATE.scores.filter(s => s > 0);
+  if (scores.length < 2) return;
+
+  const W = canvas.width = canvas.offsetWidth * 2;
+  const H = canvas.height = 240;
+  ctx.clearRect(0, 0, W, H);
+
+  const maxS = Math.max(...scores) * 1.1;
+  const minS = Math.min(...scores) * 0.9;
+  const range = maxS - minS || 1;
+
+  // Grid lines
+  ctx.strokeStyle = '#21262d';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = (i / 4) * H;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // Score line
+  ctx.strokeStyle = '#f0883e';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  scores.forEach((s, i) => {
+    const x = (i / (scores.length - 1)) * W;
+    const y = H - ((s - minS) / range) * H;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Glow
+  ctx.strokeStyle = '#f0883e44';
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  scores.forEach((s, i) => {
+    const x = (i / (scores.length - 1)) * W;
+    const y = H - ((s - minS) / range) * H;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Dots
+  ctx.fillStyle = '#f0883e';
+  scores.forEach((s, i) => {
+    const x = (i / (scores.length - 1)) * W;
+    const y = H - ((s - minS) / range) * H;
+    ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+  });
+
+  // Labels
+  ctx.fillStyle = '#8b949e';
+  ctx.font = '18px Courier New';
+  ctx.fillText(Math.round(maxS).toLocaleString(), 4, 16);
+  ctx.fillText(Math.round(minS).toLocaleString(), 4, H - 4);
+}
+
+// ── Build timeline pips ──
+function buildTimeline() {
+  const el = document.getElementById('timeline');
+  el.innerHTML = '';
+  const v5Cycles = STATE.cycles.filter(c => c.isV5);
+  const allCycles = v5Cycles.length > 0 ? v5Cycles : STATE.cycles.slice(-50);
+
+  allCycles.forEach((c, i) => {
+    const pip = document.createElement('div');
+    pip.className = 'cycle-pip';
+    pip.textContent = c.num;
+
+    if (!c.endTime) {
+      pip.classList.add('running');
+    } else if (c.exitCode === 0 || c.exitCode === null) {
+      pip.classList.add('success');
+    } else {
+      pip.classList.add('fail');
+    }
+
+    if (STATE.selectedCycle === i) pip.classList.add('selected');
+
+    pip.title = `Cycle ${c.num}${c.duration ? ` (${Math.round(c.duration)}s)` : ' (running...)'}`;
+    pip.onclick = () => {
+      STATE.selectedCycle = i;
+      STATE.activeTab = 'live';
+      loadCycleDetail(c);
+      buildTimeline();
+    };
+    el.appendChild(pip);
+  });
+
+  // Auto-scroll to end
+  el.scrollLeft = el.scrollWidth;
+}
+
+// ── Load and display a specific cycle's log ──
+async function loadCycleDetail(cycle) {
+  const prefix = cycle.isV5 ? 'fleet-v5-cycle' : 'fleet-cycle';
+  const url = `${LOG_BASE}/logs/${prefix}-${cycle.num}.log`;
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('Not found');
+    const text = await resp.text();
+    const parsed = parseCycleLog(text);
+
+    document.getElementById('logContent').innerHTML =
+      `<span class="line-info">═══ Cycle ${cycle.num} ${cycle.isV5 ? '(v5)' : ''} ═══</span>\n` +
+      colorize(text);
+
+    // Auto-scroll
+    const lc = document.getElementById('logContent');
+    lc.scrollTop = lc.scrollHeight;
+  } catch (e) {
+    document.getElementById('logContent').innerHTML =
+      `<span class="line-error">Could not load cycle ${cycle.num} log: ${e.message}</span>`;
+  }
+}
+
+// ── Update sidebar metrics ──
+function updateMetrics() {
+  const v5 = STATE.cycles.filter(c => c.isV5);
+  const all = v5.length > 0 ? v5 : STATE.cycles;
+  const completed = all.filter(c => c.endTime);
+
+  // Total cycles
+  document.getElementById('totalCycles').textContent = all.length;
+
+  // Cycle rate
+  if (completed.length >= 2) {
+    const first = completed[0].startTime;
+    const last = completed[completed.length - 1].endTime || new Date();
+    const hours = (last - first) / 3600000;
+    document.getElementById('cycleRate').textContent =
+      hours > 0 ? `${(completed.length / hours).toFixed(1)} cycles/hr` : '—';
+  }
+
+  // Uptime
+  if (all.length > 0) {
+    const first = all[0].startTime;
+    const now = new Date();
+    const mins = Math.round((now - first) / 60000);
+    const hrs = Math.floor(mins / 60);
+    const m = mins % 60;
+    document.getElementById('uptime').textContent = hrs > 0 ? `${hrs}h ${m}m` : `${m}m`;
+  }
+
+  // Last cycle
+  if (completed.length > 0) {
+    const last = completed[completed.length - 1];
+    const ago = Math.round((new Date() - (last.endTime || last.startTime)) / 60000);
+    document.getElementById('lastCycle').textContent =
+      `Last cycle: ${ago < 60 ? ago + 'm ago' : Math.round(ago / 60) + 'h ago'}`;
+
+    // Status dot
+    const dot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const running = all.some(c => !c.endTime);
+    if (running || ago < 15) {
+      dot.className = 'pulse';
+      statusText.textContent = running ? 'CYCLE ACTIVE' : 'FLEET ONLINE';
+    } else {
+      dot.className = 'pulse dead';
+      statusText.textContent = ago < 60 ? 'IDLE' : 'FLEET OFFLINE';
+    }
+  }
+
+  // Best score
+  if (STATE.bestScore > 0) {
+    document.getElementById('bestScore').textContent = STATE.bestScore.toLocaleString();
+    document.getElementById('bestGrade').textContent = `Grade: ${STATE.bestGrade}`;
+  }
+
+  // Survival / median sols from latest
+  if (STATE.latestParsed) {
+    if (STATE.latestParsed.survivalRate !== null)
+      document.getElementById('survRate').textContent = STATE.latestParsed.survivalRate + '%';
+    if (STATE.latestParsed.medianSols !== null)
+      document.getElementById('medianSols').textContent = `Median sols: ${STATE.latestParsed.medianSols}`;
+  }
+
+  // Strategies
+  if (STATE.strategies.length > 0) {
+    const el = document.getElementById('stratList');
+    el.innerHTML = STATE.strategies.slice(-15).reverse().map(s =>
+      `<div class="strat-item"><span class="name">${esc(s.name)}</span><span class="score">${s.score ? s.score.toLocaleString() : '—'}</span></div>`
+    ).join('');
+  }
+
+  drawChart();
+}
+
+// ── Tab switching ──
+document.querySelectorAll('.log-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.log-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    STATE.activeTab = tab.dataset.tab;
+    renderTab();
+  });
+});
+
+function renderTab() {
+  const el = document.getElementById('logContent');
+  switch (STATE.activeTab) {
+    case 'fleet':
+      el.innerHTML = colorize(STATE.fleetLog || 'No fleet log data yet.');
+      break;
+    case 'scores':
+      el.innerHTML = STATE.scores.length > 0
+        ? STATE.scores.map((s, i) =>
+            `<span class="${s >= 90000 ? 'line-success' : s >= 50000 ? 'line-score' : 'line-info'}">Cycle ${i + 1}: ${s.toLocaleString()}</span>`
+          ).join('\n')
+        : 'No scores recorded yet.';
+      break;
+    case 'commits':
+      el.innerHTML = STATE.allCommits.length > 0
+        ? STATE.allCommits.map(c => `<span class="line-success">📦 ${esc(c)}</span>`).join('\n')
+        : 'No commits yet.';
+      break;
+    default: // live
+      break;
+  }
+  el.scrollTop = el.scrollHeight;
+}
+
+// ── Log server base URL ──
+// The docs/ server can't serve ../logs (path traversal).
+// Auto-detect: try same-origin /logs/ first (repo-root server),
+// then fall back to port 8788 (repo-root server).
+let LOG_BASE = '';
+async function detectLogBase() {
+  for (const base of [
+    window.location.origin,                          // same origin (if served from repo root)
+    'http://localhost:8788',                          // dedicated root server
+    window.location.origin.replace(/:\d+/, ':8788'),  // same host, port 8788
+  ]) {
+    try {
+      const r = await fetch(base + '/logs/fleet.log', { method: 'HEAD' });
+      if (r.ok) { LOG_BASE = base; return; }
+    } catch (e) { /* try next */ }
+  }
+  LOG_BASE = 'http://localhost:8788'; // last resort
+}
+
+// ── Main refresh loop ──
+async function refresh() {
+  try {
+    if (!LOG_BASE) await detectLogBase();
+
+    // Fetch fleet.log
+    const fleetResp = await fetch(LOG_BASE + '/logs/fleet.log');
+    if (fleetResp.ok) {
+      STATE.fleetLog = await fleetResp.text();
+      STATE.cycles = parseFleetLog(STATE.fleetLog);
+      buildTimeline();
+    }
+
+    // Find latest v5 cycle logs
+    const v5Cycles = STATE.cycles.filter(c => c.isV5);
+    const allScores = [];
+    const allStrats = [];
+    const allCommits = [];
+
+    // Scan recent cycle logs (last 10)
+    const toScan = (v5Cycles.length > 0 ? v5Cycles : STATE.cycles).slice(-10);
+    for (const cycle of toScan) {
+      const prefix = cycle.isV5 ? 'fleet-v5-cycle' : 'fleet-cycle';
+      try {
+        const resp = await fetch(`${LOG_BASE}/logs/${prefix}-${cycle.num}.log`);
+        if (!resp.ok) continue;
+        const text = await resp.text();
+        const parsed = parseCycleLog(text);
+        if (parsed.score) allScores.push(parsed.score);
+        parsed.strategies.forEach(s => allStrats.push({ name: s, score: parsed.score }));
+        parsed.commits.forEach(c => allCommits.push(c));
+        STATE.latestParsed = parsed;
+      } catch (e) { /* skip */ }
+    }
+
+    // Also scan some older cycles for score history
+    const olderCycles = STATE.cycles.filter(c => !c.isV5).slice(-20);
+    for (const cycle of olderCycles) {
+      try {
+        const resp = await fetch(`${LOG_BASE}/logs/fleet-cycle-${cycle.num}.log`);
+        if (!resp.ok) continue;
+        const text = await resp.text();
+        const parsed = parseCycleLog(text);
+        if (parsed.score) allScores.push(parsed.score);
+        parsed.strategies.forEach(s => allStrats.push({ name: s, score: parsed.score }));
+        parsed.commits.forEach(c => allCommits.push(c));
+      } catch (e) { /* skip */ }
+    }
+
+    STATE.scores = allScores;
+    STATE.strategies = allStrats;
+    STATE.allCommits = allCommits;
+    STATE.bestScore = allScores.length > 0 ? Math.max(...allScores) : 0;
+    STATE.bestGrade = STATE.bestScore >= 90000 ? 'S+' : STATE.bestScore >= 70000 ? 'S' :
+      STATE.bestScore >= 50000 ? 'A' : STATE.bestScore >= 30000 ? 'B' : 'C';
+
+    updateMetrics();
+
+    // Auto-load latest cycle in live tab
+    if (STATE.activeTab === 'live' && STATE.selectedCycle === null) {
+      const latest = (v5Cycles.length > 0 ? v5Cycles : STATE.cycles).slice(-1)[0];
+      if (latest) loadCycleDetail(latest);
+    }
+
+    if (STATE.activeTab !== 'live') renderTab();
+
+  } catch (e) {
+    document.getElementById('statusText').textContent = 'ERROR: ' + e.message;
+    document.getElementById('statusDot').className = 'pulse dead';
+  }
+}
+
+// ── Boot ──
+refresh();
+setInterval(refresh, 10000); // Refresh every 10s
+</script>
+</body>
+</html>
