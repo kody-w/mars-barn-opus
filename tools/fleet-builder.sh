@@ -59,11 +59,14 @@ while [ ! -f "$STOP" ]; do
     "$COPILOT" -p "You are Fleet B: the AUTONOMOUS FIDELITY BUILDER.
 Your singular purpose: implement the next physics upgrade to make the Mars colony sim more realistic.
 
+AMENDMENT VII: The engine is SACRED. You are the ONLY fleet authorized to modify gauntlet.js.
+ALL changes must pass validation (tools/validate-gauntlet.sh). Play by RULES.md. Always.
+
 READ THESE FILES FIRST:
-1. docs/CONVERGENCE-ROADMAP.md — the vision
-2. docs/AUTONOMOUS-FIDELITY-PIPELINE.md — your operating manual
-3. data/fidelity-queue.json — your work queue
-4. RULES.md — current game rules
+1. RULES.md — the rules are ABSOLUTE, read section 6 on cheating
+2. CONSTITUTION.md — Amendment VII (Sacred Engine Doctrine)
+3. docs/CONVERGENCE-ROADMAP.md — the vision
+4. data/fidelity-queue.json — your work queue
 5. tools/gauntlet.js — the sim engine you're upgrading
 
 YOUR CURRENT TASK: $ID — $TITLE (version $VERSION)

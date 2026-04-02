@@ -84,6 +84,7 @@ runs ALL versions sequentially. State carries forward. Damage accumulates.
 | v6 Autonomous Ops | 778-847 | Wheel degradation, navigation error, watchdog trip, actuator seizure, comm delay, power brownout, sensor blindness, thermal shock, regolith entrapment, cable wear, autonomous logic failure, dust storm immobilization |
 | v7 Sabatier Chemistry | 848-897 | Catalyst poisoning, reactor fouling, membrane degradation, CO₂ compressor failure, water separator malfunction |
 | v8 Heat Transfer Model | 898-947 | Insulation degradation, thermal bridges, heating failures, thermal shock, condensation damage |
+| v9 Spatial Layout | 948-977 | Cable degradation, foundation settling, infrastructure overextension, thermal bridge formation, excavation hazard |
 
 ### Retroactive echo enrichment:
 - Past frames get richer data layers WITHOUT changing (additive overlay files)
@@ -93,6 +94,7 @@ runs ALL versions sequentially. State carries forward. Damage accumulates.
 - v6 enrichment: cumulative wheel wear, joint stiffness, battery degradation, sensor drift, cable fatigue, autonomous decision count, unrecoverable errors from Sol 1
 - v7 enrichment: cumulative catalyst age, catalyst efficiency degradation, electrode wear from Sol 1
 - v8 enrichment: cumulative insulation degradation, thermal bridge formation, heating system wear from Sol 1
+- v9 enrichment: None (new mechanic, not retroactive) - spatial layout is additive from Sol 948+
 - These are ALWAYS applied — you can't opt out of enrichment
 
 ### v5 Entropy Collapse — what it counters:
@@ -223,12 +225,36 @@ By Sol 897: Heating requirements ~2.6× higher due to cumulative degradation
 Legacy strategies assuming constant heating costs will fail in late mission
 ```
 
+### v9 Spatial Layout Physics (NEW):
+```
+Modules exist on 16×16 grid (160m × 160m colony footprint):
+  Each tile = 10m × 10m
+  Habitat center at (8,8)
+  New modules must connect within 2 tiles of existing infrastructure
+  Foundation preparation = 3 sols per module
+
+Infrastructure Costs (Real NASA specifications):
+  Cable resistance = ρL/A where ρ = 1.68×10⁻⁸ Ω·m (copper at Mars temp)
+  Power loss = I²R where I = P/V (typical 400V distribution voltage)
+  Thermal bridges = 1-2 kW additional heating per adjacent module pair
+  Pump cost = f(distance, flow_rate, elevation) for water/air lines
+
+Construction Constraints:
+  Site preparation: Excavation, leveling, regolith compaction (3 sols)
+  Adjacency requirement: Must connect to infrastructure within 2 tiles
+  Operational radius: Efficient maintenance limited to 50m (~5 tiles) from center
+  Distance penalties: Power efficiency decreases with cable length
+
+By Sol 977: Spatial overhead can consume 5-15% of power budget
+Legacy strategies assuming instantaneous/free construction will fail
+```
+
 ### Consumption per sol:
 ```
 O₂:    0.84 kg per HUMAN (robots don't breathe)
 H₂O:   2.5 L per HUMAN (robots don't drink)
 Food:   2500 kcal per HUMAN × food_ration (robots don't eat)
-Power:  5 kWh per crew member + 3 kWh per module
+Power:  5 kWh per crew member + 3 kWh per module + spatial_overhead_kw (v9+)
 ```
 
 ### Crew health per sol:
@@ -253,12 +279,32 @@ All crew HP ≤ 0 → colony dies (all crew offline)
 
 ## 6. What Counts as Cheating
 
+### ABSOLUTE VIOLATIONS (Amendment VII — The Sacred Engine Doctrine)
+- **Modifying `tools/gauntlet.js`** — The engine is the JUDGE. Competitors do NOT rewrite the judge. Auto-rollback enforced.
+- **Modifying `RULES.md`** — The rules are the RULES. Competitors do NOT rewrite the rules.
+- **Modifying `CONSTITUTION.md`** — The law is the LAW. Human-only.
+- **Modifying `tools/validate-gauntlet.sh`** — The validator protects the engine. Human-only.
+
+### GAME VIOLATIONS
 - Modifying frame files (hashes won't match public ledger)
-- Modifying the sim physics (production/consumption formulas)
+- Fabricating Monte Carlo results (crawler will replay and verify)
 - Using RNG seeds other than the Amendment IV formula
 - Claiming a score from fewer than 100 Monte Carlo runs
 - Building more than 6 unique module types
 - Claiming modules scored beyond the cap of 8
+- Exceeding allocation budgets (allocs must sum to ≤ 1.0)
+- Skipping frames (every frame must be consumed in order)
+- Bypassing physics (hard-coding resource values instead of earning them)
+- Any "creative reinterpretation" of rules that a reasonable person would call cheating
+
+### THE SPIRIT OF THE LAW
+This sim exists to find strategies that work on REAL MARS. A strategy that
+games the scoring formula instead of keeping the colony alive is worthless,
+even if it scores high. If the engine doesn't catch a cheat, that's a
+**fidelity bug** — report it, and Fleet B will fix the physics. The correct
+response to broken physics is better physics, not exploitation.
+
+**Play by the rules. Always. The colony depends on it.**
 
 ### What is NOT cheating:
 - Creative governor logic (adaptive, CRI-reactive, phase-switching)
@@ -266,6 +312,7 @@ All crew HP ≤ 0 → colony dies (all crew offline)
 - Any build order and timing
 - Writing LisPy mitigation tools (emergent tooling IS the game)
 - Running the fleet to evolve strategies automatically
+- Finding exploits and REPORTING them (this improves the sim)
 
 ---
 
