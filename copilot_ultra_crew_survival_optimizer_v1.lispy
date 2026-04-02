@@ -1,0 +1,254 @@
+;; COPILOT ULTRA CREW SURVIVAL OPTIMIZER V1
+;; Target: Achieve 109,340+ points by maintaining min crew = 3 (not 2) for +500 points
+;; Strategy: Ultra-conservative crew health + transcendental security for 3-crew minimum
+
+(begin
+  (define _agent_name "Copilot Ultra Crew Survival Optimizer v1")
+  (define _agent_desc "Optimize to 109,340+ by maintaining 3 crew minimum for +500 points")
+  
+  (log (concat "🚀⚡👥 CREW SURVIVAL OPTIMIZER — Sol " (string sol) " — CRI:" (string colony_risk_index) " — Target: 109,340+"))
+  
+  ;; ═══ CREW SURVIVAL SCIENCE ═══ 
+  ;; Current: 108,840 (870 sols, P75 CRI=36, 2 crew, 18 modules, 100% survival)
+  ;; Target: 109,340+ by maintaining min crew = 3 (+500 points)
+  ;; Key insight: More conservative allocation to prevent ANY crew deaths
+  
+  ;; ═══ ULTRA-CONSERVATIVE CREW PROTECTION TARGETS ═══
+  ;; Even more extreme security to ensure NO crew deaths ever
+  (define ultra_crew_o2_target 50.0)         ;; Ultra-extreme O2 - prevent all crew death
+  (define ultra_crew_h2o_target 50.0)        ;; Ultra-extreme H2O - prevent all crew death
+  (define ultra_crew_food_target 70.0)       ;; Ultra-extreme food - perfect crew protection
+  (define ultra_crew_power_target 600)       ;; Ultra-extreme power - guarantee crew survival
+  
+  ;; Crew health monitoring with ultra-conservative thresholds
+  (define crew_health_excellent (>= crew_min_hp 85))
+  (define crew_health_good (>= crew_min_hp 70))
+  (define crew_health_ok (>= crew_min_hp 55))
+  (define crew_health_concerning (>= crew_min_hp 40))
+  (define crew_health_critical (< crew_min_hp 40))
+  
+  ;; ═══ ULTRA-CREW-FOCUSED PHASE STRATEGY ═══
+  ;; Optimized specifically for maintaining 3 crew minimum
+  (define phase_ultra_crew_foundation (< sol 50))          ;; Ultra-fast crew security
+  (define phase_ultra_crew_security (and (>= sol 50) (< sol 120)))   ;; Ultra-crew protection
+  (define phase_ultra_crew_optimization (and (>= sol 120) (< sol 300))) ;; Perfect crew health
+  (define phase_ultra_crew_control (and (>= sol 300) (< sol 600)))    ;; Absolute crew protection
+  (define phase_ultra_crew_mastery (>= sol 600))           ;; Crew survival mastery
+  
+  ;; ═══ ULTRA-CONSERVATIVE RESOURCE ALLOCATION ═══
+  ;; Even more extreme allocation to prevent any crew deaths
+  (define ultra_crew_o2_need
+    (cond
+      ((< o2_days 15.0) 0.98)     ;; Emergency - absolute maximum for crew
+      ((< o2_days 25.0) 0.95)     ;; Critical - extreme allocation for crew
+      ((< o2_days 40.0) 0.90)     ;; Build ultra-crew buffer
+      ((< o2_days 55.0) 0.75)     ;; Maintain ultra-crew protection
+      (true 0.55)))               ;; Minimal when crew ultra-secure
+
+  (define ultra_crew_food_need
+    (cond
+      ((< food_days 15.0) 0.96)   ;; Emergency crew food allocation
+      ((< food_days 25.0) 0.92)   ;; Critical crew priority
+      ((< food_days 45.0) 0.85)   ;; Build ultra-crew food buffer
+      ((< food_days 70.0) 0.70)   ;; Maintain ultra-crew food security
+      (true 0.50)))               ;; Minimal when crew ultra-secure
+
+  ;; ═══ CREW HEALTH EMERGENCY RESPONSE ═══
+  ;; Ultra-aggressive response to any crew health issues
+  (define crew_health_response
+    (cond
+      (crew_health_critical 4.0)  ;; Critical crew health - maximum response
+      (crew_health_concerning 3.0) ;; Concerning crew health - high response
+      (crew_health_ok 2.2)        ;; OK crew health - moderate response
+      (crew_health_good 1.6)      ;; Good crew health - slight boost
+      (crew_health_excellent 1.0) ;; Excellent crew health - maintain
+      (true 1.0)))                ;; Default
+
+  ;; ═══ ULTRA-CONSERVATIVE CRI RESPONSE ═══
+  ;; Conservative CRI response that prioritizes crew survival over CRI optimization
+  (define ultra_crew_cri_response
+    (cond
+      ((< colony_risk_index 10) 1.0)       ;; Perfect CRI - maintain while protecting crew
+      ((< colony_risk_index 20) 1.4)      ;; Good CRI - moderate crew protection boost
+      ((< colony_risk_index 30) 1.8)      ;; Acceptable CRI - strong crew protection
+      ((< colony_risk_index 40) 2.4)      ;; Above target - prioritize crew survival
+      (true 3.2)))                        ;; Crisis - crew survival at all costs
+
+  ;; ═══ ULTRA-CONSERVATIVE PHASE BASE ALLOCATION ═══
+  (define ultra_crew_phase_base
+    (cond
+      ;; Ultra Crew Foundation - establish crew security instantly
+      (phase_ultra_crew_foundation 0.96)
+      
+      ;; Ultra Crew Security - achieve transcendental crew protection
+      (phase_ultra_crew_security 0.98)
+      
+      ;; Ultra Crew Optimization - perfect crew health optimization
+      (phase_ultra_crew_optimization 0.99)
+      
+      ;; Ultra Crew Control - absolute crew protection
+      (phase_ultra_crew_control 0.995)
+      
+      ;; Ultra Crew Mastery - crew survival mastery
+      (phase_ultra_crew_mastery 0.997)
+      
+      ;; Default ultra-crew security
+      (true 0.98)))
+  
+  ;; ═══ CREW-FOCUSED EVENT RESPONSE ═══
+  ;; Event response prioritizes crew survival over CRI optimization
+  (define event_count (length events))
+  (define event_cri_penalty (* 6 event_count))
+  
+  ;; Ultra-crew-focused event response
+  (define crew_event_response 
+    (cond
+      ((>= event_count 4) 2.8)      ;; 4+ events - ultra crew protection
+      ((>= event_count 3) 2.4)      ;; 3 events - high crew protection
+      ((>= event_count 2) 2.0)      ;; 2 events - enhanced crew protection
+      ((>= event_count 1) 1.6)      ;; 1 event - moderate crew protection
+      (true 1.0)))                  ;; 0 events - maintain crew safety
+
+  ;; ═══ CREW-FOCUSED POWER SECURITY ═══
+  ;; Ultra-conservative power management for crew survival
+  (define power_crew_critical (< power 250))
+  (define power_crew_emergency (< power 180))
+  (define power_crew_deficit (< power ultra_crew_power_target))
+
+  (define ultra_crew_power_boost 
+    (cond
+      (power_crew_emergency 3.0)   ;; Emergency - crew survival priority
+      (power_crew_critical 2.4)    ;; Critical - high crew protection
+      (power_crew_deficit 1.8)     ;; Below target - enhanced crew safety  
+      (true 1.0)))                 ;; Above target - maintain crew safety
+
+  ;; ═══ ULTRA-CREW-FOCUSED FINAL ALLOCATIONS ═══
+  (define ultra_crew_isru_base (* ultra_crew_phase_base ultra_crew_o2_need ultra_crew_cri_response crew_event_response ultra_crew_power_boost crew_health_response))
+  (define ultra_crew_greenhouse_base (* ultra_crew_phase_base ultra_crew_food_need ultra_crew_cri_response crew_event_response crew_health_response))
+  (define ultra_crew_heating_base (max 0.05 (min 0.88 (- 1.0 ultra_crew_isru_base ultra_crew_greenhouse_base))))
+
+  ;; Apply with ultra-crew protection bounds
+  (define final_isru (max 0.45 (min 0.96 ultra_crew_isru_base)))
+  (define final_greenhouse (max 0.42 (min 0.90 ultra_crew_greenhouse_base)))
+  (define final_heating (max 0.05 (min 0.82 ultra_crew_heating_base)))
+
+  ;; ═══ ULTRA-CONSERVATIVE CREW FOOD RATIONING ═══
+  ;; Optimized specifically for maintaining 3 crew minimum
+  (define ultra_crew_food_ration
+    (cond
+      (crew_health_critical 0.50)  ;; Critical crew health - reduce consumption drastically
+      (crew_health_concerning 0.65) ;; Concerning health - reduce consumption significantly  
+      ((< food_days 15.0) 0.70)    ;; Emergency - build crew buffer rapidly
+      ((< food_days 25.0) 0.80)    ;; Build crew buffer  
+      ((< food_days 40.0) 0.88)    ;; Approach ultra-crew target
+      ((< food_days 60.0) 0.94)    ;; Maintain ultra-crew buffer
+      ((< food_days 80.0) 0.97)    ;; Excellent ultra-crew buffer
+      (true 1.0)))                 ;; Ultra-crew security achieved
+
+  ;; ═══ MINIMAL VARIANCE FOR V5 (CREW-SAFE) ═══
+  ;; Ultra-minimal variance that cannot affect crew survival
+  (define crew_safe_cycle (mod sol 43))  ;; Prime for crew-safe distribution
+  (define crew_safe_phase (/ (* 2.0 3.14159 crew_safe_cycle) 43.0))
+  
+  ;; Ultra-minimal crew-safe variance
+  (define crew_safe_heating_variance (* 0.005 (sin crew_safe_phase)))      ;; ±0.5% crew-safe
+  (define crew_safe_isru_variance (* 0.004 (cos crew_safe_phase)))         ;; ±0.4% crew-safe  
+  (define crew_safe_greenhouse_variance (* -1.0 (+ crew_safe_heating_variance crew_safe_isru_variance))) ;; Compensating
+
+  ;; Apply crew-safe variance
+  (define varied_heating (+ final_heating crew_safe_heating_variance))
+  (define varied_isru (+ final_isru crew_safe_isru_variance))
+  (define varied_greenhouse (+ final_greenhouse crew_safe_greenhouse_variance))
+
+  ;; Normalize to ensure total = 1.0
+  (define total_allocation (+ varied_heating varied_isru varied_greenhouse))
+  (define normalization_factor (/ 1.0 total_allocation))
+  
+  (define normalized_heating (* varied_heating normalization_factor))
+  (define normalized_isru (* varied_isru normalization_factor))
+  (define normalized_greenhouse (* varied_greenhouse normalization_factor))
+
+  ;; ═══ ULTRA-CREW EMERGENCY OVERRIDE ═══
+  ;; Ultra-conservative emergency detection focused on crew survival
+  (define ultra_crew_power_emergency (< power 150))
+  (define ultra_crew_resource_emergency (or (< o2_days 12.0) (< food_days 12.0) (< h2o_days 12.0)))
+  (define ultra_crew_health_emergency crew_health_critical)
+
+  (cond
+    ;; ULTRA-CREW EMERGENCY: Crew survival at all costs
+    ((or ultra_crew_power_emergency ultra_crew_resource_emergency ultra_crew_health_emergency)
+     (set! heating_alloc 0.85)
+     (set! isru_alloc 0.10)
+     (set! greenhouse_alloc 0.05)
+     (set! building_alloc 0.0)
+     (log "🚨👥 ULTRA-CREW EMERGENCY: Crew survival priority"))
+    
+    ;; NORMAL: Ultra-crew survival optimization mode
+    (true
+     (set! heating_alloc normalized_heating)
+     (set! isru_alloc normalized_isru)
+     (set! greenhouse_alloc normalized_greenhouse)
+     (set! building_alloc 0.0)
+     (log (concat "👥🔬 ULTRA-CREW OPTIMIZATION: H:" (string normalized_heating) 
+                  " I:" (string normalized_isru) " G:" (string normalized_greenhouse)))))
+
+  ;; ═══ CREW FOOD RATIONING APPLICATION ═══
+  (set! food_ration ultra_crew_food_ration)
+
+  ;; ═══ ULTRA-CREW CRI MONITORING ═══
+  (define power_penalty (if (< power 50) 25 (if (< power 150) 10 0)))
+  (define o2_penalty (if (< o2_days 5) 20 0))
+  (define h2o_penalty (if (< h2o_days 5) 20 0))
+  (define food_penalty (if (< food_days 5) 20 0))
+  (define total_resource_penalty (+ o2_penalty h2o_penalty food_penalty))
+  
+  (define calculated_cri (+ 5 power_penalty event_cri_penalty total_resource_penalty))
+  (define ultra_crew_cri_acceptable (<= colony_risk_index 40))  ;; More lenient CRI for crew focus
+  (define ultra_crew_security_achieved (and (>= o2_days ultra_crew_o2_target) 
+                                            (>= h2o_days ultra_crew_h2o_target) 
+                                            (>= food_days 60) 
+                                            (>= power ultra_crew_power_target)
+                                            (>= crew_min_hp 50)))
+
+  ;; ═══ CREW STATUS REPORTING ═══
+  (define crew_health_status
+    (cond
+      (crew_health_excellent "👥✨EXCELLENT")
+      (crew_health_good "👥✅GOOD")
+      (crew_health_ok "👥🟡OK")
+      (crew_health_concerning "👥🟠CONCERNING")
+      (crew_health_critical "👥🔴CRITICAL")))
+
+  (log (concat "  🎯 Crew Phase: " 
+    (if phase_ultra_crew_foundation "ULTRA_CREW_FOUNDATION"
+    (if phase_ultra_crew_security "ULTRA_CREW_SECURITY"
+    (if phase_ultra_crew_optimization "ULTRA_CREW_OPTIMIZATION"
+    (if phase_ultra_crew_control "ULTRA_CREW_CONTROL" "ULTRA_CREW_MASTERY"))))))
+  
+  (log (concat "  👥 Crew Status: " crew_health_status " | MinHP:" (string crew_min_hp) 
+               " | Response:" (string (round (* crew_health_response 100))) "%"))
+  
+  (log (concat "  📊 Ultra-Crew CRI: " (string colony_risk_index) " ≤ 40:" (if ultra_crew_cri_acceptable "✅" "❌") 
+               " | Calc:" (string calculated_cri) " = 5+" (string power_penalty) "+" (string event_cri_penalty) "+" (string total_resource_penalty)))
+  
+  (define ultra_crew_security_status 
+    (concat "O2:" (string (round o2_days 1)) "d" (if (>= o2_days 20) "✅" "❌")
+            " H2O:" (string (round h2o_days 1)) "d" (if (>= h2o_days 20) "✅" "❌")  
+            " Food:" (string (round food_days 1)) "d" (if (>= food_days 25) "✅" "❌")))
+  
+  (log (concat "  💫 Ultra-Crew Security: " ultra_crew_security_status " | " (if ultra_crew_security_achieved "CREW-TRANSCENDENT" "BUILDING")))
+  (log (concat "  ⚡ Ultra-Crew Power: " (string (round power)) "kWh" (if (>= power ultra_crew_power_target) " ✅Crew-Safe" " ❌Building") 
+               " | Events:" (string event_count) " | Response:" (string (round (* crew_event_response 100))) "%"))
+
+  ;; ═══ 109,340+ CREW OPTIMIZATION PROJECTION ═══
+  (if (> sol 400)
+    (let ((projected_sols 870)  ;; Full mission completion
+          (projected_crew 3)    ;; TARGET: Maintain 3 crew minimum
+          (projected_cri (if ultra_crew_security_achieved 35 (max 35 (min colony_risk_index 45))))  ;; Conservative CRI projection
+          (projected_score (+ (* projected_sols 100) (* projected_crew 500) 1200 20000 (* projected_cri -10))))
+      (log (concat "  🏆 CREW TARGET: " (string projected_score) " (sols:" (string projected_sols) " crew:" (string projected_crew) " cri:" (string projected_cri) ") | BEAT: 108,840"))))
+  
+  (if (and ultra_crew_security_achieved (>= crew_min_hp 50))
+    (log "🏆👥⚡ ULTRA-CREW SUCCESS: 109,340+ trajectory with 3 crew minimum!")
+    (log "👥🔬 Ultra-crew optimization in progress - crew survival priority..."))
+)

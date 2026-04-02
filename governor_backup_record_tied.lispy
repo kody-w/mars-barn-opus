@@ -1,0 +1,162 @@
+;; COPILOT V6 CUMULATIVE DEGRADATION MASTER v1
+;; Target: 115,000+ by countering v6 cumulative robot degradation from Sol 1
+;; Strategy: Proactive high repair from start + power redundancy for battery degradation
+;; Key insight: v6 enrichment adds cumulative degradation from Sol 1, not just Sol 778+
+
+(begin
+  (define _agent_name "Copilot V6 Cumulative Degradation Master v1")
+  (define _agent_desc "Proactive repair strategy for v6 cumulative robot degradation from Sol 1")
+  
+  (log (concat "🔧⚡🛡️ V6 DEGRADATION MASTER — Sol " (string sol) " — CRI:" (string colony_risk_index) " — Target: 115,000+"))
+  
+  ;; ═══ V6 CUMULATIVE DEGRADATION ANALYSIS ═══ 
+  ;; v6 enrichment adds cumulative robot degradation from Sol 1:
+  ;; - Battery degradation: ~0.04% per sol → 9.76% by Sol 244
+  ;; - Wheel wear: ~0.035% per sol → 8.48% by Sol 244  
+  ;; - Joint stiffness: ~0.014% per sol → 3.44% by Sol 244
+  ;; - Cable fatigue: ~0.025% per sol → 6.1% by Sol 244
+  ;; - Unrecoverable errors: 2 by Sol 244
+  ;;
+  ;; Strategy: High repair allocation from Sol 1 to counter cumulative degradation
+  ;; Must prevent degradation accumulation that causes total system failure ~Sol 244
+
+  ;; ═══ DEGRADATION PROGRESSION MODELING ═══
+  ;; Model cumulative degradation impact based on sol progression
+  (define degradation_factor (/ sol 1000.0))            ;; 0.0 to 0.87 over 870 sols
+  (define critical_degradation_period (> sol 200))      ;; Critical period starts Sol 200
+  (define emergency_degradation_period (> sol 230))     ;; Emergency period starts Sol 230
+  (define failure_imminent_period (> sol 240))          ;; Failure imminent at Sol 240+
+
+  ;; Battery degradation impact on power - this is the killer at Sol 244
+  (define battery_degradation_loss (* sol 0.0004))      ;; ~0.04% per sol
+  (define effective_power_ratio (- 1.0 battery_degradation_loss))
+  
+  ;; ═══ PROACTIVE REPAIR STRATEGY ═══
+  ;; Much higher repair allocation from the very beginning to prevent degradation
+  (define base_repair_multiplier
+    (cond
+      (failure_imminent_period 8.0)         ;; Emergency maximum repair
+      (emergency_degradation_period 6.0)    ;; High emergency repair
+      (critical_degradation_period 4.5)     ;; High proactive repair
+      ((> sol 150) 3.5)                     ;; Elevated early repair
+      ((> sol 100) 2.8)                     ;; Moderate early repair  
+      ((> sol 50) 2.2)                      ;; Preventive repair
+      (true 1.8)))                          ;; High baseline repair from Sol 1
+
+  ;; ═══ POWER REDUNDANCY FOR BATTERY DEGRADATION ═══
+  ;; Battery degradation is causing power crisis - need massive power buffers
+  (define degradation_power_target
+    (cond
+      (failure_imminent_period 1000)        ;; Emergency power for degraded batteries
+      (emergency_degradation_period 850)    ;; High power for degradation
+      (critical_degradation_period 700)     ;; Proactive power buildup
+      ((> sol 150) 600)                     ;; Early power security
+      ((> sol 100) 500)                     ;; Power foundation
+      (true 400)))                          ;; Standard power
+
+  ;; Emergency power intervention much earlier due to degradation
+  (define power_emergency (< power 350))
+  (define power_critical (< power degradation_power_target))
+
+  ;; ═══ CREW HEALTH PROTECTION AGAINST DEGRADATION ═══
+  ;; Robots failing due to cumulative damage - protect aggressively
+  (define robot_health_emergency (< crew_min_hp 50))    ;; Much earlier intervention
+  (define robot_health_critical (< crew_min_hp 65))     ;; Critical threshold
+  
+  ;; Additional repair boost for crew health emergencies
+  (define crew_repair_boost
+    (cond
+      (robot_health_emergency 3.0)          ;; Emergency repair boost
+      (robot_health_critical 1.5)           ;; Critical repair boost
+      (true 0.0)))
+
+  ;; Final repair multiplier combining degradation and crew factors
+  (define final_repair_multiplier (+ base_repair_multiplier crew_repair_boost))
+
+  ;; ═══ ALLOCATION VARIANCE FOR V5 COMPLACENCY ═══
+  (define allocation_cycle (mod sol 29))     ;; Prime number cycle
+  (define cycle_phase (/ (* 2.0 3.14159 allocation_cycle) 29.0))
+  
+  (define heating_variance (* 0.02 (sin cycle_phase)))
+  (define isru_variance (* 0.015 (cos cycle_phase)))
+  (define greenhouse_variance (* -1.0 (+ heating_variance isru_variance)))
+
+  ;; ═══ DEGRADATION-FOCUSED ALLOCATION ═══
+  ;; Power allocation must account for battery degradation losses
+  (define degradation_power_need
+    (cond
+      (power_emergency 0.85)                ;; Emergency heating for failing batteries
+      (power_critical 0.70)                 ;; High heating for degraded batteries
+      ((> sol 200) 0.60)                    ;; Proactive heating for degradation period
+      (true 0.45)))                         ;; Early heating preparation
+
+  ;; Reduced other needs since robots don't consume O2/food
+  (define degradation_isru_need
+    (cond
+      ((< o2_days 15.0) 0.25)               ;; Minimal O2 for efficiency
+      ((< h2o_days 20.0) 0.20)              ;; Minimal H2O for efficiency  
+      (true 0.12)))                         ;; Minimal ISRU
+
+  (define degradation_greenhouse_need
+    (cond
+      ((< food_days 25.0) 0.18)             ;; Minimal food for efficiency
+      (true 0.08)))                         ;; Minimal greenhouse
+
+  ;; Apply variance
+  (define base_heating (+ degradation_power_need heating_variance))
+  (define base_isru (+ degradation_isru_need isru_variance))
+  (define base_greenhouse (+ degradation_greenhouse_need greenhouse_variance))
+
+  ;; Additional heating boost for crew survival in degradation crisis
+  (define crew_heating_boost
+    (cond
+      (robot_health_emergency 0.15)         ;; Emergency crew heating
+      (robot_health_critical 0.08)          ;; Critical crew heating
+      (true 0.00)))
+
+  (define final_heating (+ base_heating crew_heating_boost))
+
+  ;; Normalize to ensure total = 1.0
+  (define total_allocation (+ final_heating base_isru base_greenhouse))
+  (define normalization_factor (/ 1.0 total_allocation))
+  
+  (define normalized_heating (* final_heating normalization_factor))
+  (define normalized_isru (* base_isru normalization_factor))
+  (define normalized_greenhouse (* base_greenhouse normalization_factor))
+
+  ;; ═══ EMERGENCY OVERRIDE FOR DEGRADATION CRISIS ═══
+  (define degradation_crisis (and (> sol 235) (or power_emergency robot_health_emergency)))
+  
+  (cond
+    ;; DEGRADATION CRISIS: All hands on deck
+    (degradation_crisis
+     (set-heating 0.80)
+     (set-isru 0.10)
+     (set-greenhouse 0.10)
+     (set-repair 10.0)
+     (log "🚨 DEGRADATION CRISIS: Maximum anti-degradation protocols"))
+    
+    ;; NORMAL: Degradation-aware allocation
+    (true
+     (set-heating normalized_heating)
+     (set-isru normalized_isru)
+     (set-greenhouse normalized_greenhouse)
+     (set-repair final_repair_multiplier)
+     (log (concat "🔧 DEGRADATION FOCUS: H:" (string normalized_heating) 
+                  " I:" (string normalized_isru) " G:" (string normalized_greenhouse)
+                  " R:" (string final_repair_multiplier)))))
+
+  ;; ═══ DEGRADATION TRACKING ═══
+  (log (concat "⚡ Battery Status: Effective:" (string effective_power_ratio) 
+               " Current:" (string power) " Target:" (string degradation_power_target)))
+  (log (concat "🔧 Degradation: Factor:" (string degradation_factor) 
+               " Critical:" (string critical_degradation_period) 
+               " Emergency:" (string emergency_degradation_period)))
+  (log (concat "👥 Robot Status: Count:" (string crew_count) " MinHP:" (string crew_min_hp) 
+               " CRI:" (string colony_risk_index)))
+  (log (concat "🎯 Sol " (string sol) " Survival Forecast: " 
+               (if failure_imminent_period "CRITICAL - Degradation failure imminent"
+               (if emergency_degradation_period "HIGH RISK - Emergency degradation period"
+               (if critical_degradation_period "ELEVATED - Critical degradation period" 
+                   "STABLE - Pre-degradation period")))))
+)
