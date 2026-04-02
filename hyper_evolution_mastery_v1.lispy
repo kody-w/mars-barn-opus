@@ -1,0 +1,177 @@
+;; HYPER-EVOLUTION MASTERY v1.0
+;; Ultra-Aggressive Compound Damage Prevention with Exponential Infrastructure Scaling
+;; Goal: Transcend all known records through revolutionary damage prevention
+
+(begin
+  (define _agent_name "Hyper-Evolution Mastery v1.0")
+  (define _agent_desc "Ultra-aggressive compound damage prevention with exponential infrastructure scaling and quantum mitigation effects")
+
+  (log (concat "⚡ Hyper-Evolution v1.0 — Sol " (string sol)))
+
+  ;; ═══ REVOLUTIONARY INFRASTRUCTURE MATHEMATICS ═══
+  ;; Ultra-aggressive build timing with compound mitigation theory
+  (define sol_efficiency_ratio (/ sol (max 1 modules_built)))
+  (define power_density (/ power_kwh (max 1 crew_count)))
+  (define infrastructure_velocity (/ modules_built (max 1 sol)))
+  
+  ;; Exponential scaling factors for different phases
+  (define phase_multiplier
+    (cond
+      ((< sol 10) 3.0)    ;; Ultra-aggressive bootstrap
+      ((< sol 25) 2.5)    ;; Rapid infrastructure
+      ((< sol 60) 2.0)    ;; Sustained expansion  
+      ((< sol 150) 1.8)   ;; Consolidation
+      ((< sol 300) 1.6)   ;; Maturation
+      ((< sol 450) 1.4)   ;; Critical preparation
+      (true 1.2)))        ;; Mastery maintenance
+
+  ;; Ultra-aggressive target calculations
+  (define ultra_solar_target (max 2 (round (* sol 0.025 phase_multiplier))))
+  (define ultra_repair_target (max 0 (round (* sol 0.018 phase_multiplier))))
+  
+  ;; Current infrastructure estimates  
+  (define estimated_solar (max 2 (round (* modules_built 0.52))))
+  (define estimated_repair (max 0 (round (* modules_built 0.38))))
+  
+  ;; Build urgency system
+  (define solar_deficit (max 0 (- ultra_solar_target estimated_solar)))
+  (define repair_deficit (max 0 (- ultra_repair_target estimated_repair)))
+  
+  (define build_urgency
+    (cond
+      ((and (> solar_deficit 0) (> repair_deficit 0))
+        (if (> solar_deficit repair_deficit) "SOLAR_URGENT" "REPAIR_URGENT"))
+      ((> solar_deficit 0) "SOLAR")
+      ((> repair_deficit 0) "REPAIR")
+      ((< infrastructure_velocity 0.15) "ACCELERATE")
+      (true "OPTIMAL")))
+
+  ;; ═══ QUANTUM COMPOUND DAMAGE MODELING ═══
+  ;; Advanced threat modeling with exponential mitigation effects
+  (define base_cri_threat (/ colony_risk_index 60))
+  (define sol_acceleration_threat (* sol 0.002))  ;; Damage compounds over time
+  (define density_protection_factor (min 2.0 (max 0.3 infrastructure_velocity)))
+  
+  (define total_base_threat (+ base_cri_threat sol_acceleration_threat))
+  (define adjusted_threat (/ total_base_threat density_protection_factor))
+  
+  ;; Exponential repair bay effects (revolutionary discovery)
+  (define quantum_repair_multiplier (pow 1.9 estimated_repair))
+  (define compound_mitigation_factor (min 0.95 (max 0.1 (/ quantum_repair_multiplier (max 1 adjusted_threat)))))
+  
+  ;; Multi-factor emergency assessment
+  (define emergency_score 0)
+  (if (< o2_days 3) (set! emergency_score (+ emergency_score 5)))
+  (if (< food_days 6) (set! emergency_score (+ emergency_score 4)))
+  (if (< power_kwh 30) (set! emergency_score (+ emergency_score 4)))
+  (if (> dust_tau 6.0) (set! emergency_score (+ emergency_score 3)))
+  (if (> colony_risk_index 65) (set! emergency_score (+ emergency_score 5)))
+  (if (< compound_mitigation_factor 0.2) (set! emergency_score (+ emergency_score 6)))
+  
+  (define crisis_level
+    (cond
+      ((>= emergency_score 12) "EXTINCTION")
+      ((>= emergency_score 9) "CRITICAL")
+      ((>= emergency_score 6) "SEVERE")
+      ((>= emergency_score 3) "ELEVATED")
+      ((>= emergency_score 1) "MODERATE")
+      (true "STABLE")))
+
+  ;; ═══ HYPER-ADAPTIVE ALLOCATION ENGINE ═══
+  ;; Revolutionary allocation system that adapts to mitigation effectiveness
+  (define mitigation_bonus (max 0 (min 0.4 (- compound_mitigation_factor 0.6))))
+  (define efficiency_modifier (+ 0.8 mitigation_bonus))
+  
+  (define base_isru
+    (cond
+      ((= crisis_level "EXTINCTION") 0.05)
+      ((= crisis_level "CRITICAL") 0.10)
+      ((= crisis_level "SEVERE") 0.16)
+      ((< sol 15) 0.28)
+      ((< sol 50) 0.22)
+      ((< sol 150) 0.20)
+      ((< sol 350) 0.18)
+      (true 0.15)))
+
+  (define base_greenhouse
+    (cond
+      ((= crisis_level "EXTINCTION") 0.10)
+      ((= crisis_level "CRITICAL") 0.18)
+      ((= crisis_level "SEVERE") 0.26)
+      ((< sol 15) 0.38)
+      ((< sol 50) 0.40)
+      ((< sol 150) 0.42)
+      ((< sol 350) 0.38)
+      (true 0.35)))
+
+  ;; Dynamic heating based on power availability and crisis
+  (define power_abundance_factor (min 1.5 (max 0.5 (/ power_density 25))))
+  (define base_heating (* (- 1.0 base_isru base_greenhouse) power_abundance_factor))
+  
+  ;; Apply efficiency modifiers and normalize
+  (define raw_isru (* base_isru efficiency_modifier))
+  (define raw_greenhouse (* base_greenhouse efficiency_modifier))
+  (define raw_heating (* base_heating efficiency_modifier))
+  
+  (define total_raw (+ raw_isru raw_greenhouse raw_heating))
+  
+  (set! isru_alloc (/ raw_isru total_raw))
+  (set! greenhouse_alloc (/ raw_greenhouse total_raw))
+  (set! heating_alloc (/ raw_heating total_raw))
+
+  ;; ═══ INTELLIGENT SURVIVAL RATIONING ═══
+  ;; Advanced rationing that considers mitigation effectiveness and crisis level
+  (define crisis_ration_factor
+    (cond
+      ((= crisis_level "EXTINCTION") 0.12)
+      ((= crisis_level "CRITICAL") 0.22)
+      ((= crisis_level "SEVERE") 0.35)
+      ((= crisis_level "ELEVATED") 0.50)
+      ((= crisis_level "MODERATE") 0.70)
+      (true 0.85)))
+
+  ;; Mitigation allows higher rations when damage is well-controlled
+  (define mitigation_ration_bonus (* compound_mitigation_factor 0.3))
+  
+  ;; Phase-based baseline rations
+  (define phase_ration_base
+    (cond
+      ((< sol 20) 0.90)
+      ((< sol 60) 0.85)
+      ((< sol 150) 0.80)
+      ((< sol 350) 0.75)
+      (true 0.70)))
+
+  (set! food_ration (max 0.10 (min 1.2 (+ (* crisis_ration_factor phase_ration_base) mitigation_ration_bonus))))
+
+  ;; ═══ ADVANCED STATUS SYSTEM ═══
+  (define crisis_icon
+    (cond
+      ((= crisis_level "EXTINCTION") "💀")
+      ((= crisis_level "CRITICAL") "🔴")
+      ((= crisis_level "SEVERE") "🟠")
+      ((= crisis_level "ELEVATED") "🟡")
+      ((= crisis_level "MODERATE") "🔵")
+      (true "🟢")))
+
+  (define build_icon
+    (cond
+      ((= build_urgency "SOLAR_URGENT") "☀️🚨")
+      ((= build_urgency "REPAIR_URGENT") "🔧🚨")
+      ((= build_urgency "SOLAR") "☀️")
+      ((= build_urgency "REPAIR") "🔧")
+      ((= build_urgency "ACCELERATE") "⚡")
+      (true "✅")))
+
+  (log (concat "  Targets: Solar " (string estimated_solar) "/" (string ultra_solar_target) " | Repair " (string estimated_repair) "/" (string ultra_repair_target)))
+  (log (concat "  Crisis: " crisis_icon " " crisis_level " (" (string emergency_score) ") | Build: " build_icon " " build_urgency))
+  (log (concat "  Mitigation: " (string (round (* compound_mitigation_factor 100))) "% | Threat: " (string (round (* adjusted_threat 100))) "% | Quantum: " (string (round (* quantum_repair_multiplier 100))) "%"))
+  (log (concat "  Allocation — I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "% H:" (string (round (* heating_alloc 100))) "% | R:" (string (round (* food_ration 100))) "%"))
+
+  ;; ═══ STRATEGY OUTPUT ═══
+  (concat "Hyper-Evo v1.0 Sol " (string sol) " — " crisis_icon crisis_level " " build_icon build_urgency
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | Mit:" (string (round (* compound_mitigation_factor 100))) "%"))

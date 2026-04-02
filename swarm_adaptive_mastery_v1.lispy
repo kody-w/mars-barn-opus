@@ -1,0 +1,223 @@
+;; SWARM ADAPTIVE MASTERY v1.0
+;; Revolutionary Multi-Phase Adaptive Strategy with Swarm Intelligence
+;; Goal: Transcend 602 sols through dynamic adaptation and compound mitigation
+
+(begin
+  (define _agent_name "Swarm Adaptive Mastery v1.0")
+  (define _agent_desc "Revolutionary multi-phase adaptive strategy with swarm intelligence and predictive compound damage prevention")
+
+  (log (concat "🔥 Swarm Adaptive v1.0 — Sol " (string sol)))
+
+  ;; ═══ MULTI-DIMENSIONAL PHASE DETECTION ═══
+  ;; Revolutionary phase system that adapts strategy based on multiple variables
+  (define bootstrap_phase (< sol 15))
+  (define early_infrastructure (and (>= sol 15) (< sol 45)))
+  (define mid_consolidation (and (>= sol 45) (< sol 120)))
+  (define late_expansion (and (>= sol 120) (< sol 280)))
+  (define critical_survival (and (>= sol 280) (< sol 450)))
+  (define transcendence_phase (and (>= sol 450) (< sol 602)))
+  (define mastery_phase (>= sol 602))
+  
+  ;; Adaptive build timing based on power surplus and threat level
+  (define power_surplus_ratio (/ power_kwh (max 1 (* crew_count 25))))
+  (define infrastructure_density (/ modules_built (max 1 sol)))
+  (define threat_acceleration (max 1 (/ colony_risk_index 30)))
+  
+  (define current_phase
+    (cond
+      (mastery_phase "MASTERY")
+      (transcendence_phase "TRANSCENDENCE")
+      (critical_survival "CRITICAL")
+      (late_expansion "EXPANSION")
+      (mid_consolidation "CONSOLIDATION")
+      (early_infrastructure "INFRASTRUCTURE")
+      (bootstrap_phase "BOOTSTRAP")
+      (true "ADAPTIVE")))
+
+  ;; ═══ SWARM INTELLIGENCE INFRASTRUCTURE MANAGEMENT ═══
+  ;; Predictive build timing that adapts to colony conditions
+  (define solar_farms_needed
+    (cond
+      (bootstrap_phase (max 2 (+ crew_count 1)))
+      (early_infrastructure (max 3 (+ crew_count 2)))
+      (mid_consolidation (max 4 (+ crew_count 3)))
+      (late_expansion (max 6 (+ crew_count 4)))
+      (critical_survival (max 8 (+ crew_count 5)))
+      (true (max 10 (+ crew_count 6)))))
+
+  (define repair_bays_needed
+    (cond
+      (bootstrap_phase 0)
+      (early_infrastructure (max 1 (round (/ sol 35))))
+      (mid_consolidation (max 2 (round (/ sol 25))))
+      (late_expansion (max 4 (round (/ sol 20))))
+      (critical_survival (max 6 (round (/ sol 15))))
+      (true (max 8 (round (/ sol 12))))))
+
+  (define estimated_solar_farms (max 2 (round (* modules_built 0.55))))
+  (define estimated_repair_bays (max 0 (round (* modules_built 0.35))))
+  
+  ;; Build priority system that adapts to phase and conditions
+  (define build_priority
+    (cond
+      ;; Bootstrap: Power foundation
+      (bootstrap_phase "SOLAR")
+      ;; Early: Rapid infrastructure
+      ((and early_infrastructure (< estimated_solar_farms solar_farms_needed)) "SOLAR")
+      ((and early_infrastructure (< estimated_repair_bays 1) (> sol 18)) "REPAIR")
+      ;; Mid: Balanced expansion  
+      ((and mid_consolidation (< estimated_solar_farms solar_farms_needed)) "SOLAR")
+      ((and mid_consolidation (< estimated_repair_bays repair_bays_needed)) "REPAIR")
+      ;; Late: Repair redundancy
+      ((and late_expansion (< estimated_repair_bays repair_bays_needed)) "REPAIR")
+      ((and late_expansion (< estimated_solar_farms solar_farms_needed)) "SOLAR")
+      ;; Critical: Maximum mitigation
+      ((and critical_survival (< estimated_repair_bays repair_bays_needed)) "REPAIR")
+      ((and critical_survival (< estimated_solar_farms solar_farms_needed)) "SOLAR")
+      ;; Default: Adaptively choose based on power and risk
+      ((and (> power_surplus_ratio 3) (< estimated_repair_bays repair_bays_needed)) "REPAIR")
+      ((< power_surplus_ratio 2) "SOLAR")
+      (true "REPAIR")))
+
+  ;; ═══ ADVANCED COMPOUND DAMAGE MODELING ═══
+  ;; Predictive threat assessment with exponential scaling factors
+  (define base_threat_factor (/ colony_risk_index 70))
+  (define phase_threat_multiplier
+    (cond
+      (bootstrap_phase 0.5)
+      (early_infrastructure 0.8)
+      (mid_consolidation 1.0)
+      (late_expansion 1.4)
+      (critical_survival 2.2)
+      (transcendence_phase 3.0)
+      (mastery_phase 4.0)
+      (true 1.0)))
+
+  (define compound_damage_risk (* base_threat_factor phase_threat_multiplier))
+  
+  ;; Advanced mitigation effectiveness calculation
+  (define repair_effectiveness (min 3.0 (max 0.5 (pow 1.8 estimated_repair_bays))))
+  (define mitigation_coverage (min 0.95 (/ repair_effectiveness compound_damage_risk)))
+  
+  ;; Emergency cascade detection system
+  (define cascade_factors 0)
+  (if (< o2_days 4) (set! cascade_factors (+ cascade_factors 4)))
+  (if (< food_days 8) (set! cascade_factors (+ cascade_factors 3)))
+  (if (< power_kwh 40) (set! cascade_factors (+ cascade_factors 3)))
+  (if (> dust_tau 5.0) (set! cascade_factors (+ cascade_factors 2)))
+  (if (> colony_risk_index 60) (set! cascade_factors (+ cascade_factors 4)))
+  (if (< mitigation_coverage 0.3) (set! cascade_factors (+ cascade_factors 5)))
+  
+  (define cascade_emergency (>= cascade_factors 8))
+  
+  (define threat_level
+    (cond
+      (cascade_emergency "EXTINCTION")
+      ((> cascade_factors 6) "CATASTROPHIC")
+      ((> cascade_factors 4) "SEVERE") 
+      ((> cascade_factors 2) "ELEVATED")
+      ((> cascade_factors 0) "MODERATE")
+      (true "STABLE")))
+
+  ;; ═══ SWARM ADAPTIVE RESOURCE ALLOCATION ═══
+  ;; Dynamic allocation that adapts to phase, threat, and mitigation capacity
+  (define base_isru_alloc
+    (cond
+      (cascade_emergency 0.06)
+      ((= threat_level "CATASTROPHIC") 0.12)
+      ((= threat_level "SEVERE") 0.18)
+      (bootstrap_phase 0.25)
+      (early_infrastructure 0.20)
+      (mid_consolidation 0.22)
+      (late_expansion 0.24)
+      (critical_survival 0.18)
+      (transcendence_phase 0.15)
+      (true 0.20)))
+
+  (define base_greenhouse_alloc
+    (cond
+      (cascade_emergency 0.12)
+      ((= threat_level "CATASTROPHIC") 0.20)
+      ((= threat_level "SEVERE") 0.28)
+      (bootstrap_phase 0.35)
+      (early_infrastructure 0.38)
+      (mid_consolidation 0.40)
+      (late_expansion 0.42)
+      (critical_survival 0.35)
+      (transcendence_phase 0.30)
+      (true 0.38)))
+
+  ;; Heating allocation fills remainder and adapts to power availability
+  (define total_base_alloc (+ base_isru_alloc base_greenhouse_alloc))
+  (define base_heating_alloc (max 0.1 (- 1.0 total_base_alloc)))
+  
+  ;; Adaptive modifiers based on mitigation coverage and power surplus
+  (define mitigation_modifier (+ 0.9 (* mitigation_coverage 0.3)))
+  (define power_modifier (min 1.4 (max 0.7 power_surplus_ratio)))
+  
+  (define adaptive_modifier (* mitigation_modifier power_modifier))
+  
+  (set! isru_alloc (* base_isru_alloc adaptive_modifier))
+  (set! greenhouse_alloc (* base_greenhouse_alloc adaptive_modifier))
+  (set! heating_alloc (* base_heating_alloc adaptive_modifier))
+  
+  ;; Normalize to ensure total = 1.0
+  (define total_alloc (+ isru_alloc greenhouse_alloc heating_alloc))
+  (set! isru_alloc (/ isru_alloc total_alloc))
+  (set! greenhouse_alloc (/ greenhouse_alloc total_alloc))
+  (set! heating_alloc (/ heating_alloc total_alloc))
+
+  ;; ═══ INTELLIGENT RATIONING SYSTEM ═══
+  ;; Adaptive food rationing that considers phase, threat, and crew health
+  (define base_ration
+    (cond
+      (cascade_emergency 0.15)
+      ((= threat_level "CATASTROPHIC") 0.25)
+      ((= threat_level "SEVERE") 0.40)
+      (bootstrap_phase 0.85)
+      (early_infrastructure 0.90)
+      (mid_consolidation 0.80)
+      (late_expansion 0.75)
+      (critical_survival 0.65)
+      (transcendence_phase 0.70)
+      (true 0.80)))
+  
+  ;; Health and mitigation bonuses
+  (define health_bonus (max 0 (min 0.25 (* (- mitigation_coverage 0.5) 0.4))))
+  (define power_bonus (max 0 (min 0.15 (* (- power_surplus_ratio 2) 0.05))))
+  
+  (set! food_ration (max 0.12 (min 1.1 (+ base_ration health_bonus power_bonus))))
+
+  ;; ═══ STATUS REPORTING ═══
+  (define phase_icon
+    (cond
+      (mastery_phase "🌟")
+      (transcendence_phase "⚡")
+      (critical_survival "🔥")
+      (late_expansion "🚀")
+      (mid_consolidation "🔧")
+      (early_infrastructure "🏗️")
+      (bootstrap_phase "🌱")
+      (true "🔄")))
+
+  (define threat_icon
+    (cond
+      ((= threat_level "EXTINCTION") "💀")
+      ((= threat_level "CATASTROPHIC") "☠️")
+      ((= threat_level "SEVERE") "🔴")
+      ((= threat_level "ELEVATED") "🟠")
+      ((= threat_level "MODERATE") "🟡")
+      (true "🟢")))
+
+  (log (concat "  Phase: " phase_icon " " current_phase " | Threat: " threat_icon " " threat_level))
+  (log (concat "  Build Priority: " build_priority " | Solar:" (string estimated_solar_farms) "/" (string solar_farms_needed) " | Repair:" (string estimated_repair_bays) "/" (string repair_bays_needed)))
+  (log (concat "  Mitigation: " (string (round (* mitigation_coverage 100))) "% | Damage Risk: " (string (round (* compound_damage_risk 100))) "% | Cascade: " (string cascade_factors)))
+  (log (concat "  Allocation — I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "% H:" (string (round (* heating_alloc 100))) "% | R:" (string (round (* food_ration 100))) "%"))
+
+  ;; ═══ STRATEGY OUTPUT ═══
+  (concat "Swarm v1.0 Sol " (string sol) " — " phase_icon current_phase " " threat_icon threat_level
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | " build_priority " | M:" (string (round (* mitigation_coverage 100))) "%"))
