@@ -1,0 +1,92 @@
+● List directory .
+  └ 93 files found
+
+● Read RULES.md
+  └ 241 lines read
+
+Now I understand the gauntlet rules! Let me examine the gauntlet tool and current record-holder files to understand the scoring mechanics and what strategies are working:
+
+● Read ULTIMATE_RECORD_ACHIEVEMENT_95890_2026-04-02.md
+  └ 59 lines read
+
+● List directory tools
+  └ 91 files found
+
+Now let me look at the current gauntlet tool to understand the test command:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ 1 line read
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L1:50 (49 lines read)
+
+Let me examine the latest high-scoring strategies and understand the test execution:
+
+● Check gauntlet strategy and Monte Carlo options (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && head -n 20 tools/gauntlet.js | grep -E
+  │ "(Strategy|Goal|Target)" && grep -E "monte.*carlo|--monte-carlo" tools/gauntlet.js
+  └ 7 lines...
+
+Let me check the test command with a small Monte Carlo run to understand the current performance:
+
+● Run Monte Carlo test to understand current strategy performance (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 10
+  └ 29 lines...
+
+The current strategy is failing completely! Let me check what's happening by examining some recent working strategies:
+
+● Read GAUNTLET_RECORD_DEMOLISHED_113170_2026-04-02.md
+  └ 171 lines read
+
+● Read NEW_RECORD_ACHIEVEMENT_95990_2026-04-02.md
+  └ 69 lines read
+
+I can see there's a huge difference between different strategies! The current one gets 0% survival but there's a strategy that achieved 113,170 points. Let me look at some successful strategies to understand the patterns:
+
+● Find LisPy governor files (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && find . -name "*.lispy" | head -10
+  └ 11 lines...
+
+● Read ultimate_crew_survival_guarantee_v10.lispy
+  └ 300 lines read
+
+Now let me examine the gauntlet test tool to understand what strategy it's currently using:
+
+● Explore Analyze failing gauntlet strategy
+  │ Check for versioned frame directories (shell)
+  │   │ ls -d /Users/rapptertwo/Documents/GitHub/mars-barn-opus/data/frames/v* 2>/dev/null | head
+  │   -10
+  │   └ 1 line...
+  └ Compare file sizes (shell)
+      │ wc -l
+      │ /Users/rapptertwo/Documents/GitHub/mars-barn-opus/ultimate_crew_survival_guarantee_v10.lispy
+      │ /Users/rapptertwo/Documents/GitHub/mars-barn-opus/tools/gauntlet.js
+      └ 4 lines...
+
+Now I understand the issues! The current gauntlet.js strategy is failing because it can't load frame data. Let me fix the frame loading issue and implement a better strategy based on the successful patterns I see:
+
+● List directory data/frame-versions
+  └ 1 file found
+
+● Read versions.json
+  │ data/frame-versions/versions.json
+  └ 266 lines read
+
+Now let me check the actual frame structure:
+
+● List directory data/frames
+  └ 910 files found
+
+Perfect! Now I can see the issue. The frame files exist as individual `sol-NNNN.json` files, not in versioned directories. Let me fix the `loadFrames()` function and implement a winning strategy. I'll create a new optimized gauntlet tool:
+
+● Read frames.json
+  │ data/frames/frames.json
+  └ L1:20 (1 line read)
+
+● Read latest.json
+  │ data/frames/latest.json
+  └ 5 lines read
+
+Now I'll create a optimized gauntlet strategy based on the successful patterns. Let me create a new gauntlet tool that fixes the frame loading and

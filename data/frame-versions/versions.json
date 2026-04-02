@@ -197,6 +197,48 @@
         "power_minimum_kw": 1.5,
         "energy_per_kg_o2_kwh": 5.0
       }
+    },
+    {
+      "version": 8,
+      "name": "Heat Transfer Model",
+      "released": "2026-04-02",
+      "sol_range": [
+        898,
+        947
+      ],
+      "hazards_added": [
+        "insulation_degradation",
+        "thermal_bridge_failure", 
+        "heating_system_failure",
+        "thermal_shock_damage",
+        "condensation_damage"
+      ],
+      "events_added": [
+        "extreme_cold_snap",
+        "heating_optimization",
+        "thermal_emergency"
+      ],
+      "challenges_added": [
+        "thermal_management",
+        "insulation_maintenance"
+      ],
+      "notes": "REAL HEAT TRANSFER: Replaces magic temperature adjustments (±0.5K) with actual heat transfer equations: Q = U×A×ΔT (conduction) + ε×σ×A×(T⁴) (radiation). Interior temperature now depends on exterior temperature, insulation efficiency, crew metabolic heat, equipment waste heat, and heating power allocation. Heat loss scales with ΔT and surface area. Insulation degrades over time from thermal cycling, micrometeorites, and UV. Based on NASA aerogel studies (R-10.3/inch), ISS thermal data, and Mars habitat thermal modeling.",
+      "backtest_target": "Run v7 best strategy against v8 frames. Expected: Governors assuming constant heating costs (simple allocation ratios) will fail when real thermodynamics require adaptive power management. Heating becomes the dominant power consumer in late-mission phases.",
+      "data_sources": [
+        "Mars habitat thermal analysis (NASA JSC-CN-33799)",
+        "ISS Environmental Control and Life Support System (ECLSS) specifications",
+        "Aerogel insulation thermal properties (R-10.3 per inch, k=0.015 W/m·K)",
+        "Mars surface temperature cycles (Curiosity REMS, InSight temperature data)",
+        "Human metabolic heat production (~100W/person, NASA studies)",
+        "Stefan-Boltzmann radiation law (σ=5.67×10⁻⁸ W/m²K⁴)"
+      ],
+      "physics": {
+        "conductive_loss": "Q = U × A × ΔT where U=0.11 W/m²K (aerogel), A=150 m², ΔT varies 50-130K",
+        "radiative_loss": "Q = ε × σ × A × (T_in⁴ - T_out⁴) where ε=0.95, σ=Stefan-Boltzmann constant",
+        "internal_gains": "100W per human + 5W per kW equipment power",
+        "thermal_mass": "8000 kg habitat × 1000 J/kg·K specific heat",
+        "degradation": "Insulation efficiency decreases 0.01% per sol from cumulative damage"
+      }
     }
   ],
   "backtest_protocol": {

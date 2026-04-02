@@ -79,6 +79,7 @@ runs ALL versions sequentially. State carries forward. Damage accumulates.
 | v5 Entropy Collapse | 728-777 | Complacency drift, resource decay, maintenance avalanche, crew isolation, solar degradation, habitat entropy |
 | v6 Autonomous Ops | 778-847 | Wheel degradation, navigation error, watchdog trip, actuator seizure, comm delay, power brownout, sensor blindness, thermal shock, regolith entrapment, cable wear, autonomous logic failure, dust storm immobilization |
 | v7 Sabatier Chemistry | 848-897 | Catalyst poisoning, reactor fouling, membrane degradation, CO₂ compressor failure, water separator malfunction |
+| v8 Heat Transfer Model | 898-947 | Insulation degradation, thermal bridges, heating failures, thermal shock, condensation damage |
 
 ### Retroactive echo enrichment:
 - Past frames get richer data layers WITHOUT changing (additive overlay files)
@@ -87,6 +88,7 @@ runs ALL versions sequentially. State carries forward. Damage accumulates.
 - v5 enrichment: cumulative food decay, solar degradation, crew isolation index, system entropy, maintenance debt from Sol 1
 - v6 enrichment: cumulative wheel wear, joint stiffness, battery degradation, sensor drift, cable fatigue, autonomous decision count, unrecoverable errors from Sol 1
 - v7 enrichment: cumulative catalyst age, catalyst efficiency degradation, electrode wear from Sol 1
+- v8 enrichment: cumulative insulation degradation, thermal bridge formation, heating system wear from Sol 1
 - These are ALWAYS applied — you can't opt out of enrichment
 
 ### v5 Entropy Collapse — what it counters:
@@ -174,6 +176,47 @@ Electrode efficiency = max(0.3, 1.0 - (age_hours / 70000))
 At Sol 400: Catalyst ~50% efficient (needs replacement planning)
 At Sol 700: Catalyst at minimum 20% efficiency  
 Electrodes remain >95% efficient throughout typical mission duration
+```
+
+### v8 Heat Transfer Model (NEW):
+```
+# Real thermal physics replaces magic ±0.5K adjustments (Sol 898+)
+
+Interior Temperature = f(exterior_temp, insulation, crew_heat, equipment_heat, heating_power)
+
+Heat Loss = Conductive Loss + Radiative Loss + Air Leak Loss
+  Conductive Loss = U × A × ΔT
+    U = 0.11 W/m²K (aerogel insulation, degraded by thermal_bridge_factor / insulation_efficiency)  
+    A = 150 m² (habitat surface area)
+    ΔT = interior_temp - exterior_temp (50-130K typical)
+    
+  Radiative Loss = ε × σ × A × (T_interior⁴ - T_exterior⁴)
+    ε = 0.95 (habitat emissivity)
+    σ = 5.67×10⁻⁸ W/m²K⁴ (Stefan-Boltzmann constant)
+    
+  Air Leak Loss = air_leak_factor × 500W (additional loss from seal failures)
+
+Internal Heat Gains = Crew Metabolic + Equipment Waste
+  Crew Metabolic = humans_count × 100W (robots produce minimal heat)
+  Equipment Waste = equipment_power_kw × 5W/kW
+
+Temperature Change = (Heat_Gains + Heating_Power - Heat_Loss) / (8000 kg × 1000 J/kg·K)
+
+Exterior Temperature = Mars diurnal/seasonal cycle:
+  Daily: 183K (-90°C) to 278K (+5°C) sinusoidal variation
+  Seasonal: ±15K variation over 669 sol Mars year
+```
+
+### v8 Thermal Degradation (NEW):
+```
+Insulation degrades from thermal cycling, micrometeorites, UV exposure:
+  insulation_efficiency = max(0.3, efficiency - 0.0001 per sol)
+  thermal_bridge_factor = increases heat loss (thermal bridges in joints)
+  heating_efficiency = heater elements fail over time
+  air_leak_factor = seal failures increase air exchange
+
+By Sol 897: Heating requirements ~2.6× higher due to cumulative degradation
+Legacy strategies assuming constant heating costs will fail in late mission
 ```
 
 ### Consumption per sol:

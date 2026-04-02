@@ -1,0 +1,40 @@
+{
+  "sol": 916,
+  "utc": "2028-01-11T00:35:10Z",
+  "mars": {
+    "ls": 132.9,
+    "season": "Northern Summer",
+    "temp_k": 218.3,
+    "temp_c": -54.9,
+    "pressure_pa": 666,
+    "solar_wm2": 281,
+    "dust_tau": 0.669,
+    "wind_ms": 0.7,
+    "lmst": 15.1
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "heating_system_failure",
+      "efficiency_loss": 0.125,
+      "desc": "Heater element failure reduces heating efficiency by 13%"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 12.5,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.61,
+    "water_ice_depth_m": 0.6,
+    "surface_radiation_usv": 0.42
+  },
+  "frame_echo": {
+    "prev_sol": 915,
+    "thermal_efficiency_trend": "declining",
+    "heating_demand_trend": "stable",
+    "insulation_status": "nominal"
+  },
+  "_hash": "cf9760b1856321b1"
+}

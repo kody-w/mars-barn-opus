@@ -1,0 +1,34 @@
+{
+  "sol": 911,
+  "utc": "2028-01-06T00:13:55Z",
+  "mars": {
+    "ls": 130.2,
+    "season": "Northern Summer",
+    "temp_k": 231.7,
+    "temp_c": -41.4,
+    "pressure_pa": 657,
+    "solar_wm2": 245,
+    "dust_tau": 0.803,
+    "wind_ms": 3.3,
+    "lmst": 14.0
+  },
+  "events": [],
+  "hazards": [],
+  "comms": {
+    "earth_delay_min": 9.0,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.77,
+    "water_ice_depth_m": 2.7,
+    "surface_radiation_usv": 0.47
+  },
+  "frame_echo": {
+    "prev_sol": 910,
+    "thermal_efficiency_trend": "improving",
+    "heating_demand_trend": "decreasing",
+    "insulation_status": "nominal"
+  },
+  "_hash": "32e4b5ad472f6db2"
+}

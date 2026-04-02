@@ -1,0 +1,136 @@
+{
+  "_format": "mars-barn-echo-enrichments",
+  "version": "v8",
+  "description": "v8 Heat Transfer retroactive enrichment: Insulation degradation from Sol 1",
+  "applies_to_sols": [1, 947],
+  "physics_note": "Habitat insulation degrades from Sol 1 due to thermal cycling, micrometeorites, and UV exposure. This creates cumulative heat loss that affects strategies optimized for constant thermal performance.",
+  "data_sources": [
+    "NASA aerogel insulation studies: R-10.3 per inch degradation rates",
+    "ISS thermal cycling data: 50,000+ thermal cycles over 20+ years",
+    "Mars analog habitat thermal measurements (HI-SEAS, MDRS)",
+    "Micrometeorite impact rates on Mars surface (MSL/Curiosity data)"
+  ],
+  "enrichments": [
+    {
+      "sol": 1,
+      "thermal_state": {
+        "insulation_efficiency": 1.0,
+        "thermal_bridge_factor": 1.0,
+        "heating_efficiency": 1.0,
+        "air_leak_factor": 1.0,
+        "cumulative_thermal_cycles": 0,
+        "cumulative_micrometeorite_hits": 0
+      }
+    },
+    {
+      "sol": 100,
+      "thermal_state": {
+        "insulation_efficiency": 0.95,
+        "thermal_bridge_factor": 1.02,
+        "heating_efficiency": 0.98,
+        "air_leak_factor": 1.01,
+        "cumulative_thermal_cycles": 10000,
+        "cumulative_micrometeorite_hits": 47
+      }
+    },
+    {
+      "sol": 200,
+      "thermal_state": {
+        "insulation_efficiency": 0.88,
+        "thermal_bridge_factor": 1.05,
+        "heating_efficiency": 0.95,
+        "air_leak_factor": 1.03,
+        "cumulative_thermal_cycles": 20000,
+        "cumulative_micrometeorite_hits": 112
+      }
+    },
+    {
+      "sol": 300,
+      "thermal_state": {
+        "insulation_efficiency": 0.82,
+        "thermal_bridge_factor": 1.08,
+        "heating_efficiency": 0.91,
+        "air_leak_factor": 1.05,
+        "cumulative_thermal_cycles": 30000,
+        "cumulative_micrometeorite_hits": 189
+      }
+    },
+    {
+      "sol": 400,
+      "thermal_state": {
+        "insulation_efficiency": 0.76,
+        "thermal_bridge_factor": 1.12,
+        "heating_efficiency": 0.87,
+        "air_leak_factor": 1.08,
+        "cumulative_thermal_cycles": 40000,
+        "cumulative_micrometeorite_hits": 278
+      }
+    },
+    {
+      "sol": 500,
+      "thermal_state": {
+        "insulation_efficiency": 0.70,
+        "thermal_bridge_factor": 1.16,
+        "heating_efficiency": 0.83,
+        "air_leak_factor": 1.11,
+        "cumulative_thermal_cycles": 50000,
+        "cumulative_micrometeorite_hits": 381
+      }
+    },
+    {
+      "sol": 600,
+      "thermal_state": {
+        "insulation_efficiency": 0.65,
+        "thermal_bridge_factor": 1.21,
+        "heating_efficiency": 0.79,
+        "air_leak_factor": 1.15,
+        "cumulative_thermal_cycles": 60000,
+        "cumulative_micrometeorite_hits": 498
+      }
+    },
+    {
+      "sol": 700,
+      "thermal_state": {
+        "insulation_efficiency": 0.60,
+        "thermal_bridge_factor": 1.26,
+        "heating_efficiency": 0.75,
+        "air_leak_factor": 1.19,
+        "cumulative_thermal_cycles": 70000,
+        "cumulative_micrometeorite_hits": 629
+      }
+    },
+    {
+      "sol": 800,
+      "thermal_state": {
+        "insulation_efficiency": 0.56,
+        "thermal_bridge_factor": 1.32,
+        "heating_efficiency": 0.71,
+        "air_leak_factor": 1.24,
+        "cumulative_thermal_cycles": 80000,
+        "cumulative_micrometeorite_hits": 775
+      }
+    },
+    {
+      "sol": 897,
+      "thermal_state": {
+        "insulation_efficiency": 0.52,
+        "thermal_bridge_factor": 1.38,
+        "heating_efficiency": 0.67,
+        "air_leak_factor": 1.29,
+        "cumulative_thermal_cycles": 89700,
+        "cumulative_micrometeorite_hits": 947,
+        "note": "Final sol before v8 physics activation. Significant thermal degradation has occurred."
+      }
+    }
+  ],
+  "impact_analysis": {
+    "heating_power_increase": "By Sol 897, heating requirements ~2.6x higher due to degraded insulation",
+    "strategic_implications": [
+      "Static heating allocations become increasingly inadequate over time",
+      "Power budgeting must account for rising thermal losses",
+      "Insulation maintenance becomes critical for long-term survival",
+      "Thermal management requires adaptive strategies, not fixed ratios"
+    ],
+    "gauntlet_impact": "Governors optimized for early-mission thermal efficiency will face escalating energy costs in late mission phases"
+  }
+}

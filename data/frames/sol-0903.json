@@ -1,0 +1,40 @@
+{
+  "sol": 903,
+  "utc": "2027-12-29T21:54:11Z",
+  "mars": {
+    "ls": 125.9,
+    "season": "Northern Summer",
+    "temp_k": 222.2,
+    "temp_c": -50.9,
+    "pressure_pa": 579,
+    "solar_wm2": 363,
+    "dust_tau": 0.406,
+    "wind_ms": 3.9,
+    "lmst": 18.3
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "insulation_degradation",
+      "degradation_rate": 0.0023,
+      "desc": "Micrometeorite punctures and thermal cycling degrade aerogel insulation"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 10.2,
+    "window_open": true,
+    "bandwidth_kbps": 8
+  },
+  "terrain": {
+    "regolith_hardness": 0.83,
+    "water_ice_depth_m": 2.9,
+    "surface_radiation_usv": 0.38
+  },
+  "frame_echo": {
+    "prev_sol": 902,
+    "thermal_efficiency_trend": "stable",
+    "heating_demand_trend": "increasing",
+    "insulation_status": "critical"
+  },
+  "_hash": "c610a8e128c976b4"
+}
