@@ -1,0 +1,65 @@
+{
+  "sol": 766,
+  "utc": "2027-09-04T01:33:36Z",
+  "mars": {
+    "ls": 168.4,
+    "season": "Northern Summer",
+    "temp_k": 222.9,
+    "temp_c": -50.3,
+    "pressure_pa": 746,
+    "solar_wm2": 489,
+    "dust_tau": 0.261,
+    "wind_ms": 3.8,
+    "lmst": 19.7
+  },
+  "events": [
+    {
+      "type": "dust_devil",
+      "severity": 0.33,
+      "duration_sols": 1,
+      "desc": "Dust devil spotted near habitat perimeter"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.009
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "antenna",
+      "degradation": 0.0027
+    },
+    {
+      "type": "radiation_seu",
+      "target": "flight_computer",
+      "severity": 0.5,
+      "desc": "Radiation single-event upset \u2014 bit flip in robot computer"
+    },
+    {
+      "type": "module_cascade_failure",
+      "min_modules": 4,
+      "severity_per_module": 0.0041,
+      "desc": "Cascade failure \u2014 each additional module increases systemic risk"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 7.9,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.9,
+    "water_ice_depth_m": 1.8,
+    "surface_radiation_usv": 0.92
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 765,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -7.6,
+    "dust_delta": 0.103
+  },
+  "_hash": "754682d5c4e7a225"
+}

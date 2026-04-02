@@ -1,0 +1,46 @@
+{
+  "sol": 779,
+  "utc": "2027-09-17T10:08:24Z",
+  "mars": {
+    "ls": 175.2,
+    "season": "Northern Summer",
+    "temp_k": 237.0,
+    "temp_c": -36.2,
+    "pressure_pa": 743,
+    "solar_wm2": 505,
+    "dust_tau": 0.131,
+    "wind_ms": 3.7,
+    "lmst": 11.4
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0133
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "wheel_assembly",
+      "degradation": 0.0066
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 8.9,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.82,
+    "water_ice_depth_m": 2.2,
+    "surface_radiation_usv": 0.81
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 778,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 5.3,
+    "dust_delta": 0.053
+  },
+  "_hash": "3a9e29752ef35f6c"
+}

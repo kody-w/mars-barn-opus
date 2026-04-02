@@ -1,0 +1,61 @@
+{
+  "sol": 764,
+  "utc": "2027-09-02T00:14:24Z",
+  "mars": {
+    "ls": 167.3,
+    "season": "Northern Summer",
+    "temp_k": 237.3,
+    "temp_c": -35.8,
+    "pressure_pa": 747,
+    "solar_wm2": 540,
+    "dust_tau": 0.152,
+    "wind_ms": 3.0,
+    "lmst": 21.0
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.54,
+      "duration_sols": 4,
+      "desc": "Regional dust storm approaching from the north"
+    },
+    {
+      "type": "workload_overload",
+      "severity": 0.41,
+      "duration_sols": 7,
+      "min_crew": 3,
+      "desc": "Maintenance backlog \u2014 insufficient crew for concurrent tasks"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0116
+    },
+    {
+      "type": "electrostatic_dust",
+      "target": "thermal_radiator",
+      "degradation": 0.0012,
+      "desc": "Electrostatic dust adhesion \u2014 charged particles cling to surfaces"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 7.7,
+    "window_open": false,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.84,
+    "water_ice_depth_m": 2.3,
+    "surface_radiation_usv": 0.46
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 763,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 1.5,
+    "dust_delta": -0.015
+  },
+  "_hash": "c104990385069620"
+}

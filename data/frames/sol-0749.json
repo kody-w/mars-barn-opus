@@ -1,0 +1,64 @@
+{
+  "sol": 749,
+  "utc": "2027-08-17T14:20:24Z",
+  "mars": {
+    "ls": 159.5,
+    "season": "Northern Summer",
+    "temp_k": 226.4,
+    "temp_c": -46.8,
+    "pressure_pa": 751,
+    "solar_wm2": 478,
+    "dust_tau": 0.14,
+    "wind_ms": 7.3,
+    "lmst": 6.6
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0081
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "antenna",
+      "degradation": 0.0087
+    },
+    {
+      "type": "electrostatic_dust",
+      "target": "thermal_radiator",
+      "degradation": 0.0036,
+      "desc": "Electrostatic dust adhesion \u2014 charged particles cling to surfaces"
+    },
+    {
+      "type": "module_cascade_failure",
+      "min_modules": 4,
+      "severity_per_module": 0.0062,
+      "desc": "Cascade failure \u2014 each additional module increases systemic risk"
+    },
+    {
+      "type": "dust_infiltration",
+      "targets_all_modules": true,
+      "degradation_per_module": 0.0013,
+      "desc": "Regolith dust infiltration through module seals \u2014 affects ALL modules"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 6.5,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.89,
+    "water_ice_depth_m": 1.5,
+    "surface_radiation_usv": 0.81
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 748,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -7.1,
+    "dust_delta": 0.005
+  },
+  "_hash": "3e3e3e0d4016d9bd"
+}

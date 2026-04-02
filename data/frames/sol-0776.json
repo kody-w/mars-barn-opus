@@ -1,0 +1,65 @@
+{
+  "sol": 776,
+  "utc": "2027-09-14T08:09:36Z",
+  "mars": {
+    "ls": 173.6,
+    "season": "Northern Summer",
+    "temp_k": 234.9,
+    "temp_c": -38.3,
+    "pressure_pa": 743,
+    "solar_wm2": 488,
+    "dust_tau": 0.193,
+    "wind_ms": 3.3,
+    "lmst": 13.3
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.3,
+      "duration_sols": 16,
+      "desc": "Regional dust storm approaching from the north"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0097
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "isru_unit",
+      "degradation": 0.0044
+    },
+    {
+      "type": "power_grid_overload",
+      "min_modules": 5,
+      "power_drain_per_module": 5.0,
+      "desc": "Power grid strain \u2014 too many modules for available power capacity"
+    },
+    {
+      "type": "dust_infiltration",
+      "targets_all_modules": true,
+      "degradation_per_module": 0.0024,
+      "desc": "Regolith dust infiltration through module seals \u2014 affects ALL modules"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 8.7,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.55,
+    "water_ice_depth_m": 2.2,
+    "surface_radiation_usv": 0.74
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 775,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 7.9,
+    "dust_delta": 0.091
+  },
+  "_hash": "51517508739da1d3"
+}

@@ -1,0 +1,76 @@
+{
+  "sol": 745,
+  "utc": "2027-08-13T11:42:00Z",
+  "mars": {
+    "ls": 157.4,
+    "season": "Northern Summer",
+    "temp_k": 231.0,
+    "temp_c": -42.1,
+    "pressure_pa": 752,
+    "solar_wm2": 451,
+    "dust_tau": 0.064,
+    "wind_ms": 5.5,
+    "lmst": 9.2
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.84,
+      "duration_sols": 8,
+      "desc": "Regional dust storm approaching from the north"
+    },
+    {
+      "type": "workload_overload",
+      "severity": 0.64,
+      "duration_sols": 6,
+      "min_crew": 3,
+      "desc": "Maintenance backlog \u2014 insufficient crew for concurrent tasks"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0084
+    },
+    {
+      "type": "module_cascade_failure",
+      "min_modules": 4,
+      "severity_per_module": 0.004,
+      "desc": "Cascade failure \u2014 each additional module increases systemic risk"
+    },
+    {
+      "type": "supply_chain_bottleneck",
+      "min_crew": 3,
+      "min_modules": 3,
+      "efficiency_penalty": 0.0114,
+      "desc": "Supply chain bottleneck \u2014 insufficient crew to maintain module density"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 6.2,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.81,
+    "water_ice_depth_m": 2.3,
+    "surface_radiation_usv": 0.44
+  },
+  "challenge": {
+    "id": "sol745_nav_sensor_degradation",
+    "type": "nav_sensor_degradation",
+    "params": {
+      "sensor": "lidar",
+      "obscuration_pct": 11,
+      "cause": "dust"
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 744,
+    "global_dust_trend": "falling",
+    "solar_efficiency_trend": "improving",
+    "temp_delta": -5.6,
+    "dust_delta": -0.102
+  },
+  "_hash": "cbfe8afa0e13f73b"
+}

@@ -1,0 +1,66 @@
+{
+  "sol": 780,
+  "utc": "2027-09-18T10:48:00Z",
+  "mars": {
+    "ls": 175.7,
+    "season": "Northern Summer",
+    "temp_k": 236.3,
+    "temp_c": -36.8,
+    "pressure_pa": 742,
+    "solar_wm2": 471,
+    "dust_tau": 0.155,
+    "wind_ms": 2.4,
+    "lmst": 10.8
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0131
+    },
+    {
+      "type": "perchlorate_corrosion",
+      "target": "solar_gimbal",
+      "degradation": 0.0063,
+      "desc": "Perchlorate salt corrosion on mechanical joints"
+    },
+    {
+      "type": "regolith_abrasion",
+      "target": "solar_sensor",
+      "degradation": 0.0036,
+      "desc": "Fine regolith abrasion on optical surfaces"
+    },
+    {
+      "type": "dust_infiltration",
+      "targets_all_modules": true,
+      "degradation_per_module": 0.0017,
+      "desc": "Regolith dust infiltration through module seals \u2014 affects ALL modules"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 9.0,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.64,
+    "water_ice_depth_m": 1.0,
+    "surface_radiation_usv": 0.69
+  },
+  "challenge": {
+    "id": "sol780_radiation_dosimetry",
+    "type": "radiation_dosimetry",
+    "params": {
+      "cumulative_msv": 150,
+      "rate_usv_h": 1.0
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 779,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -0.7,
+    "dust_delta": 0.024
+  },
+  "_hash": "3e3c9477bdc5fa48"
+}

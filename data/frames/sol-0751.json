@@ -1,0 +1,56 @@
+{
+  "sol": 751,
+  "utc": "2027-08-19T15:39:36Z",
+  "mars": {
+    "ls": 160.5,
+    "season": "Northern Summer",
+    "temp_k": 238.4,
+    "temp_c": -34.8,
+    "pressure_pa": 750,
+    "solar_wm2": 483,
+    "dust_tau": 0.16,
+    "wind_ms": 3.4,
+    "lmst": 5.3
+  },
+  "events": [
+    {
+      "type": "system_redundancy_check",
+      "severity": 0.4,
+      "duration_sols": 1,
+      "min_crew": 4,
+      "desc": "Safety audit \u2014 all critical systems need simultaneous monitoring (4 crew min)"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.014
+    },
+    {
+      "type": "supply_chain_bottleneck",
+      "min_crew": 3,
+      "min_modules": 3,
+      "efficiency_penalty": 0.0187,
+      "desc": "Supply chain bottleneck \u2014 insufficient crew to maintain module density"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 6.7,
+    "window_open": false,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.78,
+    "water_ice_depth_m": 2.2,
+    "surface_radiation_usv": 0.53
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 750,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 8.5,
+    "dust_delta": -0.048
+  },
+  "_hash": "acbe6601fd1ed5bd"
+}

@@ -1,0 +1,67 @@
+{
+  "sol": 798,
+  "utc": "2027-10-06T22:40:48Z",
+  "mars": {
+    "ls": 185.2,
+    "season": "Northern Autumn",
+    "temp_k": 229.8,
+    "temp_c": -43.3,
+    "pressure_pa": 737,
+    "solar_wm2": 523,
+    "dust_tau": 0.105,
+    "wind_ms": 5.6,
+    "lmst": 23.2
+  },
+  "events": [
+    {
+      "type": "workload_overload",
+      "severity": 0.31,
+      "duration_sols": 16,
+      "min_crew": 3,
+      "desc": "Maintenance backlog \u2014 insufficient crew for concurrent tasks"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0199
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "solar_array",
+      "degradation": 0.0095
+    },
+    {
+      "type": "perchlorate_corrosion",
+      "target": "solar_gimbal",
+      "degradation": 0.0057,
+      "desc": "Perchlorate salt corrosion on mechanical joints"
+    },
+    {
+      "type": "concurrent_maintenance",
+      "min_crew_required": 3,
+      "penalty_if_understaffed": 0.0057,
+      "target": "solar_array",
+      "desc": "Multi-point maintenance \u2014 requires 3-4 crew working simultaneously"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 10.3,
+    "window_open": false,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.6,
+    "water_ice_depth_m": 1.8,
+    "surface_radiation_usv": 0.87
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 797,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -3.6,
+    "dust_delta": -0.046
+  },
+  "_hash": "5ed5f17a123a4989"
+}

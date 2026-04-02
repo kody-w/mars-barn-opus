@@ -1,0 +1,60 @@
+{
+  "sol": 747,
+  "utc": "2027-08-15T13:01:12Z",
+  "mars": {
+    "ls": 158.4,
+    "season": "Northern Summer",
+    "temp_k": 230.0,
+    "temp_c": -43.2,
+    "pressure_pa": 751,
+    "solar_wm2": 462,
+    "dust_tau": 0.144,
+    "wind_ms": 6.1,
+    "lmst": 7.9
+  },
+  "events": [
+    {
+      "type": "comms_blackout",
+      "severity": 0.47,
+      "duration_sols": 4,
+      "desc": "Solar conjunction \u2014 Earth comms degraded or lost"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0077
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "antenna",
+      "degradation": 0.0022
+    },
+    {
+      "type": "critical_solo_failure",
+      "severity": 0.89,
+      "affects": "weakest_crew_member",
+      "hp_damage": 21,
+      "desc": "Major actuator failure \u2014 crew member immobilized. No backup available with small crew."
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 6.3,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.7,
+    "water_ice_depth_m": 1.6,
+    "surface_radiation_usv": 0.88
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 746,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -7.3,
+    "dust_delta": -0.101
+  },
+  "_hash": "80b19960cade0186"
+}

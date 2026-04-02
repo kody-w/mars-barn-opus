@@ -1,0 +1,61 @@
+{
+  "sol": 781,
+  "utc": "2027-09-19T11:27:36Z",
+  "mars": {
+    "ls": 176.2,
+    "season": "Northern Summer",
+    "temp_k": 224.5,
+    "temp_c": -48.6,
+    "pressure_pa": 742,
+    "solar_wm2": 513,
+    "dust_tau": 0.159,
+    "wind_ms": 1.8,
+    "lmst": 10.1
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.61,
+      "duration_sols": 9,
+      "desc": "Regional dust storm approaching from the north"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0167
+    },
+    {
+      "type": "perchlorate_corrosion",
+      "target": "solar_gimbal",
+      "degradation": 0.0059,
+      "desc": "Perchlorate salt corrosion on mechanical joints"
+    },
+    {
+      "type": "workload_wear",
+      "target": "actuator_joint",
+      "degradation_per_missing_crew": 0.0026,
+      "baseline_crew": 4,
+      "desc": "Accelerated wear from understaffing \u2014 fewer crew = more cycles per robot"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 9.1,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.54,
+    "water_ice_depth_m": 0.9,
+    "surface_radiation_usv": 0.86
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 780,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -11.8,
+    "dust_delta": 0.004
+  },
+  "_hash": "94bb63bd6e6d3eb3"
+}

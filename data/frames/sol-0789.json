@@ -1,0 +1,54 @@
+{
+  "sol": 789,
+  "utc": "2027-09-27T16:44:24Z",
+  "mars": {
+    "ls": 180.4,
+    "season": "Northern Autumn",
+    "temp_k": 231.7,
+    "temp_c": -41.5,
+    "pressure_pa": 740,
+    "solar_wm2": 524,
+    "dust_tau": 0.171,
+    "wind_ms": 5.7,
+    "lmst": 5.0
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0161
+    },
+    {
+      "type": "regolith_abrasion",
+      "target": "spectrometer",
+      "degradation": 0.0037,
+      "desc": "Fine regolith abrasion on optical surfaces"
+    },
+    {
+      "type": "concurrent_maintenance",
+      "min_crew_required": 4,
+      "penalty_if_understaffed": 0.011,
+      "target": "hab_structure",
+      "desc": "Multi-point maintenance \u2014 requires 3-4 crew working simultaneously"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 9.7,
+    "window_open": false,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.86,
+    "water_ice_depth_m": 1.2,
+    "surface_radiation_usv": 0.35
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 788,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 1.7,
+    "dust_delta": -0.029
+  },
+  "_hash": "dc444b53d69f335c"
+}

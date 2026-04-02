@@ -1,0 +1,47 @@
+{
+  "sol": 769,
+  "utc": "2027-09-07T03:32:24Z",
+  "mars": {
+    "ls": 170.0,
+    "season": "Northern Summer",
+    "temp_k": 235.4,
+    "temp_c": -37.7,
+    "pressure_pa": 745,
+    "solar_wm2": 501,
+    "dust_tau": 0.059,
+    "wind_ms": 3.4,
+    "lmst": 17.8
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0095
+    },
+    {
+      "type": "perchlorate_corrosion",
+      "target": "actuator_joint",
+      "degradation": 0.008,
+      "desc": "Perchlorate salt corrosion on mechanical joints"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 8.1,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.85,
+    "water_ice_depth_m": 2.0,
+    "surface_radiation_usv": 0.96
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 768,
+    "global_dust_trend": "falling",
+    "solar_efficiency_trend": "improving",
+    "temp_delta": 2.8,
+    "dust_delta": -0.113
+  },
+  "_hash": "cce5f1eb42de858a"
+}

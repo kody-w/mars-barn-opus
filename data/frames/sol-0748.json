@@ -1,0 +1,60 @@
+{
+  "sol": 748,
+  "utc": "2027-08-16T13:40:48Z",
+  "mars": {
+    "ls": 159.0,
+    "season": "Northern Summer",
+    "temp_k": 233.5,
+    "temp_c": -39.6,
+    "pressure_pa": 751,
+    "solar_wm2": 419,
+    "dust_tau": 0.135,
+    "wind_ms": 3.5,
+    "lmst": 7.2
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.79,
+      "duration_sols": 3,
+      "desc": "Regional dust storm approaching from the north"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0118
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "solar_array",
+      "degradation": 0.0044
+    },
+    {
+      "type": "workload_wear",
+      "target": "solar_gimbal",
+      "degradation_per_missing_crew": 0.0023,
+      "baseline_crew": 4,
+      "desc": "Accelerated wear from understaffing \u2014 fewer crew = more cycles per robot"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 6.4,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.55,
+    "water_ice_depth_m": 2.1,
+    "surface_radiation_usv": 0.74
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 747,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 3.5,
+    "dust_delta": -0.009
+  },
+  "_hash": "f148ca50f3d14ab7"
+}

@@ -1,0 +1,62 @@
+{
+  "sol": 760,
+  "utc": "2027-08-28T21:36:00Z",
+  "mars": {
+    "ls": 165.2,
+    "season": "Northern Summer",
+    "temp_k": 230.0,
+    "temp_c": -43.2,
+    "pressure_pa": 748,
+    "solar_wm2": 492,
+    "dust_tau": 0.116,
+    "wind_ms": 5.1,
+    "lmst": 23.6
+  },
+  "events": [
+    {
+      "type": "workload_overload",
+      "severity": 0.67,
+      "duration_sols": 19,
+      "min_crew": 3,
+      "desc": "Maintenance backlog \u2014 insufficient crew for concurrent tasks"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0182
+    },
+    {
+      "type": "electrostatic_dust",
+      "target": "sensor_array",
+      "degradation": 0.0031,
+      "desc": "Electrostatic dust adhesion \u2014 charged particles cling to surfaces"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 7.4,
+    "window_open": false,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.81,
+    "water_ice_depth_m": 1.5,
+    "surface_radiation_usv": 0.46
+  },
+  "challenge": {
+    "id": "sol760_radiation_dosimetry",
+    "type": "radiation_dosimetry",
+    "params": {
+      "cumulative_msv": 124,
+      "rate_usv_h": 1.23
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 759,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -7.5,
+    "dust_delta": 0.05
+  },
+  "_hash": "e055d4fc7d63c1bc"
+}

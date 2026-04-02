@@ -1,0 +1,65 @@
+{
+  "sol": 784,
+  "utc": "2027-09-22T13:26:24Z",
+  "mars": {
+    "ls": 177.8,
+    "season": "Northern Summer",
+    "temp_k": 229.2,
+    "temp_c": -44.0,
+    "pressure_pa": 741,
+    "solar_wm2": 529,
+    "dust_tau": 0.13,
+    "wind_ms": 2.1,
+    "lmst": 8.2
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.64,
+      "duration_sols": 12,
+      "desc": "Regional dust storm approaching from the north"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0132
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "antenna",
+      "degradation": 0.0026
+    },
+    {
+      "type": "electrostatic_dust",
+      "target": "antenna_feed",
+      "degradation": 0.0035,
+      "desc": "Electrostatic dust adhesion \u2014 charged particles cling to surfaces"
+    },
+    {
+      "type": "module_cascade_failure",
+      "min_modules": 4,
+      "severity_per_module": 0.0072,
+      "desc": "Cascade failure \u2014 each additional module increases systemic risk"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 9.3,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.72,
+    "water_ice_depth_m": 0.9,
+    "surface_radiation_usv": 0.91
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 783,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -12.5,
+    "dust_delta": -0.094
+  },
+  "_hash": "16f7ae6e48d965df"
+}

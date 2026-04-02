@@ -1,0 +1,80 @@
+{
+  "sol": 755,
+  "utc": "2027-08-23T18:18:00Z",
+  "mars": {
+    "ls": 162.6,
+    "season": "Northern Summer",
+    "temp_k": 234.1,
+    "temp_c": -39.1,
+    "pressure_pa": 749,
+    "solar_wm2": 517,
+    "dust_tau": 0.184,
+    "wind_ms": 5.1,
+    "lmst": 2.8
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.86,
+      "duration_sols": 14,
+      "desc": "Regional dust storm approaching from the north"
+    },
+    {
+      "type": "dust_devil",
+      "severity": 0.35,
+      "duration_sols": 1,
+      "desc": "Dust devil spotted near habitat perimeter"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.005
+    },
+    {
+      "type": "workload_wear",
+      "target": "solar_gimbal",
+      "degradation_per_missing_crew": 0.0057,
+      "baseline_crew": 4,
+      "desc": "Accelerated wear from understaffing \u2014 fewer crew = more cycles per robot"
+    },
+    {
+      "type": "module_cascade_failure",
+      "min_modules": 4,
+      "severity_per_module": 0.0076,
+      "desc": "Cascade failure \u2014 each additional module increases systemic risk"
+    },
+    {
+      "type": "power_grid_overload",
+      "min_modules": 5,
+      "power_drain_per_module": 5.3,
+      "desc": "Power grid strain \u2014 too many modules for available power capacity"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 7.0,
+    "window_open": false,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.71,
+    "water_ice_depth_m": 0.9,
+    "surface_radiation_usv": 0.83
+  },
+  "challenge": {
+    "id": "sol755_pressure_anomaly",
+    "type": "pressure_anomaly",
+    "params": {
+      "section": "hab_a",
+      "drop_pa": 27
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 754,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -6.8,
+    "dust_delta": 0.026
+  },
+  "_hash": "81e2d45e17827ab4"
+}

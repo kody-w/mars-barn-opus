@@ -1,0 +1,52 @@
+{
+  "sol": 778,
+  "utc": "2027-09-16T09:28:48Z",
+  "mars": {
+    "ls": 174.7,
+    "season": "Northern Summer",
+    "temp_k": 231.7,
+    "temp_c": -41.5,
+    "pressure_pa": 743,
+    "solar_wm2": 476,
+    "dust_tau": 0.078,
+    "wind_ms": 4.7,
+    "lmst": 12.0
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0182
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "antenna",
+      "degradation": 0.0082
+    },
+    {
+      "type": "module_cascade_failure",
+      "min_modules": 4,
+      "severity_per_module": 0.0046,
+      "desc": "Cascade failure \u2014 each additional module increases systemic risk"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 8.8,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.57,
+    "water_ice_depth_m": 1.2,
+    "surface_radiation_usv": 0.88
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 777,
+    "global_dust_trend": "falling",
+    "solar_efficiency_trend": "improving",
+    "temp_delta": 1.2,
+    "dust_delta": -0.102
+  },
+  "_hash": "35284e0e71765bfa"
+}

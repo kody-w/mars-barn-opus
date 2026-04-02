@@ -1,0 +1,53 @@
+{
+  "sol": 744,
+  "utc": "2027-08-12T11:02:24Z",
+  "mars": {
+    "ls": 156.9,
+    "season": "Northern Summer",
+    "temp_k": 236.6,
+    "temp_c": -36.5,
+    "pressure_pa": 752,
+    "solar_wm2": 479,
+    "dust_tau": 0.166,
+    "wind_ms": 5.7,
+    "lmst": 9.8
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0172
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "solar_array",
+      "degradation": 0.0088
+    },
+    {
+      "type": "supply_chain_bottleneck",
+      "min_crew": 3,
+      "min_modules": 3,
+      "efficiency_penalty": 0.0206,
+      "desc": "Supply chain bottleneck \u2014 insufficient crew to maintain module density"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 6.1,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.67,
+    "water_ice_depth_m": 1.1,
+    "surface_radiation_usv": 0.92
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 743,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 10.1,
+    "dust_delta": 0.098
+  },
+  "_hash": "a100a96ef17233ba"
+}

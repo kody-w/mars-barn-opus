@@ -1,0 +1,48 @@
+{
+  "sol": 738,
+  "utc": "2027-08-06T07:04:48Z",
+  "mars": {
+    "ls": 153.7,
+    "season": "Northern Summer",
+    "temp_k": 228.1,
+    "temp_c": -45.1,
+    "pressure_pa": 753,
+    "solar_wm2": 518,
+    "dust_tau": 0.13,
+    "wind_ms": 4.7,
+    "lmst": 13.6
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.35,
+      "duration_sols": 16,
+      "desc": "Regional dust storm approaching from the north"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0077
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 5.6,
+    "window_open": true,
+    "bandwidth_kbps": 32
+  },
+  "terrain": {
+    "regolith_hardness": 0.7,
+    "water_ice_depth_m": 1.1,
+    "surface_radiation_usv": 0.39
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 737,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -8.9,
+    "dust_delta": -0.061
+  },
+  "_hash": "4b2253443229f356"
+}
