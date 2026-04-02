@@ -1,0 +1,210 @@
+;; ULTIMATE COMPOUND DAMAGE BREAKER v2
+;; Innovation: Advanced multi-paradigm strategy with enhanced CRI adaptation
+;; Goal: Master 602-frame gauntlet with superior efficiency and crew health
+;; Features: Adaptive governor, multiple repair bays, optimized build timing, compound damage resistance
+
+(begin
+  (define _agent_name "Ultimate Compound Damage Breaker v2")
+  (define _agent_desc "Multi-phase adaptive strategy with CRI-responsive allocation and exponential repair mastery")
+
+  (log (concat "🛡️⚡💎🔧 COMPOUND BREAKER v2 — Sol " (string sol) " — Advanced Adaptation Protocol"))
+
+  ;; ═══ MISSION PHASE INTELLIGENCE ═══
+  ;; Dynamic phase detection for optimized resource allocation
+  (define bootstrap_phase (< sol 30))          ;; Early survival focus
+  (define expansion_phase (and (>= sol 30) (< sol 100)))   ;; Infrastructure build
+  (define fortification_phase (and (>= sol 100) (< sol 250)))  ;; Repair bay deployment
+  (define optimization_phase (and (>= sol 250) (< sol 450)))   ;; Efficiency mastery
+  (define endgame_phase (>= sol 450))          ;; Final survival push
+
+  ;; ═══ ENHANCED CRI THREAT ANALYSIS ═══
+  ;; Multi-level threat assessment with dynamic response
+  (define threat_stable (< cri 8))
+  (define threat_moderate (and (>= cri 8) (< cri 18)))
+  (define threat_elevated (and (>= cri 18) (< cri 32)))
+  (define threat_critical (and (>= cri 32) (< cri 55)))
+  (define threat_apocalyptic (>= cri 55))
+
+  ;; Compound damage detection and response
+  (define compound_damage_risk 
+    (if (or (< ie 0.4) (< se 0.4) threat_critical threat_apocalyptic)
+        (+ 0.6 (* cri 0.01))  ;; Enhanced response for compound threats
+        0.0))
+
+  ;; ═══ ADAPTIVE RESOURCE ALLOCATION MATRIX ═══
+  ;; CRI-responsive allocation that changes based on threat levels and mission phase
+
+  ;; Bootstrap Phase: Focus on basic survival
+  (define bootstrap_allocation
+    (cond
+      (threat_apocalyptic (begin (set! isru_alloc 0.55) (set! greenhouse_alloc 0.25) (set! heating_alloc 0.20)))
+      (threat_critical (begin (set! isru_alloc 0.50) (set! greenhouse_alloc 0.30) (set! heating_alloc 0.20)))
+      (threat_elevated (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.20)))
+      (threat_moderate (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.25)))
+      (threat_stable (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.30)))
+      (true (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.25)))))
+
+  ;; Expansion Phase: Balanced growth with efficiency
+  (define expansion_allocation
+    (cond
+      (threat_apocalyptic (begin (set! isru_alloc 0.50) (set! greenhouse_alloc 0.30) (set! heating_alloc 0.20)))
+      (threat_critical (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.20)))
+      (threat_elevated (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.20)))
+      (threat_moderate (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.25)))
+      (threat_stable (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.25)))
+      (true (begin (set! isru_alloc 0.32) (set! greenhouse_alloc 0.43) (set! heating_alloc 0.25)))))
+
+  ;; Fortification Phase: Repair bay focus with adaptive maintenance
+  (define fortification_allocation
+    (cond
+      (threat_apocalyptic (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.20)))
+      (threat_critical (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.20)))
+      (threat_elevated (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.20)))
+      (threat_moderate (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.20)))
+      (threat_stable (begin (set! isru_alloc 0.28) (set! greenhouse_alloc 0.52) (set! heating_alloc 0.20)))
+      (true (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.20)))))
+
+  ;; Optimization Phase: Peak efficiency operations
+  (define optimization_allocation
+    (cond
+      (threat_apocalyptic (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.20)))
+      (threat_critical (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.20)))
+      (threat_elevated (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.20)))
+      (threat_moderate (begin (set! isru_alloc 0.28) (set! greenhouse_alloc 0.52) (set! heating_alloc 0.20)))
+      (threat_stable (begin (set! isru_alloc 0.25) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.20)))
+      (true (begin (set! isru_alloc 0.27) (set! greenhouse_alloc 0.53) (set! heating_alloc 0.20)))))
+
+  ;; Endgame Phase: Survival at all costs with resource conservation  
+  (define endgame_allocation
+    (cond
+      (threat_apocalyptic (begin (set! isru_alloc 0.50) (set! greenhouse_alloc 0.30) (set! heating_alloc 0.20)))
+      (threat_critical (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.20)))
+      (threat_elevated (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.20)))
+      (threat_moderate (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.20)))
+      (threat_stable (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.20)))
+      (true (begin (set! isru_alloc 0.32) (set! greenhouse_alloc 0.48) (set! heating_alloc 0.20)))))
+
+  ;; Apply phase-specific allocation
+  (cond
+    (bootstrap_phase bootstrap_allocation)
+    (expansion_phase expansion_allocation) 
+    (fortification_phase fortification_allocation)
+    (optimization_phase optimization_allocation)
+    (endgame_phase endgame_allocation)
+    (true expansion_allocation))  ;; Default fallback
+
+  ;; ═══ ADVANCED FOOD RATIONING WITH CRI ADAPTATION ═══
+  (define crisis_rationing_threshold
+    (cond
+      (threat_apocalyptic 12)  ;; More aggressive in crisis
+      (threat_critical 8)
+      (threat_elevated 5) 
+      (threat_moderate 3)
+      (true 2)))
+
+  (define base_ration
+    (cond
+      ((< food_days crisis_rationing_threshold) 
+       (if threat_apocalyptic 0.25 
+           (if threat_critical 0.30 0.35)))  ;; Crisis rationing adapted to threat
+      ((< food_days 8) 
+       (if (or threat_critical threat_apocalyptic) 0.40 0.50))
+      ((< food_days 15) 
+       (if threat_elevated 0.60 0.75))
+      ((< food_days 25) 0.85)
+      (true 0.90)))  ;; Slightly more generous when abundant
+
+  ;; Compound damage emergency rationing
+  (define emergency_ration_adjustment
+    (if (> compound_damage_risk 0.4)
+        0.85  ;; Reduce rations during compound crises
+        1.0))
+
+  (set! food_ration (* base_ration emergency_ration_adjustment))
+
+  ;; ═══ STRATEGIC BUILD TIMING WITH MULTIPLE REPAIR BAYS ═══  
+  ;; Different build timing based on mission phase and threat level
+
+  ;; Early bot expansion (sols 8-16)
+  (if (and (>= sol 8) (<= sol 16) (< bot_count 2))
+      (set! build_item 
+          (if (< crew_alive 3) "repair_bot" "worker_bot")))
+
+  ;; Strategic solar farm deployment (sols 18-35)  
+  (if (and (>= sol 18) (<= sol 35) (< solar_count 3))
+      (set! build_item "solar_array"))
+
+  ;; Additional solar if struggling with power (sols 40-60)
+  (if (and (>= sol 40) (<= sol 60) (< power_ratio 0.8) (< solar_count 4))
+      (set! build_item "solar_array"))
+
+  ;; MULTIPLE REPAIR BAY STRATEGY - Enhanced exponential deployment
+  ;; First repair bay (early protection)
+  (if (and (>= sol 45) (<= sol 65) (< repair_count 1))
+      (set! build_item "repair_bay"))
+
+  ;; Second repair bay (compound damage protection)  
+  (if (and (>= sol 80) (<= sol 110) (< repair_count 2) 
+           (or threat_elevated threat_critical threat_apocalyptic))
+      (set! build_item "repair_bay"))
+
+  ;; Third repair bay (critical damage prevention)
+  (if (and (>= sol 120) (<= sol 160) (< repair_count 3)
+           (or (< ie 0.6) (< se 0.6) threat_critical threat_apocalyptic))
+      (set! build_item "repair_bay"))
+
+  ;; Fourth repair bay (late game insurance) 
+  (if (and (>= sol 200) (<= sol 280) (< repair_count 4)
+           (or threat_critical threat_apocalyptic (> compound_damage_risk 0.5)))
+      (set! build_item "repair_bay"))
+
+  ;; Fifth repair bay (endgame transcendence)
+  (if (and (>= sol 350) (<= sol 420) (< repair_count 5)
+           (or threat_apocalyptic (> cri 40) (< (+ ie se) 1.0)))
+      (set! build_item "repair_bay"))
+
+  ;; Additional greenhouse if food production struggling
+  (if (and (>= sol 70) (<= sol 140) (< food_days 10) (< greenhouse_count 3))
+      (set! build_item "greenhouse"))
+
+  ;; Late game module optimization
+  (if (and (>= sol 300) (< module_count 20))
+      (set! build_item 
+          (cond
+            ((< repair_count 4) "repair_bay")
+            ((< greenhouse_count 4) "greenhouse") 
+            ((< solar_count 6) "solar_array")
+            (true "hab_module"))))
+
+  ;; ═══ STATUS LOGGING ═══
+  (define phase_name
+    (cond
+      (bootstrap_phase "BOOTSTRAP")
+      (expansion_phase "EXPANSION") 
+      (fortification_phase "FORTIFICATION")
+      (optimization_phase "OPTIMIZATION")
+      (endgame_phase "ENDGAME")
+      (true "UNKNOWN")))
+
+  (define threat_name
+    (cond
+      (threat_apocalyptic "APOCALYPTIC")
+      (threat_critical "CRITICAL")
+      (threat_elevated "ELEVATED") 
+      (threat_moderate "MODERATE")
+      (threat_stable "STABLE")
+      (true "UNKNOWN")))
+
+  (log (concat "  Phase: " phase_name " | Threat: " threat_name " | CRI: " (string cri)))
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Green:" (string (round (* greenhouse_alloc 100))) "% | Heat:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Resources — O2:" (string o2_days) "d Food:" (string food_days) "d | IE:" (string (round (* ie 100))) "% SE:" (string (round (* se 100))) "%"))
+  (log (concat "  Modules — Repair:" (string repair_count) " Solar:" (string solar_count) " Green:" (string greenhouse_count) " | Crew:" (string crew_alive)))
+
+  ;; ═══ OUTPUT SUMMARY ═══
+  (concat "UltimateBreaker v2 Sol " (string sol) " — " phase_name "/" threat_name
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100))) 
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | O2:" (string o2_days)
+    "d F:" (string food_days) "d | IE:" (string (round (* ie 100))) "% SE:" (string (round (* se 100))) "%"))
