@@ -103,6 +103,13 @@ Work in $BARN" \
     wait $WDOG 2>/dev/null 2>&1
 
     echo "$(date) — Completed: $ID" >> "$LOGDIR/fleet-builder.log"
+
+    # VALIDATE — auto-rollback if gauntlet is broken
+    bash "$BARN/tools/validate-gauntlet.sh" >> "$LOGDIR/fleet-builder.log" 2>&1
+    if [ $? -ne 0 ]; then
+        echo "$(date) — ⚠️ ROLLBACK triggered for $ID — gauntlet restored" >> "$LOGDIR/fleet-builder.log"
+    fi
+
     sleep 300  # 5 min between builds
 done
 
