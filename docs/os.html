@@ -1226,9 +1226,9 @@ window.os = {
       // External URL: fetch through proxy chain, inject via srcdoc
       // This bypasses X-Frame-Options — the engine fetches, not the iframe.
       const proxies = [
-        'http://localhost:8789/?url=',                          // Local dev proxy
-        'https://api.allorigins.win/raw?url=',                  // Public proxy 1
-        'https://corsproxy.io/?' ,                               // Public proxy 2
+        'https://api.allorigins.win/raw?url=',                  // Public proxy (global, free)
+        'https://corsproxy.io/?',                                // Public fallback (global, free)
+        'http://localhost:8789/?url=',                           // Local dev proxy (optional)
       ];
 
       this._renderToGUI(url); // Show window immediately with loading state
