@@ -26,6 +26,35 @@
     width: 100%; height: 100%;
   }
 
+  /* Event notifications */
+  #event-log {
+    position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
+    z-index: 60; pointer-events: none;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .event-toast {
+    background: rgba(10,5,2,0.9); border: 1px solid rgba(255,120,40,0.5);
+    border-radius: 4px; padding: 6px 16px; font-size: 12px;
+    text-shadow: 0 0 6px rgba(255,120,40,0.5);
+    animation: toastIn 0.4s ease-out, toastOut 0.6s 4s ease-in forwards;
+    white-space: nowrap;
+  }
+  .event-toast.hazard { border-color: rgba(255,60,40,0.7); color: #ff8866; }
+  .event-toast.event { border-color: rgba(255,200,40,0.7); color: #ffcc66; }
+  .event-toast.info { border-color: rgba(100,200,255,0.5); color: #88ccff; }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes toastOut { to { opacity: 0; transform: translateY(-10px); } }
+
+  /* Sol speed control */
+  #speed-control {
+    position: fixed; bottom: 12px; right: 12px; z-index: 50;
+    font-size: 11px; opacity: 0.6;
+    text-shadow: 0 0 6px rgba(255,120,40,0.5);
+  }
+  #speed-control span { cursor: pointer; pointer-events: auto; padding: 2px 6px; border-radius: 3px; }
+  #speed-control span:hover { background: rgba(255,120,40,0.2); }
+  #speed-control span.active { color: #ff8844; font-weight: bold; }
+
   /* HUD panels */
   .hud {
     position: fixed; z-index: 50; pointer-events: none;
@@ -157,6 +186,19 @@
 <!-- Fullscreen hint -->
 <div id="fs-hint" style="position:fixed;bottom:12px;right:12px;z-index:50;pointer-events:none;font-size:11px;opacity:0.5;text-shadow:0 0 6px rgba(255,120,40,0.5);">
   Press <b>F</b> or double-click for fullscreen
+</div>
+
+<!-- Event notifications -->
+<div id="event-log"></div>
+
+<!-- Sol speed control -->
+<div id="speed-control">
+  SOL SPEED:
+  <span data-speed="0.5">½×</span>
+  <span data-speed="1" class="active">1×</span>
+  <span data-speed="3">3×</span>
+  <span data-speed="10">10×</span>
+  <span data-speed="50">50×</span>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -617,7 +659,8 @@
       waypointIndex: 0,
       progress: Math.random(),
       speed: 0.3 + Math.random() * 0.3,
-      direction: new THREE.Vector3(0, 0, 1)
+      direction: new THREE.Vector3(0, 0, 1),
+      task: null
     });
   });
 
@@ -693,6 +736,27 @@
       exitFPS();
     }
     if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+    // Speed controls: +/- or ]/[
+    if (e.key === '+' || e.key === '=') {
+      const speeds = [0.5, 1, 3, 10, 50];
+      const idx = speeds.indexOf(solSpeed);
+      if (idx < speeds.length - 1) {
+        solSpeed = speeds[idx + 1];
+        document.querySelectorAll('#speed-control span').forEach(s => {
+          s.classList.toggle('active', parseFloat(s.dataset.speed) === solSpeed);
+        });
+      }
+    }
+    if (e.key === '-' || e.key === '_') {
+      const speeds = [0.5, 1, 3, 10, 50];
+      const idx = speeds.indexOf(solSpeed);
+      if (idx > 0) {
+        solSpeed = speeds[idx - 1];
+        document.querySelectorAll('#speed-control span').forEach(s => {
+          s.classList.toggle('active', parseFloat(s.dataset.speed) === solSpeed);
+        });
+      }
+    }
   });
   window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
   window.addEventListener('dblclick', toggleFullscreen);
@@ -809,6 +873,49 @@
     fill.style.background = fpsUnit.hp > 0.6 ? '#4caf50' : fpsUnit.hp > 0.3 ? '#ffc107' : '#f44336';
   }
 
+  // ─── FRAME-DRIVEN SIMULATION ───────────────────────────────
+  let frames = {};
+  let totalSols = 0;
+  let currentSol = 0;
+  let solHour = 6;         // 0-24.66 (Mars sol = 24h 39m)
+  const SOL_HOURS = 24.66;
+  let solSpeed = 1;        // real-time: 1 sol = ~25s
+  let frameData = null;    // current frame
+  let prevFrameData = null;
+
+  // Task assignments: which building each unit is heading to
+  const TASK_TARGETS = {
+    'solar_array':     { x: -6, z: 20 },
+    'isru_unit':       { x: -8, z: -16 },
+    'greenhouse':      { x: 22, z: 7 },
+    'water_extract':   { x: 5, z: -25 },
+    'repair_bay':      { x: -22, z: 8 },
+    'landing_pad':     { x: -40, z: -5 },
+    'comms_array':     { x: 15, z: -15 },
+    'hab':             { x: 0, z: 0 },
+  };
+
+  async function loadFrames() {
+    try {
+      let resp = await fetch('../data/frames/frames.json');
+      if (!resp.ok) resp = await fetch('https://raw.githubusercontent.com/kody-w/mars-barn-opus/main/data/frames/frames.json');
+      const data = await resp.json();
+      const raw = data.frames || data;
+      for (const [sol, d] of Object.entries(raw)) {
+        if (sol.startsWith('_') || sol === 'frames') continue;
+        frames[parseInt(sol)] = d;
+      }
+      totalSols = Math.max(...Object.keys(frames).map(Number));
+      showToast(`📡 Loaded ${Object.keys(frames).length} frames (Sol 1-${totalSols})`, 'info');
+      currentSol = 1;
+      frameData = frames[1] || null;
+    } catch(e) {
+      showToast('⚠️ Frames offline — standalone mode', 'event');
+      totalSols = 777;
+    }
+  }
+  loadFrames();
+
   // ─── BROADCAST CHANNEL ───────────────────────────────────────
   let twinConnected = false;
   let twinState = null;
@@ -822,34 +929,185 @@
     };
   } catch(e) {}
 
-  // Simulated state
+  // ─── EVENT TOAST ─────────────────────────────────────────────
+  function showToast(msg, type) {
+    const log = document.getElementById('event-log');
+    const toast = document.createElement('div');
+    toast.className = 'event-toast ' + (type || 'info');
+    toast.textContent = msg;
+    log.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+    // Keep max 5
+    while (log.children.length > 5) log.firstChild.remove();
+  }
+
+  // ─── SOL SPEED CONTROL ──────────────────────────────────────
+  document.querySelectorAll('#speed-control span').forEach(el => {
+    el.addEventListener('click', () => {
+      solSpeed = parseFloat(el.dataset.speed);
+      document.querySelectorAll('#speed-control span').forEach(s => s.classList.remove('active'));
+      el.classList.add('active');
+    });
+  });
+
+  // ─── SIMULATED STATE (standalone / frame-driven) ────────────
   let simState = {
-    sol: 1, cri: 0.30,
+    sol: 1, cri: 0.30, hour: 6,
     o2: 82, h2o: 68, food: 55, power: 87,
     crew_alive: 5, modules: 8,
+    dust_tau: 0.15, temp_c: -47, wind_ms: 7,
   };
 
-  function selfTick() {
-    simState.sol += 0.001;
-    simState.cri = 0.25 + Math.sin(Date.now() * 0.0001) * 0.15;
-    simState.o2 = Math.max(20, Math.min(100, simState.o2 + (Math.random() - 0.52) * 2));
-    simState.h2o = Math.max(15, Math.min(100, simState.h2o + (Math.random() - 0.51) * 1.5));
-    simState.food = Math.max(10, Math.min(100, simState.food + (Math.random() - 0.52) * 1));
-    simState.power = Math.max(30, Math.min(100, simState.power + (Math.random() - 0.5) * 3));
+  function advanceSol(dt) {
+    solHour += dt * solSpeed * (SOL_HOURS / 25); // ~25s per sol at 1×
+    if (solHour >= SOL_HOURS) {
+      solHour -= SOL_HOURS;
+      currentSol++;
+      if (currentSol > totalSols) currentSol = 1;
+      prevFrameData = frameData;
+      frameData = frames[currentSol] || null;
+      onNewSol();
+    }
+
+    // Update sim state from frame data
+    if (frameData && frameData.mars) {
+      const m = frameData.mars;
+      simState.dust_tau = m.dust_tau || 0.15;
+      simState.temp_c = m.temp_c || -47;
+      simState.wind_ms = m.wind_ms || 7;
+      // Diurnal temperature swing based on hour
+      const hourFrac = solHour / SOL_HOURS;
+      const diurnal = Math.sin((hourFrac - 0.25) * Math.PI * 2);
+      simState.temp_c = (m.temp_c || -47) + diurnal * 15;
+    }
+
+    simState.sol = currentSol;
+    simState.hour = solHour;
+
+    // Resource drift (standalone)
+    if (!twinConnected) {
+      simState.o2 = Math.max(20, Math.min(100, simState.o2 + (Math.random() - 0.52) * 0.3));
+      simState.h2o = Math.max(15, Math.min(100, simState.h2o + (Math.random() - 0.51) * 0.2));
+      simState.food = Math.max(10, Math.min(100, simState.food + (Math.random() - 0.52) * 0.1));
+      simState.power = Math.max(30, Math.min(100, simState.power + (Math.random() - 0.5) * 0.4));
+      simState.cri = 0.15 + simState.dust_tau * 0.3 + (100 - simState.power) * 0.003;
+    }
   }
-  setInterval(() => {
-    if (!twinConnected) selfTick();
-  }, 3000);
+
+  // Process new sol — fire events, assign tasks
+  let lastEventSol = 0;
+  function onNewSol() {
+    if (!frameData) return;
+
+    // Show hazards
+    if (frameData.hazards && currentSol !== lastEventSol) {
+      lastEventSol = currentSol;
+      frameData.hazards.forEach(h => {
+        if (h.probability && h.probability < 0.005) return; // skip trivial
+        const name = h.type.replace(/_/g, ' ').toUpperCase();
+        showToast(`⚠️ Sol ${currentSol}: ${name}${h.target ? ' → ' + h.target.replace(/_/g, ' ') : ''}`, 'hazard');
+        // Dispatch nearest idle unit to the affected building
+        if (h.target && TASK_TARGETS[h.target]) {
+          assignUnitToTarget(h.target);
+        }
+      });
+    }
+
+    // Show events
+    if (frameData.events) {
+      frameData.events.forEach(e => {
+        const name = e.type.replace(/_/g, ' ').toUpperCase();
+        showToast(`📋 Sol ${currentSol}: ${name}`, 'event');
+      });
+    }
+
+    // Show challenge
+    if (frameData.challenge) {
+      const c = frameData.challenge;
+      showToast(`🎯 CHALLENGE: ${c.type.replace(/_/g, ' ').toUpperCase()}`, 'hazard');
+    }
+  }
+
+  // Assign the nearest idle unit to go investigate a building
+  function assignUnitToTarget(targetKey) {
+    const target = TASK_TARGETS[targetKey];
+    if (!target) return;
+    let bestUnit = null, bestDist = Infinity;
+    units.forEach(u => {
+      if (u.task) return; // already on a task
+      const dx = u.group.position.x - target.x;
+      const dz = u.group.position.z - target.z;
+      const dist = dx * dx + dz * dz;
+      if (dist < bestDist) { bestDist = dist; bestUnit = u; }
+    });
+    if (bestUnit) {
+      bestUnit.task = { target: targetKey, x: target.x, z: target.z, duration: 8 + Math.random() * 12, timer: 0 };
+      showToast(`🤖 ${bestUnit.name} → ${targetKey.replace(/_/g, ' ').toUpperCase()}`, 'info');
+    }
+  }
+
+  // ─── DAY/NIGHT CYCLE ────────────────────────────────────────
+  function updateDayNight() {
+    const hourFrac = solHour / SOL_HOURS; // 0..1
+    // Sun position: rises at ~0.25, sets at ~0.75
+    const sunAngle = (hourFrac - 0.25) * Math.PI * 2;
+    const sunY = Math.sin(sunAngle);
+    const sunX = Math.cos(sunAngle) * 0.5;
+
+    // Sun position
+    sunLight.position.set(sunX * 120, Math.max(sunY * 120, -20), 60);
+
+    // Intensity based on elevation
+    const dayFactor = Math.max(0, Math.min(1, sunY * 2 + 0.3));
+    sunLight.intensity = 0.3 + dayFactor * 1.5;
+
+    // Color: warm orange at dawn/dusk, pale at noon
+    const dawnDusk = 1 - Math.abs(hourFrac - 0.5) * 4; // peaks at 0.25 and 0.75
+    const warmth = Math.max(0, dawnDusk);
+    sunLight.color.setRGB(
+      1,
+      0.65 + warmth * 0.1,
+      0.35 + dayFactor * 0.3 - warmth * 0.15
+    );
+
+    // Ambient: darker at night
+    ambientLight.intensity = 0.08 + dayFactor * 0.3;
+    hemiLight.intensity = 0.05 + dayFactor * 0.25;
+
+    // Sky/background: Mars red-dark to deep black
+    const bgR = 0.08 + dayFactor * 0.07;
+    const bgG = 0.03 + dayFactor * 0.02;
+    const bgB = 0.01 + dayFactor * 0.02;
+    scene.background.setRGB(bgR, bgG, bgB);
+
+    // Fog color follows sky
+    scene.fog.color.setRGB(bgR * 1.2, bgG * 1.1, bgB);
+
+    // Tone mapping exposure
+    renderer.toneMappingExposure = 0.5 + dayFactor * 0.7;
+  }
+
+  // ─── DUST STORM EFFECTS ─────────────────────────────────────
+  function updateDustEffects() {
+    const tau = simState.dust_tau || 0.15;
+    // Fog density increases with dust
+    scene.fog.density = 0.0025 + tau * 0.008;
+    // Dust particle opacity
+    dustMat.opacity = 0.15 + tau * 0.5;
+    dustMat.size = 0.3 + tau * 1.5;
+    // Wind speed affects dust movement (stored for anim loop)
+    simState._windFactor = (simState.wind_ms || 7) / 7;
+  }
 
   function updateHUD() {
-    const s = twinState || simState;
+    const s = twinConnected ? twinState : simState;
 
     document.getElementById('sol').textContent = String(Math.floor(s.sol || 1)).padStart(3, '0');
 
     const cri = s.cri != null ? s.cri : 0.3;
-    document.getElementById('cri-fill').style.width = (cri * 100) + '%';
+    document.getElementById('cri-fill').style.width = (Math.min(cri, 1) * 100) + '%';
     document.getElementById('cri-fill').style.background = cri < 0.5 ? '#4caf50' : cri < 0.75 ? '#ffc107' : '#f44336';
-    document.getElementById('cri-val').textContent = cri.toFixed(2);
+    document.getElementById('cri-val').textContent = (typeof cri === 'number' ? cri : 0.3).toFixed(2);
 
     document.getElementById('mod-count').textContent = s.modules || 8;
     document.getElementById('crew-alive').textContent = s.crew_alive || 5;
@@ -873,44 +1131,56 @@
     const dt = Math.min(clock.getDelta(), 0.1);
     const elapsed = clock.elapsedTime;
 
-    // ── Update units ──
+    // ── Advance sol clock & environment ──
+    advanceSol(dt);
+    updateDayNight();
+    updateDustEffects();
+
+    // ── Update units (frame-driven tasks + patrol) ──
     units.forEach((u, ui) => {
-      const wp = u.waypoints;
-      u.progress += dt * u.speed * 0.15;
-      if (u.progress >= 1) {
-        u.progress -= 1;
-        u.waypointIndex = (u.waypointIndex + 1) % wp.length;
+      let desiredX, desiredZ;
+
+      // If unit has a task from frame hazard, steer toward target
+      if (u.task) {
+        u.task.timer += dt;
+        desiredX = u.task.x + Math.sin(u.task.timer * 0.5) * 2;
+        desiredZ = u.task.z + Math.cos(u.task.timer * 0.5) * 2;
+        if (u.task.timer >= u.task.duration) {
+          showToast(`✅ ${u.name} completed ${u.task.target.replace(/_/g, ' ')} task`, 'info');
+          u.task = null;
+        }
+      } else {
+        // Normal patrol
+        const wp = u.waypoints;
+        u.progress += dt * u.speed * 0.15;
+        if (u.progress >= 1) {
+          u.progress -= 1;
+          u.waypointIndex = (u.waypointIndex + 1) % wp.length;
+        }
+        const ci = u.waypointIndex;
+        const ni = (ci + 1) % wp.length;
+        const t = u.progress;
+        const st = t * t * (3 - 2 * t);
+        desiredX = wp[ci][0] + (wp[ni][0] - wp[ci][0]) * st;
+        desiredZ = wp[ci][1] + (wp[ni][1] - wp[ci][1]) * st;
       }
 
-      const ci = u.waypointIndex;
-      const ni = (ci + 1) % wp.length;
-      const cx = wp[ci][0], cz = wp[ci][1];
-      const nx = wp[ni][0], nz = wp[ni][1];
-
-      // Smooth interpolation (desired position)
-      const t = u.progress;
-      const st = t * t * (3 - 2 * t); // smoothstep
-      let desiredX = cx + (nx - cx) * st;
-      let desiredZ = cz + (nz - cz) * st;
-
-      // ── Soft collision avoidance (accumulate gentle nudges) ──
+      // ── Soft collision avoidance ──
       let pushX = 0, pushZ = 0;
 
-      // Repel from buildings — soft quadratic falloff
       for (const ob of obstacles) {
         const dx = desiredX - ob.x;
         const dz = desiredZ - ob.z;
         const dist = Math.sqrt(dx * dx + dz * dz);
         const minDist = ob.r + UNIT_RADIUS;
         if (dist < minDist && dist > 0.01) {
-          const penetration = (minDist - dist) / minDist; // 0..1
+          const penetration = (minDist - dist) / minDist;
           const force = penetration * penetration * BUILDING_PUSH;
           pushX += (dx / dist) * force;
           pushZ += (dz / dist) * force;
         }
       }
 
-      // Repel from other units — soft quadratic falloff
       for (let j = 0; j < units.length; j++) {
         if (j === ui) continue;
         const other = units[j];
@@ -926,37 +1196,41 @@
         }
       }
 
-      const targetX = desiredX + pushX;
-      const targetZ = desiredZ + pushZ;
+      const goalX = desiredX + pushX;
+      const goalZ = desiredZ + pushZ;
 
-      // Smooth lerp toward target (no snapping)
       const lerpFactor = 1 - Math.pow(0.001, dt);
       const prevX = u.group.position.x;
       const prevZ = u.group.position.z;
-      const finalX = prevX + (targetX - prevX) * lerpFactor;
-      const finalZ = prevZ + (targetZ - prevZ) * lerpFactor;
-
+      const finalX = prevX + (goalX - prevX) * lerpFactor;
+      const finalZ = prevZ + (goalZ - prevZ) * lerpFactor;
       const ty = getTerrainY(finalX, finalZ);
-
       u.group.position.set(finalX, ty, finalZ);
 
-      // Smooth facing — lerp rotation instead of snapping
+      // Smooth rotation
       const moveX = finalX - prevX;
       const moveZ = finalZ - prevZ;
       if (moveX * moveX + moveZ * moveZ > 0.0001) {
         const targetAngle = Math.atan2(moveX, moveZ);
         let angleDiff = targetAngle - u.group.rotation.y;
-        // Wrap to -PI..PI
         while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
         while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
         u.group.rotation.y += angleDiff * Math.min(dt * 4, 1);
       }
       u.direction.set(Math.sin(u.group.rotation.y), 0, Math.cos(u.group.rotation.y));
 
-      // Bob animation
-      u.group.position.y = ty + Math.sin(elapsed * 3 + ci) * 0.08;
+      // Bob
+      u.group.position.y = ty + Math.sin(elapsed * 3 + ui) * 0.08;
 
-      // Update label screen position
+      // Status light: flash during high CRI, amber when on task
+      const cri = simState.cri || 0.3;
+      if (cri > 0.6) {
+        u.statusLight.color.setHex(Math.sin(elapsed * 5) > 0 ? 0xff4444 : 0xffaa00);
+      } else {
+        u.statusLight.color.setHex(u.task ? 0xffaa00 : 0x44ff88);
+      }
+
+      // Label with task indicator
       const screenPos = u.group.position.clone();
       screenPos.y += 3;
       screenPos.project(camera);
@@ -964,16 +1238,18 @@
         u.label.style.display = 'block';
         u.label.style.left = ((screenPos.x + 1) / 2 * window.innerWidth) + 'px';
         u.label.style.top = ((-screenPos.y + 1) / 2 * window.innerHeight) + 'px';
+        u.label.textContent = u.name + (u.task ? ' 🔧' : '');
       } else {
         u.label.style.display = 'none';
       }
     });
 
-    // ── Dust ──
+    // ── Dust (wind-driven from frame data) ──
+    const windFactor = simState._windFactor || 1;
     const dPos = dust.geometry.attributes.position;
     for (let i = 0; i < dustCount; i++) {
-      let x = dPos.getX(i) + dt * 3;
-      let z = dPos.getZ(i) + dt * 1;
+      let x = dPos.getX(i) + dt * 3 * windFactor;
+      let z = dPos.getZ(i) + dt * 1 * windFactor;
       if (x > 150) x -= 300;
       if (z > 150) z -= 300;
       dPos.setX(i, x);
