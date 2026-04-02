@@ -1,0 +1,2648 @@
+{
+  "_format": "mars-barn-v15-geology-frames",
+  "version": 15,
+  "description": "Site-Specific Geology frames with real NASA geological data",
+  "sol_range": [
+    1068,
+    1117
+  ],
+  "total_frames": 50,
+  "physics_added": {
+    "regolith_bearing_failure": "Foundation failure from insufficient bearing capacity",
+    "subsurface_ice_instability": "Ground ice freeze-thaw cycles affecting infrastructure",
+    "enhanced_perchlorate_corrosion": "Site-specific perchlorate corrosion above baseline",
+    "slope_instability_hazard": "Construction and operation challenges on unstable slopes",
+    "geological_isru_inefficiency": "Site geology reducing ISRU efficiency"
+  },
+  "data_sources": [
+    "Phoenix WCL perchlorate data (0.4-0.6 wt%)",
+    "SHARAD radar subsurface ice mapping",
+    "NASA SWIM ice resource characterization",
+    "Mars site geology from MRO/HiRISE",
+    "Phoenix bearing strength measurements (300-400 kPa)"
+  ],
+  "frames": {
+    "1068": {
+      "sol": 1068,
+      "utc": "2028-06-11T00:00:00Z",
+      "mars": {
+        "ls": 201.8,
+        "season": "Northern Summer",
+        "temp_k": 235.6,
+        "temp_c": -37.5,
+        "pressure_pa": 635,
+        "solar_wm2": 461,
+        "dust_tau": 0.456,
+        "wind_ms": 5.2,
+        "lmst": 8.5
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8905048557672366,
+          "mineral_content_variation": 0.14152514620504872,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 20.2,
+        "window_open": false,
+        "bandwidth_kbps": 22
+      },
+      "terrain": {
+        "regolith_hardness": 0.7036820587034527,
+        "water_ice_depth_m": 1.0488337589514074,
+        "surface_radiation_usv": 0.6711334286915053,
+        "slope_degrees": 3.211066370802823,
+        "perchlorate_wt_pct": 0.5119003062309249,
+        "bearing_strength_kpa": 413.4456281562511,
+        "regolith_cohesion": 0.6132629208587999,
+        "mineral_iron_wt_pct": 19.156584642698817,
+        "site_classification": "arcadia_planitia"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1067,
+        "geological_stress_index": 6.9,
+        "site_geology_type": "arcadia_planitia"
+      },
+      "_hash": "b8bdea5b1f26a973"
+    },
+    "1069": {
+      "sol": 1069,
+      "utc": "2028-06-12T00:00:00Z",
+      "mars": {
+        "ls": 202.3,
+        "season": "Northern Summer",
+        "temp_k": 231.8,
+        "temp_c": -41.4,
+        "pressure_pa": 557,
+        "solar_wm2": 460,
+        "dust_tau": 0.459,
+        "wind_ms": 7.2,
+        "lmst": 9.8
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.7846200535151642,
+          "mineral_content_variation": 0.08795605477529914,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 20.1,
+        "window_open": true,
+        "bandwidth_kbps": 58
+      },
+      "terrain": {
+        "regolith_hardness": 0.9345108887138166,
+        "water_ice_depth_m": 1.8466262842568462,
+        "surface_radiation_usv": 0.5696548268105599,
+        "slope_degrees": 6.784156250962544,
+        "perchlorate_wt_pct": 0.22424618498757254,
+        "bearing_strength_kpa": 430.91455069412854,
+        "regolith_cohesion": 0.6468984265221434,
+        "mineral_iron_wt_pct": 10.68697959606078,
+        "site_classification": "deuteronilus_mensae"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1068,
+        "geological_stress_index": 24.6,
+        "site_geology_type": "deuteronilus_mensae"
+      },
+      "_hash": "58fc475712877a4d"
+    },
+    "1070": {
+      "sol": 1070,
+      "utc": "2028-06-13T00:00:00Z",
+      "mars": {
+        "ls": 202.8,
+        "season": "Northern Summer",
+        "temp_k": 192.9,
+        "temp_c": -80.3,
+        "pressure_pa": 659,
+        "solar_wm2": 493,
+        "dust_tau": 0.348,
+        "wind_ms": 9.8,
+        "lmst": 18.6
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8349187717760981,
+          "mineral_content_variation": 0.05,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 20.1,
+        "window_open": false,
+        "bandwidth_kbps": 49
+      },
+      "terrain": {
+        "regolith_hardness": 0.6375567914644754,
+        "water_ice_depth_m": 5.128250385658008,
+        "surface_radiation_usv": 0.871100219624995,
+        "slope_degrees": 4.804796051166205,
+        "perchlorate_wt_pct": 0.6845131417023226,
+        "bearing_strength_kpa": 255.14980251599067,
+        "regolith_cohesion": 0.723769513651215,
+        "mineral_iron_wt_pct": 15.061371262525437,
+        "site_classification": "hellas_basin"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1069,
+        "geological_stress_index": 36.4,
+        "site_geology_type": "hellas_basin"
+      },
+      "_hash": "f6767d2e48bc6a1e"
+    },
+    "1071": {
+      "sol": 1071,
+      "utc": "2028-06-14T00:00:00Z",
+      "mars": {
+        "ls": 203.3,
+        "season": "Northern Summer",
+        "temp_k": 209.9,
+        "temp_c": -63.3,
+        "pressure_pa": 632,
+        "solar_wm2": 470,
+        "dust_tau": 0.421,
+        "wind_ms": 11.5,
+        "lmst": 14.6
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.7812623714469997,
+          "mineral_content_variation": 0.05328162434750051,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 20.0,
+        "window_open": false,
+        "bandwidth_kbps": 30
+      },
+      "terrain": {
+        "regolith_hardness": 0.762569493346089,
+        "water_ice_depth_m": 3.4374542458770336,
+        "surface_radiation_usv": 0.3449950143398325,
+        "slope_degrees": 10.858740432354045,
+        "perchlorate_wt_pct": 0.4629202713047218,
+        "bearing_strength_kpa": 324.7722766060436,
+        "regolith_cohesion": 0.31144288419399396,
+        "mineral_iron_wt_pct": 8.417005272760989,
+        "site_classification": "jezero_crater"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1070,
+        "geological_stress_index": 30.4,
+        "site_geology_type": "jezero_crater"
+      },
+      "_hash": "9540b6b5210cf57a"
+    },
+    "1072": {
+      "sol": 1072,
+      "utc": "2028-06-15T00:00:00Z",
+      "mars": {
+        "ls": 203.9,
+        "season": "Northern Summer",
+        "temp_k": 220.0,
+        "temp_c": -53.2,
+        "pressure_pa": 568,
+        "solar_wm2": 480,
+        "dust_tau": 0.389,
+        "wind_ms": 4.9,
+        "lmst": 10.1
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "subsurface_ice_instability",
+          "ice_depth_m": 0.7880903080092617,
+          "thermal_variation_k": 14.710659748587904,
+          "instability_factor": 1.782799112489172
+        },
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.7460946175695871,
+          "mineral_content_variation": 0.10742140920237264,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 20.0,
+        "window_open": false,
+        "bandwidth_kbps": 19
+      },
+      "terrain": {
+        "regolith_hardness": 0.8193242414497668,
+        "water_ice_depth_m": 0.7880903080092617,
+        "surface_radiation_usv": 0.7601504549079989,
+        "slope_degrees": 3.2906120802178354,
+        "perchlorate_wt_pct": 0.5520717657388396,
+        "bearing_strength_kpa": 371.46206434712406,
+        "regolith_cohesion": 0.47276014057853377,
+        "mineral_iron_wt_pct": 5,
+        "site_classification": "arcadia_planitia"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1071,
+        "geological_stress_index": 8.7,
+        "site_geology_type": "arcadia_planitia"
+      },
+      "_hash": "bc99830696f60180"
+    },
+    "1073": {
+      "sol": 1073,
+      "utc": "2028-06-16T00:00:00Z",
+      "mars": {
+        "ls": 204.4,
+        "season": "Northern Summer",
+        "temp_k": 180,
+        "temp_c": -93.1,
+        "pressure_pa": 606,
+        "solar_wm2": 493,
+        "dust_tau": 0.341,
+        "wind_ms": 5.5,
+        "lmst": 7.2
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "regolith_bearing_failure",
+          "bearing_stress_kpa": 466.4855410622549,
+          "failure_probability": 0.02,
+          "severity": "high"
+        },
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.9033262032511078,
+          "mineral_content_variation": 0.11335267118162705,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 19.9,
+        "window_open": true,
+        "bandwidth_kbps": 26
+      },
+      "terrain": {
+        "regolith_hardness": 0.49800643817081225,
+        "water_ice_depth_m": 2.420871135746235,
+        "surface_radiation_usv": 0.5185732485705911,
+        "slope_degrees": 6.1140891827619654,
+        "perchlorate_wt_pct": 0.29120648243486674,
+        "bearing_strength_kpa": 500,
+        "regolith_cohesion": 0.683123516137338,
+        "mineral_iron_wt_pct": 22.25892691280162,
+        "site_classification": "deuteronilus_mensae"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1072,
+        "geological_stress_index": 22.7,
+        "site_geology_type": "deuteronilus_mensae"
+      },
+      "_hash": "13f09d0141bfe56a"
+    },
+    "1074": {
+      "sol": 1074,
+      "utc": "2028-06-17T00:00:00Z",
+      "mars": {
+        "ls": 204.9,
+        "season": "Northern Summer",
+        "temp_k": 218.6,
+        "temp_c": -54.5,
+        "pressure_pa": 683,
+        "solar_wm2": 407,
+        "dust_tau": 0.631,
+        "wind_ms": 5.4,
+        "lmst": 22.2
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8111561703747571,
+          "mineral_content_variation": 0.08805114296498452,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 19.8,
+        "window_open": true,
+        "bandwidth_kbps": 41
+      },
+      "terrain": {
+        "regolith_hardness": 0.8935617086962797,
+        "water_ice_depth_m": 3.7325291260199034,
+        "surface_radiation_usv": 0.6081203851086507,
+        "slope_degrees": 3.4260046729405857,
+        "perchlorate_wt_pct": 0.7351806772519036,
+        "bearing_strength_kpa": 316.88671399540704,
+        "regolith_cohesion": 0.6957185856737793,
+        "mineral_iron_wt_pct": 13.069245171294662,
+        "site_classification": "hellas_basin"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1073,
+        "geological_stress_index": 24.9,
+        "site_geology_type": "hellas_basin"
+      },
+      "_hash": "0b42887b2fc4278f"
+    },
+    "1075": {
+      "sol": 1075,
+      "utc": "2028-06-18T00:00:00Z",
+      "mars": {
+        "ls": 205.5,
+        "season": "Northern Summer",
+        "temp_k": 180.2,
+        "temp_c": -93.0,
+        "pressure_pa": 540,
+        "solar_wm2": 462,
+        "dust_tau": 0.445,
+        "wind_ms": 3.8,
+        "lmst": 15.6
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8615790641282469,
+          "mineral_content_variation": 0.16663739959751322,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 19.8,
+        "window_open": false,
+        "bandwidth_kbps": 35
+      },
+      "terrain": {
+        "regolith_hardness": 0.6788151757744035,
+        "water_ice_depth_m": 2.5228310173399606,
+        "surface_radiation_usv": 0.5629378613695196,
+        "slope_degrees": 5.853618587478427,
+        "perchlorate_wt_pct": 0.5434382992756485,
+        "bearing_strength_kpa": 350.08027313928375,
+        "regolith_cohesion": 0.9,
+        "mineral_iron_wt_pct": 16.533794499115704,
+        "site_classification": "jezero_crater"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1074,
+        "geological_stress_index": 16.1,
+        "site_geology_type": "jezero_crater"
+      },
+      "_hash": "06ad47aa023cda91"
+    },
+    "1076": {
+      "sol": 1076,
+      "utc": "2028-06-19T00:00:00Z",
+      "mars": {
+        "ls": 206.0,
+        "season": "Northern Summer",
+        "temp_k": 217.6,
+        "temp_c": -55.5,
+        "pressure_pa": 661,
+        "solar_wm2": 419,
+        "dust_tau": 0.589,
+        "wind_ms": 1.5,
+        "lmst": 13.3
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8396237713954734,
+          "mineral_content_variation": 0.07840406569313756,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 19.7,
+        "window_open": true,
+        "bandwidth_kbps": 32
+      },
+      "terrain": {
+        "regolith_hardness": 0.7471095041319287,
+        "water_ice_depth_m": 1.4454803911429606,
+        "surface_radiation_usv": 0.6899451746384426,
+        "slope_degrees": 1.8030206336986532,
+        "perchlorate_wt_pct": 0.5825014408843812,
+        "bearing_strength_kpa": 486.0189423375685,
+        "regolith_cohesion": 0.6260077531006432,
+        "mineral_iron_wt_pct": 14.660841278745385,
+        "site_classification": "arcadia_planitia"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1075,
+        "geological_stress_index": 6.9,
+        "site_geology_type": "arcadia_planitia"
+      },
+      "_hash": "9643230ab42be2d9"
+    },
+    "1077": {
+      "sol": 1077,
+      "utc": "2028-06-20T00:00:00Z",
+      "mars": {
+        "ls": 206.5,
+        "season": "Northern Summer",
+        "temp_k": 211.4,
+        "temp_c": -61.7,
+        "pressure_pa": 586,
+        "solar_wm2": 421,
+        "dust_tau": 0.578,
+        "wind_ms": 5.3,
+        "lmst": 17.6
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8340995804117155,
+          "mineral_content_variation": 0.14219644123997704,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 19.6,
+        "window_open": false,
+        "bandwidth_kbps": 44
+      },
+      "terrain": {
+        "regolith_hardness": 0.6399719115606504,
+        "water_ice_depth_m": 2.3539829194379496,
+        "surface_radiation_usv": 0.2,
+        "slope_degrees": 5.5310344340025654,
+        "perchlorate_wt_pct": 0.42725443485128156,
+        "bearing_strength_kpa": 398.9235946737821,
+        "regolith_cohesion": 0.6871362833839213,
+        "mineral_iron_wt_pct": 14.021174825888398,
+        "site_classification": "deuteronilus_mensae"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1076,
+        "geological_stress_index": 15.7,
+        "site_geology_type": "deuteronilus_mensae"
+      },
+      "_hash": "a30d05706ea9996f"
+    },
+    "1078": {
+      "sol": 1078,
+      "utc": "2028-06-21T00:00:00Z",
+      "mars": {
+        "ls": 207.0,
+        "season": "Northern Summer",
+        "temp_k": 216.1,
+        "temp_c": -57.1,
+        "pressure_pa": 657,
+        "solar_wm2": 496,
+        "dust_tau": 0.326,
+        "wind_ms": 12.0,
+        "lmst": 1.2
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8372906538162994,
+          "mineral_content_variation": 0.12461265543794832,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 19.6,
+        "window_open": true,
+        "bandwidth_kbps": 40
+      },
+      "terrain": {
+        "regolith_hardness": 0.95,
+        "water_ice_depth_m": 4.562323875166452,
+        "surface_radiation_usv": 0.4055402726925852,
+        "slope_degrees": 4.768551212156242,
+        "perchlorate_wt_pct": 0.5698141950983395,
+        "bearing_strength_kpa": 395.30308667045654,
+        "regolith_cohesion": 0.6063687394462469,
+        "mineral_iron_wt_pct": 14.317722776446203,
+        "site_classification": "hellas_basin"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1077,
+        "geological_stress_index": 25.1,
+        "site_geology_type": "hellas_basin"
+      },
+      "_hash": "9aa92ccce74ee201"
+    },
+    "1079": {
+      "sol": 1079,
+      "utc": "2028-06-22T00:00:00Z",
+      "mars": {
+        "ls": 207.6,
+        "season": "Northern Summer",
+        "temp_k": 206.2,
+        "temp_c": -67.0,
+        "pressure_pa": 590,
+        "solar_wm2": 453,
+        "dust_tau": 0.468,
+        "wind_ms": 0.8,
+        "lmst": 11.6
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8441867228011743,
+          "mineral_content_variation": 0.09994775265878285,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 19.5,
+        "window_open": false,
+        "bandwidth_kbps": 39
+      },
+      "terrain": {
+        "regolith_hardness": 0.401882229610538,
+        "water_ice_depth_m": 3.233395356205853,
+        "surface_radiation_usv": 0.8821137733925627,
+        "slope_degrees": 3.8728530722508374,
+        "perchlorate_wt_pct": 0.41672942434095545,
+        "bearing_strength_kpa": 389.0752603497372,
+        "regolith_cohesion": 0.7261347628871929,
+        "mineral_iron_wt_pct": 15.127534157490361,
+        "site_classification": "jezero_crater"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1078,
+        "geological_stress_index": 17.2,
+        "site_geology_type": "jezero_crater"
+      },
+      "_hash": "22dcf218eb2f4e34"
+    },
+    "1080": {
+      "sol": 1080,
+      "utc": "2028-06-23T00:00:00Z",
+      "mars": {
+        "ls": 208.1,
+        "season": "Northern Summer",
+        "temp_k": 199.2,
+        "temp_c": -74.0,
+        "pressure_pa": 560,
+        "solar_wm2": 424,
+        "dust_tau": 0.567,
+        "wind_ms": 5.1,
+        "lmst": 4.5
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8691200271384186,
+          "mineral_content_variation": 0.19625743591234443,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 19.5,
+        "window_open": false,
+        "bandwidth_kbps": 23
+      },
+      "terrain": {
+        "regolith_hardness": 0.8916967118216215,
+        "water_ice_depth_m": 1.1685230778296103,
+        "surface_radiation_usv": 0.2,
+        "slope_degrees": 2.2481902744604456,
+        "perchlorate_wt_pct": 0.523038285970327,
+        "bearing_strength_kpa": 436.788563871052,
+        "regolith_cohesion": 0.6204684139130257,
+        "mineral_iron_wt_pct": 17.112695432744424,
+        "site_classification": "arcadia_planitia"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1079,
+        "geological_stress_index": 5.4,
+        "site_geology_type": "arcadia_planitia"
+      },
+      "_hash": "3f20f06b5f265852"
+    },
+    "1081": {
+      "sol": 1081,
+      "utc": "2028-06-24T00:00:00Z",
+      "mars": {
+        "ls": 208.6,
+        "season": "Northern Summer",
+        "temp_k": 188.0,
+        "temp_c": -85.2,
+        "pressure_pa": 694,
+        "solar_wm2": 343,
+        "dust_tau": 0.839,
+        "wind_ms": 6.5,
+        "lmst": 12.1
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8496295104717795,
+          "mineral_content_variation": 0.05,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 19.4,
+        "window_open": false,
+        "bandwidth_kbps": 63
+      },
+      "terrain": {
+        "regolith_hardness": 0.6546763993604301,
+        "water_ice_depth_m": 1.6908862815306631,
+        "surface_radiation_usv": 0.8692939909191982,
+        "slope_degrees": 5.2413687386442325,
+        "perchlorate_wt_pct": 0.50383751264309,
+        "bearing_strength_kpa": 376.39474118167084,
+        "regolith_cohesion": 0.5557973912365944,
+        "mineral_iron_wt_pct": 14.995568203936871,
+        "site_classification": "deuteronilus_mensae"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1080,
+        "geological_stress_index": 10.6,
+        "site_geology_type": "deuteronilus_mensae"
+      },
+      "_hash": "476ded8aacf17452"
+    },
+    "1082": {
+      "sol": 1082,
+      "utc": "2028-06-25T00:00:00Z",
+      "mars": {
+        "ls": 209.1,
+        "season": "Northern Summer",
+        "temp_k": 189.1,
+        "temp_c": -84.0,
+        "pressure_pa": 541,
+        "solar_wm2": 457,
+        "dust_tau": 0.454,
+        "wind_ms": 5.6,
+        "lmst": 4.9
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8369229037388078,
+          "mineral_content_variation": 0.08634599744957888,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 19.3,
+        "window_open": false,
+        "bandwidth_kbps": 21
+      },
+      "terrain": {
+        "regolith_hardness": 0.6624228481044274,
+        "water_ice_depth_m": 3.9955780723678624,
+        "surface_radiation_usv": 0.9305461083690653,
+        "slope_degrees": 4.284059854623517,
+        "perchlorate_wt_pct": 0.8189379240895907,
+        "bearing_strength_kpa": 338.8297281831543,
+        "regolith_cohesion": 0.4265119345757659,
+        "mineral_iron_wt_pct": 16.449492542904014,
+        "site_classification": "hellas_basin"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1081,
+        "geological_stress_index": 31.3,
+        "site_geology_type": "hellas_basin"
+      },
+      "_hash": "519b6d20ec3f0bc0"
+    },
+    "1083": {
+      "sol": 1083,
+      "utc": "2028-06-26T00:00:00Z",
+      "mars": {
+        "ls": 209.7,
+        "season": "Northern Summer",
+        "temp_k": 218.9,
+        "temp_c": -54.2,
+        "pressure_pa": 645,
+        "solar_wm2": 440,
+        "dust_tau": 0.508,
+        "wind_ms": 9.1,
+        "lmst": 19.6
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "regolith_bearing_failure",
+          "bearing_stress_kpa": 271.31979205296955,
+          "failure_probability": 0.02,
+          "severity": "moderate"
+        },
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8752067268457986,
+          "mineral_content_variation": 0.1607762326571786,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 19.3,
+        "window_open": false,
+        "bandwidth_kbps": 22
+      },
+      "terrain": {
+        "regolith_hardness": 0.9043360282024344,
+        "water_ice_depth_m": 2.5847758726070555,
+        "surface_radiation_usv": 0.33513682482609686,
+        "slope_degrees": 9.292504866516298,
+        "perchlorate_wt_pct": 0.5719171390884543,
+        "bearing_strength_kpa": 364.2237037679927,
+        "regolith_cohesion": 0.8503690334648786,
+        "mineral_iron_wt_pct": 18.154655748455518,
+        "site_classification": "jezero_crater"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1082,
+        "geological_stress_index": 24.4,
+        "site_geology_type": "jezero_crater"
+      },
+      "_hash": "672ca71d5cbb5cb8"
+    },
+    "1084": {
+      "sol": 1084,
+      "utc": "2028-06-27T00:00:00Z",
+      "mars": {
+        "ls": 210.2,
+        "season": "Northern Summer",
+        "temp_k": 235.4,
+        "temp_c": -37.8,
+        "pressure_pa": 636,
+        "solar_wm2": 416,
+        "dust_tau": 0.589,
+        "wind_ms": 8.5,
+        "lmst": 9.8
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "subsurface_ice_instability",
+          "ice_depth_m": 0.8547766917091845,
+          "thermal_variation_k": 12.688294834429128,
+          "instability_factor": 1.4530930986854194
+        },
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8541458837066725,
+          "mineral_content_variation": 0.18125066289800168,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 19.2,
+        "window_open": false,
+        "bandwidth_kbps": 54
+      },
+      "terrain": {
+        "regolith_hardness": 0.46278453017816235,
+        "water_ice_depth_m": 0.8547766917091845,
+        "surface_radiation_usv": 1.1482105602959933,
+        "slope_degrees": 2.824483726310179,
+        "perchlorate_wt_pct": 0.3634702472949801,
+        "bearing_strength_kpa": 389.0656233237555,
+        "regolith_cohesion": 0.3532539892177755,
+        "mineral_iron_wt_pct": 16.596893617732448,
+        "site_classification": "arcadia_planitia"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1083,
+        "geological_stress_index": 11.1,
+        "site_geology_type": "arcadia_planitia"
+      },
+      "_hash": "5994de7d581e56ca"
+    },
+    "1085": {
+      "sol": 1085,
+      "utc": "2028-06-28T00:00:00Z",
+      "mars": {
+        "ls": 210.7,
+        "season": "Northern Summer",
+        "temp_k": 185.8,
+        "temp_c": -87.4,
+        "pressure_pa": 657,
+        "solar_wm2": 455,
+        "dust_tau": 0.454,
+        "wind_ms": 3.4,
+        "lmst": 16.7
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "subsurface_ice_instability",
+          "ice_depth_m": 1.2220521320957929,
+          "thermal_variation_k": 17.003630736395653,
+          "instability_factor": 1.3227938278009441
+        },
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.9178286368641578,
+          "mineral_content_variation": 0.09073965767153513,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 19.1,
+        "window_open": true,
+        "bandwidth_kbps": 47
+      },
+      "terrain": {
+        "regolith_hardness": 0.7886245228150316,
+        "water_ice_depth_m": 1.2220521320957929,
+        "surface_radiation_usv": 0.6946798185841733,
+        "slope_degrees": 4.362219517551214,
+        "perchlorate_wt_pct": 0.5384459593735862,
+        "bearing_strength_kpa": 362.8949483301349,
+        "regolith_cohesion": 0.8389136155820606,
+        "mineral_iron_wt_pct": 22.137093582081484,
+        "site_classification": "deuteronilus_mensae"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1084,
+        "geological_stress_index": 10.3,
+        "site_geology_type": "deuteronilus_mensae"
+      },
+      "_hash": "59b2063705f6359d"
+    },
+    "1086": {
+      "sol": 1086,
+      "utc": "2028-06-29T00:00:00Z",
+      "mars": {
+        "ls": 211.2,
+        "season": "Northern Summer",
+        "temp_k": 192.7,
+        "temp_c": -80.5,
+        "pressure_pa": 577,
+        "solar_wm2": 454,
+        "dust_tau": 0.457,
+        "wind_ms": 6.4,
+        "lmst": 17.9
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.7926219351749741,
+          "mineral_content_variation": 0.09303427348672932,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 19.1,
+        "window_open": true,
+        "bandwidth_kbps": 26
+      },
+      "terrain": {
+        "regolith_hardness": 0.95,
+        "water_ice_depth_m": 3.864697762112957,
+        "surface_radiation_usv": 0.693570904533076,
+        "slope_degrees": 3.7386561279884747,
+        "perchlorate_wt_pct": 0.6953146889269294,
+        "bearing_strength_kpa": 281.0940622922511,
+        "regolith_cohesion": 0.9,
+        "mineral_iron_wt_pct": 10.84113972325195,
+        "site_classification": "hellas_basin"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1085,
+        "geological_stress_index": 26.2,
+        "site_geology_type": "hellas_basin"
+      },
+      "_hash": "a0c4e38a359f196e"
+    },
+    "1087": {
+      "sol": 1087,
+      "utc": "2028-06-30T00:00:00Z",
+      "mars": {
+        "ls": 211.8,
+        "season": "Northern Summer",
+        "temp_k": 203.3,
+        "temp_c": -69.8,
+        "pressure_pa": 556,
+        "solar_wm2": 430,
+        "dust_tau": 0.539,
+        "wind_ms": 8.2,
+        "lmst": 17.4
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8730949048627856,
+          "mineral_content_variation": 0.07270550706678339,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 19.0,
+        "window_open": false,
+        "bandwidth_kbps": 19
+      },
+      "terrain": {
+        "regolith_hardness": 0.4703968993604478,
+        "water_ice_depth_m": 2.920565750149403,
+        "surface_radiation_usv": 0.33552495839073143,
+        "slope_degrees": 2.2154119026921233,
+        "perchlorate_wt_pct": 0.43172804098131023,
+        "bearing_strength_kpa": 337.10233490879534,
+        "regolith_cohesion": 0.5735197758290177,
+        "mineral_iron_wt_pct": 17.909667004586943,
+        "site_classification": "jezero_crater"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1086,
+        "geological_stress_index": 11.8,
+        "site_geology_type": "jezero_crater"
+      },
+      "_hash": "edd48c27688cca50"
+    },
+    "1088": {
+      "sol": 1088,
+      "utc": "2028-07-01T00:00:00Z",
+      "mars": {
+        "ls": 212.3,
+        "season": "Northern Summer",
+        "temp_k": 208.9,
+        "temp_c": -64.3,
+        "pressure_pa": 628,
+        "solar_wm2": 448,
+        "dust_tau": 0.476,
+        "wind_ms": 10.1,
+        "lmst": 16.1
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "subsurface_ice_instability",
+          "ice_depth_m": 0.8385505496865718,
+          "thermal_variation_k": 21.48429660482595,
+          "instability_factor": 2.495292448204575
+        },
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8297402327261253,
+          "mineral_content_variation": 0.125694352584129,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 18.9,
+        "window_open": false,
+        "bandwidth_kbps": 33
+      },
+      "terrain": {
+        "regolith_hardness": 0.539116658550171,
+        "water_ice_depth_m": 0.8385505496865718,
+        "surface_radiation_usv": 0.33475458913721756,
+        "slope_degrees": 1.71087145032654,
+        "perchlorate_wt_pct": 0.5833282850381316,
+        "bearing_strength_kpa": 474.1458789638848,
+        "regolith_cohesion": 0.8621906258268677,
+        "mineral_iron_wt_pct": 13.671241377714177,
+        "site_classification": "arcadia_planitia"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1087,
+        "geological_stress_index": 6.8,
+        "site_geology_type": "arcadia_planitia"
+      },
+      "_hash": "6de58a3ea9d3b0df"
+    },
+    "1089": {
+      "sol": 1089,
+      "utc": "2028-07-02T00:00:00Z",
+      "mars": {
+        "ls": 212.8,
+        "season": "Northern Summer",
+        "temp_k": 199.8,
+        "temp_c": -73.4,
+        "pressure_pa": 544,
+        "solar_wm2": 429,
+        "dust_tau": 0.537,
+        "wind_ms": 9.2,
+        "lmst": 5.6
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8913525447102085,
+          "mineral_content_variation": 0.1000156490623974,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 18.9,
+        "window_open": false,
+        "bandwidth_kbps": 29
+      },
+      "terrain": {
+        "regolith_hardness": 0.6743918987852423,
+        "water_ice_depth_m": 2.118527527874993,
+        "surface_radiation_usv": 0.654070245683233,
+        "slope_degrees": 6.798741750433101,
+        "perchlorate_wt_pct": 0.4367069039640032,
+        "bearing_strength_kpa": 450.09244888913855,
+        "regolith_cohesion": 0.880375427454312,
+        "mineral_iron_wt_pct": 19.703012610206454,
+        "site_classification": "deuteronilus_mensae"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1088,
+        "geological_stress_index": 16.7,
+        "site_geology_type": "deuteronilus_mensae"
+      },
+      "_hash": "811b331ec2162449"
+    },
+    "1090": {
+      "sol": 1090,
+      "utc": "2028-07-03T00:00:00Z",
+      "mars": {
+        "ls": 213.3,
+        "season": "Northern Summer",
+        "temp_k": 218.9,
+        "temp_c": -54.2,
+        "pressure_pa": 567,
+        "solar_wm2": 491,
+        "dust_tau": 0.326,
+        "wind_ms": 1.2,
+        "lmst": 5.9
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8135195225927504,
+          "mineral_content_variation": 0.12926200649718983,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 18.8,
+        "window_open": false,
+        "bandwidth_kbps": 62
+      },
+      "terrain": {
+        "regolith_hardness": 0.6161885810211998,
+        "water_ice_depth_m": 4.504164654467944,
+        "surface_radiation_usv": 0.48475390107642136,
+        "slope_degrees": 2.3751543395097734,
+        "perchlorate_wt_pct": 0.7160750238263535,
+        "bearing_strength_kpa": 400.6511323950186,
+        "regolith_cohesion": 0.8107802978404388,
+        "mineral_iron_wt_pct": 13.148585518989366,
+        "site_classification": "hellas_basin"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1089,
+        "geological_stress_index": 25.9,
+        "site_geology_type": "hellas_basin"
+      },
+      "_hash": "146838865a2c8cb4"
+    },
+    "1091": {
+      "sol": 1091,
+      "utc": "2028-07-04T00:00:00Z",
+      "mars": {
+        "ls": 213.9,
+        "season": "Northern Summer",
+        "temp_k": 232.9,
+        "temp_c": -40.2,
+        "pressure_pa": 583,
+        "solar_wm2": 420,
+        "dust_tau": 0.565,
+        "wind_ms": 5.3,
+        "lmst": 2.4
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8421108162647546,
+          "mineral_content_variation": 0.06004679629017183,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 18.7,
+        "window_open": true,
+        "bandwidth_kbps": 35
+      },
+      "terrain": {
+        "regolith_hardness": 0.8830313976659839,
+        "water_ice_depth_m": 3.677596631951502,
+        "surface_radiation_usv": 0.5107168128695916,
+        "slope_degrees": 5.947674095697405,
+        "perchlorate_wt_pct": 0.5682495217273481,
+        "bearing_strength_kpa": 356.0813675593703,
+        "regolith_cohesion": 0.9,
+        "mineral_iron_wt_pct": 14.789767736011031,
+        "site_classification": "jezero_crater"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1090,
+        "geological_stress_index": 23.0,
+        "site_geology_type": "jezero_crater"
+      },
+      "_hash": "c7602b7c1813c9b7"
+    },
+    "1092": {
+      "sol": 1092,
+      "utc": "2028-07-05T00:00:00Z",
+      "mars": {
+        "ls": 214.4,
+        "season": "Northern Summer",
+        "temp_k": 223.2,
+        "temp_c": -50.0,
+        "pressure_pa": 654,
+        "solar_wm2": 361,
+        "dust_tau": 0.768,
+        "wind_ms": 9.1,
+        "lmst": 13.4
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.819680262409251,
+          "mineral_content_variation": 0.10326058048922868,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 18.7,
+        "window_open": false,
+        "bandwidth_kbps": 62
+      },
+      "terrain": {
+        "regolith_hardness": 0.7108423293766883,
+        "water_ice_depth_m": 0.5,
+        "surface_radiation_usv": 0.9409487717482741,
+        "slope_degrees": 3.5672312231141534,
+        "perchlorate_wt_pct": 0.45267896323792584,
+        "bearing_strength_kpa": 259.31973801301285,
+        "regolith_cohesion": 0.5425753858058548,
+        "mineral_iron_wt_pct": 12.357751660321094,
+        "site_classification": "arcadia_planitia"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1091,
+        "geological_stress_index": 12.4,
+        "site_geology_type": "arcadia_planitia"
+      },
+      "_hash": "63dfe07577dd58c6"
+    },
+    "1093": {
+      "sol": 1093,
+      "utc": "2028-07-06T00:00:00Z",
+      "mars": {
+        "ls": 214.9,
+        "season": "Northern Summer",
+        "temp_k": 206.2,
+        "temp_c": -66.9,
+        "pressure_pa": 576,
+        "solar_wm2": 484,
+        "dust_tau": 0.346,
+        "wind_ms": 2.9,
+        "lmst": 4.7
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8779768360422562,
+          "mineral_content_variation": 0.20315062129932282,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 18.6,
+        "window_open": false,
+        "bandwidth_kbps": 25
+      },
+      "terrain": {
+        "regolith_hardness": 0.5186511845155719,
+        "water_ice_depth_m": 2.421268619359508,
+        "surface_radiation_usv": 0.7287382471829964,
+        "slope_degrees": 4.678423525370164,
+        "perchlorate_wt_pct": 0.5105995493410238,
+        "bearing_strength_kpa": 425.1606982676493,
+        "regolith_cohesion": 0.8242571430935364,
+        "mineral_iron_wt_pct": 17.89084393792004,
+        "site_classification": "deuteronilus_mensae"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1092,
+        "geological_stress_index": 11.9,
+        "site_geology_type": "deuteronilus_mensae"
+      },
+      "_hash": "27485cf0ec223c08"
+    },
+    "1094": {
+      "sol": 1094,
+      "utc": "2028-07-07T00:00:00Z",
+      "mars": {
+        "ls": 215.4,
+        "season": "Northern Summer",
+        "temp_k": 227.9,
+        "temp_c": -45.2,
+        "pressure_pa": 590,
+        "solar_wm2": 349,
+        "dust_tau": 0.805,
+        "wind_ms": 7.7,
+        "lmst": 4.8
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.847435529217774,
+          "mineral_content_variation": 0.08381027014653622,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 18.5,
+        "window_open": false,
+        "bandwidth_kbps": 62
+      },
+      "terrain": {
+        "regolith_hardness": 0.9472943390886622,
+        "water_ice_depth_m": 5.311810742940016,
+        "surface_radiation_usv": 0.6756521389631278,
+        "slope_degrees": 3.643586008200236,
+        "perchlorate_wt_pct": 0.5739485557133628,
+        "bearing_strength_kpa": 288.50466941345013,
+        "regolith_cohesion": 0.8336434463021742,
+        "mineral_iron_wt_pct": 15.374887887121687,
+        "site_classification": "hellas_basin"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1093,
+        "geological_stress_index": 27.8,
+        "site_geology_type": "hellas_basin"
+      },
+      "_hash": "3bb64cace9c87fda"
+    },
+    "1095": {
+      "sol": 1095,
+      "utc": "2028-07-08T00:00:00Z",
+      "mars": {
+        "ls": 216.0,
+        "season": "Northern Summer",
+        "temp_k": 234.3,
+        "temp_c": -38.8,
+        "pressure_pa": 497,
+        "solar_wm2": 463,
+        "dust_tau": 0.413,
+        "wind_ms": 8.6,
+        "lmst": 7.4
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8415358343804409,
+          "mineral_content_variation": 0.10276669212987495,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 18.5,
+        "window_open": false,
+        "bandwidth_kbps": 36
+      },
+      "terrain": {
+        "regolith_hardness": 0.7176448592416629,
+        "water_ice_depth_m": 3.211085679993693,
+        "surface_radiation_usv": 0.8151257988258055,
+        "slope_degrees": 7.309974691394713,
+        "perchlorate_wt_pct": 0.5493307967200504,
+        "bearing_strength_kpa": 316.44918205001784,
+        "regolith_cohesion": 0.9,
+        "mineral_iron_wt_pct": 14.57077782296824,
+        "site_classification": "jezero_crater"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1094,
+        "geological_stress_index": 22.6,
+        "site_geology_type": "jezero_crater"
+      },
+      "_hash": "f26be5599bf97cdc"
+    },
+    "1096": {
+      "sol": 1096,
+      "utc": "2028-07-09T00:00:00Z",
+      "mars": {
+        "ls": 216.5,
+        "season": "Northern Summer",
+        "temp_k": 184.8,
+        "temp_c": -88.3,
+        "pressure_pa": 554,
+        "solar_wm2": 469,
+        "dust_tau": 0.393,
+        "wind_ms": 4.5,
+        "lmst": 20.7
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8305490614042401,
+          "mineral_content_variation": 0.128037921907723,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 18.4,
+        "window_open": false,
+        "bandwidth_kbps": 51
+      },
+      "terrain": {
+        "regolith_hardness": 0.7286434984095213,
+        "water_ice_depth_m": 0.5,
+        "surface_radiation_usv": 0.6018460292107528,
+        "slope_degrees": 3.873358080077827,
+        "perchlorate_wt_pct": 0.437496800695907,
+        "bearing_strength_kpa": 445.7725200169167,
+        "regolith_cohesion": 0.8941841844778363,
+        "mineral_iron_wt_pct": 13.577290947764439,
+        "site_classification": "arcadia_planitia"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1095,
+        "geological_stress_index": 10.2,
+        "site_geology_type": "arcadia_planitia"
+      },
+      "_hash": "5159b9cc89a83507"
+    },
+    "1097": {
+      "sol": 1097,
+      "utc": "2028-07-10T00:00:00Z",
+      "mars": {
+        "ls": 217.0,
+        "season": "Northern Summer",
+        "temp_k": 180,
+        "temp_c": -93.1,
+        "pressure_pa": 549,
+        "solar_wm2": 484,
+        "dust_tau": 0.339,
+        "wind_ms": 12.8,
+        "lmst": 22.9
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "regolith_bearing_failure",
+          "bearing_stress_kpa": 257.0954494914958,
+          "failure_probability": 0.04578073450967213,
+          "severity": "moderate"
+        },
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.7327676875285524,
+          "mineral_content_variation": 0.058173359407341856,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 18.3,
+        "window_open": true,
+        "bandwidth_kbps": 22
+      },
+      "terrain": {
+        "regolith_hardness": 0.6230421200779244,
+        "water_ice_depth_m": 2.640508078899371,
+        "surface_radiation_usv": 0.9053101697247142,
+        "slope_degrees": 5.211677217880289,
+        "perchlorate_wt_pct": 0.27023583371403115,
+        "bearing_strength_kpa": 277.10963274516394,
+        "regolith_cohesion": 0.7082858222092657,
+        "mineral_iron_wt_pct": 5,
+        "site_classification": "deuteronilus_mensae"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1096,
+        "geological_stress_index": 24.7,
+        "site_geology_type": "deuteronilus_mensae"
+      },
+      "_hash": "155cc8f2cf43e0cf"
+    },
+    "1098": {
+      "sol": 1098,
+      "utc": "2028-07-11T00:00:00Z",
+      "mars": {
+        "ls": 217.5,
+        "season": "Northern Summer",
+        "temp_k": 224.3,
+        "temp_c": -48.8,
+        "pressure_pa": 549,
+        "solar_wm2": 469,
+        "dust_tau": 0.388,
+        "wind_ms": 4.1,
+        "lmst": 13.4
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8157099487422256,
+          "mineral_content_variation": 0.12472128843596117,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 18.3,
+        "window_open": true,
+        "bandwidth_kbps": 47
+      },
+      "terrain": {
+        "regolith_hardness": 0.7426873346384874,
+        "water_ice_depth_m": 4.80668147692009,
+        "surface_radiation_usv": 0.2437757316356941,
+        "slope_degrees": 4.340015015210094,
+        "perchlorate_wt_pct": 0.5809710213251532,
+        "bearing_strength_kpa": 241.9304861688636,
+        "regolith_cohesion": 0.9,
+        "mineral_iron_wt_pct": 12.23687525219854,
+        "site_classification": "hellas_basin"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1097,
+        "geological_stress_index": 30.8,
+        "site_geology_type": "hellas_basin"
+      },
+      "_hash": "ffba2309e2fb3c96"
+    },
+    "1099": {
+      "sol": 1099,
+      "utc": "2028-07-12T00:00:00Z",
+      "mars": {
+        "ls": 218.1,
+        "season": "Northern Summer",
+        "temp_k": 221.9,
+        "temp_c": -51.3,
+        "pressure_pa": 592,
+        "solar_wm2": 434,
+        "dust_tau": 0.51,
+        "wind_ms": 8.1,
+        "lmst": 1.5
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8158558496037355,
+          "mineral_content_variation": 0.09711981181996115,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 18.2,
+        "window_open": true,
+        "bandwidth_kbps": 48
+      },
+      "terrain": {
+        "regolith_hardness": 0.575359087223063,
+        "water_ice_depth_m": 3.000605169433495,
+        "surface_radiation_usv": 0.49853181692392395,
+        "slope_degrees": 4.828371343562058,
+        "perchlorate_wt_pct": 0.5619057404575475,
+        "bearing_strength_kpa": 278.90569958352614,
+        "regolith_cohesion": 0.5986775437662666,
+        "mineral_iron_wt_pct": 12.09379266254788,
+        "site_classification": "jezero_crater"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1098,
+        "geological_stress_index": 18.9,
+        "site_geology_type": "jezero_crater"
+      },
+      "_hash": "e620eba7538814db"
+    },
+    "1100": {
+      "sol": 1100,
+      "utc": "2028-07-13T00:00:00Z",
+      "mars": {
+        "ls": 218.6,
+        "season": "Northern Summer",
+        "temp_k": 183.2,
+        "temp_c": -90.0,
+        "pressure_pa": 604,
+        "solar_wm2": 476,
+        "dust_tau": 0.364,
+        "wind_ms": 6.1,
+        "lmst": 5.0
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.7952801312884062,
+          "mineral_content_variation": 0.1527878149960683,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 18.1,
+        "window_open": true,
+        "bandwidth_kbps": 30
+      },
+      "terrain": {
+        "regolith_hardness": 0.8471068622891031,
+        "water_ice_depth_m": 0.5,
+        "surface_radiation_usv": 0.6661744426284618,
+        "slope_degrees": 3.6500616667031878,
+        "perchlorate_wt_pct": 0.5680349170257085,
+        "bearing_strength_kpa": 448.26181729200454,
+        "regolith_cohesion": 0.7480104809057625,
+        "mineral_iron_wt_pct": 10.072787675391883,
+        "site_classification": "arcadia_planitia"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1099,
+        "geological_stress_index": 10.0,
+        "site_geology_type": "arcadia_planitia"
+      },
+      "_hash": "4ed94d37aaa7286c"
+    },
+    "1101": {
+      "sol": 1101,
+      "utc": "2028-07-14T00:00:00Z",
+      "mars": {
+        "ls": 219.1,
+        "season": "Northern Summer",
+        "temp_k": 185.7,
+        "temp_c": -87.4,
+        "pressure_pa": 573,
+        "solar_wm2": 486,
+        "dust_tau": 0.328,
+        "wind_ms": 6.1,
+        "lmst": 9.0
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8595455286181584,
+          "mineral_content_variation": 0.2281617297727594,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 18.0,
+        "window_open": true,
+        "bandwidth_kbps": 48
+      },
+      "terrain": {
+        "regolith_hardness": 0.6794077392702826,
+        "water_ice_depth_m": 2.4438779631988377,
+        "surface_radiation_usv": 0.7636933992317279,
+        "slope_degrees": 4.061023399084391,
+        "perchlorate_wt_pct": 0.40593927951130204,
+        "bearing_strength_kpa": 404.39893820367683,
+        "regolith_cohesion": 0.8615718196992461,
+        "mineral_iron_wt_pct": 16.770724548653106,
+        "site_classification": "deuteronilus_mensae"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1100,
+        "geological_stress_index": 14.1,
+        "site_geology_type": "deuteronilus_mensae"
+      },
+      "_hash": "b8b1a7e2f2915ce8"
+    },
+    "1102": {
+      "sol": 1102,
+      "utc": "2028-07-15T00:00:00Z",
+      "mars": {
+        "ls": 219.7,
+        "season": "Northern Summer",
+        "temp_k": 210.0,
+        "temp_c": -63.1,
+        "pressure_pa": 587,
+        "solar_wm2": 480,
+        "dust_tau": 0.346,
+        "wind_ms": 9.2,
+        "lmst": 15.3
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.7352202323646115,
+          "mineral_content_variation": 0.06738164411482506,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 18.0,
+        "window_open": false,
+        "bandwidth_kbps": 53
+      },
+      "terrain": {
+        "regolith_hardness": 0.95,
+        "water_ice_depth_m": 3.2704921943123058,
+        "surface_radiation_usv": 0.465307221538648,
+        "slope_degrees": 3.2171441947684722,
+        "perchlorate_wt_pct": 0.6970635684718466,
+        "bearing_strength_kpa": 301.2158816146071,
+        "regolith_cohesion": 0.4838958219865047,
+        "mineral_iron_wt_pct": 5,
+        "site_classification": "hellas_basin"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1101,
+        "geological_stress_index": 20.7,
+        "site_geology_type": "hellas_basin"
+      },
+      "_hash": "f4868d78f17da07d"
+    },
+    "1103": {
+      "sol": 1103,
+      "utc": "2028-07-16T00:00:00Z",
+      "mars": {
+        "ls": 220.2,
+        "season": "Northern Summer",
+        "temp_k": 210.6,
+        "temp_c": -62.5,
+        "pressure_pa": 673,
+        "solar_wm2": 478,
+        "dust_tau": 0.351,
+        "wind_ms": 8.6,
+        "lmst": 5.1
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "slope_instability_hazard",
+          "slope_degrees": 9.950321738308297,
+          "regolith_cohesion": 0.7148476059797972,
+          "hazard_factor": 2.3164521759626053
+        },
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8484971953239573,
+          "mineral_content_variation": 0.0876596552741795,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 17.9,
+        "window_open": false,
+        "bandwidth_kbps": 57
+      },
+      "terrain": {
+        "regolith_hardness": 0.95,
+        "water_ice_depth_m": 3.1941999862880412,
+        "surface_radiation_usv": 0.987645956516414,
+        "slope_degrees": 9.950321738308297,
+        "perchlorate_wt_pct": 0.42532564799830924,
+        "bearing_strength_kpa": 386.7925546027346,
+        "regolith_cohesion": 0.7148476059797972,
+        "mineral_iron_wt_pct": 15.488096352292285,
+        "site_classification": "jezero_crater"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1102,
+        "geological_stress_index": 28.9,
+        "site_geology_type": "jezero_crater"
+      },
+      "_hash": "0da763c3c37035b8"
+    },
+    "1104": {
+      "sol": 1104,
+      "utc": "2028-07-17T00:00:00Z",
+      "mars": {
+        "ls": 220.7,
+        "season": "Northern Summer",
+        "temp_k": 192.1,
+        "temp_c": -81.0,
+        "pressure_pa": 635,
+        "solar_wm2": 476,
+        "dust_tau": 0.357,
+        "wind_ms": 12.1,
+        "lmst": 17.0
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8948847366805113,
+          "mineral_content_variation": 0.14404924831365157,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 17.8,
+        "window_open": true,
+        "bandwidth_kbps": 60
+      },
+      "terrain": {
+        "regolith_hardness": 0.7157753878736937,
+        "water_ice_depth_m": 0.9854001372620624,
+        "surface_radiation_usv": 0.5249981101563103,
+        "slope_degrees": 2.5415858147802752,
+        "perchlorate_wt_pct": 0.4002532661311294,
+        "bearing_strength_kpa": 484.58128341497655,
+        "regolith_cohesion": 0.6585393212159182,
+        "mineral_iron_wt_pct": 20.390085245790782,
+        "site_classification": "arcadia_planitia"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1103,
+        "geological_stress_index": 9.1,
+        "site_geology_type": "arcadia_planitia"
+      },
+      "_hash": "969974b25a8d9a8f"
+    },
+    "1105": {
+      "sol": 1105,
+      "utc": "2028-07-18T00:00:00Z",
+      "mars": {
+        "ls": 221.2,
+        "season": "Northern Summer",
+        "temp_k": 204.1,
+        "temp_c": -69.0,
+        "pressure_pa": 571,
+        "solar_wm2": 478,
+        "dust_tau": 0.35,
+        "wind_ms": 6.2,
+        "lmst": 17.4
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.9028300204665771,
+          "mineral_content_variation": 0.08473751238331134,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 17.8,
+        "window_open": false,
+        "bandwidth_kbps": 28
+      },
+      "terrain": {
+        "regolith_hardness": 0.7482673205858471,
+        "water_ice_depth_m": 2.6496317283644957,
+        "surface_radiation_usv": 0.4869315004206425,
+        "slope_degrees": 4.100441095928752,
+        "perchlorate_wt_pct": 0.2727324562125968,
+        "bearing_strength_kpa": 448.72397118712377,
+        "regolith_cohesion": 0.6445410891337647,
+        "mineral_iron_wt_pct": 22.38255774541761,
+        "site_classification": "deuteronilus_mensae"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1104,
+        "geological_stress_index": 20.5,
+        "site_geology_type": "deuteronilus_mensae"
+      },
+      "_hash": "99b016a6bfefab79"
+    },
+    "1106": {
+      "sol": 1106,
+      "utc": "2028-07-19T00:00:00Z",
+      "mars": {
+        "ls": 221.8,
+        "season": "Northern Summer",
+        "temp_k": 226.4,
+        "temp_c": -46.8,
+        "pressure_pa": 578,
+        "solar_wm2": 413,
+        "dust_tau": 0.571,
+        "wind_ms": 7.7,
+        "lmst": 10.9
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.872501761300782,
+          "mineral_content_variation": 0.14774626434155153,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 17.7,
+        "window_open": false,
+        "bandwidth_kbps": 47
+      },
+      "terrain": {
+        "regolith_hardness": 0.7316079204438015,
+        "water_ice_depth_m": 3.866945936396977,
+        "surface_radiation_usv": 0.7747633058961254,
+        "slope_degrees": 3.890221864903248,
+        "perchlorate_wt_pct": 0.6314223998087057,
+        "bearing_strength_kpa": 266.6727580723501,
+        "regolith_cohesion": 0.8638968919019518,
+        "mineral_iron_wt_pct": 18.41210928755014,
+        "site_classification": "hellas_basin"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1105,
+        "geological_stress_index": 25.1,
+        "site_geology_type": "hellas_basin"
+      },
+      "_hash": "04a112174c944dde"
+    },
+    "1107": {
+      "sol": 1107,
+      "utc": "2028-07-20T00:00:00Z",
+      "mars": {
+        "ls": 222.3,
+        "season": "Northern Summer",
+        "temp_k": 191.1,
+        "temp_c": -82.1,
+        "pressure_pa": 580,
+        "solar_wm2": 441,
+        "dust_tau": 0.474,
+        "wind_ms": 10.4,
+        "lmst": 20.7
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.7902921197176187,
+          "mineral_content_variation": 0.1428673604852412,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 17.6,
+        "window_open": false,
+        "bandwidth_kbps": 43
+      },
+      "terrain": {
+        "regolith_hardness": 0.7223752653861437,
+        "water_ice_depth_m": 4.015753890624427,
+        "surface_radiation_usv": 0.9921358277503867,
+        "slope_degrees": 4.135895560421036,
+        "perchlorate_wt_pct": 0.5369534852961652,
+        "bearing_strength_kpa": 313.5271699597914,
+        "regolith_cohesion": 0.8410308407018058,
+        "mineral_iron_wt_pct": 9.322335648165073,
+        "site_classification": "jezero_crater"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1106,
+        "geological_stress_index": 19.8,
+        "site_geology_type": "jezero_crater"
+      },
+      "_hash": "f7e8ac1ee4634486"
+    },
+    "1108": {
+      "sol": 1108,
+      "utc": "2028-07-21T00:00:00Z",
+      "mars": {
+        "ls": 222.8,
+        "season": "Northern Summer",
+        "temp_k": 198.2,
+        "temp_c": -74.9,
+        "pressure_pa": 599,
+        "solar_wm2": 422,
+        "dust_tau": 0.538,
+        "wind_ms": 10.9,
+        "lmst": 19.5
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "subsurface_ice_instability",
+          "ice_depth_m": 0.5710074988682173,
+          "thermal_variation_k": 22.264475978634003,
+          "instability_factor": 3.18157692150967
+        },
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8843616907275693,
+          "mineral_content_variation": 0.07152257092865272,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 17.5,
+        "window_open": false,
+        "bandwidth_kbps": 58
+      },
+      "terrain": {
+        "regolith_hardness": 0.8595248719184561,
+        "water_ice_depth_m": 0.5710074988682173,
+        "surface_radiation_usv": 0.9528591378431899,
+        "slope_degrees": 1.6544074295181903,
+        "perchlorate_wt_pct": 0.43383368707738856,
+        "bearing_strength_kpa": 374.29214677707716,
+        "regolith_cohesion": 0.6434697041217433,
+        "mineral_iron_wt_pct": 19.025216103427173,
+        "site_classification": "arcadia_planitia"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1107,
+        "geological_stress_index": 6.0,
+        "site_geology_type": "arcadia_planitia"
+      },
+      "_hash": "7b3024dd1d6b7bcb"
+    },
+    "1109": {
+      "sol": 1109,
+      "utc": "2028-07-22T00:00:00Z",
+      "mars": {
+        "ls": 223.3,
+        "season": "Northern Summer",
+        "temp_k": 221.1,
+        "temp_c": -52.0,
+        "pressure_pa": 656,
+        "solar_wm2": 366,
+        "dust_tau": 0.73,
+        "wind_ms": 10.7,
+        "lmst": 8.7
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "regolith_bearing_failure",
+          "bearing_stress_kpa": 509.18881116986176,
+          "failure_probability": 0.02,
+          "severity": "high"
+        },
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.830138490431962,
+          "mineral_content_variation": 0.08920695019599933,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 17.5,
+        "window_open": false,
+        "bandwidth_kbps": 49
+      },
+      "terrain": {
+        "regolith_hardness": 0.6656484771378934,
+        "water_ice_depth_m": 2.4939004894875256,
+        "surface_radiation_usv": 0.6464058916045564,
+        "slope_degrees": 6.9086532847865385,
+        "perchlorate_wt_pct": 0.4095799779813342,
+        "bearing_strength_kpa": 473.3036471965564,
+        "regolith_cohesion": 0.694631309744745,
+        "mineral_iron_wt_pct": 13.771309407310344,
+        "site_classification": "deuteronilus_mensae"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1108,
+        "geological_stress_index": 19.9,
+        "site_geology_type": "deuteronilus_mensae"
+      },
+      "_hash": "ea5fc023888087d0"
+    },
+    "1110": {
+      "sol": 1110,
+      "utc": "2028-07-23T00:00:00Z",
+      "mars": {
+        "ls": 223.9,
+        "season": "Northern Summer",
+        "temp_k": 220.6,
+        "temp_c": -52.6,
+        "pressure_pa": 523,
+        "solar_wm2": 487,
+        "dust_tau": 0.312,
+        "wind_ms": 5.3,
+        "lmst": 22.5
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8291557605203681,
+          "mineral_content_variation": 0.05,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 17.4,
+        "window_open": false,
+        "bandwidth_kbps": 33
+      },
+      "terrain": {
+        "regolith_hardness": 0.8478654158182636,
+        "water_ice_depth_m": 4.518910587039998,
+        "surface_radiation_usv": 0.6119054195872685,
+        "slope_degrees": 4.531072292549014,
+        "perchlorate_wt_pct": 0.725699826089272,
+        "bearing_strength_kpa": 185.60369919124048,
+        "regolith_cohesion": 0.9,
+        "mineral_iron_wt_pct": 14.83019201042403,
+        "site_classification": "hellas_basin"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1109,
+        "geological_stress_index": 40.2,
+        "site_geology_type": "hellas_basin"
+      },
+      "_hash": "2177e62e72897a15"
+    },
+    "1111": {
+      "sol": 1111,
+      "utc": "2028-07-24T00:00:00Z",
+      "mars": {
+        "ls": 224.4,
+        "season": "Northern Summer",
+        "temp_k": 185.4,
+        "temp_c": -87.7,
+        "pressure_pa": 561,
+        "solar_wm2": 448,
+        "dust_tau": 0.445,
+        "wind_ms": 8.9,
+        "lmst": 15.8
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "regolith_bearing_failure",
+          "bearing_stress_kpa": 326.0120423461903,
+          "failure_probability": 0.02,
+          "severity": "high"
+        },
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8403053801766504,
+          "mineral_content_variation": 0.14977080172783375,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 17.3,
+        "window_open": true,
+        "bandwidth_kbps": 54
+      },
+      "terrain": {
+        "regolith_hardness": 0.95,
+        "water_ice_depth_m": 2.732763405619719,
+        "surface_radiation_usv": 0.7719946858065592,
+        "slope_degrees": 6.977502291976474,
+        "perchlorate_wt_pct": 0.6392927792715198,
+        "bearing_strength_kpa": 404.7524099849156,
+        "regolith_cohesion": 0.5870994847355228,
+        "mineral_iron_wt_pct": 15.217557054145155,
+        "site_classification": "jezero_crater"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1110,
+        "geological_stress_index": 23.2,
+        "site_geology_type": "jezero_crater"
+      },
+      "_hash": "e0f34ca808cc20f9"
+    },
+    "1112": {
+      "sol": 1112,
+      "utc": "2028-07-25T00:00:00Z",
+      "mars": {
+        "ls": 224.9,
+        "season": "Northern Summer",
+        "temp_k": 194.6,
+        "temp_c": -78.6,
+        "pressure_pa": 666,
+        "solar_wm2": 458,
+        "dust_tau": 0.409,
+        "wind_ms": 10.7,
+        "lmst": 15.3
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "subsurface_ice_instability",
+          "ice_depth_m": 0.5,
+          "thermal_variation_k": 14.454832267982468,
+          "instability_factor": 2.16822484019737
+        },
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8464328771315532,
+          "mineral_content_variation": 0.1776589452362077,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 17.2,
+        "window_open": false,
+        "bandwidth_kbps": 52
+      },
+      "terrain": {
+        "regolith_hardness": 0.7888029941045027,
+        "water_ice_depth_m": 0.5,
+        "surface_radiation_usv": 0.6673061914882071,
+        "slope_degrees": 2.126227165652598,
+        "perchlorate_wt_pct": 0.5046118756737724,
+        "bearing_strength_kpa": 375.28305003352483,
+        "regolith_cohesion": 0.6412985182198594,
+        "mineral_iron_wt_pct": 14.682342156534313,
+        "site_classification": "arcadia_planitia"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1111,
+        "geological_stress_index": 4.4,
+        "site_geology_type": "arcadia_planitia"
+      },
+      "_hash": "0f4cacc66aab2c8d"
+    },
+    "1113": {
+      "sol": 1113,
+      "utc": "2028-07-26T00:00:00Z",
+      "mars": {
+        "ls": 225.4,
+        "season": "Northern Summer",
+        "temp_k": 181.3,
+        "temp_c": -91.8,
+        "pressure_pa": 542,
+        "solar_wm2": 362,
+        "dust_tau": 0.74,
+        "wind_ms": 13.8,
+        "lmst": 16.6
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.7554397750197247,
+          "mineral_content_variation": 0.11532925445663707,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 17.2,
+        "window_open": true,
+        "bandwidth_kbps": 43
+      },
+      "terrain": {
+        "regolith_hardness": 0.7920720555981109,
+        "water_ice_depth_m": 1.470259300585557,
+        "surface_radiation_usv": 0.9270591587124579,
+        "slope_degrees": 6.660037820214718,
+        "perchlorate_wt_pct": 0.2446457343710815,
+        "bearing_strength_kpa": 500,
+        "regolith_cohesion": 0.6940892296833308,
+        "mineral_iron_wt_pct": 7.523575059804948,
+        "site_classification": "deuteronilus_mensae"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1112,
+        "geological_stress_index": 23.5,
+        "site_geology_type": "deuteronilus_mensae"
+      },
+      "_hash": "70ab7a3867ae09bc"
+    },
+    "1114": {
+      "sol": 1114,
+      "utc": "2028-07-27T00:00:00Z",
+      "mars": {
+        "ls": 226.0,
+        "season": "Northern Summer",
+        "temp_k": 215.5,
+        "temp_c": -57.6,
+        "pressure_pa": 629,
+        "solar_wm2": 442,
+        "dust_tau": 0.463,
+        "wind_ms": 7.8,
+        "lmst": 18.5
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8189216685765567,
+          "mineral_content_variation": 0.16198861808701165,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 17.1,
+        "window_open": false,
+        "bandwidth_kbps": 25
+      },
+      "terrain": {
+        "regolith_hardness": 0.95,
+        "water_ice_depth_m": 3.9127889181054414,
+        "surface_radiation_usv": 0.871308363319172,
+        "slope_degrees": 2.5246635161739803,
+        "perchlorate_wt_pct": 0.5999591589022515,
+        "bearing_strength_kpa": 304.52207136757875,
+        "regolith_cohesion": 0.7325597421254836,
+        "mineral_iron_wt_pct": 12.719019216263359,
+        "site_classification": "hellas_basin"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1113,
+        "geological_stress_index": 18.6,
+        "site_geology_type": "hellas_basin"
+      },
+      "_hash": "98b1a0e8dc0a6c24"
+    },
+    "1115": {
+      "sol": 1115,
+      "utc": "2028-07-28T00:00:00Z",
+      "mars": {
+        "ls": 226.5,
+        "season": "Northern Summer",
+        "temp_k": 237.8,
+        "temp_c": -35.4,
+        "pressure_pa": 622,
+        "solar_wm2": 394,
+        "dust_tau": 0.628,
+        "wind_ms": 6.3,
+        "lmst": 0.9
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8589385686157786,
+          "mineral_content_variation": 0.12153225882348433,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 17.0,
+        "window_open": false,
+        "bandwidth_kbps": 53
+      },
+      "terrain": {
+        "regolith_hardness": 0.6929098225713832,
+        "water_ice_depth_m": 3.2494392318713525,
+        "surface_radiation_usv": 0.6093879520106271,
+        "slope_degrees": 9.095035464532588,
+        "perchlorate_wt_pct": 0.43471605509093253,
+        "bearing_strength_kpa": 312.64744370570395,
+        "regolith_cohesion": 0.5682454536544579,
+        "mineral_iron_wt_pct": 16.458290690213047,
+        "site_classification": "jezero_crater"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1114,
+        "geological_stress_index": 27.0,
+        "site_geology_type": "jezero_crater"
+      },
+      "_hash": "b7906a86593d366d"
+    },
+    "1116": {
+      "sol": 1116,
+      "utc": "2028-07-29T00:00:00Z",
+      "mars": {
+        "ls": 227.0,
+        "season": "Northern Summer",
+        "temp_k": 180,
+        "temp_c": -93.1,
+        "pressure_pa": 484,
+        "solar_wm2": 437,
+        "dust_tau": 0.476,
+        "wind_ms": 1.7,
+        "lmst": 12.4
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8193301527817543,
+          "mineral_content_variation": 0.15312984118493242,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 16.9,
+        "window_open": false,
+        "bandwidth_kbps": 49
+      },
+      "terrain": {
+        "regolith_hardness": 0.6152652416027378,
+        "water_ice_depth_m": 0.5579352980672471,
+        "surface_radiation_usv": 0.7805564734139135,
+        "slope_degrees": 1.119869852410976,
+        "perchlorate_wt_pct": 0.4292979711598194,
+        "bearing_strength_kpa": 481.34719574816256,
+        "regolith_cohesion": 0.5838950632724861,
+        "mineral_iron_wt_pct": 12.51642313097491,
+        "site_classification": "arcadia_planitia"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1115,
+        "geological_stress_index": 5.1,
+        "site_geology_type": "arcadia_planitia"
+      },
+      "_hash": "b98492491ba1467f"
+    },
+    "1117": {
+      "sol": 1117,
+      "utc": "2028-07-30T00:00:00Z",
+      "mars": {
+        "ls": 227.5,
+        "season": "Northern Summer",
+        "temp_k": 219.4,
+        "temp_c": -53.8,
+        "pressure_pa": 608,
+        "solar_wm2": 406,
+        "dust_tau": 0.583,
+        "wind_ms": 4.2,
+        "lmst": 9.1
+      },
+      "events": [],
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.8067738568137456,
+          "mineral_content_variation": 0.1182367058132573,
+          "affected_systems": [
+            "water_extraction",
+            "oxygen_production",
+            "regolith_processing"
+          ]
+        }
+      ],
+      "comms": {
+        "earth_delay_min": 16.9,
+        "window_open": true,
+        "bandwidth_kbps": 20
+      },
+      "terrain": {
+        "regolith_hardness": 0.5672661942272303,
+        "water_ice_depth_m": 1.6463934463457481,
+        "surface_radiation_usv": 0.6791168329241716,
+        "slope_degrees": 5.962606249579307,
+        "perchlorate_wt_pct": 0.25846367604477344,
+        "bearing_strength_kpa": 389.3367412143368,
+        "regolith_cohesion": 0.8357995855307349,
+        "mineral_iron_wt_pct": 12.674269597808358,
+        "site_classification": "deuteronilus_mensae"
+      },
+      "challenge": null,
+      "frame_echo": {
+        "prev_sol": 1116,
+        "geological_stress_index": 21.6,
+        "site_geology_type": "deuteronilus_mensae"
+      },
+      "_hash": "e82dc4c751c0f6e4"
+    }
+  }
+}

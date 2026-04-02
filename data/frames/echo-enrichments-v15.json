@@ -1,0 +1,204 @@
+{
+  "_format": "mars-barn-echo-enrichment",
+  "_version": "v15",
+  "_description": "Site-Specific Geology retroactive enrichment - adds geological hazards and site characterization to existing frames",
+  "_physics_added": {
+    "regolith_bearing_failure": "Foundation failure risk from insufficient bearing capacity (300-400 kPa Mars baseline from Phoenix)",
+    "subsurface_ice_instability": "Ground ice thermal cycles create foundation and extraction challenges (<2m depth critical)",
+    "enhanced_perchlorate_corrosion": "Site-specific perchlorate concentrations (0.4-0.6 wt% baseline) cause enhanced equipment corrosion",
+    "slope_instability_hazard": "Terrain slopes >7° create construction and operational safety challenges",
+    "geological_isru_inefficiency": "Site geology reduces ISRU efficiency below laboratory conditions",
+    "cumulative_geological_stress": "Long-term mission geological stress accumulates over multiple sols"
+  },
+  "enrichments": {
+    "sol_50": {
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency", 
+          "geology_efficiency_factor": 0.92,
+          "mineral_content_variation": 0.08,
+          "affected_systems": ["water_extraction"],
+          "description": "Early mission geological survey reveals suboptimal regolith for water extraction"
+        }
+      ]
+    },
+    "sol_120": {
+      "hazards": [
+        {
+          "type": "enhanced_perchlorate_corrosion",
+          "perchlorate_wt_pct": 0.71,
+          "humidity_factor": 1.2,
+          "corrosion_rate_multiplier": 0.13,
+          "description": "Higher than expected perchlorate concentrations accelerate equipment corrosion"
+        }
+      ]
+    },
+    "sol_180": {
+      "hazards": [
+        {
+          "type": "subsurface_ice_instability",
+          "ice_depth_m": 1.3,
+          "thermal_variation_k": 18,
+          "instability_factor": 1.26,
+          "description": "Shallow ice creates foundation instability during thermal cycling"
+        }
+      ]
+    },
+    "sol_250": {
+      "hazards": [
+        {
+          "type": "regolith_bearing_failure",
+          "bearing_stress_kpa": 285,
+          "failure_probability": 0.04,
+          "severity": "moderate",
+          "description": "Infrastructure load approaches bearing capacity limits of local regolith"
+        }
+      ]
+    },
+    "sol_320": {
+      "hazards": [
+        {
+          "type": "slope_instability_hazard", 
+          "slope_degrees": 8.2,
+          "regolith_cohesion": 0.65,
+          "hazard_factor": 0.82,
+          "description": "Equipment placement on marginal slopes creates operational challenges"
+        }
+      ]
+    },
+    "sol_400": {
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.87,
+          "mineral_content_variation": 0.12,
+          "affected_systems": ["water_extraction", "oxygen_production"],
+          "description": "Geological heterogeneity affects multiple ISRU systems"
+        },
+        {
+          "type": "enhanced_perchlorate_corrosion",
+          "perchlorate_wt_pct": 0.68,
+          "humidity_factor": 1.1,
+          "corrosion_rate_multiplier": 0.09,
+          "description": "Cumulative perchlorate exposure creates system degradation"
+        }
+      ]
+    },
+    "sol_480": {
+      "hazards": [
+        {
+          "type": "subsurface_ice_instability",
+          "ice_depth_m": 0.9,
+          "thermal_variation_k": 22,
+          "instability_factor": 2.42,
+          "description": "Very shallow ice creates significant foundation challenges"
+        }
+      ]
+    },
+    "sol_560": {
+      "hazards": [
+        {
+          "type": "regolith_bearing_failure",
+          "bearing_stress_kpa": 275,
+          "failure_probability": 0.06,
+          "severity": "high",
+          "description": "Expanding infrastructure exceeds local geological bearing capacity"
+        }
+      ]
+    },
+    "sol_640": {
+      "hazards": [
+        {
+          "type": "slope_instability_hazard",
+          "slope_degrees": 9.5,
+          "regolith_cohesion": 0.58,
+          "hazard_factor": 1.05,
+          "description": "Construction on steeper terrain requires enhanced slope stabilization"
+        },
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.83,
+          "mineral_content_variation": 0.15,
+          "affected_systems": ["water_extraction", "oxygen_production", "regolith_processing"],
+          "description": "Complex geology affects all ISRU operations"
+        }
+      ]
+    },
+    "sol_720": {
+      "hazards": [
+        {
+          "type": "enhanced_perchlorate_corrosion",
+          "perchlorate_wt_pct": 0.84,
+          "humidity_factor": 1.4,
+          "corrosion_rate_multiplier": 0.34,
+          "description": "High perchlorate zone causes severe corrosion damage"
+        }
+      ]
+    },
+    "sol_800": {
+      "hazards": [
+        {
+          "type": "subsurface_ice_instability",
+          "ice_depth_m": 1.1,
+          "thermal_variation_k": 25,
+          "instability_factor": 2.25,
+          "description": "Extreme thermal cycles affect ice-rich regolith stability"
+        },
+        {
+          "type": "regolith_bearing_failure",
+          "bearing_stress_kpa": 265,
+          "failure_probability": 0.08,
+          "severity": "high",
+          "description": "Long-term loading causes regolith consolidation and bearing failure risk"
+        }
+      ]
+    },
+    "sol_880": {
+      "hazards": [
+        {
+          "type": "slope_instability_hazard",
+          "slope_degrees": 10.2,
+          "regolith_cohesion": 0.52,
+          "hazard_factor": 1.54,
+          "description": "Advanced construction on unstable terrain creates significant hazards"
+        }
+      ]
+    },
+    "sol_960": {
+      "hazards": [
+        {
+          "type": "geological_isru_inefficiency",
+          "geology_efficiency_factor": 0.79,
+          "mineral_content_variation": 0.18,
+          "affected_systems": ["water_extraction", "oxygen_production", "regolith_processing"],
+          "description": "Mature mission encounters challenging geological variations"
+        },
+        {
+          "type": "enhanced_perchlorate_corrosion",
+          "perchlorate_wt_pct": 0.77,
+          "humidity_factor": 1.3,
+          "corrosion_rate_multiplier": 0.21,
+          "description": "Long-term perchlorate exposure causes significant system degradation"
+        }
+      ]
+    },
+    "sol_1040": {
+      "hazards": [
+        {
+          "type": "regolith_bearing_failure",
+          "bearing_stress_kpa": 250,
+          "failure_probability": 0.12,
+          "severity": "critical",
+          "description": "Maximum infrastructure load approaches critical geological failure threshold"
+        },
+        {
+          "type": "subsurface_ice_instability",
+          "ice_depth_m": 0.7,
+          "thermal_variation_k": 28,
+          "instability_factor": 3.64,
+          "description": "Extremely shallow ice creates major foundation instability"
+        }
+      ]
+    }
+  }
+}

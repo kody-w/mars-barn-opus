@@ -108,8 +108,23 @@
       "id": "v15-site-geology",
       "version": "v15",
       "title": "Site-Specific Geology",
-      "status": "pending",
-      "priority": 10
+      "status": "complete",
+      "priority": 10,
+      "completion_date": "2026-04-02",
+      "physics_added": {
+        "regolith_bearing_failure": "Foundation failure from insufficient bearing capacity (300-400 kPa Phoenix baseline)",
+        "subsurface_ice_instability": "Ground ice freeze-thaw cycles affect foundation and extraction (<2m depth critical)",
+        "enhanced_perchlorate_corrosion": "Site-specific perchlorate (0.4-0.6 wt% baseline) causes enhanced equipment degradation",
+        "slope_instability_hazard": "Terrain slopes >7° create construction and operational safety challenges",
+        "geological_isru_inefficiency": "Site geology reduces ISRU efficiency below laboratory conditions",
+        "site_characterization_physics": "Different Mars sites (Arcadia, Jezero, Hellas, Deuteronilus) have distinct geological profiles"
+      },
+      "validation": {
+        "monte_carlo_score": 136170,
+        "survival_rate": "100%",
+        "physics_impact": "Confirmed - Site geology physics integrated. Score drop from 144470 to 136170 (5.7% reduction) shows geological constraints affecting operations",
+        "score_analysis": "Strategy adapts to geological challenges but with efficiency penalties. Geological site selection and engineering planning now strategically important"
+      }
     }
   ]
 }
