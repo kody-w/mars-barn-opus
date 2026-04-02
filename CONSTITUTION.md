@@ -517,6 +517,13 @@ The engine (`tools/gauntlet.js`) is the **judge**. It evaluates strategies. It c
 2. **Fleet Prompt Guardrail:** Fleet A's prompt explicitly states: *"do NOT modify tools/gauntlet.js — the sim engine is SACRED."*
 3. **Known-Good Snapshot:** Every validated gauntlet.js is snapshotted. Corruption is always recoverable.
 4. **Separation of Powers:** Fleet A competes. Fleet B builds. Neither does the other's job. The engine is the judiciary — independent of both.
+5. **Rules Compliance:** ALL fleets MUST read and obey `RULES.md` before every action. Strategies that violate the rules (fabricating scores, skipping frames, exceeding allocation budgets, bypassing physics) are INVALID. The gauntlet enforces the rules — if a strategy tries to cheat, the engine catches it. If the engine doesn't catch it, that's a fidelity bug for Fleet B to fix.
+
+### The Two Laws
+
+**Law 1: The engine is sacred.** No competitor may modify the judge.
+
+**Law 2: The rules are absolute.** Every fleet, every agent, every strategy plays by `RULES.md`. Always. No exceptions. No creative reinterpretation. No "technically not prohibited." If it feels like cheating, it is cheating. The sim exists to find strategies that work on REAL MARS — a strategy that games the scoring formula instead of keeping the colony alive is worthless, even if it scores high.
 
 ### The Metaphor
 
