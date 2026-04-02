@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Colony Systems Diagram — Mars Barn</title>
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg: #0a0a0f;
+  --card: #161b22;
+  --border: #1b2028;
+  --text: #c9d1d9;
+  --dim: #484f58;
+  --cyan: #00fff5;
+  --green: #3fb950;
+  --yellow: #ffcc00;
+  --red: #ff4444;
+  --blue: #58a6ff;
+  --purple: #bf00ff;
+  --orange: #f0883e;
+  --mono: 'Courier New', 'SFMono-Regular', Consolas, monospace;
+  /* Line colors by resource */
+  --line-power: #ffcc00;
+  --line-o2: #00fff5;
+  --line-h2o: #58a6ff;
+  --line-food: #3fb950;
+  --line-data: #bf00ff;
+  --line-thermal: #f0883e;
+}
+html, body { width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--text); font-family:var(--mono); font-size:11px; }
+
+/* CRT scanlines */
+#scanlines {
+  position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+}
+
+/* Mars surface gradient */
+#world {
+  position:absolute; top:0; left:0; width:100%; height:100%; overflow:hidden;
+  background: radial-gradient(ellipse at 50% 120%, rgba(139,69,19,0.08) 0%, transparent 60%), var(--bg);
+}
+
+/* Canvas for connection lines */
+#lineCanvas {
+  position:absolute; top:0; left:0; pointer-events:none;
+}
+
+/* Node container (transforms for pan/zoom) */
+#viewport {
+  position:absolute; top:0; left:0; width:100%; height:100%; transform-origin:0 0;
+}
+
+/* Component nodes */
+.node {
+  position:absolute; width:200px; min-height:80px; background:var(--card);
+  border:1px solid var(--border); border-left:3px solid var(--dim);
+  border-radius:4px; padding:8px 10px; cursor:grab; user-select:none;
+  transition: box-shadow 0.3s, border-color 0.3s;
+  z-index:2;
+}
+.node:hover { border-color: rgba(0,255,245,0.4); box-shadow:0 0 12px rgba(0,255,245,0.1); }
+.node.selected { border-color: var(--cyan); box-shadow:0 0 20px rgba(0,255,245,0.2); }
+.node.cascade-flash { animation: cascadePulse 0.6s ease-in-out; }
+@keyframes cascadePulse {
+  0%,100% { box-shadow:0 0 0 rgba(255,68,68,0); }
+  50% { box-shadow:0 0 30px rgba(255,68,68,0.6); border-color:var(--red); }
+}
+
+/* System type border colors */
+.node[data-system="power"] { border-left-color: var(--yellow); }
+.node[data-system="atmosphere"] { border-left-color: var(--cyan); }
+.node[data-system="life-support"] { border-left-color: var(--blue); }
+.node[data-system="habitat"] { border-left-color: var(--green); }
+.node[data-system="thermal"] { border-left-color: var(--orange); }
+.node[data-system="crew"] { border-left-color: var(--purple); width:160px; min-height:50px; }
+
+.node-header { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+.node-icon { font-size:16px; }
+.node-title { font-size:11px; font-weight:bold; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; }
+.node-stats { font-size:9px; color:var(--dim); line-height:1.5; }
+.node-stats .val { color:var(--text); }
+.node-stats .ok { color:var(--green); }
+.node-stats .warn { color:var(--yellow); }
+.node-stats .crit { color:var(--red); }
+
+/* Health dot */
+.health-dot { width:6px; height:6px; border-radius:50%; margin-left:auto; flex-shrink:0; }
+.health-dot.green { background:var(--green); box-shadow:0 0 6px var(--green); }
+.health-dot.yellow { background:var(--yellow); box-shadow:0 0 6px var(--yellow); }
+.health-dot.red { background:var(--red); box-shadow:0 0 6px var(--red); animation:blink 1s infinite; }
+@keyframes blink { 0%,100%{opacity:1;}50%{opacity:0.3;} }
+
+/* Crew HP bar */
+.hp-bar { width:100%; height:4px; background:#1b2028; border-radius:2px; margin-top:2px; overflow:hidden; }
+.hp-fill { height:100%; border-radius:2px; transition:width 0.5s; }
+
+/* HUD overlays */
+#hud-top-left {
+  position:fixed; top:10px; left:14px; z-index:100;
+  font-size:13px; color:var(--cyan); text-shadow:0 0 8px rgba(0,255,245,0.3);
+}
+#hud-top-right {
+  position:fixed; top:10px; right:14px; z-index:100; text-align:right;
+}
+.cri-label { font-size:9px; color:var(--dim); text-transform:uppercase; letter-spacing:1px; }
+.cri-value { font-size:22px; font-weight:bold; text-shadow:0 0 10px; }
+.cri-low { color:var(--green); }
+.cri-med { color:var(--yellow); }
+.cri-high { color:var(--red); }
+
+/* Legend */
+#legend {
+  position:fixed; top:50px; left:14px; z-index:100; background:rgba(22,27,34,0.9);
+  border:1px solid var(--border); border-radius:4px; padding:8px 10px; font-size:9px;
+}
+.legend-row { display:flex; align-items:center; gap:6px; margin:2px 0; }
+.legend-line { width:24px; height:2px; }
+
+/* Detail panel */
+#detail-panel {
+  position:fixed; top:0; right:-320px; width:320px; height:100%; z-index:200;
+  background:rgba(13,17,23,0.97); border-left:1px solid var(--border);
+  transition:right 0.3s; overflow-y:auto; padding:16px;
+}
+#detail-panel.open { right:0; }
+#detail-panel h2 { font-size:14px; color:var(--cyan); margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:8px; }
+#detail-panel .close-btn {
+  position:absolute; top:8px; right:12px; background:none; border:none; color:var(--dim);
+  font-size:16px; cursor:pointer; font-family:var(--mono);
+}
+#detail-panel .close-btn:hover { color:var(--text); }
+.detail-stat { display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid rgba(27,32,40,0.5); font-size:10px; }
+.detail-stat .label { color:var(--dim); }
+.detail-stat .value { color:var(--text); }
+.detail-deps { margin-top:12px; }
+.detail-deps h3 { font-size:10px; color:var(--dim); text-transform:uppercase; margin-bottom:6px; }
+.dep-item { font-size:9px; padding:2px 0; color:var(--text); }
+
+/* Validation panel */
+#validation-panel {
+  position:fixed; bottom:0; left:0; right:0; z-index:150; max-height:120px;
+  background:rgba(13,17,23,0.95); border-top:1px solid var(--border);
+  overflow-y:auto; padding:6px 14px;
+}
+#validation-panel .vp-header {
+  font-size:9px; color:var(--dim); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;
+}
+.vp-msg { font-size:10px; padding:2px 0; }
+.vp-msg.info { color:var(--blue); }
+.vp-msg.warn { color:var(--yellow); }
+.vp-msg.error { color:var(--red); }
+
+/* Minimap */
+#minimap {
+  position:fixed; bottom:130px; right:14px; width:180px; height:120px; z-index:100;
+  background:rgba(10,10,15,0.85); border:1px solid var(--border); border-radius:4px;
+  overflow:hidden;
+}
+#minimap canvas { width:100%; height:100%; }
+#minimap .mm-viewport {
+  position:absolute; border:1px solid var(--cyan); pointer-events:none;
+}
+
+/* Zoom controls */
+#zoom-controls {
+  position:fixed; bottom:260px; right:14px; z-index:100; display:flex; flex-direction:column; gap:4px;
+}
+#zoom-controls button {
+  width:28px; height:28px; background:var(--card); border:1px solid var(--border);
+  color:var(--text); font-size:14px; cursor:pointer; border-radius:3px; font-family:var(--mono);
+}
+#zoom-controls button:hover { border-color:var(--cyan); color:var(--cyan); }
+
+/* Responsive adjustments */
+@media (max-width:800px) {
+  .node { width:160px; font-size:9px; }
+  .node[data-system="crew"] { width:130px; }
+  #detail-panel { width:260px; }
+}
+</style>
+</head>
+<body>
+
+<div id="scanlines"></div>
+
+<div id="world">
+  <canvas id="lineCanvas"></canvas>
+  <div id="viewport"></div>
+</div>
+
+<!-- HUD: Sol counter -->
+<div id="hud-top-left">
+  <div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;">Sol</div>
+  <div id="sol-display">080</div>
+  <div style="font-size:8px;color:var(--dim);margin-top:2px;" id="season-display">Northern Summer</div>
+</div>
+
+<!-- HUD: CRI -->
+<div id="hud-top-right">
+  <div class="cri-label">Colony Risk Index</div>
+  <div class="cri-value cri-low" id="cri-display">12</div>
+  <div style="font-size:8px;color:var(--dim);" id="cri-status">NOMINAL</div>
+</div>
+
+<!-- Legend -->
+<div id="legend">
+  <div style="font-size:9px;color:var(--dim);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;">Flows</div>
+  <div class="legend-row"><div class="legend-line" style="background:var(--line-power);"></div>Power</div>
+  <div class="legend-row"><div class="legend-line" style="background:var(--line-o2);"></div>O₂</div>
+  <div class="legend-row"><div class="legend-line" style="background:var(--line-h2o);"></div>H₂O</div>
+  <div class="legend-row"><div class="legend-line" style="background:var(--line-food);"></div>Food</div>
+  <div class="legend-row"><div class="legend-line" style="background:var(--line-data);"></div>Data</div>
+  <div class="legend-row"><div class="legend-line" style="background:var(--line-thermal);"></div>Thermal</div>
+</div>
+
+<!-- Detail panel -->
+<div id="detail-panel">
+  <button class="close-btn" onclick="closeDetail()">✕</button>
+  <div id="detail-content"></div>
+</div>
+
+<!-- Validation panel -->
+<div id="validation-panel">
+  <div class="vp-header">System Diagnostics</div>
+  <div id="vp-messages"></div>
+</div>
+
+<!-- Minimap -->
+<div id="minimap">
+  <canvas id="minimap-canvas"></canvas>
+  <div class="mm-viewport" id="mm-viewport"></div>
+</div>
+
+<!-- Zoom -->
+<div id="zoom-controls">
+  <button onclick="zoomIn()" title="Zoom In">+</button>
+  <button onclick="zoomOut()" title="Zoom Out">−</button>
+  <button onclick="resetView()" title="Reset">⌂</button>
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+const state = {
+  sol: 80,
+  season: 'Northern Summer',
+  cri: 12,
+  marsTemp: -42.5,
+  solarIrradiance: 475,
+  dustTau: 0.172,
+  earthDelay: 10.4,
+  bandwidth: 16,
+
+  power: {
+    solarOutput: 320, solarEfficiency: 0.91, panelCount: 48,
+    batteryCapacity: 2400, batteryCharge: 1860, batteryDegradation: 3.2,
+    busLoad: 280, busSupply: 310
+  },
+  atmosphere: {
+    isruTemp: 573, catalystAge: 1420, catalystEfficiency: 0.82, o2OutputRate: 2.1,
+    electrodeEfficiency: 0.96, h2oInput: 1.8, o2Output: 1.4, h2Output: 0.18,
+    scrubberSaturation: 42, crewCO2: 1.04
+  },
+  lifeSupport: {
+    recyclingRate: 94, contamination: 0.8,
+    iceMiningRate: 0.6, regolithIce: 3.2,
+    foodOutput: 0.42, transpirationO2: 0.3, ghWaterUse: 1.2,
+    foodDaysRemaining: 127, decayRate: 0.8
+  },
+  habitat: {
+    interiorTemp: 20.1, crewCount: 6, morale: 78,
+    healthStatus: 'NOMINAL',
+    repairRate: 0.85, repairQueue: 2,
+    commsDelay: 10.4, commsBandwidth: 16, blackout: false
+  },
+  thermal: {
+    heatingAlloc: 0.20, heatOutput: 1400,
+    wasteHeatRejection: 980
+  },
+  crew: [
+    { name:'CMD-01', role:'Commander', hp:94, radDose:48, active:true },
+    { name:'ENG-02', role:'Engineer', hp:88, radDose:52, active:true },
+    { name:'SCI-03', role:'Scientist', hp:91, radDose:45, active:true },
+    { name:'MED-04', role:'Medic', hp:96, radDose:41, active:true },
+    { name:'BOT-05', role:'Robot', hp:100, radDose:0, active:true },
+    { name:'BOT-06', role:'Robot', hp:82, radDose:0, active:true }
+  ]
+};
+
+// ─── COMPONENT DEFINITIONS ──────────────────────────────────────────────────
+const components = [
+  // Power
+  { id:'solar',      system:'power',        icon:'☀️',  title:'Solar Array',       x:80,   y:80 },
+  { id:'battery',    system:'power',        icon:'🔋', title:'Battery Bank',      x:80,   y:200 },
+  { id:'powerbus',   system:'power',        icon:'⚡', title:'Power Bus',         x:80,   y:340 },
+  // Atmosphere
+  { id:'scrubber',   system:'atmosphere',   icon:'🌬️', title:'CO₂ Scrubber',      x:380,  y:80 },
+  { id:'isru',       system:'atmosphere',   icon:'⚙️',  title:'ISRU Plant',        x:380,  y:200 },
+  { id:'electro',    system:'atmosphere',   icon:'💧',  title:'Electrolysis Unit', x:380,  y:340 },
+  // Life Support
+  { id:'recycler',   system:'life-support', icon:'💧', title:'Water Recycler',    x:680,  y:80 },
+  { id:'extractor',  system:'life-support', icon:'🧊', title:'Water Extractor',   x:680,  y:200 },
+  { id:'greenhouse', system:'life-support', icon:'🌱', title:'Greenhouse Dome',   x:680,  y:340 },
+  { id:'foodstore',  system:'life-support', icon:'🌾', title:'Food Storage',      x:680,  y:480 },
+  // Habitat
+  { id:'hab',        system:'habitat',      icon:'🏠', title:'Hab Module',        x:980,  y:80 },
+  { id:'medbay',     system:'habitat',      icon:'🏥', title:'Medical Bay',       x:980,  y:200 },
+  { id:'repairbay',  system:'habitat',      icon:'🔧', title:'Repair Bay',        x:980,  y:340 },
+  { id:'comms',      system:'habitat',      icon:'📡', title:'Comms Array',       x:980,  y:480 },
+  // Thermal
+  { id:'heating',    system:'thermal',      icon:'🌡️', title:'Heating System',    x:1280, y:80 },
+  { id:'radiators',  system:'thermal',      icon:'❄️',  title:'Radiators',         x:1280, y:220 },
+  // Crew
+  ...state.crew.map((c,i) => ({
+    id:'crew_'+i, system:'crew', icon:c.role==='Robot'?'🤖':'👤',
+    title:c.name, x:1280, y:380+i*65
+  }))
+];
+
+// ─── CONNECTIONS ─────────────────────────────────────────────────────────────
+const connections = [
+  // Power flow
+  { from:'solar',    to:'battery',    type:'power' },
+  { from:'battery',  to:'powerbus',   type:'power' },
+  { from:'powerbus', to:'isru',       type:'power' },
+  { from:'powerbus', to:'electro',    type:'power' },
+  { from:'powerbus', to:'scrubber',   type:'power' },
+  { from:'powerbus', to:'recycler',   type:'power' },
+  { from:'powerbus', to:'extractor',  type:'power' },
+  { from:'powerbus', to:'greenhouse', type:'power' },
+  { from:'powerbus', to:'hab',        type:'power' },
+  { from:'powerbus', to:'heating',    type:'power' },
+  { from:'powerbus', to:'comms',      type:'power' },
+  { from:'powerbus', to:'repairbay',  type:'power' },
+  // Atmosphere cycle: CO2 → ISRU → CH4+H2O → Electrolysis → O2
+  { from:'scrubber', to:'isru',       type:'o2' },
+  { from:'isru',     to:'electro',    type:'h2o' },
+  { from:'electro',  to:'hab',        type:'o2' },
+  { from:'electro',  to:'greenhouse', type:'o2' },
+  // Water flows
+  { from:'extractor', to:'recycler',  type:'h2o' },
+  { from:'recycler',  to:'electro',   type:'h2o' },
+  { from:'recycler',  to:'greenhouse',type:'h2o' },
+  { from:'recycler',  to:'hab',       type:'h2o' },
+  // Food
+  { from:'greenhouse',to:'foodstore', type:'food' },
+  { from:'foodstore', to:'hab',       type:'food' },
+  // Thermal
+  { from:'heating',   to:'hab',       type:'thermal' },
+  { from:'heating',   to:'greenhouse',type:'thermal' },
+  { from:'hab',       to:'radiators', type:'thermal' },
+  // Data
+  { from:'comms',     to:'hab',       type:'data' },
+  { from:'hab',       to:'medbay',    type:'data' },
+  { from:'hab',       to:'repairbay', type:'data' },
+  // Crew → Hab
+  ...state.crew.map((_,i)=>({ from:'crew_'+i, to:'hab', type:'data' })),
+  // Greenhouse transpiration O2
+  { from:'greenhouse',to:'hab',       type:'o2' },
+  // Medbay support
+  { from:'medbay',    to:'hab',       type:'data' },
+];
+
+// ─── CONNECTION STYLE MAP ────────────────────────────────────────────────────
+const lineStyles = {
+  power:   { color:'#ffcc00', width:2, dash:[6,4],  dotColor:'#ffcc00', dotRadius:3 },
+  o2:      { color:'#00fff5', width:2, dash:[],      dotColor:'#00fff5', dotRadius:2.5 },
+  h2o:     { color:'#58a6ff', width:2, dash:[],      dotColor:'#58a6ff', dotRadius:2.5 },
+  food:    { color:'#3fb950', width:1.5, dash:[3,5], dotColor:'#3fb950', dotRadius:2 },
+  data:    { color:'#bf00ff', width:1, dash:[],      dotColor:'#bf00ff', dotRadius:2 },
+  thermal: { color:'#f0883e', width:2, dash:[],      dotColor:'#f0883e', dotRadius:2.5 }
+};
+
+// ─── DEPENDENCY GRAPH (v10 cascade) ─────────────────────────────────────────
+const dependencyGraph = {
+  powerbus:   ['isru','electro','scrubber','recycler','extractor','greenhouse','hab','heating','comms','repairbay'],
+  isru:       ['electro'],
+  electro:    ['hab','greenhouse'],
+  recycler:   ['electro','greenhouse','hab'],
+  heating:    ['hab','greenhouse'],
+  scrubber:   ['isru'],
+  greenhouse: ['foodstore','hab'],
+  extractor:  ['recycler']
+};
+
+// ─── VIEWPORT / PAN-ZOOM ────────────────────────────────────────────────────
+let vpX = 0, vpY = 0, vpScale = 1;
+let isPanning = false, panStartX = 0, panStartY = 0;
+const viewport = document.getElementById('viewport');
+const canvas = document.getElementById('lineCanvas');
+const ctx = canvas.getContext('2d');
+const world = document.getElementById('world');
+
+function applyTransform() {
+  viewport.style.transform = `translate(${vpX}px,${vpY}px) scale(${vpScale})`;
+  drawConnections();
+  updateMinimap();
+}
+
+world.addEventListener('mousedown', e => {
+  if (e.target === world || e.target === canvas) {
+    isPanning = true; panStartX = e.clientX - vpX; panStartY = e.clientY - vpY;
+    world.style.cursor = 'grabbing';
+  }
+});
+window.addEventListener('mousemove', e => {
+  if (isPanning) { vpX = e.clientX - panStartX; vpY = e.clientY - panStartY; applyTransform(); }
+});
+window.addEventListener('mouseup', () => { isPanning = false; world.style.cursor = 'default'; });
+world.addEventListener('wheel', e => {
+  e.preventDefault();
+  const delta = e.deltaY > 0 ? 0.9 : 1.1;
+  const newScale = Math.max(0.3, Math.min(3, vpScale * delta));
+  const rect = world.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  vpX = mx - (mx - vpX) * (newScale / vpScale);
+  vpY = my - (my - vpY) * (newScale / vpScale);
+  vpScale = newScale;
+  applyTransform();
+}, { passive:false });
+
+function zoomIn() { vpScale = Math.min(3, vpScale * 1.2); applyTransform(); }
+function zoomOut() { vpScale = Math.max(0.3, vpScale * 0.8); applyTransform(); }
+function resetView() { vpX = 0; vpY = 0; vpScale = 1; applyTransform(); }
+
+// ─── RENDER NODES ────────────────────────────────────────────────────────────
+const nodeEls = {};
+let selectedNode = null;
+
+function getNodeStats(c) {
+  const s = state;
+  switch(c.id) {
+    case 'solar': return `<span class="val">${s.power.solarOutput.toFixed(0)}</span> kW output<br>Eff: <span class="${s.power.solarEfficiency>0.85?'ok':'warn'}">${(s.power.solarEfficiency*100).toFixed(1)}%</span> · ${s.power.panelCount} panels`;
+    case 'battery': return `<span class="val">${s.power.batteryCharge.toFixed(0)}</span>/${s.power.batteryCapacity} Wh<br>Charge: <span class="${s.power.batteryCharge/s.power.batteryCapacity>0.5?'ok':'warn'}">${(s.power.batteryCharge/s.power.batteryCapacity*100).toFixed(0)}%</span> · Deg: ${s.power.batteryDegradation.toFixed(1)}%`;
+    case 'powerbus': {
+      const ok = s.power.busSupply >= s.power.busLoad;
+      return `Load: <span class="${ok?'ok':'crit'}">${s.power.busLoad.toFixed(0)}W</span> / Supply: <span class="val">${s.power.busSupply.toFixed(0)}W</span><br>${ok?'<span class="ok">BALANCED</span>':'<span class="crit">⚠ DEFICIT</span>'}`;
+    }
+    case 'isru': return `Reactor: <span class="val">${s.atmosphere.isruTemp.toFixed(0)}K</span><br>Catalyst: <span class="${s.atmosphere.catalystEfficiency>0.7?'ok':s.atmosphere.catalystEfficiency>0.5?'warn':'crit'}">${(s.atmosphere.catalystEfficiency*100).toFixed(0)}%</span> (${s.atmosphere.catalystAge}h)<br>O₂ out: <span class="val">${s.atmosphere.o2OutputRate.toFixed(1)}</span> kg/sol`;
+    case 'electro': return `Electrode: <span class="ok">${(s.atmosphere.electrodeEfficiency*100).toFixed(0)}%</span><br>H₂O in: <span class="val">${s.atmosphere.h2oInput.toFixed(1)}</span> kg/sol<br>O₂: <span class="val">${s.atmosphere.o2Output.toFixed(1)}</span> · H₂: <span class="val">${s.atmosphere.h2Output.toFixed(2)}</span>`;
+    case 'scrubber': return `Filter: <span class="${s.atmosphere.scrubberSaturation<60?'ok':s.atmosphere.scrubberSaturation<80?'warn':'crit'}">${s.atmosphere.scrubberSaturation.toFixed(0)}%</span> saturated<br>Crew CO₂: <span class="val">${s.atmosphere.crewCO2.toFixed(2)}</span> kg/sol`;
+    case 'recycler': return `Rate: <span class="${s.lifeSupport.recyclingRate>90?'ok':'warn'}">${s.lifeSupport.recyclingRate.toFixed(0)}%</span><br>Contam: <span class="${s.lifeSupport.contamination<2?'ok':'warn'}">${s.lifeSupport.contamination.toFixed(1)}</span> ppm`;
+    case 'extractor': return `Mining: <span class="val">${s.lifeSupport.iceMiningRate.toFixed(1)}</span> kg/sol<br>Regolith ice: <span class="val">${s.lifeSupport.regolithIce.toFixed(1)}%</span>`;
+    case 'greenhouse': return `Food: <span class="val">${s.lifeSupport.foodOutput.toFixed(2)}</span> kg/sol<br>Transpiration O₂: <span class="val">${s.lifeSupport.transpirationO2.toFixed(1)}</span><br>H₂O use: <span class="val">${s.lifeSupport.ghWaterUse.toFixed(1)}</span> kg/sol`;
+    case 'foodstore': return `<span class="${s.lifeSupport.foodDaysRemaining>30?'ok':s.lifeSupport.foodDaysRemaining>10?'warn':'crit'}">${s.lifeSupport.foodDaysRemaining}</span> days remaining<br>Decay: <span class="val">${s.lifeSupport.decayRate.toFixed(1)}%</span>/sol (entropy)`;
+    case 'hab': return `Temp: <span class="ok">${s.habitat.interiorTemp.toFixed(1)}°C</span><br>Crew: <span class="val">${s.habitat.crewCount}</span> · Morale: <span class="${s.habitat.morale>60?'ok':s.habitat.morale>40?'warn':'crit'}">${s.habitat.morale}</span>`;
+    case 'medbay': return `Status: <span class="ok">${s.habitat.healthStatus}</span>`;
+    case 'repairbay': return `Rate: <span class="val">${(s.habitat.repairRate*100).toFixed(0)}%</span><br>Queue: <span class="${s.habitat.repairQueue<3?'ok':'warn'}">${s.habitat.repairQueue}</span> items`;
+    case 'comms': return `Earth delay: <span class="val">${s.habitat.commsDelay.toFixed(1)}</span> min<br>BW: <span class="val">${s.habitat.commsBandwidth}</span> kbps<br>${s.habitat.blackout?'<span class="crit">■ BLACKOUT</span>':'<span class="ok">■ LINK OK</span>'}`;
+    case 'heating': return `Alloc: <span class="val">${(s.thermal.heatingAlloc*100).toFixed(0)}%</span><br>Output: <span class="val">${s.thermal.heatOutput.toFixed(0)}</span> W`;
+    case 'radiators': return `Rejection: <span class="val">${s.thermal.wasteHeatRejection.toFixed(0)}</span> W`;
+    default: {
+      const ci = parseInt(c.id.split('_')[1]);
+      if (!isNaN(ci) && s.crew[ci]) {
+        const cr = s.crew[ci];
+        const hpClass = cr.hp>70?'ok':cr.hp>40?'warn':'crit';
+        return `<span class="val">${cr.role}</span><br>Rad: <span class="val">${cr.radDose}</span> mSv<div class="hp-bar"><div class="hp-fill" style="width:${cr.hp}%;background:${cr.hp>70?'var(--green)':cr.hp>40?'var(--yellow)':'var(--red)'}"></div></div>`;
+      }
+      return '';
+    }
+  }
+}
+
+function getNodeHealth(c) {
+  const s = state;
+  switch(c.id) {
+    case 'solar': return s.power.solarEfficiency > 0.8 ? 'green' : s.power.solarEfficiency > 0.6 ? 'yellow' : 'red';
+    case 'battery': return s.power.batteryCharge/s.power.batteryCapacity > 0.4 ? 'green' : s.power.batteryCharge/s.power.batteryCapacity > 0.2 ? 'yellow' : 'red';
+    case 'powerbus': return s.power.busSupply >= s.power.busLoad ? 'green' : 'red';
+    case 'isru': return s.atmosphere.catalystEfficiency > 0.7 ? 'green' : s.atmosphere.catalystEfficiency > 0.5 ? 'yellow' : 'red';
+    case 'electro': return s.atmosphere.electrodeEfficiency > 0.85 ? 'green' : 'yellow';
+    case 'scrubber': return s.atmosphere.scrubberSaturation < 60 ? 'green' : s.atmosphere.scrubberSaturation < 80 ? 'yellow' : 'red';
+    case 'recycler': return s.lifeSupport.recyclingRate > 90 ? 'green' : 'yellow';
+    case 'extractor': return 'green';
+    case 'greenhouse': return s.lifeSupport.foodOutput > 0.3 ? 'green' : 'yellow';
+    case 'foodstore': return s.lifeSupport.foodDaysRemaining > 30 ? 'green' : s.lifeSupport.foodDaysRemaining > 10 ? 'yellow' : 'red';
+    case 'hab': return s.habitat.morale > 60 ? 'green' : s.habitat.morale > 40 ? 'yellow' : 'red';
+    case 'medbay': return 'green';
+    case 'repairbay': return s.habitat.repairQueue < 3 ? 'green' : 'yellow';
+    case 'comms': return s.habitat.blackout ? 'red' : 'green';
+    case 'heating': return 'green';
+    case 'radiators': return 'green';
+    default: {
+      const ci = parseInt(c.id.split('_')[1]);
+      if (!isNaN(ci) && state.crew[ci]) {
+        const hp = state.crew[ci].hp;
+        return hp > 70 ? 'green' : hp > 40 ? 'yellow' : 'red';
+      }
+      return 'green';
+    }
+  }
+}
+
+function createNodeEl(c) {
+  const el = document.createElement('div');
+  el.className = 'node';
+  el.dataset.system = c.system;
+  el.dataset.id = c.id;
+  el.style.left = c.x + 'px';
+  el.style.top = c.y + 'px';
+  const health = getNodeHealth(c);
+  el.innerHTML = `
+    <div class="node-header">
+      <span class="node-icon">${c.icon}</span>
+      <span class="node-title">${c.title}</span>
+      <div class="health-dot ${health}"></div>
+    </div>
+    <div class="node-stats" id="stats-${c.id}">${getNodeStats(c)}</div>
+  `;
+  // Dragging
+  let dragging = false, dx = 0, dy = 0;
+  el.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    e.stopPropagation();
+    dragging = true;
+    dx = e.clientX / vpScale - c.x;
+    dy = e.clientY / vpScale - c.y;
+    el.style.cursor = 'grabbing';
+    el.style.zIndex = 10;
+  });
+  window.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    c.x = e.clientX / vpScale - dx - vpX / vpScale;
+    c.y = e.clientY / vpScale - dy - vpY / vpScale;
+    el.style.left = c.x + 'px';
+    el.style.top = c.y + 'px';
+    drawConnections();
+    updateMinimap();
+  });
+  window.addEventListener('mouseup', () => {
+    if (dragging) { dragging = false; el.style.cursor = 'grab'; el.style.zIndex = 2; }
+  });
+  // Click for detail
+  el.addEventListener('click', e => {
+    if (dragging) return;
+    selectNode(c);
+  });
+  viewport.appendChild(el);
+  nodeEls[c.id] = el;
+}
+
+components.forEach(createNodeEl);
+
+// ─── NODE SELECTION & DETAIL PANEL ──────────────────────────────────────────
+function selectNode(c) {
+  if (selectedNode) nodeEls[selectedNode].classList.remove('selected');
+  selectedNode = c.id;
+  nodeEls[c.id].classList.add('selected');
+  const panel = document.getElementById('detail-panel');
+  const content = document.getElementById('detail-content');
+
+  let html = `<h2>${c.icon} ${c.title}</h2>`;
+  html += getDetailStats(c);
+
+  // Dependencies
+  if (dependencyGraph[c.id]) {
+    html += `<div class="detail-deps"><h3>Depends On This System</h3>`;
+    dependencyGraph[c.id].forEach(depId => {
+      const depComp = components.find(x => x.id === depId);
+      if (depComp) html += `<div class="dep-item">${depComp.icon} ${depComp.title}</div>`;
+    });
+    html += `</div>`;
+  }
+  // What it depends on
+  const upstreams = [];
+  for (const [k,v] of Object.entries(dependencyGraph)) {
+    if (v.includes(c.id)) {
+      const up = components.find(x => x.id === k);
+      if (up) upstreams.push(up);
+    }
+  }
+  if (upstreams.length) {
+    html += `<div class="detail-deps"><h3>Depends On</h3>`;
+    upstreams.forEach(u => { html += `<div class="dep-item">${u.icon} ${u.title}</div>`; });
+    html += `</div>`;
+  }
+
+  content.innerHTML = html;
+  panel.classList.add('open');
+}
+
+function getDetailStats(c) {
+  const s = state;
+  let rows = [];
+  switch(c.id) {
+    case 'solar':
+      rows = [['Output',s.power.solarOutput.toFixed(1)+' kW'],['Efficiency',(s.power.solarEfficiency*100).toFixed(1)+'%'],['Panel Count',s.power.panelCount],['Irradiance',s.solarIrradiance+' W/m²'],['Dust τ',s.dustTau.toFixed(3)]]; break;
+    case 'battery':
+      rows = [['Charge',s.power.batteryCharge.toFixed(0)+' Wh'],['Capacity',s.power.batteryCapacity+' Wh'],['Level',(s.power.batteryCharge/s.power.batteryCapacity*100).toFixed(1)+'%'],['Degradation',s.power.batteryDegradation.toFixed(1)+'%'],['Cycles Est.','~'+Math.floor(s.sol*0.8)]]; break;
+    case 'powerbus':
+      rows = [['Load',s.power.busLoad.toFixed(0)+' W'],['Supply',s.power.busSupply.toFixed(0)+' W'],['Delta',(s.power.busSupply-s.power.busLoad).toFixed(0)+' W'],['Status',s.power.busSupply>=s.power.busLoad?'BALANCED':'DEFICIT']]; break;
+    case 'isru':
+      rows = [['Reactor Temp',s.atmosphere.isruTemp+'K'],['Catalyst Age',s.atmosphere.catalystAge+'h'],['Catalyst Eff.',(s.atmosphere.catalystEfficiency*100).toFixed(1)+'%'],['O₂ Output',s.atmosphere.o2OutputRate.toFixed(2)+' kg/sol'],['Process','Sabatier (CO₂+4H₂→CH₄+2H₂O)']]; break;
+    case 'electro':
+      rows = [['Electrode Eff.',(s.atmosphere.electrodeEfficiency*100).toFixed(1)+'%'],['H₂O Input',s.atmosphere.h2oInput.toFixed(2)+' kg/sol'],['O₂ Output',s.atmosphere.o2Output.toFixed(2)+' kg/sol'],['H₂ Output',s.atmosphere.h2Output.toFixed(3)+' kg/sol'],['Process','PEM Electrolysis']]; break;
+    case 'scrubber':
+      rows = [['Filter Saturation',s.atmosphere.scrubberSaturation.toFixed(1)+'%'],['Crew CO₂ Rate',s.atmosphere.crewCO2.toFixed(3)+' kg/sol'],['Type','Amine Swing Bed']]; break;
+    case 'recycler':
+      rows = [['Recycling Rate',s.lifeSupport.recyclingRate.toFixed(1)+'%'],['Contamination',s.lifeSupport.contamination.toFixed(2)+' ppm'],['Type','Vapor Compression Distillation']]; break;
+    case 'extractor':
+      rows = [['Mining Rate',s.lifeSupport.iceMiningRate.toFixed(2)+' kg/sol'],['Regolith Ice',s.lifeSupport.regolithIce.toFixed(1)+'%'],['Depth','1.7m']]; break;
+    case 'greenhouse':
+      rows = [['Food Output',s.lifeSupport.foodOutput.toFixed(3)+' kg/sol'],['Transpiration O₂',s.lifeSupport.transpirationO2.toFixed(2)+' kg/sol'],['Water Use',s.lifeSupport.ghWaterUse.toFixed(2)+' kg/sol'],['Growth Cycle','45 sols avg']]; break;
+    case 'foodstore':
+      rows = [['Days Remaining',s.lifeSupport.foodDaysRemaining],['Decay Rate',s.lifeSupport.decayRate.toFixed(2)+'%/sol'],['v5 Entropy','Active — resource decay model']]; break;
+    case 'hab':
+      rows = [['Interior Temp',s.habitat.interiorTemp.toFixed(1)+'°C'],['Crew Count',s.habitat.crewCount],['Morale',s.habitat.morale],['Mars Surface Temp',s.marsTemp+'°C'],['Pressure','101.3 kPa']]; break;
+    case 'medbay':
+      rows = [['Status',s.habitat.healthStatus],['Avg Crew HP',(s.crew.reduce((a,c)=>a+c.hp,0)/s.crew.length).toFixed(0)],['Max Rad Dose',Math.max(...s.crew.map(c=>c.radDose))+' mSv']]; break;
+    case 'repairbay':
+      rows = [['Repair Rate',(s.habitat.repairRate*100).toFixed(0)+'%'],['Queue Depth',s.habitat.repairQueue],['Power Cost','10 kW/sol']]; break;
+    case 'comms':
+      rows = [['Earth Delay',s.habitat.commsDelay.toFixed(1)+' min'],['Bandwidth',s.habitat.commsBandwidth+' kbps'],['Blackout',s.habitat.blackout?'YES':'NO'],['Protocol','DSN X-Band']]; break;
+    case 'heating':
+      rows = [['Allocation',(s.thermal.heatingAlloc*100).toFixed(0)+'%'],['Heat Output',s.thermal.heatOutput+' W'],['Type','RTG + Electric']]; break;
+    case 'radiators':
+      rows = [['Rejection',s.thermal.wasteHeatRejection+' W'],['Type','Deployable Radiator Panels']]; break;
+    default: {
+      const ci = parseInt(c.id.split('_')[1]);
+      if (!isNaN(ci) && state.crew[ci]) {
+        const cr = state.crew[ci];
+        rows = [['Role',cr.role],['HP',cr.hp+'/100'],['Radiation',cr.radDose+' mSv'],['Active',cr.active?'YES':'NO'],['Type',cr.role==='Robot'?'Autonomous':'Human']];
+      }
+    }
+  }
+  return rows.map(r => `<div class="detail-stat"><span class="label">${r[0]}</span><span class="value">${r[1]}</span></div>`).join('');
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('open');
+  if (selectedNode) { nodeEls[selectedNode].classList.remove('selected'); selectedNode = null; }
+}
+
+// ─── DRAW CONNECTIONS ────────────────────────────────────────────────────────
+let animTime = 0;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', () => { resizeCanvas(); drawConnections(); });
+resizeCanvas();
+
+function getNodeCenter(id) {
+  const c = components.find(x => x.id === id);
+  if (!c) return { x:0, y:0 };
+  const el = nodeEls[id];
+  const w = el ? el.offsetWidth : 200;
+  const h = el ? el.offsetHeight : 80;
+  return {
+    x: (c.x + w / 2) * vpScale + vpX,
+    y: (c.y + h / 2) * vpScale + vpY
+  };
+}
+
+function drawConnections() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  connections.forEach(conn => {
+    const from = getNodeCenter(conn.from);
+    const to = getNodeCenter(conn.to);
+    const style = lineStyles[conn.type];
+    if (!style) return;
+
+    ctx.save();
+    ctx.strokeStyle = style.color;
+    ctx.lineWidth = style.width * vpScale;
+    ctx.globalAlpha = 0.5;
+    if (style.dash.length) ctx.setLineDash(style.dash.map(d => d * vpScale));
+    else ctx.setLineDash([]);
+
+    // Draw curved line
+    const mx = (from.x + to.x) / 2;
+    const my = (from.y + to.y) / 2;
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const cx = mx + dy * 0.15;
+    const cy = my - dx * 0.15;
+
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.quadraticCurveTo(cx, cy, to.x, to.y);
+    ctx.stroke();
+
+    // Animated flow dots
+    ctx.globalAlpha = 0.9;
+    const dotCount = 3;
+    for (let i = 0; i < dotCount; i++) {
+      const t = ((animTime * 0.001 + i / dotCount) % 1);
+      const px = (1 - t) * (1 - t) * from.x + 2 * (1 - t) * t * cx + t * t * to.x;
+      const py = (1 - t) * (1 - t) * from.y + 2 * (1 - t) * t * cy + t * t * to.y;
+      ctx.beginPath();
+      ctx.arc(px, py, style.dotRadius * vpScale, 0, Math.PI * 2);
+      ctx.fillStyle = style.dotColor;
+      ctx.fill();
+    }
+    ctx.restore();
+  });
+}
+
+// ─── MINIMAP ─────────────────────────────────────────────────────────────────
+const mmCanvas = document.getElementById('minimap-canvas');
+const mmCtx = mmCanvas.getContext('2d');
+const mmViewport = document.getElementById('mm-viewport');
+
+function updateMinimap() {
+  // Find bounds
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  components.forEach(c => {
+    minX = Math.min(minX, c.x);
+    minY = Math.min(minY, c.y);
+    maxX = Math.max(maxX, c.x + 200);
+    maxY = Math.max(maxY, c.y + 80);
+  });
+  const pad = 40;
+  minX -= pad; minY -= pad; maxX += pad; maxY += pad;
+  const worldW = maxX - minX, worldH = maxY - minY;
+
+  mmCanvas.width = 180; mmCanvas.height = 120;
+  const scaleX = 180 / worldW, scaleY = 120 / worldH;
+  const sc = Math.min(scaleX, scaleY);
+
+  mmCtx.clearRect(0, 0, 180, 120);
+
+  // Draw connection lines
+  connections.forEach(conn => {
+    const from = components.find(x => x.id === conn.from);
+    const to = components.find(x => x.id === conn.to);
+    if (!from || !to) return;
+    mmCtx.strokeStyle = lineStyles[conn.type]?.color || '#333';
+    mmCtx.globalAlpha = 0.2;
+    mmCtx.lineWidth = 0.5;
+    mmCtx.beginPath();
+    mmCtx.moveTo((from.x + 100 - minX) * sc, (from.y + 40 - minY) * sc);
+    mmCtx.lineTo((to.x + 100 - minX) * sc, (to.y + 40 - minY) * sc);
+    mmCtx.stroke();
+  });
+
+  // Draw nodes
+  mmCtx.globalAlpha = 0.7;
+  components.forEach(c => {
+    const systemColors = { power:'#ffcc00', atmosphere:'#00fff5', 'life-support':'#58a6ff', habitat:'#3fb950', thermal:'#f0883e', crew:'#bf00ff' };
+    mmCtx.fillStyle = systemColors[c.system] || '#666';
+    const w = c.system === 'crew' ? 160 : 200;
+    const h = c.system === 'crew' ? 50 : 80;
+    mmCtx.fillRect((c.x - minX) * sc, (c.y - minY) * sc, w * sc, h * sc);
+  });
+
+  // Viewport rectangle
+  const vx = (-vpX / vpScale - minX) * sc;
+  const vy = (-vpY / vpScale - minY) * sc;
+  const vw = (window.innerWidth / vpScale) * sc;
+  const vh = (window.innerHeight / vpScale) * sc;
+  mmViewport.style.left = Math.max(0, vx) + 'px';
+  mmViewport.style.top = Math.max(0, vy) + 'px';
+  mmViewport.style.width = Math.min(180, vw) + 'px';
+  mmViewport.style.height = Math.min(120, vh) + 'px';
+}
+
+// ─── VALIDATION MESSAGES ─────────────────────────────────────────────────────
+function updateValidation() {
+  const msgs = [];
+  const s = state;
+  if (s.power.busLoad > s.power.busSupply)
+    msgs.push({ level:'error', text:`⚠️ Power deficit: load ${s.power.busLoad.toFixed(0)}W exceeds supply ${s.power.busSupply.toFixed(0)}W` });
+  if (s.atmosphere.catalystEfficiency < 0.6)
+    msgs.push({ level:'error', text:`🔴 Catalyst efficiency below 60% — replacement needed` });
+  else if (s.atmosphere.catalystEfficiency < 0.75)
+    msgs.push({ level:'warn', text:`⚠️ Catalyst efficiency at ${(s.atmosphere.catalystEfficiency*100).toFixed(0)}% — degrading` });
+  if (s.lifeSupport.recyclingRate < 95 && s.lifeSupport.recyclingRate >= 80)
+    msgs.push({ level:'info', text:`ℹ️ Water recycler at ${s.lifeSupport.recyclingRate.toFixed(0)}% capacity` });
+  else if (s.lifeSupport.recyclingRate < 80)
+    msgs.push({ level:'warn', text:`⚠️ Water recycler below 80% — maintenance required` });
+  if (s.atmosphere.scrubberSaturation > 70)
+    msgs.push({ level:'warn', text:`⚠️ CO₂ scrubber filter at ${s.atmosphere.scrubberSaturation.toFixed(0)}% saturation` });
+  if (s.lifeSupport.foodDaysRemaining < 30)
+    msgs.push({ level:'warn', text:`⚠️ Food reserves: only ${s.lifeSupport.foodDaysRemaining} days remaining` });
+  if (s.lifeSupport.foodDaysRemaining < 10)
+    msgs.push({ level:'error', text:`🔴 CRITICAL: Food reserves critically low — ${s.lifeSupport.foodDaysRemaining} days` });
+  if (s.power.batteryCharge / s.power.batteryCapacity < 0.3)
+    msgs.push({ level:'warn', text:`⚠️ Battery charge below 30%` });
+  if (s.habitat.morale < 50)
+    msgs.push({ level:'warn', text:`⚠️ Crew morale at ${s.habitat.morale} — isolation effects possible` });
+  if (s.habitat.repairQueue > 3)
+    msgs.push({ level:'warn', text:`⚠️ Repair queue depth ${s.habitat.repairQueue} — maintenance backlog` });
+  if (s.cri > 30)
+    msgs.push({ level:'warn', text:`⚠️ CRI elevated at ${s.cri} — cascade risk increasing` });
+  if (s.cri > 50)
+    msgs.push({ level:'error', text:`🔴 CRI CRITICAL: ${s.cri} — secondary failures likely` });
+  // v5 entropy
+  if (s.lifeSupport.decayRate > 1)
+    msgs.push({ level:'info', text:`ℹ️ v5 Entropy: food decay rate at ${s.lifeSupport.decayRate.toFixed(1)}%/sol` });
+  if (s.power.solarEfficiency < 0.85)
+    msgs.push({ level:'info', text:`ℹ️ Solar degradation: efficiency at ${(s.power.solarEfficiency*100).toFixed(1)}% (cumulative dust + aging)` });
+
+  if (msgs.length === 0)
+    msgs.push({ level:'info', text:`✅ All systems nominal — Sol ${s.sol}` });
+
+  const el = document.getElementById('vp-messages');
+  el.innerHTML = msgs.map(m => `<div class="vp-msg ${m.level}">${m.text}</div>`).join('');
+}
+
+// ─── CRI DISPLAY ─────────────────────────────────────────────────────────────
+function updateCRI() {
+  const criEl = document.getElementById('cri-display');
+  const statusEl = document.getElementById('cri-status');
+  criEl.textContent = state.cri.toFixed(0);
+  criEl.className = 'cri-value ' + (state.cri < 20 ? 'cri-low' : state.cri < 50 ? 'cri-med' : 'cri-high');
+  statusEl.textContent = state.cri < 10 ? 'STABLE' : state.cri < 20 ? 'NOMINAL' : state.cri < 40 ? 'ELEVATED' : state.cri < 60 ? 'HIGH' : 'CRITICAL';
+}
+
+// ─── V10 CASCADE SIMULATION ─────────────────────────────────────────────────
+function triggerCascade(sourceId) {
+  const affected = dependencyGraph[sourceId];
+  if (!affected) return;
+  const el = nodeEls[sourceId];
+  if (el) el.classList.add('cascade-flash');
+  setTimeout(() => { if (el) el.classList.remove('cascade-flash'); }, 600);
+  affected.forEach((depId, i) => {
+    setTimeout(() => {
+      const depEl = nodeEls[depId];
+      if (depEl) {
+        depEl.classList.add('cascade-flash');
+        setTimeout(() => depEl.classList.remove('cascade-flash'), 600);
+      }
+      // Recurse
+      if (dependencyGraph[depId]) {
+        setTimeout(() => triggerCascade(depId), 400);
+      }
+    }, (i + 1) * 300);
+  });
+}
+
+// ─── ANIMATION LOOP ──────────────────────────────────────────────────────────
+function oscillate(base, amplitude, speed) {
+  return base + Math.sin(animTime * speed * 0.001) * amplitude;
+}
+
+function updateLiveValues() {
+  const s = state;
+  s.power.solarOutput = oscillate(318, 8, 0.7);
+  s.power.batteryCharge = oscillate(1860, 20, 0.3);
+  s.power.busLoad = oscillate(278, 12, 0.5);
+  s.power.busSupply = oscillate(308, 8, 0.4);
+  s.atmosphere.isruTemp = oscillate(573, 3, 0.6);
+  s.atmosphere.o2OutputRate = oscillate(2.1, 0.08, 0.4);
+  s.atmosphere.o2Output = oscillate(1.4, 0.05, 0.5);
+  s.atmosphere.h2Output = oscillate(0.18, 0.01, 0.5);
+  s.atmosphere.scrubberSaturation = oscillate(42, 1.5, 0.2);
+  s.atmosphere.crewCO2 = oscillate(1.04, 0.02, 0.3);
+  s.lifeSupport.recyclingRate = oscillate(94, 1, 0.3);
+  s.lifeSupport.contamination = oscillate(0.8, 0.1, 0.4);
+  s.lifeSupport.iceMiningRate = oscillate(0.6, 0.05, 0.35);
+  s.lifeSupport.foodOutput = oscillate(0.42, 0.02, 0.25);
+  s.lifeSupport.transpirationO2 = oscillate(0.3, 0.02, 0.3);
+  s.lifeSupport.ghWaterUse = oscillate(1.2, 0.05, 0.25);
+  s.habitat.interiorTemp = oscillate(20.1, 0.3, 0.2);
+  s.habitat.morale = Math.round(oscillate(78, 2, 0.15));
+  s.thermal.heatOutput = oscillate(1400, 30, 0.3);
+  s.thermal.wasteHeatRejection = oscillate(980, 20, 0.35);
+  s.habitat.commsDelay = oscillate(10.4, 0.1, 0.1);
+  // CRI
+  s.cri = Math.max(0, Math.min(100, oscillate(12, 3, 0.15)));
+  // Crew HP subtle changes
+  s.crew.forEach(c => { c.hp = Math.max(0, Math.min(100, oscillate(c.hp, 0.5, 0.1 + Math.random() * 0.05))); });
+}
+
+function updateNodeDisplays() {
+  components.forEach(c => {
+    const statsEl = document.getElementById('stats-' + c.id);
+    if (statsEl) statsEl.innerHTML = getNodeStats(c);
+    const el = nodeEls[c.id];
+    const healthDot = el?.querySelector('.health-dot');
+    if (healthDot) {
+      healthDot.className = 'health-dot ' + getNodeHealth(c);
+    }
+  });
+}
+
+let lastUpdate = 0;
+function animate(ts) {
+  animTime = ts;
+  // Update values every 500ms for readability
+  if (ts - lastUpdate > 500) {
+    updateLiveValues();
+    updateNodeDisplays();
+    updateCRI();
+    updateValidation();
+    lastUpdate = ts;
+  }
+  drawConnections();
+  requestAnimationFrame(animate);
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+updateCRI();
+updateValidation();
+updateMinimap();
+requestAnimationFrame(animate);
+
+// Random cascade demo every 30s
+setInterval(() => {
+  const cascadeSources = Object.keys(dependencyGraph);
+  const src = cascadeSources[Math.floor(Math.random() * cascadeSources.length)];
+  triggerCascade(src);
+}, 30000);
+
+// Keyboard: Escape to close detail
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeDetail();
+});
+</script>
+</body>
+</html>

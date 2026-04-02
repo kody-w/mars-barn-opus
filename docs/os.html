@@ -128,6 +128,7 @@ text-transform:uppercase;border-top:1px solid var(--border);margin-top:4px}
   <div class="start-item" onclick="openIframeApp('replay','📼 Replay Viewer','replay.html')"><span class="icon">📼</span> Replay Viewer</div>
   <div class="start-item" onclick="openIframeApp('obs','📺 OBS Overlay','obs-overlay.html')"><span class="icon">📺</span> OBS Overlay</div>
   <div class="start-item" onclick="openIframeApp('marsfps','🔫 Mars Defense','mars-fps.html')"><span class="icon">🔫</span> Mars Defense</div>
+  <div class="start-item" onclick="openIframeApp('systems','🔌 Systems Diagram','systems.html')"><span class="icon">🔌</span> Systems Diagram</div>
 </div>
 
 <!-- Taskbar -->
@@ -438,7 +439,8 @@ function updateTaskbar(){
   const titles = {terminal:'🖥️ Terminal',editor:'📝 Editor',files:'📁 Files',monitor:'📡 Monitor',
     browser:'🌐 Browser',wallet:'💰 Wallet',help:'📖 Help',sim:'🔴 Colony Sim',gov:'🏛️ Mars Gov',
     'iframe-simhub':'🏆 SimHub','iframe-hofame':'🏅 Hall of Fame','iframe-patterns':'🔧 Patterns',
-    'iframe-blogapp':'📡 Blog','iframe-control':'◉ Control','iframe-replay':'📼 Replay','iframe-obs':'📺 OBS'};
+    'iframe-blogapp':'📡 Blog','iframe-control':'◉ Control','iframe-replay':'📼 Replay','iframe-obs':'📺 OBS',
+    'iframe-systems':'🔌 Systems'};
   el.innerHTML = [...openApps].map(name=>{
     return `<div class="taskbar-app ${focusedApp===name?'active':''}" onclick="focusApp('${name}')">${titles[name]||name}</div>`;
   }).join('');
