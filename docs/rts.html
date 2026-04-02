@@ -654,7 +654,6 @@
   tunnelRoutes.forEach(([x1, z1, x2, z2]) => {
     const dx = x2 - x1, dz = z2 - z1;
     const length = Math.sqrt(dx * dx + dz * dz);
-    const angle = Math.atan2(dx, dz);
     const mx = (x1 + x2) / 2, mz = (z1 + z2) / 2;
     const my = getTerrainY(mx, mz);
 
@@ -662,12 +661,10 @@
       new THREE.CylinderGeometry(0.6, 0.6, length, 6),
       tunnelMat
     );
-    tunnel.rotation.z = Math.PI / 2;
-    tunnel.rotation.y = -angle;
-    // Lay flat
     tunnel.position.set(mx, my + 0.6, mz);
-    tunnel.rotation.order = 'YZX';
-    tunnel.rotation.set(0, angle, Math.PI / 2);
+    // Rotate cylinder Y-axis to lie along the XZ direction
+    const dir = new THREE.Vector3(dx, 0, dz).normalize();
+    tunnel.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
     tunnel.castShadow = true;
     scene.add(tunnel);
 
