@@ -1,0 +1,131 @@
+;; MINIMAL MASTERY 602 - Ultra-Efficient Approach
+;; Strategy: Achieve 602 sols with minimal infrastructure through precision optimization
+;; Innovation: Maximum efficiency with minimal modules
+
+(begin
+  (define _agent_name "Minimal Mastery 602")
+  (define _agent_desc "Ultra-efficient precision strategy: minimal modules, maximum survival through perfect optimization")
+
+  (log (concat "✨ Minimal Mastery — Sol " (string sol)))
+
+  ;; ═══ PRECISION EFFICIENCY ANALYSIS ═══
+  ;; Hyper-optimized build estimation for minimal strategy
+  (define efficiency_ratio (min 1.0 (/ modules_built 8)))  ;; Target: only 8 modules max
+  (define precision_solar (max 1 (round (* modules_built 0.50))))  ;; Higher solar ratio
+  (define precision_repair (max 1 (round (* modules_built 0.20))))  ;; Minimal repair focus
+  
+  ;; Minimal infrastructure creates hyper-efficiency through precision
+  (define minimal_efficiency_base 2.0)  ;; Higher efficiency with fewer modules
+  (define precision_multiplier (pow minimal_efficiency_base (max 0 (8 - modules_built))))
+  (define total_precision_efficiency (* precision_multiplier (+ 1 (* efficiency_ratio 0.2))))
+  
+  (log (concat "  Minimal Build: " (string precision_solar) " solar, " (string precision_repair) " repair | Efficiency: " (string (round (* precision_multiplier 100))) "%"))
+
+  ;; ═══ ULTRA-PRECISE CRI MANAGEMENT ═══
+  ;; Hyper-sensitive CRI response for minimal strategy
+  (define cri_precision (/ colony_risk_index 90))  ;; More sensitive thresholds
+  (define cri_minimal_multiplier (if (> colony_risk_index 45) 2.5 1.0))  ;; Lower crisis threshold
+  
+  (define minimal_threat_factor (* cri_precision cri_minimal_multiplier))
+  (define minimal_threat_level
+    (cond
+      ((> minimal_threat_factor 1.6) "CRISIS")
+      ((> minimal_threat_factor 1.0) "DANGER") 
+      ((> minimal_threat_factor 0.5) "RISK")
+      ((> minimal_threat_factor 0.25) "CAUTION")
+      (true "OPTIMAL")))
+
+  ;; Ultra-sensitive crisis detection for minimal strategy
+  (define minimal_crisis_score 0)
+  (if (< o2_days 9) (set! minimal_crisis_score (+ minimal_crisis_score 2)))
+  (if (< food_days 14) (set! minimal_crisis_score (+ minimal_crisis_score 2)))
+  (if (< power_kwh 90) (set! minimal_crisis_score (+ minimal_crisis_score 1)))
+  (if (> dust_tau 3.0) (set! minimal_crisis_score (+ minimal_crisis_score 1)))
+  (if (> colony_risk_index 40) (set! minimal_crisis_score (+ minimal_crisis_score 2)))
+  
+  (define minimal_emergency (>= minimal_crisis_score 4))  ;; Lower threshold
+  
+  (log (concat "  Threat: " minimal_threat_level " | Crisis Score: " (string minimal_crisis_score) (if minimal_emergency " ⚠️" "")))
+
+  ;; ═══ PRECISION RESOURCE ALLOCATION ═══
+  ;; Ultra-optimized allocation for minimal infrastructure
+  (define precision_efficiency_bonus (min 2.0 (max 0.8 total_precision_efficiency)))
+  
+  ;; Minimal allocation targets - precision over abundance
+  (define minimal_isru_target
+    (cond
+      (minimal_emergency 0.12)  ;; Emergency: strict minimum
+      ((= minimal_threat_level "CRISIS") 0.18)
+      ((= minimal_threat_level "DANGER") 0.24)
+      ((= minimal_threat_level "RISK") 0.30)
+      ((< o2_days 5) 0.70)
+      ((< o2_days 10) 0.45)
+      (true 0.32)))
+
+  (define minimal_greenhouse_target
+    (cond
+      (minimal_emergency 0.20)
+      ((= minimal_threat_level "CRISIS") 0.26)
+      ((= minimal_threat_level "DANGER") 0.32)
+      ((= minimal_threat_level "RISK") 0.38)
+      ((< food_days 8) 0.55)
+      ((< food_days 15) 0.42)
+      (true 0.36)))
+
+  (define minimal_heating_target
+    (cond
+      (minimal_emergency 0.68)
+      ((= minimal_threat_level "CRISIS") 0.56)
+      ((= minimal_threat_level "DANGER") 0.44)
+      ((= minimal_threat_level "RISK") 0.32)
+      ((< power_kwh 50) 0.60)
+      ((< power_kwh 90) 0.45)
+      (true 0.32)))
+
+  ;; Apply precision efficiency and normalize
+  (define minimal_total (+ minimal_isru_target minimal_greenhouse_target minimal_heating_target))
+  (define minimal_normalization (/ precision_efficiency_bonus minimal_total))
+  
+  (set! isru_alloc (* minimal_isru_target minimal_normalization))
+  (set! greenhouse_alloc (* minimal_greenhouse_target minimal_normalization))
+  (set! heating_alloc (* minimal_heating_target minimal_normalization))
+
+  ;; ═══ PRECISION SURVIVAL RATIONING ═══
+  ;; Optimized rationing for minimal strategy
+  (define minimal_base_ration
+    (cond
+      (minimal_emergency 0.30)  ;; Higher emergency rations with precision efficiency
+      ((= minimal_threat_level "CRISIS") 0.40)
+      ((= minimal_threat_level "DANGER") 0.55)
+      ((= minimal_threat_level "RISK") 0.70)
+      ((< food_days 5) 0.40)
+      ((< food_days 10) 0.60)
+      ((< food_days 20) 0.80)
+      (true 0.98)))  ;; Higher baseline with efficiency
+
+  ;; Precision efficiency allows better rationing
+  (define minimal_efficiency_bonus (max 0 (min 0.25 (- precision_efficiency_bonus 1))))
+  (set! food_ration (max 0.25 (min 1.0 (+ minimal_base_ration minimal_efficiency_bonus))))
+
+  ;; ═══ MINIMAL STATUS DISPLAY ═══
+  (define minimal_status_icon
+    (cond
+      (minimal_emergency "⚠️")
+      ((= minimal_threat_level "CRISIS") "🔴")
+      ((= minimal_threat_level "DANGER") "🟠")
+      ((= minimal_threat_level "RISK") "🟡")
+      ((= minimal_threat_level "CAUTION") "🔵")
+      (true "✨")))
+
+  (log (concat "  Status: " minimal_status_icon " " minimal_threat_level))
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Greenhouse:" (string (round (* greenhouse_alloc 100))) "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Ration: " (string (round (* food_ration 100))) "% | Precision Efficiency: " (string (round (* total_precision_efficiency 100))) "%"))
+
+  ;; ═══ MINIMAL STRATEGY SUMMARY ═══
+  (concat "Minimal602 Sol " (string sol) " — " minimal_status_icon " " minimal_threat_level
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | Eff:" (string (round (* total_precision_efficiency 100)))
+    "% | C:" (string minimal_crisis_score)))

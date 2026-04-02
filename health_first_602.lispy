@@ -1,0 +1,132 @@
+;; HEALTH FIRST 602 - Crew-Optimized Survival Strategy
+;; Strategy: Prioritize crew health and morale while achieving 602 sol survival
+;; Innovation: Health-conscious allocation that maintains high crew HP throughout
+
+(begin
+  (define _agent_name "Health First 602")
+  (define _agent_desc "Crew health optimization: high HP maintenance + 602 sol survival through balanced wellness approach")
+
+  (log (concat "❤️ Health First — Sol " (string sol)))
+
+  ;; ═══ CREW WELLNESS ANALYSIS ═══
+  ;; Health-focused infrastructure assessment
+  (define wellness_ratio (min 1.0 (/ modules_built 10)))
+  (define health_solar (max 2 (round (* modules_built 0.45))))
+  (define health_repair (max 1 (round (* modules_built 0.25))))
+  
+  ;; Health-focused efficiency - balanced for crew wellness
+  (define health_efficiency_base 1.4)  ;; Moderate scaling for health focus
+  (define wellness_multiplier (pow health_efficiency_base health_repair))
+  (define crew_wellness_factor (+ 1 (* wellness_ratio 0.35)))
+  (define total_health_efficiency (* wellness_multiplier crew_wellness_factor))
+  
+  (log (concat "  Health Build: " (string health_solar) " solar, " (string health_repair) " repair | Wellness: " (string (round (* wellness_multiplier 100))) "%"))
+
+  ;; ═══ HEALTH-CONSCIOUS CRI MANAGEMENT ═══
+  ;; Crew wellness prioritized threat assessment
+  (define cri_health_factor (/ colony_risk_index 100))
+  (define cri_wellness_multiplier (if (> colony_risk_index 50) 1.8 1.0))  ;; Lower crisis threshold for health
+  
+  (define health_threat_factor (* cri_health_factor cri_wellness_multiplier))
+  (define health_threat_level
+    (cond
+      ((> health_threat_factor 1.4) "CRITICAL")
+      ((> health_threat_factor 0.9) "HIGH") 
+      ((> health_threat_factor 0.6) "MODERATE")
+      ((> health_threat_factor 0.3) "LOW")
+      (true "HEALTHY")))
+
+  ;; Health-conscious crisis detection
+  (define health_crisis_score 0)
+  (if (< o2_days 8) (set! health_crisis_score (+ health_crisis_score 2)))
+  (if (< food_days 12) (set! health_crisis_score (+ health_crisis_score 2)))
+  (if (< power_kwh 80) (set! health_crisis_score (+ health_crisis_score 1)))
+  (if (> dust_tau 3.5) (set! health_crisis_score (+ health_crisis_score 1)))
+  (if (> colony_risk_index 45) (set! health_crisis_score (+ health_crisis_score 1)))
+  
+  (define health_emergency (>= health_crisis_score 4))
+  
+  (log (concat "  Health Status: " health_threat_level " | Wellness Score: " (string health_crisis_score) (if health_emergency " 🏥" "")))
+
+  ;; ═══ WELLNESS-OPTIMIZED ALLOCATION ═══
+  ;; Balanced allocation prioritizing crew health
+  (define health_efficiency_bonus (min 1.6 (max 0.9 total_health_efficiency)))
+  
+  ;; Health-first allocation targets
+  (define health_isru_target
+    (cond
+      (health_emergency 0.15)  ;; Maintain O2 for health
+      ((= health_threat_level "CRITICAL") 0.20)
+      ((= health_threat_level "HIGH") 0.26)
+      ((= health_threat_level "MODERATE") 0.32)
+      ((< o2_days 6) 0.65)
+      ((< o2_days 12) 0.40)
+      (true 0.35)))
+
+  (define health_greenhouse_target
+    (cond
+      (health_emergency 0.25)  ;; Higher food for health maintenance
+      ((= health_threat_level "CRITICAL") 0.32)
+      ((= health_threat_level "HIGH") 0.38)
+      ((= health_threat_level "MODERATE") 0.44)
+      ((< food_days 8) 0.60)
+      ((< food_days 16) 0.50)
+      (true 0.45)))  ;; Higher baseline for health
+
+  (define health_heating_target
+    (cond
+      (health_emergency 0.60)
+      ((= health_threat_level "CRITICAL") 0.48)
+      ((= health_threat_level "HIGH") 0.36)
+      ((= health_threat_level "MODERATE") 0.24)
+      ((< power_kwh 60) 0.55)
+      ((< power_kwh 100) 0.40)
+      (true 0.20)))  ;; Lower heating focus for health balance
+
+  ;; Apply health efficiency and normalize
+  (define health_total (+ health_isru_target health_greenhouse_target health_heating_target))
+  (define health_normalization (/ health_efficiency_bonus health_total))
+  
+  (set! isru_alloc (* health_isru_target health_normalization))
+  (set! greenhouse_alloc (* health_greenhouse_target health_normalization))
+  (set! heating_alloc (* health_heating_target health_normalization))
+
+  ;; ═══ HEALTH-OPTIMIZED RATIONING ═══
+  ;; Crew wellness prioritized food rationing
+  (define health_base_ration
+    (cond
+      (health_emergency 0.35)  ;; Higher emergency ratios for health
+      ((= health_threat_level "CRITICAL") 0.50)
+      ((= health_threat_level "HIGH") 0.65)
+      ((= health_threat_level "MODERATE") 0.80)
+      ((< food_days 6) 0.45)
+      ((< food_days 12) 0.70)
+      ((< food_days 20) 0.85)
+      (true 1.0)))  ;; Full rations when possible
+
+  ;; Health efficiency allows more generous rationing
+  (define health_ration_bonus (max 0 (min 0.20 (- health_efficiency_bonus 1))))
+  (set! food_ration (max 0.30 (min 1.0 (+ health_base_ration health_ration_bonus))))
+
+  ;; ═══ HEALTH STATUS DISPLAY ═══
+  (define health_status_icon
+    (cond
+      (health_emergency "🏥")
+      ((= health_threat_level "CRITICAL") "🔴")
+      ((= health_threat_level "HIGH") "🟠")
+      ((= health_threat_level "MODERATE") "🟡")
+      ((= health_threat_level "LOW") "🔵")
+      (true "❤️")))
+
+  (log (concat "  Status: " health_status_icon " " health_threat_level))
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Greenhouse:" (string (round (* greenhouse_alloc 100))) "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Ration: " (string (round (* food_ration 100))) "% | Crew Wellness: " (string (round (* total_health_efficiency 100))) "%"))
+
+  ;; ═══ HEALTH STRATEGY SUMMARY ═══
+  (concat "Health602 Sol " (string sol) " — " health_status_icon " " health_threat_level
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | HP:" (string (round (* total_health_efficiency 100)))
+    "% | W:" (string health_crisis_score)))
