@@ -1,0 +1,163 @@
+;; COPILOT ULTRA CRI OPTIMIZER v1
+;; Innovation: Minimize CRI for maximum scoring while maintaining 100% survival
+;; Goal: Reduce P75 CRI from 5 to 1-3 for +20-40 bonus points
+;; Features: CRI-minimization focus with perfect resource management
+
+(begin
+  (define _agent_name "Copilot Ultra CRI Optimizer v1")
+  (define _agent_desc "Ultra-low CRI strategy targeting P75 CRI of 1-3 for maximum scoring")
+
+  (log (concat "🎯⚡🔥💎 CRI OPTIMIZER v1 — Sol " (string sol) " — Minimum Risk Protocol"))
+
+  ;; ═══ MISSION PHASE ANALYSIS ═══
+  (define early_phase (< sol 100))
+  (define mid_phase (and (>= sol 100) (< sol 300)))
+  (define late_phase (and (>= sol 300) (< sol 500)))
+  (define end_phase (>= sol 500))
+
+  ;; ═══ ULTRA-CONSERVATIVE RISK THRESHOLDS ═══
+  ;; Much lower thresholds for earlier intervention
+  (define threat_critical (>= cri 25))     ;; Was 50+
+  (define threat_elevated (and (>= cri 15) (< cri 25)))  ;; Was 35+
+  (define threat_moderate (and (>= cri 8) (< cri 15)))   ;; Was 20+
+  (define threat_low (and (>= cri 4) (< cri 8)))         ;; Was 10+
+  (define threat_minimal (< cri 4))                      ;; Target zone
+
+  ;; ═══ CRI-MINIMIZING RESOURCE ALLOCATION ═══
+  ;; Focus on maintaining abundant resources to keep CRI ultra-low
+
+  ;; Early Phase: Build resource buffer quickly
+  (if early_phase
+    (cond
+      (threat_critical (begin (set! isru_alloc 0.65) (set! greenhouse_alloc 0.25) (set! heating_alloc 0.10)))
+      (threat_elevated (begin (set! isru_alloc 0.58) (set! greenhouse_alloc 0.32) (set! heating_alloc 0.10)))
+      (threat_moderate (begin (set! isru_alloc 0.52) (set! greenhouse_alloc 0.38) (set! heating_alloc 0.10)))
+      (threat_low (begin (set! isru_alloc 0.48) (set! greenhouse_alloc 0.42) (set! heating_alloc 0.10)))
+      (threat_minimal (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.10)))
+      (true (begin (set! isru_alloc 0.52) (set! greenhouse_alloc 0.38) (set! heating_alloc 0.10)))))
+
+  ;; Mid Phase: Maintain abundance
+  (if mid_phase
+    (cond
+      (threat_critical (begin (set! isru_alloc 0.60) (set! greenhouse_alloc 0.32) (set! heating_alloc 0.08)))
+      (threat_elevated (begin (set! isru_alloc 0.52) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.08)))
+      (threat_moderate (begin (set! isru_alloc 0.46) (set! greenhouse_alloc 0.46) (set! heating_alloc 0.08)))
+      (threat_low (begin (set! isru_alloc 0.42) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.08)))
+      (threat_minimal (begin (set! isru_alloc 0.38) (set! greenhouse_alloc 0.54) (set! heating_alloc 0.08)))
+      (true (begin (set! isru_alloc 0.46) (set! greenhouse_alloc 0.46) (set! heating_alloc 0.08)))))
+
+  ;; Late Phase: Optimize for low CRI
+  (if late_phase
+    (cond
+      (threat_critical (begin (set! isru_alloc 0.58) (set! greenhouse_alloc 0.34) (set! heating_alloc 0.08)))
+      (threat_elevated (begin (set! isru_alloc 0.48) (set! greenhouse_alloc 0.44) (set! heating_alloc 0.08)))
+      (threat_moderate (begin (set! isru_alloc 0.42) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.08)))
+      (threat_low (begin (set! isru_alloc 0.38) (set! greenhouse_alloc 0.54) (set! heating_alloc 0.08)))
+      (threat_minimal (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.57) (set! heating_alloc 0.08)))
+      (true (begin (set! isru_alloc 0.42) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.08)))))
+
+  ;; End Phase: Perfect efficiency
+  (if end_phase
+    (cond
+      (threat_critical (begin (set! isru_alloc 0.55) (set! greenhouse_alloc 0.37) (set! heating_alloc 0.08)))
+      (threat_elevated (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.47) (set! heating_alloc 0.08)))
+      (threat_moderate (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.52) (set! heating_alloc 0.08)))
+      (threat_low (begin (set! isru_alloc 0.36) (set! greenhouse_alloc 0.56) (set! heating_alloc 0.08)))
+      (threat_minimal (begin (set! isru_alloc 0.33) (set! greenhouse_alloc 0.59) (set! heating_alloc 0.08)))
+      (true (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.52) (set! heating_alloc 0.08)))))
+
+  ;; ═══ ABUNDANT FOOD RATIONING ═══
+  ;; Keep food abundant to minimize CRI
+  (define base_ration
+    (cond
+      ((< food_days 3) 0.60)      ;; Emergency - higher than normal
+      ((< food_days 5) 0.75)      ;; Crisis - generous
+      ((< food_days 8) 0.90)      ;; Conservative - very generous  
+      ((< food_days 15) 1.05)     ;; Normal - abundant
+      ((< food_days 25) 1.15)     ;; Surplus - very abundant
+      (true 1.25)))               ;; Excess - maximum abundance
+
+  ;; Health-based boost (more generous than normal)
+  (define avg_health (/ (+ crew_1_health crew_2_health (if (> crew_count 2) crew_3_health 100)) crew_count))
+  (define health_boost
+    (cond
+      ((< avg_health 50) 1.30)    ;; Major health boost
+      ((< avg_health 70) 1.20)    ;; Moderate health boost
+      ((< avg_health 85) 1.10)    ;; Light health boost
+      (true 1.0)))
+
+  ;; CRI penalty reduction (lower food ration only in extreme CRI)
+  (define cri_adjustment
+    (cond
+      ((>= cri 40) 0.85)          ;; Only reduce in extreme CRI
+      ((>= cri 25) 0.95)          ;; Small reduction in high CRI
+      (true 1.0)))                ;; No reduction otherwise
+
+  (set! food_ration (max 0.30 (min 1.5 (* base_ration health_boost cri_adjustment))))
+
+  ;; ═══ RESOURCE BUFFER TARGETING ═══
+  ;; Target higher resource days to keep CRI ultra-low
+
+  ;; Oxygen target: 8+ days (vs normal 5)
+  (define o2_buffer_needed (< o2_days 8))
+  
+  ;; Water target: 10+ days (vs normal 5) 
+  (define water_buffer_needed (< water_days 10))
+  
+  ;; Food target: 20+ days (vs normal 10)
+  (define food_buffer_needed (< food_days 20))
+
+  ;; Dynamic allocation adjustment for buffer building
+  (if (and o2_buffer_needed (not threat_critical))
+    (begin 
+      (set! isru_alloc (+ isru_alloc 0.05))
+      (set! greenhouse_alloc (- greenhouse_alloc 0.05))))
+
+  (if (and food_buffer_needed (not threat_critical))
+    (begin
+      (set! greenhouse_alloc (+ greenhouse_alloc 0.05))
+      (set! isru_alloc (- isru_alloc 0.05))))
+
+  ;; Ensure allocations stay within bounds
+  (set! isru_alloc (max 0.15 (min 0.75 isru_alloc)))
+  (set! greenhouse_alloc (max 0.20 (min 0.75 greenhouse_alloc)))
+  (set! heating_alloc (max 0.05 (min 0.20 heating_alloc)))
+
+  ;; Normalize allocations to sum to 1.0
+  (define total_alloc (+ isru_alloc greenhouse_alloc heating_alloc))
+  (set! isru_alloc (/ isru_alloc total_alloc))
+  (set! greenhouse_alloc (/ greenhouse_alloc total_alloc))
+  (set! heating_alloc (/ heating_alloc total_alloc))
+
+  ;; ═══ STATUS LOGGING ═══
+  (define phase_name
+    (cond
+      (early_phase "⚡EARLY")
+      (mid_phase "🔧MID") 
+      (late_phase "⏳LATE")
+      (end_phase "🎯END")
+      (true "CRI OPTIMIZER")))
+
+  (define threat_level
+    (cond
+      (threat_critical "🚨CRITICAL")
+      (threat_elevated "⚠️ELEVATED")
+      (threat_moderate "⚡MODERATE")
+      (threat_low "✅LOW")
+      (threat_minimal "💎MINIMAL")
+      (true "UNKNOWN")))
+
+  (log (concat "  🎯 " phase_name " | " threat_level " | CRI:" (string (round cri)) " | Target: <4"))
+  (log (concat "  🔧 I:" (string (round (* isru_alloc 100))) "% | G:" (string (round (* greenhouse_alloc 100))) "% | H:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  🍽️ Ration:" (string (round (* food_ration 100))) "% | 💧H2O:" (string water_days) "d | 🍎Food:" (string food_days) "d | 💨O2:" (string o2_days) "d"))
+  (log (concat "  🎯 Buffers: O2=" (if o2_buffer_needed "❌" "✅") " H2O=" (if water_buffer_needed "❌" "✅") " Food=" (if food_buffer_needed "❌" "✅")))
+  (log (concat "  💪 Health:" (string (round avg_health)) "% | 🔋 Power:" (string (round (* power_ratio 100))) "%"))
+
+  ;; ═══ CRI-OPTIMIZED OUTPUT ═══
+  (concat "🎯💎 CRI-OPT Sol " (string sol) " | " phase_name
+    " | CRI:" (string (round cri))
+    " | I:" (string (round (* isru_alloc 100))) "%"
+    " | G:" (string (round (* greenhouse_alloc 100))) "%"
+    " | O2:" (string o2_days) "d"
+    " | Food:" (string food_days) "d"
+    " | " threat_level))

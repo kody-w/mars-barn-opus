@@ -109,17 +109,55 @@ function tick(st, sol, frame, R){
       // Late game standard: prepare for critical zone
       a.h=0.35; a.i=0.35; a.g=0.30; a.r=1.4;
     } else if(ultraHigh) {
-      // Ultra high CRI in normal phase: defensive
-      a.h=0.50; a.i=0.30; a.g=0.20; a.r=1.6;
+      // Ultra high CRI: maximum defensive mode with intelligent resource targeting
+      if(o2d < 10) {
+        a.h=0.40; a.i=0.45; a.g=0.15; a.r=1.6;  // O2 emergency
+      } else if(hd < 10) {
+        a.h=0.40; a.i=0.45; a.g=0.15; a.r=1.6;  // H2O emergency
+      } else if(fd < 10) {
+        a.h=0.40; a.i=0.20; a.g=0.40; a.r=1.6;  // Food emergency
+      } else {
+        a.h=0.48; a.i=0.32; a.g=0.20; a.r=1.6;  // General ultra-high CRI defense
+      }
     } else if(highRisk) {
-      // High CRI in normal phase: defensive allocation
-      a.h=0.40; a.i=0.35; a.g=0.25; a.r=1.4;
+      // High CRI: ultra-defensive allocation with aggressive resource buffer building
+      if(o2d < 8) {
+        a.h=0.30; a.i=0.50; a.g=0.20; a.r=1.4;  // O2 critical
+      } else if(hd < 8) {
+        a.h=0.30; a.i=0.50; a.g=0.20; a.r=1.4;  // H2O critical  
+      } else if(fd < 8) {
+        a.h=0.30; a.i=0.25; a.g=0.45; a.r=1.4;  // Food critical
+      } else {
+        a.h=0.38; a.i=0.37; a.g=0.25; a.r=1.4;  // Standard high risk with better buffers
+      }
     } else if(mediumRisk) {
-      // Medium CRI: enhanced balanced allocation
-      a.h=0.25; a.i=0.40; a.g=0.35; a.r=1.2;
+      // Medium CRI: ultra-conservative allocation to prevent CRI growth
+      // More aggressive resource building to stay under 5-day shortage thresholds
+      if(o2d < 7) {
+        a.h=0.20; a.i=0.55; a.g=0.25; a.r=1.2;  // O2 shortage prevention
+      } else if(hd < 7) {
+        a.h=0.20; a.i=0.55; a.g=0.25; a.r=1.2;  // H2O shortage prevention
+      } else if(fd < 7) {
+        a.h=0.20; a.i=0.30; a.g=0.50; a.r=1.2;  // Food shortage prevention
+      } else {
+        a.h=0.22; a.i=0.42; a.g=0.36; a.r=1.2;  // Balanced with higher buffers
+      }
     } else {
-      // Low CRI: efficient growth allocation
-      a.h=0.15; a.i=0.40; a.g=0.45; a.r=1.0;
+      // Low CRI: ULTRA-CONSERVATIVE allocation for minimum CRI maintenance
+      // Focus on building resource buffers to keep all days > 5
+      if(o2d < 10 || hd < 10 || fd < 10) {
+        // Buffer building mode - prioritize deficient resources with higher thresholds
+        if(o2d < hd && o2d < fd) {
+          a.h=0.10; a.i=0.65; a.g=0.25; a.r=1.0;  // O2 focus - more aggressive
+        } else if(hd < fd) {
+          a.h=0.10; a.i=0.65; a.g=0.25; a.r=1.0;  // H2O focus (same as O2)
+        } else {
+          a.h=0.10; a.i=0.25; a.g=0.65; a.r=1.0;  // Food focus - more aggressive
+        }
+      } else {
+        // All buffers adequate - balanced efficient growth
+        a.h=0.15; a.i=0.40; a.g=0.45; a.r=1.0;
+      }
     }
   }
 

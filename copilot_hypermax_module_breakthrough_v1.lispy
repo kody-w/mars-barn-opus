@@ -1,0 +1,204 @@
+;; COPILOT HYPERMAX MODULE BREAKTHROUGH v1
+;; Innovation: Ultra-aggressive early module building for maximum density scoring
+;; Goal: Push median modules from 21 to 30+ for score breakthrough
+;; Features: Revolutionary early module strategy with optimized survival infrastructure
+
+(begin
+  (define _agent_name "Copilot Hypermax Module Breakthrough v1")
+  (define _agent_desc "Ultra-aggressive early module building strategy targeting 30+ median modules")
+
+  (log (concat "🏗️🚀💎⚡ MODULE BREAKTHROUGH v1 — Sol " (string sol) " — Module Density Revolution"))
+
+  ;; ═══ STREAMLINED MISSION PHASES ═══
+  (define bootstrap_phase (< sol 25))
+  (define infrastructure_phase (and (>= sol 25) (< sol 80)))
+  (define module_acceleration_phase (and (>= sol 80) (< sol 200)))
+  (define module_maximum_phase (and (>= sol 200) (< sol 400)))
+  (define transcendence_phase (>= sol 400))
+
+  ;; ═══ SIMPLIFIED THREAT ASSESSMENT ═══
+  (define threat_high (>= cri 50))
+  (define threat_medium (and (>= cri 25) (< cri 50)))
+  (define threat_low (< cri 25))
+
+  ;; ═══ MODULE-OPTIMIZED RESOURCE ALLOCATION ═══
+  
+  ;; Bootstrap: Fast setup
+  (if bootstrap_phase
+    (cond
+      (threat_high (begin (set! isru_alloc 0.55) (set! greenhouse_alloc 0.30) (set! heating_alloc 0.15)))
+      (threat_medium (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.15)))
+      (threat_low (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.15)))
+      (true (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.15)))))
+
+  ;; Infrastructure: Build foundation
+  (if infrastructure_phase
+    (cond
+      (threat_high (begin (set! isru_alloc 0.50) (set! greenhouse_alloc 0.38) (set! heating_alloc 0.12)))
+      (threat_medium (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.48) (set! heating_alloc 0.12)))
+      (threat_low (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.53) (set! heating_alloc 0.12)))
+      (true (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.48) (set! heating_alloc 0.12)))))
+
+  ;; Module Acceleration: Focus on building
+  (if module_acceleration_phase
+    (cond
+      (threat_high (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.43) (set! heating_alloc 0.12)))
+      (threat_medium (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.53) (set! heating_alloc 0.12)))
+      (threat_low (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.58) (set! heating_alloc 0.12)))
+      (true (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.53) (set! heating_alloc 0.12)))))
+
+  ;; Module Maximum: All-in on modules
+  (if module_maximum_phase
+    (cond
+      (threat_high (begin (set! isru_alloc 0.42) (set! greenhouse_alloc 0.46) (set! heating_alloc 0.12)))
+      (threat_medium (begin (set! isru_alloc 0.32) (set! greenhouse_alloc 0.56) (set! heating_alloc 0.12)))
+      (threat_low (begin (set! isru_alloc 0.28) (set! greenhouse_alloc 0.60) (set! heating_alloc 0.12)))
+      (true (begin (set! isru_alloc 0.32) (set! greenhouse_alloc 0.56) (set! heating_alloc 0.12)))))
+
+  ;; Transcendence: Ultimate density
+  (if transcendence_phase
+    (cond
+      (threat_high (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.48) (set! heating_alloc 0.12)))
+      (threat_medium (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.58) (set! heating_alloc 0.12)))
+      (threat_low (begin (set! isru_alloc 0.26) (set! greenhouse_alloc 0.62) (set! heating_alloc 0.12)))
+      (true (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.58) (set! heating_alloc 0.12)))))
+
+  ;; ═══ OPTIMIZED FOOD RATIONING ═══
+  (define base_ration
+    (cond
+      ((< food_days 3) 0.50)
+      ((< food_days 6) 0.65)
+      ((< food_days 12) 0.80)
+      ((< food_days 20) 0.95)
+      (true 1.05)))
+
+  ;; Health boost when needed
+  (define avg_health (/ (+ crew_1_health crew_2_health (if (> crew_count 2) crew_3_health 100)) crew_count))
+  (define health_mult (if (< avg_health 70) 1.15 1.0))
+  
+  ;; Threat adjustment
+  (define threat_mult (if threat_high 0.95 1.0))
+
+  (set! food_ration (max 0.25 (min 1.2 (* base_ration health_mult threat_mult))))
+
+  ;; ═══ CRITICAL INFRASTRUCTURE DEPLOYMENT ═══
+  
+  ;; Lightning-fast bots (sols 3-8)
+  (if (and (>= sol 3) (<= sol 8) (< bot_count 2))
+      (set! build_item "worker_bot"))
+
+  ;; Rapid solar (sols 12-22) - Later to prioritize modules
+  (if (and (>= sol 12) (<= sol 22) (< solar_count 3))
+      (set! build_item "solar_array"))
+
+  ;; Additional power only when needed
+  (if (and (>= sol 28) (<= sol 40) (< solar_count 4) (< power_ratio 0.80))
+      (set! build_item "solar_array"))
+
+  ;; MINIMAL BUT SUFFICIENT REPAIR STRATEGY
+  ;; First repair bay - essential protection
+  (if (and (>= sol 35) (<= sol 50) (< repair_count 1))
+      (set! build_item "repair_bay"))
+
+  ;; Second repair bay - compound protection
+  (if (and (>= sol 70) (<= sol 90) (< repair_count 2) (or threat_high threat_medium (< ie 0.75)))
+      (set! build_item "repair_bay"))
+
+  ;; Third repair bay - only if needed
+  (if (and (>= sol 120) (<= sol 150) (< repair_count 3) (or threat_high (< (+ ie se) 1.35)))
+      (set! build_item "repair_bay"))
+
+  ;; Fourth repair bay - selective
+  (if (and (>= sol 200) (<= sol 250) (< repair_count 4) (or threat_high (< (+ ie se) 1.25)))
+      (set! build_item "repair_bay"))
+
+  ;; Fifth repair bay - very selective
+  (if (and (>= sol 320) (<= sol 380) (< repair_count 5) (or threat_high (< (+ ie se) 1.15)))
+      (set! build_item "repair_bay"))
+
+  ;; MINIMAL FOOD INFRASTRUCTURE
+  ;; Basic greenhouse coverage
+  (if (and (>= sol 45) (<= sol 65) (< food_days 8) (< greenhouse_count 3))
+      (set! build_item "greenhouse"))
+
+  (if (and (>= sol 100) (<= sol 130) (< food_days 12) (< greenhouse_count 4))
+      (set! build_item "greenhouse"))
+
+  (if (and (>= sol 180) (<= sol 220) (< food_days 16) (< greenhouse_count 5))
+      (set! build_item "greenhouse"))
+
+  ;; REVOLUTIONARY EARLY MODULE STRATEGY
+  ;; Start modules VERY early - sol 25!
+  (if (and (>= sol 25) (< module_count 5) (>= bot_count 2))
+      (set! build_item "hab_module"))
+
+  ;; Aggressive early modules - sol 35
+  (if (and (>= sol 35) (< module_count 10) (>= solar_count 2))
+      (set! build_item "hab_module"))
+
+  ;; Accelerated module push - sol 50
+  (if (and (>= sol 50) (< module_count 15) (>= repair_count 1))
+      (set! build_item "hab_module"))
+
+  ;; Module acceleration phase - MAXIMUM MODULES
+  (if (and module_acceleration_phase (< module_count 40))
+      (set! build_item
+          (cond
+            ;; Safety infrastructure
+            ((and (< repair_count 2) (> cri 40)) "repair_bay")
+            ((and (< greenhouse_count 3) (< food_days 8)) "greenhouse")
+            ((and (< solar_count 4) (< power_ratio 0.75)) "solar_array")
+            ;; OTHERWISE: BUILD MODULES!
+            (true "hab_module"))))
+
+  ;; Module maximum phase - ALL-IN ON MODULES
+  (if (and module_maximum_phase (< module_count 60))
+      (set! build_item
+          (cond
+            ;; Minimal safety only
+            ((and (< repair_count 3) (> cri 50)) "repair_bay")
+            ((and (< greenhouse_count 4) (< food_days 10)) "greenhouse")
+            ((and (< solar_count 6) (< power_ratio 0.70)) "solar_array")
+            ;; MODULES MODULES MODULES!
+            (true "hab_module"))))
+
+  ;; Transcendence phase - UNLIMITED MODULES
+  (if (and transcendence_phase (< module_count 80))
+      (set! build_item
+          (cond
+            ;; Absolutely minimal infrastructure
+            ((and (< repair_count 4) (> cri 60)) "repair_bay")
+            ((and (< greenhouse_count 5) (< food_days 12)) "greenhouse")
+            ((and (< solar_count 8) (< power_ratio 0.65)) "solar_array")
+            ;; INFINITE MODULES!
+            (true "hab_module"))))
+
+  ;; ═══ STATUS LOGGING ═══
+  (define phase_name
+    (cond
+      (bootstrap_phase "⚡BOOTSTRAP")
+      (infrastructure_phase "🔧INFRASTRUCTURE")
+      (module_acceleration_phase "🏗️MODULE ACCEL")
+      (module_maximum_phase "💎MODULE MAX")
+      (transcendence_phase "🚀TRANSCENDENCE")
+      (true "MODULE BREAKTHROUGH")))
+
+  (define threat_level
+    (cond
+      (threat_high "⚠️HIGH")
+      (threat_medium "⚡MEDIUM")
+      (threat_low "✅LOW")
+      (true "UNKNOWN")))
+
+  (log (concat "  💎 " phase_name " | " threat_level " | CRI:" (string (round cri))))
+  (log (concat "  🔧 I:" (string (round (* isru_alloc 100))) "% | G:" (string (round (* greenhouse_alloc 100))) "% | H:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  🍽️ Ration:" (string (round (* food_ration 100))) "% | O2:" (string o2_days) "d | Food:" (string food_days) "d"))
+  (log (concat "  🏭 " (string repair_count) "R " (string solar_count) "S " (string greenhouse_count) "G 💎" (string module_count) "M"))
+  (log (concat "  💪 Health:" (string (round avg_health)) "% | 🔋 Power:" (string (round (* power_ratio 100))) "%"))
+
+  ;; ═══ REVOLUTIONARY OUTPUT ═══
+  (concat "🏗️💎 BREAKTHROUGH Sol " (string sol) " | " phase_name 
+    " | 💎" (string module_count) "M"
+    " | I:" (string (round (* isru_alloc 100))) "%"
+    " | Food:" (string food_days) "d"
+    " | " threat_level))
