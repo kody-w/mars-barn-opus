@@ -313,6 +313,21 @@ One cartridge format, multiple worlds:
 
 ---
 
+## Infrastructure: vOS Browser Proxy
+
+The vOS headless browser fetches external pages through a proxy chain to bypass CORS/X-Frame-Options. The engine fetches, the iframe only renders (via srcdoc injection).
+
+**Current:** Public proxy chain (allorigins.win → corsproxy.io → localhost fallback)
+
+**Future:** Deploy our own Cloudflare Worker or GitHub Action page cache:
+- **Cloudflare Worker** — free tier (100K req/day), custom domain, edge-cached
+- **GitHub Action Page Cache** — scheduled action fetches popular pages, commits as static HTML to a `cache/` branch, vOS reads from raw.githubusercontent.com
+- This turns the browser into a fully offline-capable, self-hosted web renderer
+
+The proxy is infrastructure, not fidelity — it enables the vOS browser to load ANY page on the internet, which lets agents browse documentation, research NASA data, and scrape real telemetry.
+
+---
+
 ## The Endgame
 
 ```

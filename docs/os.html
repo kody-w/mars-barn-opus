@@ -1205,37 +1205,70 @@ window.os = {
         return 'Ready';
       }
 
-      // For external URLs: skip fetch, load directly in iframe
-      // (fetch will fail due to CORS, and srcdoc strips CSS/JS context)
+      // Same-origin: fetch directly (no proxy needed)
       const isExternal = url.startsWith('https://') || url.startsWith('http://');
       const isSameOrigin = !isExternal || url.includes(window.location.host);
 
-      if (isExternal && !isSameOrigin) {
-        // External site: load directly in iframe, skip the headless engine
-        this._html = '';
-        this._doc = null;
-        this._status = 0;
-        this._renderToGUI(url, true); // true = direct iframe load
-        return 'Loading: ' + url;
+      if (isSameOrigin) {
+        try {
+          const resp = await fetch(url);
+          this._status = resp.status;
+          this._html = await resp.text();
+          const parser = new DOMParser();
+          this._doc = parser.parseFromString(this._html, 'text/html');
+          this._renderToGUI(url);
+          return 'Loaded: ' + url;
+        } catch (e) {
+          return 'Error: ' + e.message;
+        }
       }
 
-      // Same-origin: use the headless engine (fetch → parse → srcdoc)
-      try {
-        const resp = await fetch(url);
-        this._status = resp.status;
-        this._html = await resp.text();
-        const parser = new DOMParser();
-        this._doc = parser.parseFromString(this._html, 'text/html');
-        this._renderToGUI(url);
-        return 'Loaded: ' + url + ' (' + this._status + ', ' + this._html.length + ' bytes)';
-      } catch (e) {
-        // Fetch failed — try direct iframe load as fallback
-        this._html = '';
-        this._doc = null;
-        this._status = 0;
-        this._renderToGUI(url, true);
-        return 'Direct load: ' + url;
+      // External URL: fetch through proxy chain, inject via srcdoc
+      // This bypasses X-Frame-Options — the engine fetches, not the iframe.
+      const proxies = [
+        'http://localhost:8789/?url=',                          // Local dev proxy
+        'https://api.allorigins.win/raw?url=',                  // Public proxy 1
+        'https://corsproxy.io/?' ,                               // Public proxy 2
+      ];
+
+      this._renderToGUI(url); // Show window immediately with loading state
+      const urlBar = document.getElementById('vos-url-bar');
+      const titleEl = document.querySelector('#win-iframe-vbrowser .title');
+      if (titleEl) titleEl.textContent = '🌐 Loading...';
+
+      for (const proxy of proxies) {
+        try {
+          const proxyUrl = proxy + encodeURIComponent(url);
+          const resp = await fetch(proxyUrl);
+          if (!resp.ok) continue;
+          this._status = resp.status;
+          this._html = await resp.text();
+          if (!this._html || this._html.length < 50) continue;
+
+          // Rewrite relative URLs to absolute so images/css load
+          const base = new URL(url);
+          this._html = this._html
+            .replace(/(href|src|action)="\/(?!\/)/g, '$1="' + base.origin + '/')
+            .replace(/(href|src|action)='\/(?!\/)/g, "$1='" + base.origin + '/');
+
+          // Inject a <base> tag so remaining relative URLs resolve
+          this._html = this._html.replace(/<head([^>]*)>/i, '<head$1><base href="' + base.origin + '/">');
+
+          const parser = new DOMParser();
+          this._doc = parser.parseFromString(this._html, 'text/html');
+          this._renderToGUI(url);
+          return 'Loaded: ' + url + ' (' + this._html.length + ' bytes via proxy)';
+        } catch (e) {
+          continue; // Try next proxy
+        }
       }
+
+      // All proxies failed — show error
+      this._html = '<html><head><title>Cannot Load</title></head><body style="background:#0d1117;color:#c9d1d9;font-family:monospace;padding:40px;text-align:center"><h1 style="color:#f0883e">🌐 Cannot Load Page</h1><p style="color:#8b949e">' + url + '</p><p style="color:#58a6ff;margin-top:20px"><a href="' + url + '" target="_blank" style="color:#58a6ff">Open in new tab ↗</a></p><p style="color:#484f58;margin-top:10px;font-size:11px">All proxy servers unreachable. The page may block automated access.</p></body></html>';
+      const parser = new DOMParser();
+      this._doc = parser.parseFromString(this._html, 'text/html');
+      this._renderToGUI(url);
+      return 'Failed: all proxies unavailable';
     },
 
     _renderToGUI(url, directLoad) {
@@ -1279,15 +1312,10 @@ window.os = {
       // Update title
       const titleEl = win.querySelector('.title');
       if (titleEl) titleEl.textContent = '🌐 ' + (this._doc?.title || url || 'Browser');
-      // For same-origin: use srcdoc (headless engine renders). For cross-origin: use src directly.
+      // Always inject via srcdoc — the engine fetches, the iframe just renders
       const iframe = win.querySelector('iframe');
       if (iframe) {
-        if (directLoad) {
-          // External site: load URL directly in iframe
-          iframe.removeAttribute('srcdoc');
-          iframe.src = url;
-        } else if (this._html) {
-          // Same-origin: inject fetched HTML via srcdoc
+        if (this._html) {
           iframe.removeAttribute('src');
           iframe.srcdoc = this._html;
         }
