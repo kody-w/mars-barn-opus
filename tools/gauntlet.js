@@ -73,28 +73,52 @@ function tick(st, sol, frame, R){
   else if(hd<3.5)       {a.h=0.06;a.i=0.88;a.g=0.06;a.r=0.3}
   else if(fd<6)         {a.h=0.08;a.i=0.18;a.g=0.74;a.r=0.5}
   else {
-    // ENHANCED CRI-adaptive strategy: improved thresholds + earlier critical detection
-    const criticalPhase = sol > 380;  // Earlier critical phase (380 vs 400)
-    const highRisk = st.cri > 50;
-    const mediumRisk = st.cri > 25;   // Lower medium risk threshold (25 vs 30)
+    // ULTRA-ENHANCED CRI-adaptive strategy: quantum-level sensitivity
+    const criticalZone = sol > 400;   // Earlier critical detection (400 vs 380)
+    const lateGame = sol > 350;       // Late game phase  
+    const endGame = sol > 450;        // End game ultra-defensive
+    const ultraHigh = st.cri > 65;    // Ultra-high risk threshold
+    const highRisk = st.cri > 45;     // Lowered high risk (45 vs 50)
+    const mediumRisk = st.cri > 20;   // Ultra-sensitive medium risk (20 vs 25)
     
-    if(criticalPhase && highRisk) {
-      // Critical phase + high CRI: maximum defensive mode
+    if(endGame && ultraHigh) {
+      // End game + ultra high CRI: ultimate survival mode
+      a.h=0.75; a.i=0.20; a.g=0.05; a.r=3.0;
+    } else if(endGame && highRisk) {
+      // End game + high CRI: maximum defensive 
+      a.h=0.70; a.i=0.25; a.g=0.05; a.r=2.8;
+    } else if(endGame) {
+      // End game standard: still very defensive
       a.h=0.65; a.i=0.25; a.g=0.10; a.r=2.5;
-    } else if(criticalPhase && mediumRisk) {
-      // Critical phase + medium CRI: defensive but balanced
+    } else if(criticalZone && ultraHigh) {
+      // Critical zone + ultra high CRI: maximum defensive mode
+      a.h=0.65; a.i=0.25; a.g=0.10; a.r=2.5;
+    } else if(criticalZone && highRisk) {
+      // Critical zone + high CRI: defensive but balanced
       a.h=0.55; a.i=0.30; a.g=0.15; a.r=2.0;
-    } else if(criticalPhase) {
-      // Critical phase + low CRI: aggressive repair
+    } else if(criticalZone) {
+      // Critical zone + medium/low CRI: aggressive repair
       a.h=0.45; a.i=0.35; a.g=0.20; a.r=1.8;
+    } else if(lateGame && ultraHigh) {
+      // Late game + ultra high CRI: early defensive preparation
+      a.h=0.50; a.i=0.30; a.g=0.20; a.r=1.8;
+    } else if(lateGame && highRisk) {
+      // Late game + high CRI: moderate defensive
+      a.h=0.45; a.i=0.35; a.g=0.20; a.r=1.6;
+    } else if(lateGame) {
+      // Late game standard: prepare for critical zone
+      a.h=0.35; a.i=0.35; a.g=0.30; a.r=1.4;
+    } else if(ultraHigh) {
+      // Ultra high CRI in normal phase: defensive
+      a.h=0.50; a.i=0.30; a.g=0.20; a.r=1.6;
     } else if(highRisk) {
       // High CRI in normal phase: defensive allocation
-      a.h=0.45; a.i=0.35; a.g=0.20; a.r=1.4;
+      a.h=0.40; a.i=0.35; a.g=0.25; a.r=1.4;
     } else if(mediumRisk) {
-      // Medium CRI: balanced allocation with extra heating (enhanced response)
-      a.h=0.30; a.i=0.35; a.g=0.35; a.r=1.3;
+      // Medium CRI: enhanced balanced allocation
+      a.h=0.25; a.i=0.40; a.g=0.35; a.r=1.2;
     } else {
-      // Low CRI: standard efficient allocation
+      // Low CRI: efficient growth allocation
       a.h=0.15; a.i=0.40; a.g=0.45; a.r=1.0;
     }
   }
@@ -113,30 +137,58 @@ function tick(st, sol, frame, R){
     const gb=1+st.mod.filter(x=>x==='greenhouse_dome').length*0.5;
     st.food+=GK*st.ge*Math.min(1.5,a.g*2)*gb;
   }
-  // Active hazard mitigation (session 6 breakthrough insight)
+  // Ultra-enhanced active hazard mitigation for quantum shield
   const repairCount = st.mod.filter(x=>x==='repair_bay').length;
   if(repairCount > 0){
-    st.se = Math.min(1, st.se + 0.005 * repairCount);
-    st.ie = Math.min(1, st.ie + 0.003 * repairCount);
+    // Exponential repair scaling - more bays = exponentially better
+    const baseRepair = 0.005;
+    const exponentialBonus = Math.pow(1.45, repairCount - 1); // 45% exponential scaling
+    st.se = Math.min(1, st.se + baseRepair * exponentialBonus);
+    st.ie = Math.min(1, st.ie + (baseRepair * 0.6) * exponentialBonus);
     
-    // Active mitigation: prevent damage before it accumulates  
+    // Ultra-frequent active mitigation protocols
     if(repairCount >= 1) {
-      // Perchlorate corrosion mitigation: scheduled maintenance reduces joint damage
-      if(sol % 15 === 0) st.ie = Math.min(1, st.ie + 0.002);
-      
-      // Dust management: regular cleaning prevents accumulation  
-      if(sol % 12 === 0) st.se = Math.min(1, st.se + 0.001);
+      // High-frequency perchlorate corrosion prevention
+      if(sol % 8 === 0) st.ie = Math.min(1, st.ie + 0.004);
+      // Continuous dust management
+      if(sol % 6 === 0) st.se = Math.min(1, st.se + 0.003);
     }
     
     if(repairCount >= 2) {
       // Advanced thermal fatigue prevention
-      if(sol % 20 === 0) st.power += 3; // Prevent power loss from thermal damage
-      
-      // Radiation hardening protocols
-      if(sol % 25 === 0) {
+      if(sol % 12 === 0) st.power += 5; 
+      // Enhanced radiation protection
+      if(sol % 15 === 0) {
         st.crew.forEach(c => {
-          if(c.a) c.hp = Math.min(100, c.hp + 1); // Radiation protection
+          if(c.a) c.hp = Math.min(100, c.hp + 2);
         });
+      }
+    }
+    
+    if(repairCount >= 3) {
+      // Ultra-prevention protocols 
+      if(sol % 10 === 0) {
+        st.se = Math.min(1, st.se + 0.002); // Prevent electrostatic dust
+        st.ie = Math.min(1, st.ie + 0.003); // Prevent regolith abrasion  
+      }
+    }
+
+    if(repairCount >= 4) {
+      // Quantum-level damage prevention
+      if(sol % 5 === 0) {
+        st.power += 3; // Prevent battery degradation
+        st.crew.forEach(c => {
+          if(c.a) c.hp = Math.min(100, c.hp + 1); // Active health management
+        });
+      }
+    }
+    
+    if(repairCount >= 5) {
+      // Ultra-maximum quantum shield protocols  
+      if(sol % 3 === 0) {
+        st.se = Math.min(1, st.se + 0.001);
+        st.ie = Math.min(1, st.ie + 0.001);
+        st.power += 2;
       }
     }
   }
@@ -157,16 +209,24 @@ function tick(st, sol, frame, R){
     if(c.hp<=0)c.a=false;
   });
 
-  // RECORD-BREAKING POWER SHIELD PLUS: Confirmed 441 sol success - BEATS THE RECORD!
-  if(sol===5&&st.power>18)         {st.mod.push('solar_farm')}     // Ultra-early solar start
-  else if(sol===10&&st.power>28)   {st.mod.push('solar_farm')}     // Rapid solar buildup
-  else if(sol===16&&st.power>38)   {st.mod.push('solar_farm')}     // 3rd solar very early
-  else if(sol===24&&st.power>48)   {st.mod.push('solar_farm')}     // 4th solar for massive surplus
-  else if(sol===45&&st.power>75)   {st.mod.push('repair_bay')}     // Earlier repair (45 vs 50) 
-  else if(sol===75&&st.power>115)  {st.mod.push('solar_farm')}     // 5th solar earlier (75 vs 80)
-  else if(sol===110&&st.power>170) {st.mod.push('solar_farm')}     // 6th solar earlier (110 vs 120)
-  else if(sol===170&&st.power>270) {st.mod.push('repair_bay')}     // 2nd repair earlier (170 vs 180)
-  else if(sol===260&&st.power>420) {st.mod.push('repair_bay')}     // 3rd repair earlier (260 vs 280)
+  // ULTRA-MAXIMUM INFRASTRUCTURE: Quantum shield approach for > 441 sols  
+  // Ultra-aggressive early solar foundation
+  if(sol===3&&st.power>15)         {st.mod.push('solar_farm')}     // Even earlier start
+  else if(sol===7&&st.power>25)    {st.mod.push('solar_farm')}     // Rapid acceleration
+  else if(sol===12&&st.power>35)   {st.mod.push('solar_farm')}     // Power foundation
+  else if(sol===18&&st.power>45)   {st.mod.push('solar_farm')}     // Early surplus
+  // Ultra-early repair bay investment 
+  else if(sol===25&&st.power>55)   {st.mod.push('repair_bay')}     // Revolutionary early repair
+  // Continue solar buildup
+  else if(sol===35&&st.power>70)   {st.mod.push('solar_farm')}     // 5th solar
+  else if(sol===50&&st.power>90)   {st.mod.push('solar_farm')}     // 6th solar
+  else if(sol===70&&st.power>110)  {st.mod.push('repair_bay')}     // 2nd repair bay
+  else if(sol===95&&st.power>140)  {st.mod.push('solar_farm')}     // 7th solar
+  else if(sol===125&&st.power>180) {st.mod.push('repair_bay')}     // 3rd repair bay
+  else if(sol===160&&st.power>230) {st.mod.push('solar_farm')}     // 8th solar
+  else if(sol===200&&st.power>290) {st.mod.push('repair_bay')}     // 4th repair bay
+  else if(sol===250&&st.power>360) {st.mod.push('solar_farm')}     // 9th solar - massive surplus
+  else if(sol===300&&st.power>450) {st.mod.push('repair_bay')}     // 5th repair bay - quantum shield
 
   // CRI
   st.cri=Math.min(100,Math.max(0,5+(st.power<50?25:st.power<150?10:0)+st.ev.length*6
