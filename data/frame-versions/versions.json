@@ -390,6 +390,62 @@
         "self_sufficiency": "ISRU capacity vs Earth dependency trade-offs",
         "mission_architecture": "Pre-positioned supplies vs continuous resupply strategy"
       }
+    },
+    {
+      "version": 12,
+      "name": "Individual Crew Physiology",
+      "released": "2026-04-02",
+      "sol_range": [
+        1038,
+        1067
+      ],
+      "hazards_added": [
+        "radiation_storm",
+        "bone_fracture_risk",
+        "muscle_weakness_incident", 
+        "circadian_disruption_crisis",
+        "exercise_equipment_failure",
+        "caloric_deficiency_crisis"
+      ],
+      "events_added": [
+        "crew_health_assessment",
+        "exercise_session_scheduled",
+        "radiation_monitoring_alert"
+      ],
+      "challenges_added": [
+        "individual_health_optimization",
+        "exercise_equipment_maintenance",
+        "radiation_dose_management",
+        "crew_workload_balancing"
+      ],
+      "notes": "INDIVIDUAL CREW PHYSIOLOGY: Real NASA human factors tracking. Each crew member has individual mass, radiation dose accumulation (0.67 mSv/day Mars surface), bone/muscle loss in 0.38g gravity (1.5-2%/month without exercise), circadian disruption from 24h37m sol length. Career radiation limit 1 Sv (NASA STD-3001). Exercise equipment provides countermeasures (60-70% protection). Health impacts cascade to performance: bone fractures, muscle weakness, cognitive errors. Based on Curiosity RAD measurements, ISS crew health data, Mars-500/HI-SEAS analog studies, NASA OCHMO medical briefs.",
+      "backtest_target": "Run v11 best strategy against v12 frames. Expected: Governors ignoring individual crew health will fail when radiation limits are exceeded, bone fractures occur, or circadian disruption causes cognitive errors. Must balance crew health vs mission objectives.",
+      "data_sources": [
+        "NASA Curiosity Rover Radiation Assessment Detector (RAD) - 0.67 mSv/day",
+        "NASA STD-3001 Space Radiation Exposure Standards",
+        "NASA OCHMO Technical Brief: Bone Loss (NASA/TB-2022-030)",
+        "ISS crew health and countermeasures database", 
+        "Mars-500 isolation study physiological and psychological data",
+        "HI-SEAS analog mission crew health monitoring",
+        "NASA Fatigue Countermeasures Laboratory circadian research",
+        "Antarctic analog station crew health studies"
+      ],
+      "physiology_physics": {
+        "radiation_daily_dose": "0.67 mSv/day Mars surface (Curiosity RAD)",
+        "career_radiation_limit": "1 Sv (1000 mSv) NASA career limit", 
+        "bone_loss_rate": "1.5% per month in 0.38g Mars gravity",
+        "muscle_loss_rate": "2% per month without exercise countermeasures",
+        "circadian_drift": "37 minutes daily drift from Mars sol length",
+        "exercise_protection": "60-70% reduction in bone/muscle loss with equipment"
+      },
+      "physics": {
+        "mars_radiation": "Daily 0.67 mSv accumulation, solar particle events 10-200 mSv",
+        "bone_muscle_loss": "Monthly 1.5-2% degradation in Mars 0.38g gravity",
+        "circadian_misalignment": "37-minute daily drift disrupts Earth-evolved sleep cycles",
+        "exercise_countermeasures": "Equipment provides 60-70% protection from deconditioning", 
+        "health_performance": "Physiological degradation reduces work capacity and increases errors"
+      },
+      "enrichment": "echo-enrichments-v12.json - Retroactive radiation dose accumulation from Sol 1"
     }
   ],
   "backtest_protocol": {

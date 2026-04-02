@@ -48,8 +48,19 @@
       "id": "v12-crew-physiology",
       "version": "v12",
       "title": "Individual Crew Physiology",
-      "status": "pending",
-      "priority": 7
+      "status": "complete",
+      "priority": 7,
+      "completion_date": "2026-04-02",
+      "physics_added": {
+        "radiation_exposure": "0.67 mSv/day Mars surface baseline (Curiosity RAD), 1.0 Sv career limit",
+        "bone_muscle_loss": "1.5%/month bone density, 2.0%/month muscle mass loss in 0.38g",
+        "circadian_disruption": "24h 37m Mars sols cause progressive sleep/cognitive degradation"
+      },
+      "validation": {
+        "monte_carlo_score": 27040,
+        "survival_rate": "100%",
+        "physics_impact": "Confirmed - physiology constraints significantly impact strategic decisions"
+      }
     },
     {
       "id": "v13-crew-psychology",

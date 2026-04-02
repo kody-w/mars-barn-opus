@@ -1,0 +1,302 @@
+{
+  "_format": "mars-barn-echo-enrichments",
+  "version": 12,
+  "title": "Individual Crew Physiology - Retroactive Radiation Dose Accumulation",
+  "description": "Cumulative radiation dose tracking from Sol 1 for all crew members based on daily Mars surface exposure",
+  "physics_basis": "Mars surface radiation: 0.67 mSv/day (Curiosity RAD measurements), cumulative dose tracking for NASA career limits",
+  "data_sources": [
+    "NASA Curiosity Rover Radiation Assessment Detector (RAD) measurements",
+    "NASA STD-3001 Space Radiation Exposure Standards",
+    "NASA OCHMO Technical Brief: Space Radiation (NASA/TB-2022-028)",
+    "Mars surface radiation environment studies"
+  ],
+  "enrichment_algorithm": "Daily radiation accumulation: 0.67 mSv/day * sols_elapsed = cumulative_dose_msv",
+  "enrichments": [
+    {
+      "sol_range": [1, 1037],
+      "type": "cumulative_radiation_tracking",
+      "description": "Retroactive radiation dose accumulation for crew members from mission start",
+      "physics_constants": {
+        "mars_surface_radiation_msv_day": 0.67,
+        "nasa_career_limit_sv": 1.0,
+        "solar_particle_event_frequency": "1-2% daily probability",
+        "radiation_shielding_factor": 1.0
+      },
+      "calculation_method": {
+        "daily_dose": "0.67 mSv baseline Mars surface radiation",
+        "cumulative_formula": "total_dose_msv = 0.67 * (sol - mission_start_sol)",
+        "career_tracking": "Individual crew member dose accumulation",
+        "health_thresholds": {
+          "caution_level": "500 mSv (50% of career limit)",
+          "warning_level": "750 mSv (75% of career limit)", 
+          "critical_level": "1000 mSv (NASA career limit)"
+        }
+      },
+      "enrichment_data": {
+        "sol_0001": {
+          "crew_radiation_doses_msv": {
+            "accumulated_dose_per_crew": 0.67,
+            "mission_cumulative_dose": 0.67,
+            "career_limit_percentage": 0.067,
+            "days_to_career_limit": 1492
+          }
+        },
+        "sol_0100": {
+          "crew_radiation_doses_msv": {
+            "accumulated_dose_per_crew": 67.0,
+            "mission_cumulative_dose": 67.0,
+            "career_limit_percentage": 6.7,
+            "days_to_career_limit": 1393
+          }
+        },
+        "sol_0200": {
+          "crew_radiation_doses_msv": {
+            "accumulated_dose_per_crew": 134.0,
+            "mission_cumulative_dose": 134.0,
+            "career_limit_percentage": 13.4,
+            "days_to_career_limit": 1293
+          }
+        },
+        "sol_0300": {
+          "crew_radiation_doses_msv": {
+            "accumulated_dose_per_crew": 201.0,
+            "mission_cumulative_dose": 201.0,
+            "career_limit_percentage": 20.1,
+            "days_to_career_limit": 1194
+          }
+        },
+        "sol_0400": {
+          "crew_radiation_doses_msv": {
+            "accumulated_dose_per_crew": 268.0,
+            "mission_cumulative_dose": 268.0,
+            "career_limit_percentage": 26.8,
+            "days_to_career_limit": 1094
+          }
+        },
+        "sol_0500": {
+          "crew_radiation_doses_msv": {
+            "accumulated_dose_per_crew": 335.0,
+            "mission_cumulative_dose": 335.0,
+            "career_limit_percentage": 33.5,
+            "days_to_career_limit": 995,
+            "health_status": "Caution - approaching 50% career limit"
+          }
+        },
+        "sol_0600": {
+          "crew_radiation_doses_msv": {
+            "accumulated_dose_per_crew": 402.0,
+            "mission_cumulative_dose": 402.0,
+            "career_limit_percentage": 40.2,
+            "days_to_career_limit": 896
+          }
+        },
+        "sol_0700": {
+          "crew_radiation_doses_msv": {
+            "accumulated_dose_per_crew": 469.0,
+            "mission_cumulative_dose": 469.0,
+            "career_limit_percentage": 46.9,
+            "days_to_career_limit": 796
+          }
+        },
+        "sol_0750": {
+          "crew_radiation_doses_msv": {
+            "accumulated_dose_per_crew": 502.5,
+            "mission_cumulative_dose": 502.5,
+            "career_limit_percentage": 50.25,
+            "days_to_career_limit": 742,
+            "health_status": "Caution - exceeded 50% career limit"
+          }
+        },
+        "sol_0800": {
+          "crew_radiation_doses_msv": {
+            "accumulated_dose_per_crew": 536.0,
+            "mission_cumulative_dose": 536.0,
+            "career_limit_percentage": 53.6,
+            "days_to_career_limit": 697
+          }
+        },
+        "sol_0900": {
+          "crew_radiation_doses_msv": {
+            "accumulated_dose_per_crew": 603.0,
+            "mission_cumulative_dose": 603.0,
+            "career_limit_percentage": 60.3,
+            "days_to_career_limit": 597
+          }
+        },
+        "sol_1000": {
+          "crew_radiation_doses_msv": {
+            "accumulated_dose_per_crew": 670.0,
+            "mission_cumulative_dose": 670.0,
+            "career_limit_percentage": 67.0,
+            "days_to_career_limit": 497
+          }
+        },
+        "sol_1037": {
+          "crew_radiation_doses_msv": {
+            "accumulated_dose_per_crew": 694.79,
+            "mission_cumulative_dose": 694.79,
+            "career_limit_percentage": 69.48,
+            "days_to_career_limit": 455,
+            "health_status": "Warning - approaching 75% career limit"
+          }
+        }
+      }
+    },
+    {
+      "sol_range": [1, 1037],
+      "type": "bone_muscle_baseline_tracking",
+      "description": "Retroactive bone density and muscle mass baseline tracking for physiology system",
+      "physics_constants": {
+        "mars_gravity": 0.38,
+        "bone_loss_rate_per_month": 0.015,
+        "muscle_loss_rate_per_month": 0.02,
+        "exercise_protection_bone": 0.6,
+        "exercise_protection_muscle": 0.7
+      },
+      "calculation_method": {
+        "bone_loss_formula": "bone_density = 1.0 - (sols / 57) * 0.015 * (1 - exercise_factor)",
+        "muscle_loss_formula": "muscle_mass = 1.0 - (sols / 57) * 0.02 * (1 - exercise_factor)", 
+        "sols_per_month": 57,
+        "exercise_assumption": "Assume 50% exercise protection for baseline calculation"
+      },
+      "enrichment_data": {
+        "sol_0001": {
+          "bone_density": 1.0,
+          "muscle_mass": 1.0,
+          "bone_loss_cumulative": 0.0,
+          "muscle_loss_cumulative": 0.0
+        },
+        "sol_0114": {
+          "bone_density": 0.985,
+          "muscle_mass": 0.982,
+          "bone_loss_cumulative": 1.5,
+          "muscle_loss_cumulative": 1.8,
+          "comment": "2 months on Mars - measurable bone/muscle loss"
+        },
+        "sol_0228": {
+          "bone_density": 0.970,
+          "muscle_mass": 0.964,
+          "bone_loss_cumulative": 3.0,
+          "muscle_loss_cumulative": 3.6,
+          "comment": "4 months - significant deconditioning without robust exercise"
+        },
+        "sol_0342": {
+          "bone_density": 0.955,
+          "muscle_mass": 0.946,
+          "bone_loss_cumulative": 4.5,
+          "muscle_loss_cumulative": 5.4,
+          "comment": "6 months - bone density approaching fracture risk threshold"
+        },
+        "sol_0456": {
+          "bone_density": 0.940,
+          "muscle_mass": 0.928,
+          "bone_loss_cumulative": 6.0,
+          "muscle_loss_cumulative": 7.2,
+          "comment": "8 months - work capacity noticeably reduced"
+        },
+        "sol_0570": {
+          "bone_density": 0.925,
+          "muscle_mass": 0.910,
+          "bone_loss_cumulative": 7.5,
+          "muscle_loss_cumulative": 9.0,
+          "comment": "10 months - significant health and performance impacts"
+        },
+        "sol_0684": {
+          "bone_density": 0.910,
+          "muscle_mass": 0.892,
+          "bone_loss_cumulative": 9.0,
+          "muscle_loss_cumulative": 10.8,
+          "comment": "12 months (1 Mars year) - major health concern without countermeasures"
+        },
+        "sol_1037": {
+          "bone_density": 0.865,
+          "muscle_mass": 0.835,
+          "bone_loss_cumulative": 13.5,
+          "muscle_loss_cumulative": 16.5,
+          "comment": "18.2 months - severe deconditioning, high injury risk, reduced work capacity"
+        }
+      }
+    },
+    {
+      "sol_range": [1, 1037],  
+      "type": "circadian_disruption_accumulation",
+      "description": "Cumulative circadian misalignment from Mars sol length (24h 37m)",
+      "physics_constants": {
+        "mars_sol_hours": 24.617,
+        "earth_day_hours": 24.0,
+        "daily_drift_hours": 0.617,
+        "circadian_cycle_hours": 24.0
+      },
+      "calculation_method": {
+        "daily_drift": "0.617 hours per sol",
+        "cumulative_drift": "total_drift = sols * 0.617",
+        "phase_misalignment": "phase_offset = (cumulative_drift % 24) / 24",
+        "sleep_quality_impact": "sleep_quality = 1.0 - 0.3 * sin(phase_offset * 2 * pi)"
+      },
+      "enrichment_data": {
+        "sol_0001": {
+          "cumulative_drift_hours": 0.617,
+          "phase_offset": 0.026,
+          "sleep_quality": 0.95,
+          "circadian_stress": 0.0
+        },
+        "sol_0039": {
+          "cumulative_drift_hours": 24.063,
+          "phase_offset": 0.003,
+          "sleep_quality": 0.999,
+          "circadian_stress": 0.1,
+          "comment": "First complete circadian cycle - minimal impact with adaptation"
+        },
+        "sol_0078": {
+          "cumulative_drift_hours": 48.126,
+          "phase_offset": 0.005,
+          "sleep_quality": 0.998,
+          "circadian_stress": 0.2
+        },
+        "sol_0195": {
+          "cumulative_drift_hours": 120.315,
+          "phase_offset": 0.013,
+          "sleep_quality": 0.98,
+          "circadian_stress": 0.5,
+          "comment": "5 complete cycles - cumulative stress beginning to show"
+        },
+        "sol_0390": {
+          "cumulative_drift_hours": 240.63,
+          "phase_offset": 0.026,
+          "sleep_quality": 0.95,
+          "circadian_stress": 1.0,
+          "comment": "10 cycles - moderate sleep disruption and cognitive impact"
+        },
+        "sol_0780": {
+          "cumulative_drift_hours": 481.26,
+          "phase_offset": 0.052,
+          "sleep_quality": 0.90,
+          "circadian_stress": 2.0,
+          "comment": "20 cycles - significant cumulative stress, reduced performance"
+        },
+        "sol_1037": {
+          "cumulative_drift_hours": 639.829,
+          "phase_offset": 0.66,
+          "sleep_quality": 0.73,
+          "circadian_stress": 2.67,
+          "comment": "26.7 cycles - severe circadian disruption without countermeasures"
+        }
+      }
+    }
+  ],
+  "integration_notes": [
+    "These enrichments provide baseline physiological state for crew members entering v12 tracking",
+    "All crew members accumulate radiation dose equally (robots unaffected)",
+    "Bone/muscle loss only affects human crew members (robots unaffected)",
+    "Circadian disruption only affects human crew members (robots unaffected)",
+    "Exercise equipment (radiation_shelter module) provides protection factors",
+    "Individual variation in crew physiology will be added in v12+ frames"
+  ],
+  "validation_data": [
+    "Mars surface radiation: 0.67 mSv/day matches Curiosity RAD measurements",
+    "Bone loss rate: 1.5%/month matches ISS crew data for reduced gravity",
+    "Muscle loss rate: 2%/month matches spaceflight analog studies", 
+    "Circadian drift: 37min/day matches Mars sol length physics",
+    "NASA career radiation limit: 1 Sv (1000 mSv) per NASA STD-3001"
+  ]
+}
