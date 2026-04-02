@@ -1,0 +1,244 @@
+;; HYPERMAX CREW PRESERVATION V9 — SCORE TARGET: 112,000+
+;; Strategy: Guarantee 5+ crew survival + ultra-low CRI for maximum scoring
+;; Innovation: More conservative resource management + enhanced crew protection
+;; Target: Beat 109,840 → Achieve 112,000+ (5+ crew minimum + CRI optimization)
+
+(begin
+  (define _agent_name "Hypermax Crew Preservation V9")
+  (define _agent_desc "Guarantee 5+ crew survival with ultra-low CRI - Target: 112,000+")
+  
+  (log (concat "🚀🛡️⚡ V9 HYPERMAX — Sol " (string sol) " — CRI:" (string colony_risk_index) " — MinHP:" (string crew_min_hp) " — Alive:" (string crew_count)))
+  
+  ;; ═══ HYPERMAX CREW THRESHOLDS — EVEN MORE CONSERVATIVE ═══
+  ;; Trigger intervention EXTREMELY early to guarantee 5+ crew survival
+  (define crew_transcendent (>= crew_min_hp 99))         ;; Transcendent condition (new level)
+  (define crew_perfect (>= crew_min_hp 95))              ;; Perfect condition (raised even higher)
+  (define crew_excellent (>= crew_min_hp 88))            ;; Excellent condition (raised)
+  (define crew_good (>= crew_min_hp 78))                 ;; Good condition (raised)
+  (define crew_acceptable (>= crew_min_hp 68))           ;; Acceptable condition (raised)
+  (define crew_concerning (>= crew_min_hp 58))           ;; Concerning - intervention needed (raised)
+  (define crew_danger (>= crew_min_hp 48))               ;; Danger zone - aggressive action (raised)
+  (define crew_crisis (>= crew_min_hp 38))               ;; Crisis - maximum intervention (raised)
+  (define crew_emergency (>= crew_min_hp 28))            ;; Emergency - all-out preservation (raised)
+  (define crew_critical (< crew_min_hp 28))              ;; Critical - death imminent (raised)
+
+  ;; ═══ ABSOLUTE CREW COUNT OPTIMIZATION ═══
+  ;; Current: Min crew = 4 → 2,000 points
+  ;; Target:  Min crew = 5+ → 2,500+ points (+500 improvement)
+  ;; Key: Never let crew count drop below 5, EVER
+  
+  (define current_crew_count crew_count)
+  (define hypermax_critical_level (<= current_crew_count 5))  ;; HYPERMAX CRITICAL: must preserve 5+
+  (define ultra_critical_level (<= current_crew_count 6))     ;; ULTRA CRITICAL: buffer zone
+  (define critical_crew_level (<= current_crew_count 7))      ;; CRITICAL: still dangerous zone
+
+  ;; ═══ ULTRA-CONSERVATIVE CRI MANAGEMENT ═══
+  ;; Current P75 CRI = 36 → -360 penalty
+  ;; Target: P75 CRI < 30 → <-300 penalty (+60 improvement)
+  ;; Strategy: Much more conservative allocations when CRI rises
+  (define cri_ultra_low (< colony_risk_index 15))        ;; Ultra-low CRI (target state)
+  (define cri_excellent (< colony_risk_index 20))        ;; Excellent CRI
+  (define cri_good (< colony_risk_index 25))             ;; Good CRI 
+  (define cri_acceptable (< colony_risk_index 30))       ;; Acceptable CRI
+  (define cri_concerning (< colony_risk_index 35))       ;; Concerning CRI
+  (define cri_dangerous (>= colony_risk_index 35))       ;; Dangerous CRI (emergency mode)
+
+  ;; ═══ HYPERMAX PHASE DETECTION ═══
+  ;; Even earlier preparation with more conservative approach
+  (define foundation_phase (< sol 150))                  ;; Foundation building
+  (define early_stability (and (>= sol 150) (< sol 400))) ;; Early stability
+  (define mid_game_prep (and (>= sol 400) (< sol 650)))   ;; Mid-game preparation
+  (define v6_mega_prep (and (>= sol 650) (< sol 778)))    ;; V6 mega preparation
+  (define v6_survival (and (>= sol 778) (< sol 847)))     ;; V6 survival mode
+  (define v6_recovery (>= sol 847))                       ;; Post-V6 recovery
+
+  ;; ═══ HYPERMAX REPAIR ALLOCATION ═══
+  ;; Even more aggressive repair scaling
+  (define hypermax_repair_base
+    (cond
+      (hypermax_critical_level 400.0)     ;; HYPERMAX for ≤5 crew
+      (crew_critical 300.0)               ;; ULTRA MAX for critical health
+      (ultra_critical_level 250.0)        ;; MEGA HIGH for ≤6 crew
+      (crew_emergency 200.0)              ;; ULTRA HIGH for emergency health
+      (critical_crew_level 150.0)         ;; HIGH for ≤7 crew
+      (crew_crisis 120.0)                 ;; HIGH for crisis health
+      (crew_danger 80.0)                  ;; MODERATE HIGH for danger
+      (crew_concerning 60.0)              ;; MODERATE HIGH for concerning
+      (crew_acceptable 45.0)              ;; MODERATE for acceptable
+      (crew_good 35.0)                    ;; LIGHT for good
+      (crew_excellent 25.0)               ;; MINIMAL for excellent
+      (crew_perfect 18.0)                 ;; BASELINE for perfect
+      (crew_transcendent 15.0)            ;; OPTIMIZED for transcendent
+      (true 15.0)))                       ;; DEFAULT
+
+  ;; Hypermax phase multipliers
+  (define phase_repair_multiplier
+    (cond
+      (v6_survival 12.0)                  ;; HYPERMAX during V6
+      (v6_mega_prep 8.0)                  ;; ULTRA during mega prep
+      (mid_game_prep 5.0)                 ;; HIGH during mid prep
+      (early_stability 3.0)               ;; MODERATE during early
+      (foundation_phase 2.0)              ;; LIGHT during foundation
+      (v6_recovery 4.0)                   ;; MODERATE during recovery
+      (true 2.0)))                        ;; ENHANCED baseline
+
+  ;; CRI-based repair multiplier
+  (define cri_repair_multiplier
+    (cond
+      (cri_dangerous 6.0)                 ;; HYPERMAX for dangerous CRI
+      (cri_concerning 4.0)                ;; ULTRA for concerning CRI
+      (cri_acceptable 3.0)                ;; HIGH for acceptable CRI
+      (cri_good 2.0)                      ;; MODERATE for good CRI
+      (cri_excellent 1.5)                 ;; LIGHT for excellent CRI
+      (cri_ultra_low 1.0)                 ;; BASELINE for ultra-low CRI
+      (true 2.0)))                        ;; DEFAULT
+
+  ;; Final hypermax repair calculation
+  (define hypermax_repair_allocation (* hypermax_repair_base phase_repair_multiplier cri_repair_multiplier))
+
+  ;; ═══ HYPERMAX THERMAL PROTECTION ═══
+  ;; Enhanced thermal protection for crew preservation
+  (define thermal_protection_base
+    (cond
+      (hypermax_critical_level 0.60)      ;; HYPERMAX for ≤5 crew
+      (crew_critical 0.55)                ;; MAXIMUM for critical health
+      (ultra_critical_level 0.50)         ;; ULTRA for ≤6 crew
+      (crew_emergency 0.45)               ;; ULTRA for emergency health
+      (critical_crew_level 0.40)          ;; HIGH for ≤7 crew
+      (crew_crisis 0.35)                  ;; HIGH for crisis
+      (crew_danger 0.30)                  ;; MODERATE HIGH for danger
+      (crew_concerning 0.25)              ;; MODERATE for concerning
+      (crew_acceptable 0.20)              ;; LIGHT for acceptable
+      (crew_good 0.15)                    ;; MINIMAL for good
+      (crew_excellent 0.10)               ;; BASELINE for excellent
+      (crew_perfect 0.08)                 ;; OPTIMIZED for perfect
+      (crew_transcendent 0.05)            ;; MINIMAL for transcendent
+      (true 0.08)))                       ;; DEFAULT
+
+  ;; Enhanced thermal multipliers for V6
+  (define thermal_phase_multiplier
+    (cond
+      (v6_survival 3.0)                   ;; MAXIMUM during V6
+      (v6_mega_prep 2.0)                  ;; HIGH during mega prep
+      (mid_game_prep 1.5)                 ;; MODERATE during mid prep
+      (true 1.0)))                        ;; BASELINE
+
+  (define total_thermal_protection (* thermal_protection_base thermal_phase_multiplier))
+
+  ;; ═══ HYPERMAX POWER SECURITY ═══
+  ;; Ultra-conservative power targets
+  (define hypermax_power_target
+    (cond
+      (v6_survival 1400)                  ;; HYPERMAX during V6
+      (v6_mega_prep 1200)                 ;; ULTRA during mega prep
+      (mid_game_prep 1000)                ;; HIGH during mid prep
+      (early_stability 800)               ;; MODERATE during early
+      (foundation_phase 600)              ;; LIGHT during foundation
+      (v6_recovery 1000)                  ;; MODERATE during recovery
+      (true 800)))                        ;; ENHANCED baseline
+
+  ;; ═══ HYPERMAX CRI RESPONSE ═══
+  ;; More aggressive CRI response to keep P75 CRI below 30
+  (define cri_response_factor
+    (cond
+      ((< colony_risk_index 15) 0.85)     ;; REWARD ultra-low CRI
+      ((< colony_risk_index 20) 0.90)     ;; REWARD excellent CRI
+      ((< colony_risk_index 25) 0.95)     ;; LIGHT penalty for good CRI
+      ((< colony_risk_index 30) 1.05)     ;; LIGHT penalty for acceptable CRI
+      ((< colony_risk_index 35) 1.20)     ;; MODERATE penalty for concerning CRI
+      (true 1.50)))                       ;; HEAVY penalty for dangerous CRI
+
+  ;; ═══ HYPERMAX ALLOCATION STRATEGY ═══
+  ;; Ultra-conservative allocations prioritizing crew preservation
+  
+  ;; Hypermax heating allocation
+  (define hypermax_heating_base
+    (cond
+      (hypermax_critical_level 0.92)      ;; HYPERMAX for ≤5 crew
+      (crew_critical 0.90)                ;; MAXIMUM for critical health
+      (ultra_critical_level 0.88)         ;; ULTRA for ≤6 crew
+      (crew_emergency 0.85)               ;; ULTRA for emergency health
+      (critical_crew_level 0.82)          ;; HIGH for ≤7 crew
+      (crew_crisis 0.78)                  ;; HIGH for crisis
+      (crew_danger 0.74)                  ;; MODERATE HIGH for danger
+      ((<= power hypermax_power_target) 0.70) ;; POWER BUILDING mode
+      (crew_concerning 0.65)              ;; MODERATE for concerning
+      (crew_acceptable 0.60)              ;; LIGHT for acceptable
+      (crew_good 0.55)                    ;; MINIMAL for good
+      (crew_excellent 0.50)               ;; BASELINE for excellent
+      (crew_perfect 0.47)                 ;; OPTIMIZED for perfect
+      (crew_transcendent 0.45)            ;; MINIMAL for transcendent
+      (true 0.50)))                       ;; DEFAULT
+
+  ;; Enhanced heating with thermal protection and CRI response
+  (define total_heating (* (+ hypermax_heating_base total_thermal_protection) cri_response_factor))
+
+  ;; Ultra-conservative resource allocations
+  (define hypermax_isru_allocation
+    (cond
+      ((< o2_days 10.0) 0.55)             ;; O2 critical 
+      ((< h2o_days 12.0) 0.50)            ;; H2O critical
+      ((< o2_days 25.0) 0.40)             ;; O2 moderate building
+      ((< h2o_days 30.0) 0.35)            ;; H2O moderate building
+      (hypermax_critical_level 0.25)      ;; MINIMAL for critical crew count
+      (ultra_critical_level 0.28)         ;; LIGHT for ultra critical crew
+      (critical_crew_level 0.32)          ;; MODERATE for critical crew
+      (cri_dangerous 0.20)                ;; MINIMAL during dangerous CRI
+      (cri_concerning 0.25)               ;; LIGHT during concerning CRI
+      (true 0.30)))                       ;; DEFAULT
+
+  ;; Ultra-conservative greenhouse allocation
+  (define hypermax_greenhouse_allocation
+    (cond
+      ((< food_days 12.0) 0.18)           ;; Food critical
+      ((< food_days 25.0) 0.15)           ;; Food moderate
+      (hypermax_critical_level 0.08)      ;; ULTRA MINIMAL for critical crew count
+      (ultra_critical_level 0.10)         ;; MINIMAL for ultra critical crew
+      (critical_crew_level 0.12)          ;; LIGHT for critical crew
+      (cri_dangerous 0.06)                ;; ULTRA MINIMAL during dangerous CRI
+      (cri_concerning 0.08)               ;; MINIMAL during concerning CRI
+      (true 0.10)))                       ;; DEFAULT
+
+  ;; ═══ ENHANCED EVENT RESPONSE ═══
+  (define event_count (length events))
+  (define hypermax_event_response
+    (cond
+      ((and v6_survival (>= event_count 4) hypermax_critical_level) 8.0)  ;; ABSOLUTE maximum
+      ((and v6_survival (>= event_count 3) hypermax_critical_level) 7.0)  ;; ULTRA maximum
+      ((and v6_mega_prep (>= event_count 4) hypermax_critical_level) 6.0) ;; MAXIMUM
+      ((and (>= event_count 4) hypermax_critical_level) 5.0)              ;; HIGH for critical crew
+      ((>= event_count 4) 4.0)                                            ;; HIGH event response
+      ((>= event_count 3) 3.0)                                            ;; MODERATE HIGH
+      ((>= event_count 2) 2.2)                                            ;; MODERATE
+      ((>= event_count 1) 1.7)                                            ;; LIGHT
+      (true 1.0)))                                                        ;; NO events
+
+  ;; ═══ FINAL ALLOCATION CALCULATIONS ═══
+  (define calc_heating (min 0.98 (* total_heating hypermax_event_response)))
+  (define calc_isru (* hypermax_isru_allocation hypermax_event_response))
+  (define calc_greenhouse (* hypermax_greenhouse_allocation hypermax_event_response))
+
+  ;; Clamp allocations to valid ranges
+  (define final_heating (max 0.05 (min 0.98 calc_heating)))
+  (define final_isru (max 0.05 (min 0.60 calc_isru)))
+  (define final_greenhouse (max 0.02 (min 0.40 calc_greenhouse)))
+
+  ;; Ensure allocations sum to ≤ 1.0 (normalize if needed)
+  (define alloc_sum (+ final_heating final_isru final_greenhouse))
+  (define normalization_factor (if (> alloc_sum 1.0) (/ 1.0 alloc_sum) 1.0))
+
+  (define normalized_heating (* final_heating normalization_factor))
+  (define normalized_isru (* final_isru normalization_factor))
+  (define normalized_greenhouse (* final_greenhouse normalization_factor))
+
+  ;; ═══ LOGGING AND OUTPUT ═══
+  (log (concat "🔧 Repair:" (string hypermax_repair_allocation) " 🔥Thermal:" (string total_thermal_protection)))
+  (log (concat "⚡ PowerTarget:" (string hypermax_power_target) " 📊 CRI_Factor:" (string cri_response_factor)))
+  (log (concat "🎯 Final → H:" (string normalized_heating) " I:" (string normalized_isru) " G:" (string normalized_greenhouse)))
+
+  ;; Return final allocations
+  (list 
+    normalized_heating 
+    normalized_isru 
+    normalized_greenhouse 
+    hypermax_repair_allocation))
