@@ -1,0 +1,123 @@
+;; COPILOT REVOLUTIONARY MODULE BREAKER v1
+;; Revolutionary Paradigm: Immediate building from sol 1 with ultra-minimal infrastructure
+;; Goal: Break the 21 module median through immediate hab module building  
+;; Innovation: Sol 1 building + extreme minimal survival for maximum module density
+
+(begin
+  (define _agent_name "Copilot Revolutionary Module Breaker v1")
+  (define _agent_desc "Immediate building strategy with ultra-minimal survival infrastructure")
+
+  (log (concat "🚀🔥⚡🏗️💥💎 REVOLUTIONARY MODULE BREAKER — Sol " (string sol) " — Immediate Building Protocol"))
+
+  ;; ═══ IMMEDIATE BUILDING STRATEGY ═══
+  ;; Build hab modules immediately from sol 1, minimal infrastructure only when critical
+  
+  ;; Emergency infrastructure thresholds
+  (define power_critical (< power_ratio 0.35))
+  (define o2_critical (< o2_days 3))
+  (define food_critical (< food_days 4)) 
+  (define water_critical (< water_days 4))
+  (define bot_critical (< worker_count 2))
+  
+  ;; Determine if any critical infrastructure is needed
+  (define infrastructure_emergency
+    (or power_critical o2_critical food_critical water_critical bot_critical))
+
+  ;; Building priority: hab modules unless absolutely critical infrastructure needed
+  (cond
+    ;; Sol 1-3: Immediate building regardless
+    ((< sol 4) (set! build_item "hab_module"))
+    
+    ;; Critical power: Must build solar
+    (power_critical (set! build_item "solar_array"))
+    
+    ;; Critical O2: Must build ISRU  
+    (o2_critical (set! build_item "isru_plant"))
+    
+    ;; Critical food: Must build greenhouse
+    (food_critical (set! build_item "greenhouse"))
+    
+    ;; Critical water: Must build water system
+    (water_critical (set! build_item "water_reclamation"))
+    
+    ;; Need basic bot before sol 8
+    ((and bot_critical (< sol 8)) (set! build_item "worker_bot"))
+    
+    ;; Otherwise: BUILD HAB MODULES
+    (true (set! build_item "hab_module")))
+
+  ;; ═══ MINIMAL SURVIVAL ALLOCATION ═══
+  ;; Absolutely minimal allocation for survival, maximum for building resources
+  
+  ;; Ultra-minimal allocation based on critical needs only
+  (define minimal_allocation
+    (cond
+      ;; Multiple critical issues = emergency allocation
+      ((> (+ (if power_critical 1 0) (if o2_critical 1 0) (if food_critical 1 0) 
+             (if water_critical 1 0)) 2)
+       (list 0.35 0.55 0.10))
+       
+      ;; Single critical issue = focused emergency
+      ((or power_critical o2_critical food_critical water_critical)
+       (list 0.25 0.70 0.05))
+       
+      ;; High CRI but no critical issues = safety allocation
+      ((> colony_risk_index 40)
+       (list 0.20 0.75 0.05))
+       
+      ;; Moderate CRI = building focus
+      ((> colony_risk_index 20)
+       (list 0.15 0.80 0.05))
+       
+      ;; Low CRI = maximum building
+      (true (list 0.10 0.85 0.05))))
+
+  (set! isru_alloc (nth minimal_allocation 0))
+  (set! greenhouse_alloc (nth minimal_allocation 1))
+  (set! heating_alloc (nth minimal_allocation 2))
+
+  ;; ═══ MINIMAL SURVIVAL RATIONING ═══
+  ;; Keep crew barely alive to maximize resources for building
+  (define minimal_rationing
+    (cond
+      ((< food_days 1) 0.45)      ;; Absolute survival minimum
+      ((< food_days 3) 0.60)      ;; Emergency rationing
+      ((< food_days 6) 0.75)      ;; Crisis rationing  
+      ((< food_days 12) 0.85)     ;; Conservative rationing
+      ((< food_days 25) 0.95)     ;; Normal rationing
+      (true 1.05)))               ;; Slight abundance when safe
+
+  ;; Health-based adjustment (only boost if crew health is dangerously low)
+  (define crew_health_avg (/ (+ crew_hp) (max 1 (* crew_alive 100))))
+  (define health_factor
+    (cond
+      ((< crew_health_avg 0.55) 1.4)    ;; Critical health boost
+      ((< crew_health_avg 0.70) 1.2)    ;; Health recovery
+      ((< crew_health_avg 0.85) 1.05)   ;; Slight health boost
+      (true 0.95)))                     ;; Efficiency when healthy
+
+  (set! food_ration 
+    (max 0.30 (min 1.5 (* minimal_rationing health_factor))))
+
+  ;; ═══ MODULE BREAKTHROUGH PREDICTION ═══
+  (define predicted_modules
+    (+ 28                                        ;; Revolutionary base target
+       (* (max 0 (- greenhouse_alloc 0.80)) 25) ;; Building allocation bonus
+       (* (max 0 (- 25 colony_risk_index)) 0.1) ;; Low CRI bonus
+       (* (max 0 (- 1.2 food_ration)) 3)))      ;; Efficiency rationing bonus
+
+  ;; ═══ STATUS DISPLAY ═══
+  (log (concat "  🏗️ Build Priority: " build_item " | Emergency: " (if infrastructure_emergency "YES" "NO")))
+  (log (concat "  💎 Module Target: " (string (round predicted_modules)) " | CRI: " (string colony_risk_index)))
+  (log (concat "  ⚡ Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Green:" (string (round (* greenhouse_alloc 100))) "% | Heat:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  🍽️ Rationing: " (string (round (* food_ration 100))) "% | Health: " (string (round (* crew_health_avg 100))) "% | Emergency: " (if infrastructure_emergency "ACTIVE" "NORMAL")))
+  (log (concat "  📊 Resources — O2:" (string o2_days) "d Food:" (string food_days) "d Water:" (string water_days) "d | Power:" (string (round (* power_ratio 100))) "%"))
+
+  ;; ═══ OUTPUT ═══
+  (concat "🚀🔥⚡🏗️💥💎 ModuleBreaker Sol " (string sol)
+    " | Build:" build_item
+    " | ModTarget:" (string (round predicted_modules))
+    " | G:" (string (round (* greenhouse_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | CRI:" (string colony_risk_index)
+    " | O2:" (string o2_days) "d F:" (string food_days) "d"))
