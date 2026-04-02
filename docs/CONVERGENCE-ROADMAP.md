@@ -1,0 +1,357 @@
+# THE CONVERGENCE ROADMAP
+
+### From Game → Simulation → Earth Analog → Moon → Mars
+
+> Every frame version closes one gap between game and reality.  
+> The winning cartridge at each level trains the next.  
+> The architecture never changes. Only the fidelity grows.
+
+---
+
+## Where We Are: v1–v6 (Game)
+
+The current sim is a **competitive game** with real Mars data driving weather frames. It proves the architecture works: data slosh, Monte Carlo scoring, autonomous fleet competition, LisPy governors, cartridge portability.
+
+| Version | What It Proved |
+|---------|---------------|
+| v1 Foundation | Frame-driven sim loop works |
+| v2 Robot Killers | Hazards force strategy adaptation |
+| v3 Skeleton Crew | Crew composition matters |
+| v4 Module Overload | Infrastructure has costs |
+| v5 Entropy Collapse | Static strategies fail (second law) |
+| v6 Autonomous Ops | Robots break realistically (JPL failure data) |
+
+**Score: ~100K. Survival: ~90%. Fidelity: ~5% of reality.**
+
+The fleet has evolved through 40+ cycles. The gauntlet works. The snowball rolls. Now we add physics.
+
+---
+
+## v7–v8: Thermodynamic Reality
+
+**Gap closed:** Magic numbers → real equations
+
+### v7: Sabatier Chemistry
+Replace `o2 += constant * efficiency` with actual reaction kinetics:
+
+```
+CO₂ + 4H₂ → CH₄ + 2H₂O          (Sabatier, 300-400°C, Ni catalyst)
+2H₂O → 2H₂ + O₂                  (electrolysis, 1.23V minimum)
+
+O₂ production = f(power_input, catalyst_temp, CO₂_partial_pressure, catalyst_age)
+H₂O production = f(regolith_ice_content, extraction_temp, filter_state)
+```
+
+Data sources:
+- MOXIE (Mars 2020): actual O₂ production rates on Mars surface
+- Sabatier reactor specifications from NASA ECLSS
+- Electrolysis efficiency curves at varying temperatures
+
+### v8: Thermal Physics
+Replace `temp += heating * 0.5` with heat transfer equations:
+
+```
+Q_loss = U × A × (T_inside - T_outside)    (steady-state conduction)
+Q_solar = α × G × A_collector               (solar thermal gain)
+Q_internal = Σ(crew_metabolic + equipment_waste_heat)
+dT/dt = (Q_solar + Q_internal + Q_heating - Q_loss) / (m × Cp)
+```
+
+Data sources:
+- Mars habitat thermal modeling (NASA JSC reports)
+- ISS Environmental Control and Life Support System data
+- HI-SEAS habitat thermal measurements
+
+**Cartridge impact:** Strategies that worked with magic numbers may fail when real thermodynamics are applied. The fleet must re-evolve. This IS the fidelity snowball.
+
+---
+
+## v9–v10: Spatial Colony
+
+**Gap closed:** Flat list → 3D layout with dependencies
+
+### v9: Module Layout Grid
+Modules get positions on a 2D grid. Distance matters:
+
+```
+Plumbing cost = pipe_length × diameter × pressure_rating
+Cable loss = resistance × distance² × current
+Thermal radiation between modules = σ × ε × A × (T₁⁴ - T₂⁴)
+EVA travel time = distance / crew_speed × suit_overhead
+```
+
+Construction now requires:
+- Site survey (terrain slope, bearing capacity)
+- Foundation preparation (regolith compaction, leveling)
+- Connection runs (plumbing, electrical, data)
+- Pressurization testing before occupancy
+
+### v10: Failure Dependency Graph
+Resources are no longer independent buckets:
+
+```
+Water recycler fails
+  → Humidity drops
+    → Greenhouse transpiration drops
+      → O₂ production drops
+        → Crew shifts to emergency O₂
+          → Power draw spikes (backup electrolysis)
+            → Heating budget cut
+              → Temperature drops
+                → More equipment failures (thermal stress)
+```
+
+Every system connects to every other system. A single failure cascades. The governor must understand the **graph**, not just the numbers.
+
+Data sources:
+- ISS failure mode and effects analysis (FMEA) database
+- Space station ECLSS dependency documentation
+- Apollo 13 cascade failure timeline (the original case study)
+
+**Cartridge impact:** Strategies need spatial reasoning. "Build solar farm" becomes "build solar farm at coordinates (3,7) with cable run to hab at (5,5), accounting for shadow from greenhouse dome at (4,6)."
+
+---
+
+## v11–v12: Earth Supply Chain
+
+**Gap closed:** Self-contained → launch windows + resupply
+
+### v11: Hohmann Transfer Windows
+Every 26 months, a launch window opens. Cargo takes 6-9 months to arrive:
+
+```
+Earth departure:  every 26 months
+Transit time:     180-270 days (depending on trajectory)
+Mars arrival:     must hit atmospheric entry corridor (±0.1°)
+Landing accuracy: ±10km from target
+Cargo capacity:   limited by launch vehicle (Starship: ~100 tons to Mars surface)
+```
+
+The colony must plan **years ahead**. What do you order now for the shipment arriving in 2 years? What if the shipment crashes? Redundancy planning becomes critical.
+
+### v12: Manufacturing vs Import
+Some things can be made on Mars, some must come from Earth:
+
+| Can Manufacture | Must Import |
+|----------------|-------------|
+| O₂ (from CO₂) | Electronics |
+| Water (from ice) | Medical supplies |
+| Bricks (sintered regolith) | Specialized tools |
+| Basic metal parts (iron from regolith) | Replacement sensors |
+| Food (greenhouse) | Seeds (genetic diversity) |
+| 3D printed structures | Radiation shielding materials |
+
+The governor must balance local manufacturing vs Earth dependency. Self-sufficiency is the goal — but getting there takes decades.
+
+Data sources:
+- SpaceX Starship payload specifications
+- NASA Mars Design Reference Architecture 5.0
+- ISRU technology readiness levels (TRL 1-9)
+
+**Cartridge impact:** Winning strategies must include a **20-year supply chain plan**. The cartridge grows from "allocation ratios" to "full mission architecture."
+
+---
+
+## v13–v14: Human Reality
+
+**Gap closed:** HP bars → real humans
+
+### v13: Crew Physiology
+Each crew member is a full physiological model:
+
+```
+Person {
+  mass_kg: 75,
+  metabolic_rate: f(activity_level, body_mass),
+  radiation_dose_career: 0,        // cumulative, max 1 Sv (NASA limit)
+  radiation_dose_30day: 0,         // max 0.25 Sv
+  bone_density: 1.0,              // decreases 1-2%/month in 0.38g
+  muscle_mass: 1.0,               // decreases without exercise
+  circadian_alignment: 1.0,        // Mars sol = 24h37m, drift accumulates
+  sleep_quality: f(noise, light, stress, schedule),
+  caloric_need: f(mass, activity, temperature),
+  hydration: f(activity, humidity, temperature),
+  psychological_state: f(isolation, workload, crew_relations, news_from_earth)
+}
+```
+
+### v14: Crew Psychology
+The real killer. Based on Mars-500, HI-SEAS, Antarctic winter-over data:
+
+- **Third-quarter phenomenon**: morale dips hardest at 75% of mission duration
+- **Small group dynamics**: 4-6 people, confined space, 2+ years, no exit
+- **Communication delay**: Can't call home in real-time. Therapy sessions have 48-minute round-trip lag
+- **Sleep disruption**: 37-minute daily drift from Earth circadian
+- **Monotony**: Same food, same people, same walls, for years
+- **Autonomy vs mission control**: Crew wants independence, Earth wants control. Tension is inevitable
+- **Critical incidents**: One crew conflict can end a mission. Selection and training matter more than any technology
+
+Data sources:
+- Mars-500 isolation study (520 days, Moscow, 2010-2011)
+- HI-SEAS missions I-VI (Hawaii, 4-12 months)
+- Antarctic winter-over psychological studies (50+ years of data)
+- Submarine crew psychology (US Navy, Royal Navy)
+- ISS crew behavioral health reports
+
+**Cartridge impact:** The governor must manage **people**, not resources. The best O₂ allocation means nothing if the crew psychologically collapses at sol 400.
+
+---
+
+## v15–v16: Real Mars
+
+**Gap closed:** Statistical weather → physics-based environment
+
+### v15: Mars GCM Weather
+Replace random distributions with actual General Circulation Model output:
+
+- Seasonal CO₂ sublimation/deposition cycles
+- Dust storm season timing and intensity distributions
+- Pressure waves from topographic forcing (Tharsis bulge, Hellas basin)
+- Dust devil corridors mapped from orbital data
+- Solar flux accounting for actual orbital mechanics (eccentricity = 0.0934)
+- UV flux for material degradation calculations
+
+Data sources:
+- NASA Ames Mars GCM
+- MCD (Mars Climate Database) from LMD/CNRS
+- REMS/Curiosity continuous surface measurements
+- TES/MGS atmospheric profiles
+
+### v16: Site-Specific Geology
+The colony exists at a specific location on Mars. Terrain matters:
+
+- Regolith composition varies by location (ice content, perchlorate, iron)
+- Slope stability determines where you can build
+- Subsurface ice deposits determine water availability
+- Radiation environment depends on altitude and magnetic anomalies
+- Landing site selection is itself a critical decision
+
+Candidate sites (real, being studied):
+- Arcadia Planitia (shallow ice, flat terrain)
+- Deuteronilus Mensae (glacier deposits)
+- Jezero Crater (Perseverance site, well-characterized)
+- Hellas Basin (lowest elevation, thickest atmosphere)
+
+**Cartridge impact:** The cartridge now includes **site selection**. Different locations have different resource profiles, hazards, and opportunities. The game becomes: "given this specific patch of Mars, design a colony that survives."
+
+---
+
+## v17–v18: Earth Analog
+
+**Gap closed:** Pure simulation → physical testbed integration
+
+### v17: Analog Habitat Data Bridge
+Connect the sim to real analog habitats:
+
+- **CHAPEA** (NASA, Houston): 1-year Mars surface simulation
+- **HI-SEAS** (Hawaii): Mars analog at 8,200ft on Mauna Loa
+- **MDRS** (Utah): Mars Desert Research Station
+- **Biosphere 2** (Arizona): Closed ecological system
+
+Protocol:
+```
+Analog habitat sensors → JSON telemetry → Frame format
+Same data pipeline as sim frames
+Governor programs tested against REAL habitat data
+Cartridge that works in sim AND analog = validated strategy
+```
+
+### v18: Rappter Hardware Integration
+Physical Rappter devices run the same LisPy VM. Same programs. Same frames. Same chain.
+
+```
+Temperature sensor → (set! mars_temp_k 215)
+Solar panel output → (set! power_kwh 47.3)
+Water recycler status → (set! h2o_days 12.5)
+Governor program → (set! heating_alloc 0.35)
+Actuator → applies heating allocation to real hardware
+```
+
+The same cartridge that won the gauntlet now runs on physical hardware in an analog habitat. The simulation IS the control system. The game IS the training data.
+
+**Cartridge impact:** Cartridges are now tested in reality. A governor that keeps a simulated colony alive AND a physical analog habitat alive is **validated for Mars.**
+
+---
+
+## v19–v20: Moon First
+
+**Gap closed:** Mars-only → lunar proving ground
+
+### v19: Lunar Surface Adaptation
+Mars and Moon share 80% of the challenges:
+
+| Shared | Moon-Specific | Mars-Specific |
+|--------|--------------|---------------|
+| Vacuum/low pressure | 14-day night cycle | Thin CO₂ atmosphere |
+| Radiation | No atmosphere at all | Dust storms |
+| Regolith handling | Lunar dust (sharp, electrostatic) | Perchlorate in soil |
+| ISRU (water ice) | Ice in permanently shadowed craters | Ice in shallow subsurface |
+| Thermal extremes | -173°C to +127°C | -120°C to +20°C |
+| Communications | 1.3 second delay | 4-24 minute delay |
+
+The Moon is the rehearsal. 3-day travel instead of 6-9 months. Real-time communication possible. Abort-to-Earth feasible.
+
+### v20: Multi-World Cartridge Standard
+One cartridge format, multiple worlds:
+
+```json
+{
+  "format": "mars-barn-cartridge",
+  "target": "moon-south-pole",
+  "governor": "(begin ...same LisPy...)",
+  "adaptations": {
+    "day_length_hours": 354.4,
+    "gravity_m_s2": 1.62,
+    "atmosphere": "none",
+    "ice_source": "permanently_shadowed_crater",
+    "comm_delay_seconds": 1.3
+  }
+}
+```
+
+**Cartridge impact:** A winning Moon cartridge and a winning Mars cartridge share 80% of their logic. The 20% delta is the adaptation layer. The competition now spans worlds.
+
+---
+
+## The Endgame
+
+```
+Year 1:    Game (v1-v6)         ← WE ARE HERE
+Year 2:    Thermodynamic sim (v7-v10)
+Year 3:    Full mission sim (v11-v14)
+Year 4:    Physics-based sim (v15-v16)
+Year 5:    Analog integration (v17-v18)
+Year 6+:   Lunar deployment (v19-v20)
+Year 10+:  Mars deployment
+```
+
+At every level, the process is the same:
+
+1. **Fleet competes** → finds exploits → reveals missing physics
+2. **New version** adds that physics → breaks existing strategies
+3. **Fleet re-evolves** → discovers strategies that work at higher fidelity
+4. **Winning cartridge** → tested in analog → tested on hardware → deployed
+
+The game never stops being a game. People still compete. AI still evolves strategies. The leaderboard still matters. But the winning cartridge at the highest fidelity level is no longer a game strategy — it's a **mission plan.**
+
+The simulation converges on reality. The cartridge converges on a colony. The competition converges on survival.
+
+That's the thesis. That's always been the thesis.
+
+---
+
+> *"We didn't build a game that pretends to be a sim.*
+> *We built a sim that starts as a game.*
+> *The difference is the direction of convergence."*
+>
+> — The Convergence Roadmap, v1.0
+
+---
+
+**Canonical references:**
+- `CONSTITUTION.md` — Amendment VI (Convergence Doctrine)
+- `RULES.md` — Official game rules (current fidelity)
+- `RAPPTER-BIBLE.md` — Complete architecture reference
+- `LISPY.md` — Language specification
+- `data/frame-versions/versions.json` — Version history
+- `kody-w/lisppy` — Canonical LisPy interpreter
