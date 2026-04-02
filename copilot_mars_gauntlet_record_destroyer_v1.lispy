@@ -1,0 +1,211 @@
+;; COPILOT MARS GAUNTLET RECORD DESTROYER v1
+;; Innovation: Ultimate compound damage resistance with score optimization
+;; Goal: Beat 441 sol record and achieve maximum possible score in 602-frame gauntlet
+;; Features: Ultra-adaptive allocation, predictive CRI control, optimal module targeting
+
+(begin
+  (define _agent_name "Copilot Mars Gauntlet Record Destroyer v1")
+  (define _agent_desc "Record-breaking strategy optimized for 602+ frame survival with maximum efficiency")
+
+  (log (concat "🏆💎🚀⚡ RECORD DESTROYER — Sol " (string sol) " — Ultimate Gauntlet Mastery"))
+
+  ;; ═══ ADVANCED MISSION PHASE INTELLIGENCE ═══
+  ;; Optimized 6-phase evolution for maximum score
+  (define genesis_phase (< sol 20))               ;; Ultra-fast bootstrap 
+  (define momentum_phase (and (>= sol 20) (< sol 65)))    ;; Rapid expansion
+  (define mastery_phase (and (>= sol 65) (< sol 140)))    ;; Infrastructure mastery
+  (define transcendence_phase (and (>= sol 140) (< sol 280))) ;; Module optimization
+  (define apex_phase (and (>= sol 280) (< sol 480)))      ;; Peak performance
+  (define infinity_phase (>= sol 480))           ;; Final transcendence
+
+  ;; ═══ PREDICTIVE CRI OPTIMIZATION ═══
+  ;; Advanced threat modeling with score optimization
+  (define cri_growth_factor (max 1.0 (pow (/ sol 300) 0.7)))
+  (define predicted_cri_advanced (* cri cri_growth_factor))
+  
+  ;; CRI targeting for optimal score (aim for P75 of 5 for maximum points)
+  (define target_cri 5)
+  (define cri_optimization_factor (/ target_cri (max 1 predicted_cri_advanced)))
+  
+  (define threat_optimal (< predicted_cri_advanced 4))
+  (define threat_good (and (>= predicted_cri_advanced 4) (< predicted_cri_advanced 8)))
+  (define threat_acceptable (and (>= predicted_cri_advanced 8) (< predicted_cri_advanced 15)))
+  (define threat_concerning (and (>= predicted_cri_advanced 15) (< predicted_cri_advanced 30)))
+  (define threat_dangerous (and (>= predicted_cri_advanced 30) (< predicted_cri_advanced 55)))
+  (define threat_critical (>= predicted_cri_advanced 55))
+
+  ;; Infrastructure efficiency scoring for module optimization
+  (define infrastructure_efficiency
+    (* (+ ie se 1.0) 0.5))  ;; Combined ISRU and solar efficiency
+
+  (define module_target_base (if (< sol 100) 8 (if (< sol 250) 16 21)))
+  (define module_efficiency_bonus (max 1.0 (/ modules_built module_target_base)))
+
+  ;; ═══ ULTRA-ADAPTIVE ALLOCATION MATRIX ═══
+  ;; Optimized for both survival and maximum module/score achievement
+
+  ;; Genesis Phase: Ultra-fast efficient bootstrap
+  (define genesis_allocation
+    (cond
+      (threat_critical (begin (set! isru_alloc 0.50) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.15)))
+      (threat_dangerous (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.15)))
+      (threat_concerning (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.15)))
+      (threat_acceptable (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.15)))
+      (threat_good (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.15)))
+      (threat_optimal (begin (set! isru_alloc 0.25) (set! greenhouse_alloc 0.60) (set! heating_alloc 0.15)))
+      (true (begin (set! isru_alloc 0.32) (set! greenhouse_alloc 0.53) (set! heating_alloc 0.15)))))
+
+  ;; Momentum Phase: Aggressive building focus
+  (define momentum_allocation
+    (cond
+      (threat_critical (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.43) (set! heating_alloc 0.12)))
+      (threat_dangerous (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.48) (set! heating_alloc 0.12)))
+      (threat_concerning (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.53) (set! heating_alloc 0.12)))
+      (threat_acceptable (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.58) (set! heating_alloc 0.12)))
+      (threat_good (begin (set! isru_alloc 0.25) (set! greenhouse_alloc 0.63) (set! heating_alloc 0.12)))
+      (threat_optimal (begin (set! isru_alloc 0.20) (set! greenhouse_alloc 0.68) (set! heating_alloc 0.12)))
+      (true (begin (set! isru_alloc 0.28) (set! greenhouse_alloc 0.60) (set! heating_alloc 0.12)))))
+
+  ;; Mastery Phase: Optimal module density building
+  (define mastery_allocation
+    (cond
+      (threat_critical (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.48) (set! heating_alloc 0.12)))
+      (threat_dangerous (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.53) (set! heating_alloc 0.12)))
+      (threat_concerning (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.58) (set! heating_alloc 0.12)))
+      (threat_acceptable (begin (set! isru_alloc 0.25) (set! greenhouse_alloc 0.63) (set! heating_alloc 0.12)))
+      (threat_good (begin (set! isru_alloc 0.22) (set! greenhouse_alloc 0.66) (set! heating_alloc 0.12)))
+      (threat_optimal (begin (set! isru_alloc 0.18) (set! greenhouse_alloc 0.70) (set! heating_alloc 0.12)))
+      (true (begin (set! isru_alloc 0.25) (set! greenhouse_alloc 0.63) (set! heating_alloc 0.12)))))
+
+  ;; Transcendence Phase: Maximum efficiency push
+  (define transcendence_allocation
+    (cond
+      (threat_critical (begin (set! isru_alloc 0.38) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.12)))
+      (threat_dangerous (begin (set! isru_alloc 0.33) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.12)))
+      (threat_concerning (begin (set! isru_alloc 0.28) (set! greenhouse_alloc 0.60) (set! heating_alloc 0.12)))
+      (threat_acceptable (begin (set! isru_alloc 0.23) (set! greenhouse_alloc 0.65) (set! heating_alloc 0.12)))
+      (threat_good (begin (set! isru_alloc 0.20) (set! greenhouse_alloc 0.68) (set! heating_alloc 0.12)))
+      (threat_optimal (begin (set! isru_alloc 0.16) (set! greenhouse_alloc 0.72) (set! heating_alloc 0.12)))
+      (true (begin (set! isru_alloc 0.23) (set! greenhouse_alloc 0.65) (set! heating_alloc 0.12)))))
+
+  ;; Apex Phase: Score optimization focus
+  (define apex_allocation
+    (cond
+      (threat_critical (begin (set! isru_alloc 0.36) (set! greenhouse_alloc 0.52) (set! heating_alloc 0.12)))
+      (threat_dangerous (begin (set! isru_alloc 0.31) (set! greenhouse_alloc 0.57) (set! heating_alloc 0.12)))
+      (threat_concerning (begin (set! isru_alloc 0.26) (set! greenhouse_alloc 0.62) (set! heating_alloc 0.12)))
+      (threat_acceptable (begin (set! isru_alloc 0.21) (set! greenhouse_alloc 0.67) (set! heating_alloc 0.12)))
+      (threat_good (begin (set! isru_alloc 0.18) (set! greenhouse_alloc 0.70) (set! heating_alloc 0.12)))
+      (threat_optimal (begin (set! isru_alloc 0.15) (set! greenhouse_alloc 0.73) (set! heating_alloc 0.12)))
+      (true (begin (set! isru_alloc 0.21) (set! greenhouse_alloc 0.67) (set! heating_alloc 0.12)))))
+
+  ;; Infinity Phase: Final optimization
+  (define infinity_allocation
+    (cond
+      (threat_critical (begin (set! isru_alloc 0.34) (set! greenhouse_alloc 0.54) (set! heating_alloc 0.12)))
+      (threat_dangerous (begin (set! isru_alloc 0.29) (set! greenhouse_alloc 0.59) (set! heating_alloc 0.12)))
+      (threat_concerning (begin (set! isru_alloc 0.24) (set! greenhouse_alloc 0.64) (set! heating_alloc 0.12)))
+      (threat_acceptable (begin (set! isru_alloc 0.19) (set! greenhouse_alloc 0.69) (set! heating_alloc 0.12)))
+      (threat_good (begin (set! isru_alloc 0.16) (set! greenhouse_alloc 0.72) (set! heating_alloc 0.12)))
+      (threat_optimal (begin (set! isru_alloc 0.13) (set! greenhouse_alloc 0.75) (set! heating_alloc 0.12)))
+      (true (begin (set! isru_alloc 0.19) (set! greenhouse_alloc 0.69) (set! heating_alloc 0.12)))))
+
+  ;; Apply appropriate phase allocation
+  (cond
+    (genesis_phase genesis_allocation)
+    (momentum_phase momentum_allocation)
+    (mastery_phase mastery_allocation)
+    (transcendence_phase transcendence_allocation)
+    (apex_phase apex_allocation)
+    (infinity_phase infinity_allocation)
+    (true transcendence_allocation))
+
+  ;; ═══ SCORE-OPTIMIZED FOOD RATIONING ═══
+  ;; Balance crew health with resource efficiency for maximum score
+  (define crew_health_factor
+    (/ crew_hp (max 1 (* crew_count 25))))  ;; Normalize to percentage
+
+  (define resource_abundance_factor
+    (+ (/ food_days 30) (/ o2_days 20)))  ;; Factor based on resource abundance
+
+  (define base_ration_score_optimized
+    (cond
+      ((< food_days 1.5) 0.30)    ;; Absolute emergency
+      ((< food_days 3) 0.45)      ;; Emergency
+      ((< food_days 6) 0.65)      ;; Crisis management
+      ((< food_days 12) 0.80)     ;; Conservative
+      ((< food_days 20) 0.90)     ;; Efficient
+      (true 0.95)))               ;; Abundance
+
+  ;; Health-based adjustments for optimization
+  (define health_adjustment_factor
+    (cond
+      ((< crew_health_factor 0.5) 1.20)   ;; Boost when unhealthy
+      ((< crew_health_factor 0.7) 1.10)   ;; Slight boost
+      ((< crew_health_factor 0.9) 1.00)   ;; Normal
+      (true 0.95)))                       ;; Can reduce slightly when healthy
+
+  ;; CRI-based efficiency optimization
+  (define cri_efficiency_factor
+    (cond
+      ((> predicted_cri_advanced 30) 0.90) ;; Build reserves during high CRI
+      ((> predicted_cri_advanced 15) 0.95) ;; Slight efficiency
+      (true 1.00)))                        ;; No adjustment
+
+  (set! food_ration (* base_ration_score_optimized health_adjustment_factor cri_efficiency_factor))
+  (set! food_ration (max 0.25 (min 1.0 food_ration)))
+
+  ;; ═══ ADVANCED STATUS DISPLAY ═══
+  (define current_phase_name
+    (cond
+      (genesis_phase "Genesis")
+      (momentum_phase "Momentum")
+      (mastery_phase "Mastery")
+      (transcendence_phase "Transcendence")
+      (apex_phase "Apex")
+      (infinity_phase "Infinity")
+      (true "Unknown")))
+
+  (define threat_level_name
+    (cond
+      (threat_critical "CRITICAL")
+      (threat_dangerous "DANGEROUS")
+      (threat_concerning "CONCERNING")
+      (threat_acceptable "ACCEPTABLE")
+      (threat_good "GOOD")
+      (threat_optimal "OPTIMAL")
+      (true "UNKNOWN")))
+
+  (log (concat "  🏆 Phase: " current_phase_name " | Threat: " threat_level_name))
+  (log (concat "  🎯 CRI: " (string cri) "→" (string (round predicted_cri_advanced)) 
+               " | Target: " (string target_cri) " | OptFactor: " (string (round (* cri_optimization_factor 100))) "%"))
+  (log (concat "  ⚙️ Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Greenhouse:" 
+               (string (round (* greenhouse_alloc 100))) "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  📊 Modules: " (string modules_built) "/" (string module_target_base) 
+               " | Efficiency: " (string (round (* module_efficiency_bonus 100))) "%"))
+  (log (concat "  🥘 Food Ration: " (string (round (* food_ration 100))) "% | Health: " 
+               (string (round (* crew_health_factor 100))) "% | Resources: O2=" (string o2_days) "d F=" (string food_days) "d"))
+
+  ;; ═══ SCORE PREDICTION ═══
+  (define predicted_score
+    (+ (* sol 100)                    ;; Sol score
+       (* crew_alive 500)             ;; Crew score  
+       (* modules_built 150)          ;; Module score
+       (* 100 20000)                  ;; Perfect survival bonus
+       (* (max 0 (- 5 cri)) -10)))    ;; CRI penalty
+
+  (log (concat "  📈 Predicted Score: " (string predicted_score) " | Infrastructure: IE=" 
+               (string (round (* ie 100))) "% SE=" (string (round (* se 100))) "%"))
+
+  ;; ═══ OUTPUT SUMMARY ═══
+  (concat "🏆 Record Sol " (string sol) " — " current_phase_name 
+    " | " threat_level_name
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | CRI:" (string cri)
+    "→" (string (round predicted_cri_advanced))
+    " | M:" (string modules_built)
+    "/" (string module_target_base)
+    " | Score:" (string predicted_score)))

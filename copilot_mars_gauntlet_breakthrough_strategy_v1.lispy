@@ -1,0 +1,215 @@
+;; COPILOT MARS GAUNTLET BREAKTHROUGH STRATEGY v1
+;; Innovation: Adaptive compound damage resistance with predictive optimization
+;; Goal: Beat 441 sol record through intelligent adaptation to 602+ frame compound damage
+;; Features: Multi-repair orchestration, CRI-predictive allocation, compound threat mitigation
+
+(begin
+  (define _agent_name "Copilot Mars Gauntlet Breakthrough Strategy v1")
+  (define _agent_desc "Advanced adaptive strategy designed to survive 602+ frames through predictive compound damage resistance")
+
+  (log (concat "🚀🛡️⚡🎯 GAUNTLET BREAKTHROUGH — Sol " (string sol) " — Adaptive Compound Resistance Protocol"))
+
+  ;; ═══ ADVANCED MISSION PHASE INTELLIGENCE ═══
+  ;; 6-phase evolution optimized for compound damage survival
+  (define bootstrap_phase (< sol 25))             ;; Critical foundation 
+  (define acceleration_phase (and (>= sol 25) (< sol 80)))    ;; Rapid infrastructure
+  (define fortification_phase (and (>= sol 80) (< sol 160)))  ;; Multi-repair deployment
+  (define optimization_phase (and (>= sol 160) (< sol 300)))  ;; Efficiency mastery
+  (define endurance_phase (and (>= sol 300) (< sol 500)))     ;; Long-term survival
+  (define transcendence_phase (>= sol 500))       ;; Final push
+
+  ;; ═══ PREDICTIVE CRI THREAT MODELING ═══
+  ;; Enhanced threat assessment with compound damage prediction
+  (define cri_trend_acceleration (max 1.0 (/ sol 200)))  ;; CRI tends to accelerate over time
+  (define predicted_cri (min 100 (* cri cri_trend_acceleration)))
+  
+  (define threat_stable (< predicted_cri 6))
+  (define threat_elevated (and (>= predicted_cri 6) (< predicted_cri 15)))
+  (define threat_high (and (>= predicted_cri 15) (< predicted_cri 28)))
+  (define threat_critical (and (>= predicted_cri 28) (< predicted_cri 50)))
+  (define threat_catastrophic (>= predicted_cri 50))
+
+  ;; Infrastructure vulnerability assessment for compound damage
+  (define infrastructure_health_score
+    (+ (if (< ie 0.4) 25 0)         ;; ISRU degradation risk
+       (if (< se 0.4) 25 0)         ;; Solar degradation risk
+       (if (< repair_count 2) 20 0) ;; Inadequate repair capacity
+       (if (< solar_count 3) 15 0)  ;; Power shortage risk
+       (if (< o2_days 5) 20 0)      ;; O2 shortage risk
+       (if (< food_days 8) 15 0)))  ;; Food shortage risk
+
+  (define compound_damage_multiplier
+    (cond
+      ((> infrastructure_health_score 60) 2.0)   ;; High vulnerability
+      ((> infrastructure_health_score 40) 1.6)   ;; Moderate vulnerability
+      ((> infrastructure_health_score 20) 1.3)   ;; Some vulnerability
+      (true 1.0)))                               ;; Healthy infrastructure
+
+  ;; ═══ ADAPTIVE RESOURCE ALLOCATION MATRIX ═══
+  ;; Dynamic allocation that responds to phase, threat, and compound damage risk
+
+  ;; Bootstrap Phase: Establish critical foundation
+  (define bootstrap_allocation
+    (cond
+      (threat_catastrophic (begin (set! isru_alloc 0.55) (set! greenhouse_alloc 0.30) (set! heating_alloc 0.15)))
+      (threat_critical (begin (set! isru_alloc 0.50) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.15)))
+      (threat_high (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.38) (set! heating_alloc 0.17)))
+      (threat_elevated (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.20)))
+      (threat_stable (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.20)))
+      (true (begin (set! isru_alloc 0.38) (set! greenhouse_alloc 0.42) (set! heating_alloc 0.20)))))
+
+  ;; Acceleration Phase: Rapid infrastructure buildup with repair focus
+  (define acceleration_allocation
+    (cond
+      (threat_catastrophic (begin (set! isru_alloc 0.48) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.17)))
+      (threat_critical (begin (set! isru_alloc 0.43) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.17)))
+      (threat_high (begin (set! isru_alloc 0.38) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.17)))
+      (threat_elevated (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.48) (set! heating_alloc 0.17)))
+      (threat_stable (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.15)))
+      (true (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.15)))))
+
+  ;; Fortification Phase: Multi-repair bay deployment priority
+  (define fortification_allocation
+    (cond
+      (threat_catastrophic (begin (set! isru_alloc 0.42) (set! greenhouse_alloc 0.43) (set! heating_alloc 0.15)))
+      (threat_critical (begin (set! isru_alloc 0.38) (set! greenhouse_alloc 0.47) (set! heating_alloc 0.15)))
+      (threat_high (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.15)))
+      (threat_elevated (begin (set! isru_alloc 0.32) (set! greenhouse_alloc 0.53) (set! heating_alloc 0.15)))
+      (threat_stable (begin (set! isru_alloc 0.28) (set! greenhouse_alloc 0.57) (set! heating_alloc 0.15)))
+      (true (begin (set! isru_alloc 0.32) (set! greenhouse_alloc 0.53) (set! heating_alloc 0.15)))))
+
+  ;; Optimization Phase: Balance efficiency with protection
+  (define optimization_allocation
+    (cond
+      (threat_catastrophic (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.15)))
+      (threat_critical (begin (set! isru_alloc 0.36) (set! greenhouse_alloc 0.49) (set! heating_alloc 0.15)))
+      (threat_high (begin (set! isru_alloc 0.33) (set! greenhouse_alloc 0.52) (set! heating_alloc 0.15)))
+      (threat_elevated (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.15)))
+      (threat_stable (begin (set! isru_alloc 0.26) (set! greenhouse_alloc 0.59) (set! heating_alloc 0.15)))
+      (true (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.15)))))
+
+  ;; Endurance Phase: Survive long-term compound damage accumulation
+  (define endurance_allocation
+    (cond
+      (threat_catastrophic (begin (set! isru_alloc 0.38) (set! greenhouse_alloc 0.47) (set! heating_alloc 0.15)))
+      (threat_critical (begin (set! isru_alloc 0.34) (set! greenhouse_alloc 0.51) (set! heating_alloc 0.15)))
+      (threat_high (begin (set! isru_alloc 0.31) (set! greenhouse_alloc 0.54) (set! heating_alloc 0.15)))
+      (threat_elevated (begin (set! isru_alloc 0.28) (set! greenhouse_alloc 0.57) (set! heating_alloc 0.15)))
+      (threat_stable (begin (set! isru_alloc 0.25) (set! greenhouse_alloc 0.60) (set! heating_alloc 0.15)))
+      (true (begin (set! isru_alloc 0.29) (set! greenhouse_alloc 0.56) (set! heating_alloc 0.15)))))
+
+  ;; Transcendence Phase: Final survival optimization
+  (define transcendence_allocation
+    (cond
+      (threat_catastrophic (begin (set! isru_alloc 0.36) (set! greenhouse_alloc 0.49) (set! heating_alloc 0.15)))
+      (threat_critical (begin (set! isru_alloc 0.32) (set! greenhouse_alloc 0.53) (set! heating_alloc 0.15)))
+      (threat_high (begin (set! isru_alloc 0.29) (set! greenhouse_alloc 0.56) (set! heating_alloc 0.15)))
+      (threat_elevated (begin (set! isru_alloc 0.26) (set! greenhouse_alloc 0.59) (set! heating_alloc 0.15)))
+      (threat_stable (begin (set! isru_alloc 0.23) (set! greenhouse_alloc 0.62) (set! heating_alloc 0.15)))
+      (true (begin (set! isru_alloc 0.27) (set! greenhouse_alloc 0.58) (set! heating_alloc 0.15)))))
+
+  ;; Apply appropriate phase allocation
+  (cond
+    (bootstrap_phase bootstrap_allocation)
+    (acceleration_phase acceleration_allocation)
+    (fortification_phase fortification_allocation)
+    (optimization_phase optimization_allocation)
+    (endurance_phase endurance_allocation)
+    (transcendence_phase transcendence_allocation)
+    (true optimization_allocation))
+
+  ;; Apply compound damage adjustments
+  (when (> compound_damage_multiplier 1.2)
+    (set! isru_alloc (+ isru_alloc 0.05))  ;; Boost O2 production when vulnerable
+    (set! greenhouse_alloc (- greenhouse_alloc 0.03))
+    (set! heating_alloc (- heating_alloc 0.02)))
+
+  ;; ═══ INTELLIGENT FOOD RATIONING ═══
+  ;; Adaptive rationing that considers health, CRI, and compound damage risk
+  (define health_factor
+    (/ (+ crew_hp 1) (+ crew_count 1)))  ;; Normalize health per crew member
+
+  (define base_ration
+    (cond
+      ((< food_days 2) 0.25)    ;; Emergency rationing
+      ((< food_days 4) 0.40)    ;; Crisis rationing
+      ((< food_days 8) 0.60)    ;; Conservative rationing
+      ((< food_days 15) 0.75)   ;; Careful rationing
+      (true 0.85)))             ;; Normal operations
+
+  ;; CRI-adjusted rationing - reduce intake during high CRI to build reserves
+  (define cri_ration_factor
+    (cond
+      ((> predicted_cri 40) 0.85)  ;; Reduce rations to build reserves
+      ((> predicted_cri 25) 0.90)  ;; Slight reduction
+      ((> predicted_cri 15) 0.95)  ;; Very slight reduction
+      (true 1.0)))                 ;; No adjustment
+
+  ;; Health-adjusted rationing - increase when crew is unhealthy
+  (define health_ration_factor
+    (cond
+      ((< health_factor 0.6) 1.15)  ;; Boost nutrition when unhealthy
+      ((< health_factor 0.8) 1.05)  ;; Slight boost
+      (true 1.0)))                  ;; No adjustment
+
+  (set! food_ration (* base_ration cri_ration_factor health_ration_factor))
+  (set! food_ration (max 0.2 (min 1.0 food_ration)))  ;; Clamp to safe range
+
+  ;; ═══ STATUS DISPLAY AND DIAGNOSTICS ═══
+  (log (concat "  Phase: " 
+    (cond
+      (bootstrap_phase "Bootstrap")
+      (acceleration_phase "Acceleration") 
+      (fortification_phase "Fortification")
+      (optimization_phase "Optimization")
+      (endurance_phase "Endurance")
+      (transcendence_phase "Transcendence")
+      (true "Unknown"))))
+
+  (log (concat "  Threat Level: " 
+    (cond
+      (threat_catastrophic "CATASTROPHIC")
+      (threat_critical "CRITICAL")
+      (threat_high "HIGH")
+      (threat_elevated "ELEVATED")
+      (threat_stable "STABLE")
+      (true "UNKNOWN"))))
+
+  (log (concat "  CRI: Current=" (string cri) " Predicted=" (string (round predicted_cri)) 
+               " | Compound Multiplier=" (string (round (* compound_damage_multiplier 100))) "%"))
+
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Greenhouse:" 
+               (string (round (* greenhouse_alloc 100))) "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+
+  (log (concat "  Resources: O2=" (string o2_days) "d Food=" (string food_days) 
+               "d | Ration:" (string (round (* food_ration 100))) "% | Health:" (string (round health_factor 100)) "%"))
+
+  (log (concat "  Infrastructure: IE=" (string (round (* ie 100))) "% SE=" (string (round (* se 100))) 
+               "% | Vulnerability=" (string infrastructure_health_score)))
+
+  ;; ═══ OUTPUT SUMMARY ═══
+  (concat "Gauntlet Sol " (string sol) " — "
+    (cond
+      (bootstrap_phase "Bootstrap")
+      (acceleration_phase "Acceleration") 
+      (fortification_phase "Fortification")
+      (optimization_phase "Optimization")
+      (endurance_phase "Endurance")
+      (transcendence_phase "Transcendence")
+      (true "Phase"))
+    " | Threat:"
+    (cond
+      (threat_catastrophic "CATA")
+      (threat_critical "CRIT")
+      (threat_high "HIGH")
+      (threat_elevated "ELEV")
+      (threat_stable "SAFE")
+      (true "?"))
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | CRI:" (string cri)
+    "/" (string (round predicted_cri))
+    " | O2:" (string o2_days)
+    "d F:" (string food_days) "d"))
