@@ -1,0 +1,48 @@
+{
+  "sol": 527,
+  "utc": "2027-01-01T11:49:12Z",
+  "mars": {
+    "ls": 43.1,
+    "season": "Northern Spring",
+    "temp_k": 217.4,
+    "temp_c": -55.8,
+    "pressure_pa": 761,
+    "solar_wm2": 434,
+    "dust_tau": 0.168,
+    "wind_ms": 7.4,
+    "lmst": 4.7
+  },
+  "events": [
+    {
+      "type": "comms_blackout",
+      "severity": 0.64,
+      "duration_sols": 14,
+      "desc": "Solar conjunction \u2014 Earth comms degraded or lost"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0185
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 13.9,
+    "window_open": false,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.83,
+    "water_ice_depth_m": 1.8,
+    "surface_radiation_usv": 0.87
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 526,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 13.2,
+    "dust_delta": 0.019
+  },
+  "_hash": "3861a971b981ba10"
+}

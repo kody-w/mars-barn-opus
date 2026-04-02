@@ -98,6 +98,25 @@ def generate_events(sol, mars, rng):
         events.append({'type': 'cold_snap', 'severity': round(0.4 + rng.next() * 0.4, 2),
                        'duration_sols': rng.randint(3, 10),
                        'desc': 'Extreme cold — battery and actuator performance degraded'})
+
+    # v3: Crew-size events (counter the 2-bot exploit)
+    # Source: ISS crew psychology research, Mars analog mission reports (HI-SEAS, MDRS)
+    if rng.next() < 0.15:
+        events.append({'type': 'workload_overload', 'severity': round(0.3 + rng.next() * 0.5, 2),
+                       'duration_sols': rng.randint(5, 20),
+                       'min_crew': 3,
+                       'desc': 'Maintenance backlog — insufficient crew for concurrent tasks'})
+    if rng.next() < 0.08:
+        events.append({'type': 'mandatory_eva', 'severity': round(0.2 + rng.next() * 0.4, 2),
+                       'duration_sols': rng.randint(1, 3),
+                       'min_crew': 2,
+                       'buddy_required': True,
+                       'desc': 'External repair requires buddy system (2 crew minimum on EVA)'})
+    if rng.next() < 0.05:
+        events.append({'type': 'system_redundancy_check', 'severity': round(0.3 + rng.next() * 0.4, 2),
+                       'duration_sols': 1,
+                       'min_crew': 4,
+                       'desc': 'Safety audit — all critical systems need simultaneous monitoring (4 crew min)'})
     return events
 
 
@@ -170,6 +189,35 @@ def generate_hazards(sol, mars, rng):
                         'degradation': round(0.002 + abs(mars['temp_c'] + 30) * 0.0001, 4),
                         'capacity_loss_pct': round(0.1 + rng.next() * 0.3, 2),
                         'desc': f'Battery capacity loss from cold cycling at {mars["temp_c"]}°C'})
+
+    # v3: Crew-size hazards (the 2-bot exploit dies here)
+
+    # Workload accumulation — fewer crew = more wear per unit
+    # Source: ISS maintenance logs show linear relationship between crew size and equipment longevity
+    if rng.next() < 0.20:
+        workload_mult = 1.0  # baseline for 4+ crew, caller scales by actual crew count
+        hazards.append({'type': 'workload_wear',
+                        'target': rng.choice(['actuator_joint', 'wheel_bearing', 'tool_gripper', 'solar_gimbal', 'hab_seal']),
+                        'degradation_per_missing_crew': round(0.002 + rng.next() * 0.004, 4),
+                        'baseline_crew': 4,
+                        'desc': 'Accelerated wear from understaffing — fewer crew = more cycles per robot'})
+
+    # Single point of failure — with 2 bots, losing 1 is catastrophic
+    # This hazard specifically targets small crews
+    if rng.next() < 0.04:
+        hazards.append({'type': 'critical_solo_failure',
+                        'severity': round(0.5 + rng.next() * 0.4, 2),
+                        'affects': 'weakest_crew_member',
+                        'hp_damage': round(15 + rng.next() * 25),
+                        'desc': 'Major actuator failure — crew member immobilized. No backup available with small crew.'})
+
+    # Concurrent task requirement — some maintenance needs parallel hands
+    if rng.next() < 0.10:
+        hazards.append({'type': 'concurrent_maintenance',
+                        'min_crew_required': rng.choice([3, 3, 4]),
+                        'penalty_if_understaffed': round(0.005 + rng.next() * 0.01, 4),
+                        'target': rng.choice(['solar_array', 'isru_unit', 'hab_structure']),
+                        'desc': 'Multi-point maintenance — requires 3-4 crew working simultaneously'})
 
     return hazards
 

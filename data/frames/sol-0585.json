@@ -1,0 +1,56 @@
+{
+  "sol": 585,
+  "utc": "2027-03-02T02:06:00Z",
+  "mars": {
+    "ls": 73.5,
+    "season": "Northern Spring",
+    "temp_k": 215.4,
+    "temp_c": -57.7,
+    "pressure_pa": 769,
+    "solar_wm2": 423,
+    "dust_tau": 0.208,
+    "wind_ms": 3.2,
+    "lmst": 15.6
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.37,
+      "duration_sols": 10,
+      "desc": "Regional dust storm approaching from the north"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0158
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 13.2,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.63,
+    "water_ice_depth_m": 1.1,
+    "surface_radiation_usv": 0.71
+  },
+  "challenge": {
+    "id": "sol585_software_watchdog_reset",
+    "type": "software_watchdog_reset",
+    "params": {
+      "subsystem": "comm",
+      "reboot_count": 5,
+      "memory_errors": 2
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 584,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 5.8,
+    "dust_delta": 0.107
+  },
+  "_hash": "50f58c36024b37ee"
+}

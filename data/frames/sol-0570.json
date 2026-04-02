@@ -1,0 +1,62 @@
+{
+  "sol": 570,
+  "utc": "2027-02-14T16:12:00Z",
+  "mars": {
+    "ls": 65.7,
+    "season": "Northern Spring",
+    "temp_k": 207.1,
+    "temp_c": -66.0,
+    "pressure_pa": 767,
+    "solar_wm2": 377,
+    "dust_tau": 0.12,
+    "wind_ms": 3.2,
+    "lmst": 1.2
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0078
+    },
+    {
+      "type": "workload_wear",
+      "target": "hab_seal",
+      "degradation_per_missing_crew": 0.0035,
+      "baseline_crew": 4,
+      "desc": "Accelerated wear from understaffing \u2014 fewer crew = more cycles per robot"
+    },
+    {
+      "type": "critical_solo_failure",
+      "severity": 0.87,
+      "affects": "weakest_crew_member",
+      "hp_damage": 35,
+      "desc": "Major actuator failure \u2014 crew member immobilized. No backup available with small crew."
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 13.7,
+    "window_open": false,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.8,
+    "water_ice_depth_m": 1.8,
+    "surface_radiation_usv": 0.79
+  },
+  "challenge": {
+    "id": "sol570_water_recycler_fault",
+    "type": "water_recycler_fault",
+    "params": {
+      "efficiency_drop": 0.25,
+      "filter_age_sols": 39
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 569,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -4.7,
+    "dust_delta": 0.022
+  },
+  "_hash": "ffb3a31f411935c9"
+}

@@ -1,0 +1,61 @@
+{
+  "sol": 593,
+  "utc": "2027-03-10T07:22:48Z",
+  "mars": {
+    "ls": 77.7,
+    "season": "Northern Spring",
+    "temp_k": 213.5,
+    "temp_c": -59.6,
+    "pressure_pa": 769,
+    "solar_wm2": 406,
+    "dust_tau": 0.155,
+    "wind_ms": 6.0,
+    "lmst": 10.4
+  },
+  "events": [
+    {
+      "type": "workload_overload",
+      "severity": 0.71,
+      "duration_sols": 18,
+      "min_crew": 3,
+      "desc": "Maintenance backlog \u2014 insufficient crew for concurrent tasks"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0078
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "antenna",
+      "degradation": 0.0028
+    },
+    {
+      "type": "workload_wear",
+      "target": "tool_gripper",
+      "degradation_per_missing_crew": 0.0048,
+      "baseline_crew": 4,
+      "desc": "Accelerated wear from understaffing \u2014 fewer crew = more cycles per robot"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 12.9,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.71,
+    "water_ice_depth_m": 2.0,
+    "surface_radiation_usv": 0.67
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 592,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 1.0,
+    "dust_delta": 0.006
+  },
+  "_hash": "547537bb30a23abb"
+}

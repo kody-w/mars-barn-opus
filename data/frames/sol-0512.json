@@ -1,0 +1,55 @@
+{
+  "sol": 512,
+  "utc": "2026-12-17T01:55:12Z",
+  "mars": {
+    "ls": 35.3,
+    "season": "Northern Spring",
+    "temp_k": 206.6,
+    "temp_c": -66.5,
+    "pressure_pa": 757,
+    "solar_wm2": 482,
+    "dust_tau": 0.157,
+    "wind_ms": 3.6,
+    "lmst": 14.3
+  },
+  "events": [
+    {
+      "type": "comms_blackout",
+      "severity": 0.44,
+      "duration_sols": 10,
+      "desc": "Solar conjunction \u2014 Earth comms degraded or lost"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0131
+    },
+    {
+      "type": "workload_wear",
+      "target": "solar_gimbal",
+      "degradation_per_missing_crew": 0.0056,
+      "baseline_crew": 4,
+      "desc": "Accelerated wear from understaffing \u2014 fewer crew = more cycles per robot"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 13.7,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.75,
+    "water_ice_depth_m": 1.7,
+    "surface_radiation_usv": 0.78
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 511,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -0.7,
+    "dust_delta": -0.073
+  },
+  "_hash": "40f21fd88ff3c839"
+}

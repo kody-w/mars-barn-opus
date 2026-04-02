@@ -1,0 +1,53 @@
+{
+  "sol": 549,
+  "utc": "2027-01-24T02:20:24Z",
+  "mars": {
+    "ls": 54.7,
+    "season": "Northern Spring",
+    "temp_k": 210.1,
+    "temp_c": -63.1,
+    "pressure_pa": 764,
+    "solar_wm2": 437,
+    "dust_tau": 0.205,
+    "wind_ms": 7.5,
+    "lmst": 14.6
+  },
+  "events": [
+    {
+      "type": "cold_snap",
+      "severity": 0.44,
+      "duration_sols": 10,
+      "desc": "Extreme cold \u2014 battery and actuator performance degraded"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.015
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "wheel_assembly",
+      "degradation": 0.0027
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 14.0,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.55,
+    "water_ice_depth_m": 1.0,
+    "surface_radiation_usv": 0.46
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 548,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -3.0,
+    "dust_delta": 0.142
+  },
+  "_hash": "4c1e3e96701a221a"
+}

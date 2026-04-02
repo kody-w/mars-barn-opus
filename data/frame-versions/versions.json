@@ -1,33 +1,96 @@
 {
   "_format": "mars-barn-frame-versions",
   "description": "Track sim growth over time. Each version adds hazards/fidelity. Same cartridge run against different versions produces different outcomes — the delta IS the learning signal.",
-
   "versions": [
     {
       "version": 1,
       "name": "Foundation",
       "released": "2025-07-09",
-      "sol_range": [1, 161],
-      "hazards": ["micrometeorite", "equipment_fatigue", "dust_accumulation"],
-      "events": ["dust_storm", "dust_devil", "solar_flare", "thermal_cycle"],
-      "challenges": ["solar_tracking_fault", "pressure_anomaly", "water_recycler_fault", "isru_catalyst_degradation", "co2_scrubber_saturation", "radiation_dosimetry"],
+      "sol_range": [
+        1,
+        161
+      ],
+      "hazards": [
+        "micrometeorite",
+        "equipment_fatigue",
+        "dust_accumulation"
+      ],
+      "events": [
+        "dust_storm",
+        "dust_devil",
+        "solar_flare",
+        "thermal_cycle"
+      ],
+      "challenges": [
+        "solar_tracking_fault",
+        "pressure_anomaly",
+        "water_recycler_fault",
+        "isru_catalyst_degradation",
+        "co2_scrubber_saturation",
+        "radiation_dosimetry"
+      ],
       "notes": "Base sim. Mars weather + basic equipment hazards. Robot-only colonies are nearly immortal.",
-      "best_known_run": {"strategy": "optimus_4_robots", "sols": 161, "status": "alive", "grade": "A", "score": 20150}
+      "best_known_run": {
+        "strategy": "optimus_4_robots",
+        "sols": 161,
+        "status": "alive",
+        "grade": "A",
+        "score": 20150
+      }
     },
     {
       "version": 2,
       "name": "Robot Killers",
       "released": "2025-04-01",
-      "sol_range": [162, 201],
-      "hazards_added": ["perchlorate_corrosion", "regolith_abrasion", "electrostatic_dust", "thermal_fatigue", "radiation_seu", "battery_degradation"],
-      "events_added": ["comms_blackout", "cold_snap"],
-      "challenges_added": ["actuator_calibration", "nav_sensor_degradation", "battery_reconditioning", "software_watchdog_reset"],
+      "sol_range": [
+        162,
+        201
+      ],
+      "hazards_added": [
+        "perchlorate_corrosion",
+        "regolith_abrasion",
+        "electrostatic_dust",
+        "thermal_fatigue",
+        "radiation_seu",
+        "battery_degradation"
+      ],
+      "events_added": [
+        "comms_blackout",
+        "cold_snap"
+      ],
+      "challenges_added": [
+        "actuator_calibration",
+        "nav_sensor_degradation",
+        "battery_reconditioning",
+        "software_watchdog_reset"
+      ],
       "notes": "Addresses the robot exploit. Perchlorate eats joints, regolith blinds cameras, radiation flips bits. Pure robot colonies now face real Mars challenges. Hybrid strategies become competitive.",
       "best_known_run": null,
       "backtest_target": "Run v1 best cartridge (optimus_4_robots) against v2 frames. Expected: colony faces new hazards it has no governor logic for. Delta = what the governor needs to learn."
+    },
+    {
+      "version": 3,
+      "name": "Skeleton Crew Killer",
+      "released": "2025-04-01",
+      "sol_range": [
+        503,
+        602
+      ],
+      "hazards_added": [
+        "workload_wear",
+        "critical_solo_failure",
+        "concurrent_maintenance"
+      ],
+      "events_added": [
+        "workload_overload",
+        "mandatory_eva",
+        "system_redundancy_check"
+      ],
+      "notes": "Counters the 2-bot exploit. Fewer crew = more wear per robot, concurrent tasks need 3-4 crew, solo failures are catastrophic with small teams. ISS maintenance data + Mars analog reports.",
+      "best_known_run": null,
+      "backtest_target": "Run v2 best (2 robots, 432 sols) against v3. Expected: workload wear + solo failures kill small crews faster."
     }
   ],
-
   "backtest_protocol": {
     "description": "Run a cartridge from version N against frames from version N+1. The cartridge's governor was optimized for v1 hazards. v2 frames introduce hazards the governor has never seen. The survival delta between v1 and v2 measures how much the sim grew.",
     "steps": [
@@ -43,7 +106,6 @@
       "10. Repeat for v3, v4, ... — the sim grows forever, cartridges evolve forever"
     ]
   },
-
   "growth_metrics": {
     "hazard_count": "How many distinct hazard types exist in this version",
     "event_count": "How many distinct event types",

@@ -1,0 +1,60 @@
+{
+  "sol": 580,
+  "utc": "2027-02-24T22:48:00Z",
+  "mars": {
+    "ls": 70.9,
+    "season": "Northern Spring",
+    "temp_k": 215.8,
+    "temp_c": -57.4,
+    "pressure_pa": 768,
+    "solar_wm2": 390,
+    "dust_tau": 0.217,
+    "wind_ms": 4.8,
+    "lmst": 18.8
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0171
+    },
+    {
+      "type": "perchlorate_corrosion",
+      "target": "tool_gripper",
+      "degradation": 0.0046,
+      "desc": "Perchlorate salt corrosion on mechanical joints"
+    },
+    {
+      "type": "electrostatic_dust",
+      "target": "thermal_radiator",
+      "degradation": 0.0013,
+      "desc": "Electrostatic dust adhesion \u2014 charged particles cling to surfaces"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 13.4,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.72,
+    "water_ice_depth_m": 1.9,
+    "surface_radiation_usv": 0.54
+  },
+  "challenge": {
+    "id": "sol580_pressure_anomaly",
+    "type": "pressure_anomaly",
+    "params": {
+      "section": "hab_b",
+      "drop_pa": 37
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 579,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -0.6,
+    "dust_delta": 0.068
+  },
+  "_hash": "06a9aceb97489b4c"
+}

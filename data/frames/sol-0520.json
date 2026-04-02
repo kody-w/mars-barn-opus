@@ -1,0 +1,74 @@
+{
+  "sol": 520,
+  "utc": "2026-12-25T07:12:00Z",
+  "mars": {
+    "ls": 39.5,
+    "season": "Northern Spring",
+    "temp_k": 207.1,
+    "temp_c": -66.1,
+    "pressure_pa": 759,
+    "solar_wm2": 413,
+    "dust_tau": 0.136,
+    "wind_ms": 3.8,
+    "lmst": 9.2
+  },
+  "events": [
+    {
+      "type": "system_redundancy_check",
+      "severity": 0.51,
+      "duration_sols": 1,
+      "min_crew": 4,
+      "desc": "Safety audit \u2014 all critical systems need simultaneous monitoring (4 crew min)"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0173
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "isru_unit",
+      "degradation": 0.0061
+    },
+    {
+      "type": "perchlorate_corrosion",
+      "target": "solar_gimbal",
+      "degradation": 0.0038,
+      "desc": "Perchlorate salt corrosion on mechanical joints"
+    },
+    {
+      "type": "concurrent_maintenance",
+      "min_crew_required": 3,
+      "penalty_if_understaffed": 0.0087,
+      "target": "hab_structure",
+      "desc": "Multi-point maintenance \u2014 requires 3-4 crew working simultaneously"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 13.8,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.89,
+    "water_ice_depth_m": 2.2,
+    "surface_radiation_usv": 0.56
+  },
+  "challenge": {
+    "id": "sol520_radiation_dosimetry",
+    "type": "radiation_dosimetry",
+    "params": {
+      "cumulative_msv": 217,
+      "rate_usv_h": 1.26
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 519,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -2.0,
+    "dust_delta": -0.056
+  },
+  "_hash": "92c7b2e3a991c5c0"
+}

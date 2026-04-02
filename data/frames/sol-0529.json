@@ -1,0 +1,74 @@
+{
+  "sol": 529,
+  "utc": "2027-01-03T13:08:24Z",
+  "mars": {
+    "ls": 44.2,
+    "season": "Northern Spring",
+    "temp_k": 200.8,
+    "temp_c": -72.3,
+    "pressure_pa": 761,
+    "solar_wm2": 428,
+    "dust_tau": 0.152,
+    "wind_ms": 5.6,
+    "lmst": 3.4
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.78,
+      "duration_sols": 18,
+      "desc": "Regional dust storm approaching from the north"
+    },
+    {
+      "type": "dust_devil",
+      "severity": 0.37,
+      "duration_sols": 1,
+      "desc": "Dust devil spotted near habitat perimeter"
+    },
+    {
+      "type": "cold_snap",
+      "severity": 0.66,
+      "duration_sols": 5,
+      "desc": "Extreme cold \u2014 battery and actuator performance degraded"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0089
+    },
+    {
+      "type": "battery_degradation",
+      "target": "battery_pack",
+      "degradation": 0.0062,
+      "capacity_loss_pct": 0.15,
+      "desc": "Battery capacity loss from cold cycling at -72.3\u00b0C"
+    },
+    {
+      "type": "critical_solo_failure",
+      "severity": 0.71,
+      "affects": "weakest_crew_member",
+      "hp_damage": 33,
+      "desc": "Major actuator failure \u2014 crew member immobilized. No backup available with small crew."
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 14.0,
+    "window_open": false,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.52,
+    "water_ice_depth_m": 2.1,
+    "surface_radiation_usv": 0.57
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 528,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -1.0,
+    "dust_delta": 0.058
+  },
+  "_hash": "41fe8d3d9aaefb8f"
+}

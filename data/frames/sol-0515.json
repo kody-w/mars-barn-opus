@@ -1,0 +1,49 @@
+{
+  "sol": 515,
+  "utc": "2026-12-20T03:54:00Z",
+  "mars": {
+    "ls": 36.9,
+    "season": "Northern Spring",
+    "temp_k": 214.5,
+    "temp_c": -58.7,
+    "pressure_pa": 758,
+    "solar_wm2": 446,
+    "dust_tau": 0.211,
+    "wind_ms": 5.0,
+    "lmst": 12.4
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0132
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 13.8,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.62,
+    "water_ice_depth_m": 2.2,
+    "surface_radiation_usv": 0.3
+  },
+  "challenge": {
+    "id": "sol515_nav_sensor_degradation",
+    "type": "nav_sensor_degradation",
+    "params": {
+      "sensor": "rear_hazcam",
+      "obscuration_pct": 39,
+      "cause": "frost"
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 514,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 9.1,
+    "dust_delta": 0.081
+  },
+  "_hash": "bc434f592bf603e5"
+}

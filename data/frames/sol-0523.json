@@ -1,0 +1,55 @@
+{
+  "sol": 523,
+  "utc": "2026-12-28T09:10:48Z",
+  "mars": {
+    "ls": 41.1,
+    "season": "Northern Spring",
+    "temp_k": 211.5,
+    "temp_c": -61.7,
+    "pressure_pa": 760,
+    "solar_wm2": 426,
+    "dust_tau": 0.144,
+    "wind_ms": 3.0,
+    "lmst": 7.2
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.36,
+      "duration_sols": 19,
+      "desc": "Regional dust storm approaching from the north"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0058
+    },
+    {
+      "type": "battery_degradation",
+      "target": "battery_pack",
+      "degradation": 0.0052,
+      "capacity_loss_pct": 0.36,
+      "desc": "Battery capacity loss from cold cycling at -61.7\u00b0C"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 13.9,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.76,
+    "water_ice_depth_m": 1.1,
+    "surface_radiation_usv": 0.41
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 522,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 6.0,
+    "dust_delta": -0.027
+  },
+  "_hash": "4a618e230660ffe2"
+}

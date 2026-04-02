@@ -1,0 +1,49 @@
+{
+  "sol": 552,
+  "utc": "2027-01-27T04:19:12Z",
+  "mars": {
+    "ls": 56.2,
+    "season": "Northern Spring",
+    "temp_k": 203.8,
+    "temp_c": -69.3,
+    "pressure_pa": 765,
+    "solar_wm2": 471,
+    "dust_tau": 0.102,
+    "wind_ms": 2.0,
+    "lmst": 12.7
+  },
+  "events": [
+    {
+      "type": "system_redundancy_check",
+      "severity": 0.37,
+      "duration_sols": 1,
+      "min_crew": 4,
+      "desc": "Safety audit \u2014 all critical systems need simultaneous monitoring (4 crew min)"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0068
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 13.9,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.54,
+    "water_ice_depth_m": 1.6,
+    "surface_radiation_usv": 0.6
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 551,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": 1.3,
+    "dust_delta": 0.052
+  },
+  "_hash": "12b7072595970533"
+}

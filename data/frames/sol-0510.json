@@ -1,0 +1,68 @@
+{
+  "sol": 510,
+  "utc": "2026-12-15T00:36:00Z",
+  "mars": {
+    "ls": 34.2,
+    "season": "Northern Spring",
+    "temp_k": 203.6,
+    "temp_c": -69.6,
+    "pressure_pa": 757,
+    "solar_wm2": 399,
+    "dust_tau": 0.147,
+    "wind_ms": 3.6,
+    "lmst": 15.6
+  },
+  "events": [
+    {
+      "type": "dust_devil",
+      "severity": 0.37,
+      "duration_sols": 1,
+      "desc": "Dust devil spotted near habitat perimeter"
+    },
+    {
+      "type": "workload_overload",
+      "severity": 0.45,
+      "duration_sols": 20,
+      "min_crew": 3,
+      "desc": "Maintenance backlog \u2014 insufficient crew for concurrent tasks"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0092
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "hab_seal",
+      "degradation": 0.0086
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 13.7,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.74,
+    "water_ice_depth_m": 1.4,
+    "surface_radiation_usv": 0.67
+  },
+  "challenge": {
+    "id": "sol510_nav_sensor_degradation",
+    "type": "nav_sensor_degradation",
+    "params": {
+      "sensor": "rear_hazcam",
+      "obscuration_pct": 51,
+      "cause": "frost"
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 509,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -0.6,
+    "dust_delta": 0.05
+  },
+  "_hash": "2c9a5a4e7defc884"
+}

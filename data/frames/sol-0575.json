@@ -1,0 +1,61 @@
+{
+  "sol": 575,
+  "utc": "2027-02-19T19:30:00Z",
+  "mars": {
+    "ls": 68.3,
+    "season": "Northern Spring",
+    "temp_k": 209.6,
+    "temp_c": -63.6,
+    "pressure_pa": 768,
+    "solar_wm2": 374,
+    "dust_tau": 0.073,
+    "wind_ms": 3.0,
+    "lmst": 22.0
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.011
+    },
+    {
+      "type": "perchlorate_corrosion",
+      "target": "actuator_joint",
+      "degradation": 0.0086,
+      "desc": "Perchlorate salt corrosion on mechanical joints"
+    },
+    {
+      "type": "radiation_seu",
+      "target": "motor_controller",
+      "severity": 0.37,
+      "desc": "Radiation single-event upset \u2014 bit flip in robot computer"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 13.5,
+    "window_open": false,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.62,
+    "water_ice_depth_m": 1.5,
+    "surface_radiation_usv": 0.88
+  },
+  "challenge": {
+    "id": "sol575_nav_sensor_degradation",
+    "type": "nav_sensor_degradation",
+    "params": {
+      "sensor": "front_hazcam",
+      "obscuration_pct": 44,
+      "cause": "abrasion"
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 574,
+    "global_dust_trend": "falling",
+    "solar_efficiency_trend": "improving",
+    "temp_delta": -4.3,
+    "dust_delta": -0.042
+  },
+  "_hash": "77a6eeb386b29181"
+}

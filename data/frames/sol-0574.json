@@ -1,0 +1,47 @@
+{
+  "sol": 574,
+  "utc": "2027-02-18T18:50:24Z",
+  "mars": {
+    "ls": 67.8,
+    "season": "Northern Spring",
+    "temp_k": 213.9,
+    "temp_c": -59.2,
+    "pressure_pa": 768,
+    "solar_wm2": 418,
+    "dust_tau": 0.115,
+    "wind_ms": 6.6,
+    "lmst": 22.6
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0067
+    },
+    {
+      "type": "radiation_seu",
+      "target": "comm_processor",
+      "severity": 0.52,
+      "desc": "Radiation single-event upset \u2014 bit flip in robot computer"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 13.6,
+    "window_open": false,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.85,
+    "water_ice_depth_m": 1.1,
+    "surface_radiation_usv": 0.57
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 573,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -3.0,
+    "dust_delta": -0.069
+  },
+  "_hash": "893f018636be4db8"
+}

@@ -1,0 +1,61 @@
+{
+  "sol": 597,
+  "utc": "2027-03-14T10:01:12Z",
+  "mars": {
+    "ls": 79.8,
+    "season": "Northern Spring",
+    "temp_k": 210.4,
+    "temp_c": -62.7,
+    "pressure_pa": 770,
+    "solar_wm2": 439,
+    "dust_tau": 0.144,
+    "wind_ms": 3.9,
+    "lmst": 7.9
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.88,
+      "duration_sols": 5,
+      "desc": "Regional dust storm approaching from the north"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0057
+    },
+    {
+      "type": "electrostatic_dust",
+      "target": "solar_array",
+      "degradation": 0.0035,
+      "desc": "Electrostatic dust adhesion \u2014 charged particles cling to surfaces"
+    },
+    {
+      "type": "workload_wear",
+      "target": "hab_seal",
+      "degradation_per_missing_crew": 0.0023,
+      "baseline_crew": 4,
+      "desc": "Accelerated wear from understaffing \u2014 fewer crew = more cycles per robot"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 12.8,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.81,
+    "water_ice_depth_m": 0.8,
+    "surface_radiation_usv": 0.43
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 596,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -7.9,
+    "dust_delta": -0.018
+  },
+  "_hash": "221c50a89fb304a3"
+}
