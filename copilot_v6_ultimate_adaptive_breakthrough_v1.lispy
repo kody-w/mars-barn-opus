@@ -1,0 +1,315 @@
+;; COPILOT V6 ULTIMATE ADAPTIVE BREAKTHROUGH v1
+;; Target: 110,000+ via optimized robot survival + CRI minimization
+;; Strategy: Adaptive thermal protection + precision repair allocation + resource efficiency
+;; Innovation: Dynamic repair targeting based on v6 degradation patterns
+
+(begin
+  (define _agent_name "Copilot V6 Ultimate Adaptive Breakthrough v1")
+  (define _agent_desc "Ultimate adaptive v6 robot survival with precision CRI control for 110,000+ target")
+  
+  (log (concat "🤖🔧⚡🎯 V6 ULTIMATE ADAPTIVE — Sol " (string sol) " — CRI:" (string colony_risk_index) " — Target: 110,000+"))
+  
+  ;; ═══ V6 ROBOT SURVIVAL SCIENCE ═══ 
+  ;; Critical insight: repair_rate = 0.05 * (1.0 + repair_bonus) means repair_bay module is CRITICAL
+  ;; V6 failures accumulate exponentially - must counter with exponential repair response
+  ;; Thermal shock (140°C swings) + power brownouts are the primary killers
+  
+  ;; Robot health monitoring (5 robots total)
+  (define robot_count 5)
+  (define robot_avg_hp (if (> crew_count 0) (/ crew_total_hp crew_count) 100))
+  (define robot_min_hp crew_min_hp)
+  (define robot_health_excellent (>= robot_min_hp 85))   ;; Perfect state
+  (define robot_health_good (>= robot_min_hp 70))        ;; Good state  
+  (define robot_health_decent (>= robot_min_hp 55))      ;; Decent state
+  (define robot_health_concerning (>= robot_min_hp 40))  ;; Concerning
+  (define robot_health_critical (>= robot_min_hp 25))    ;; Critical
+  (define robot_health_emergency (< robot_min_hp 25))    ;; Emergency
+  (define robot_death_imminent (< robot_min_hp 15))      ;; Death imminent
+  
+  ;; V6 period detection with enhanced preparation phases
+  (define v6_active_period (and (>= sol 778) (<= sol 847)))     ;; Zero-human period
+  (define v6_final_phase (and (>= sol 830) (<= sol 847)))       ;; Last 17 sols (most dangerous)
+  (define v6_critical_phase (and (>= sol 800) (< sol 830)))     ;; Middle phase (degradation peaks)
+  (define v6_initial_phase (and (>= sol 778) (< sol 800)))      ;; Initial phase (adaptation period)
+  (define v6_preparation (and (>= sol 720) (< sol 778)))        ;; 58-sol preparation window
+  (define v6_early_prep (and (>= sol 650) (< sol 720)))         ;; Early preparation phase
+  (define post_v6 (> sol 847))                                  ;; Post-v6 victory mode
+  
+  ;; ═══ ADAPTIVE THERMAL PROTECTION ═══
+  ;; Thermal shock mitigation - critical for preventing component failures
+  ;; Based on degradation analysis: thermal protection prevents cascading failures
+  (define adaptive_thermal_protection 
+    (cond
+      ;; V6 FINAL PHASE - Maximum thermal emergency
+      ((and v6_final_phase robot_death_imminent) 0.25)         ;; Ultimate emergency
+      ((and v6_final_phase robot_health_emergency) 0.20)       ;; Final phase emergency
+      ((and v6_final_phase robot_health_critical) 0.15)        ;; Final phase critical
+      (v6_final_phase 0.10)                                    ;; Final phase base
+      ;; V6 CRITICAL PHASE - High thermal protection
+      ((and v6_critical_phase robot_death_imminent) 0.22)      ;; Critical emergency
+      ((and v6_critical_phase robot_health_emergency) 0.17)    ;; Critical phase emergency
+      ((and v6_critical_phase robot_health_critical) 0.12)     ;; Critical phase critical
+      (v6_critical_phase 0.08)                                 ;; Critical phase base
+      ;; V6 INITIAL PHASE - Moderate thermal protection
+      ((and v6_initial_phase robot_health_emergency) 0.15)     ;; Initial emergency
+      ((and v6_initial_phase robot_health_critical) 0.10)      ;; Initial critical
+      (v6_initial_phase 0.06)                                  ;; Initial base
+      ;; V6 PREPARATION - Preventive thermal protection
+      ((and v6_preparation robot_health_critical) 0.08)        ;; Prep critical
+      (v6_preparation 0.04)                                    ;; Prep base
+      ;; EARLY PREP - Light thermal protection
+      ((and v6_early_prep robot_health_critical) 0.05)         ;; Early prep critical
+      (v6_early_prep 0.02)                                     ;; Early prep base
+      ;; GENERAL - Maintenance thermal protection
+      ((and robot_health_critical (> sol 300)) 0.03)           ;; General critical care
+      (true 0.00)))                                            ;; Normal operations
+  
+  ;; ═══ CRI PRECISION TARGETING ═══
+  ;; Target P75 CRI ≤ 25 for maximum score boost (+110 points minimum)
+  ;; CRI = 5 + power_penalty + resource_penalties + event_penalties
+  ;; Resource penalties: 20 each for <5 days O2/H2O/Food
+  ;; Power penalty: 10 for 50-150kWh, 25 for <50kWh
+  
+  (define cri_safe_power 160)        ;; 7% buffer above 150 penalty threshold
+  (define cri_safe_o2_days 6.0)      ;; 20% buffer above 5.0 penalty threshold
+  (define cri_safe_h2o_days 6.0)     ;; 20% buffer above 5.0 penalty threshold
+  (define cri_safe_food_days 6.0)    ;; 20% buffer above 5.0 penalty threshold
+  
+  ;; CRI status monitoring
+  (define cri_perfect (<= colony_risk_index 15))       ;; Perfect control
+  (define cri_excellent (<= colony_risk_index 20))     ;; Excellent control
+  (define cri_target (<= colony_risk_index 25))        ;; Target achieved
+  (define cri_acceptable (<= colony_risk_index 30))    ;; Acceptable
+  (define cri_warning (> colony_risk_index 30))        ;; Warning level
+  
+  ;; ═══ ADAPTIVE RESOURCE ALLOCATION ═══
+  ;; Precision allocation to maintain exactly CRI-safe levels while maximizing robot survival
+  
+  ;; Power allocation (critical for robot charging and thermal stability)
+  (define adaptive_power_need
+    (cond
+      ((< power 120) 0.90)                             ;; Power crisis
+      ((< power cri_safe_power) 0.70)                  ;; Building to safe level
+      ((and v6_active_period (< power 250)) 0.60)      ;; V6 power security
+      ((and v6_preparation (< power 200)) 0.55)        ;; V6 prep power build
+      ((< power 300) 0.50)                             ;; General power maintenance
+      (true 0.45)))                                    ;; Efficient maintenance
+  
+  ;; O2 allocation (minimal for robots but needed for CRI)
+  (define adaptive_o2_need
+    (cond
+      ((< o2_days 4.0) 0.85)                           ;; O2 emergency
+      ((< o2_days cri_safe_o2_days) 0.60)              ;; Build to CRI-safe level
+      ((< o2_days 10.0) 0.35)                          ;; Maintenance above safe
+      (true 0.25)))                                    ;; Minimal when abundant
+  
+  ;; H2O allocation (for greenhouse and CRI safety)
+  (define adaptive_h2o_need
+    (cond
+      ((< h2o_days 4.0) 0.80)                          ;; H2O emergency
+      ((< h2o_days cri_safe_h2o_days) 0.55)            ;; Build to CRI-safe level
+      ((< h2o_days 12.0) 0.30)                         ;; Maintenance above safe
+      (true 0.20)))                                    ;; Minimal when abundant
+  
+  ;; Food allocation (for CRI only - robots don't eat)
+  (define adaptive_food_need
+    (cond
+      ((< food_days 4.0) 0.70)                         ;; Food emergency
+      ((< food_days cri_safe_food_days) 0.45)          ;; Build to CRI-safe level
+      ((< food_days 15.0) 0.25)                        ;; Maintenance above safe
+      (true 0.15)))                                    ;; Minimal when abundant
+  
+  (define adaptive_isru_need (max adaptive_o2_need adaptive_h2o_need))
+  
+  ;; ═══ ADAPTIVE RESPONSE MULTIPLIERS ═══
+  ;; Dynamic response to CRI, events, and robot health
+  
+  (define adaptive_cri_response
+    (cond
+      (cri_perfect 1.0)          ;; Perfect CRI = efficient operation
+      (cri_excellent 1.1)        ;; Excellent CRI = minimal response
+      (cri_target 1.2)           ;; Target CRI = light response
+      (cri_acceptable 1.5)       ;; Acceptable CRI = moderate response
+      (true 2.0)))               ;; Warning CRI = emergency response
+  
+  (define event_count (length events))
+  (define adaptive_event_response
+    (cond
+      ((and v6_active_period (>= event_count 3)) 2.2)          ;; V6 + many events
+      ((and v6_active_period (>= event_count 2)) 1.8)          ;; V6 + events
+      ((and v6_active_period (>= event_count 1)) 1.5)          ;; V6 + single event
+      (v6_active_period 1.3)                                   ;; V6 base response
+      ((>= event_count 4) 1.9)                                 ;; Many events
+      ((>= event_count 3) 1.6)                                 ;; Several events
+      ((>= event_count 2) 1.3)                                 ;; Couple events
+      ((>= event_count 1) 1.1)                                 ;; Single event
+      (true 1.0)))                                             ;; No events
+  
+  (define adaptive_robot_response
+    (cond
+      (robot_death_imminent 3.0)        ;; Maximum robot protection
+      (robot_health_emergency 2.5)      ;; Emergency robot protection
+      (robot_health_critical 2.0)       ;; Critical robot protection
+      ((not robot_health_decent) 1.5)   ;; Moderate robot boost
+      (robot_health_good 1.2)           ;; Maintenance when good
+      (true 1.0)))                      ;; Normal when excellent
+  
+  ;; ═══ ANTI-COMPLACENCY VARIANCE ═══
+  ;; Minimal variance to prevent v5 complacency while maintaining CRI precision
+  (define variance_cycle (mod sol 13))  ;; Prime number cycle
+  (define variance_phase (/ (* 2.0 3.14159 variance_cycle) 13.0))
+  
+  (define heating_variance (* 0.008 (sin variance_phase)))        ;; ±0.8% variance
+  (define isru_variance (* 0.006 (cos variance_phase)))           ;; ±0.6% variance  
+  (define greenhouse_variance (* -0.5 (+ heating_variance isru_variance)))  ;; Compensating variance
+  
+  ;; ═══ ADAPTIVE ALLOCATION CALCULATION ═══
+  (define base_heating (* adaptive_power_need adaptive_cri_response adaptive_event_response adaptive_robot_response))
+  (define base_isru (* adaptive_isru_need adaptive_cri_response adaptive_event_response adaptive_robot_response))
+  (define base_greenhouse (* adaptive_food_need adaptive_cri_response adaptive_event_response adaptive_robot_response))
+  
+  ;; Apply thermal protection and variance
+  (define thermal_heating (+ base_heating adaptive_thermal_protection))
+  (define variance_heating_final (+ thermal_heating heating_variance))
+  (define variance_isru_final (+ base_isru isru_variance))
+  (define variance_greenhouse_final (+ base_greenhouse greenhouse_variance))
+  
+  ;; Apply constraints and normalization
+  (define constrained_heating (max 0.20 (min 0.80 variance_heating_final)))
+  (define constrained_isru (max 0.15 (min 0.70 variance_isru_final)))
+  (define constrained_greenhouse (max 0.10 (min 0.60 variance_greenhouse_final)))
+  
+  (define total_allocation (+ constrained_heating constrained_isru constrained_greenhouse))
+  (define norm_factor (/ 1.0 total_allocation))
+  
+  (define final_heating (* constrained_heating norm_factor))
+  (define final_isru (* constrained_isru norm_factor))
+  (define final_greenhouse (* constrained_greenhouse norm_factor))
+  
+  ;; ═══ ADAPTIVE REPAIR OPTIMIZATION ═══
+  ;; Exponential repair scaling during v6 to counter exponential degradation
+  (define adaptive_repair_multiplier
+    (cond
+      ;; V6 FINAL PHASE - Maximum repair intensity
+      ((and v6_final_phase robot_death_imminent) 20.0)         ;; Ultimate emergency repair
+      ((and v6_final_phase robot_health_emergency) 15.0)       ;; Final emergency repair
+      ((and v6_final_phase robot_health_critical) 12.0)        ;; Final critical repair
+      (v6_final_phase 8.0)                                     ;; Final phase base repair
+      ;; V6 CRITICAL PHASE - High repair intensity
+      ((and v6_critical_phase robot_death_imminent) 18.0)      ;; Critical emergency repair
+      ((and v6_critical_phase robot_health_emergency) 13.0)    ;; Critical emergency repair
+      ((and v6_critical_phase robot_health_critical) 10.0)     ;; Critical critical repair
+      (v6_critical_phase 6.5)                                  ;; Critical phase base repair
+      ;; V6 INITIAL PHASE - Moderate repair intensity
+      ((and v6_initial_phase robot_health_emergency) 12.0)     ;; Initial emergency repair
+      ((and v6_initial_phase robot_health_critical) 8.0)       ;; Initial critical repair
+      (v6_initial_phase 5.0)                                   ;; Initial phase base repair
+      ;; V6 PREPARATION - Preventive repair
+      ((and v6_preparation robot_health_critical) 6.0)         ;; Prep critical repair
+      (v6_preparation 3.5)                                     ;; Prep base repair
+      ;; GENERAL ROBOT MAINTENANCE
+      (robot_death_imminent 15.0)                              ;; General emergency
+      (robot_health_emergency 10.0)                            ;; General emergency
+      (robot_health_critical 6.0)                              ;; General critical
+      ((not robot_health_decent) 4.0)                          ;; General concerning
+      (robot_health_good 2.8)                                  ;; Good maintenance
+      (true 2.0)))                                             ;; Excellent baseline
+  
+  ;; ═══ EMERGENCY OVERRIDE SYSTEM ═══
+  (define power_crisis (< power 150))
+  (define crew_death_crisis (< crew_min_hp 12))
+  (define resource_crisis (or (< o2_days 3.0) (< h2o_days 3.0)))
+  
+  (cond
+    ;; CREW DEATH CRISIS - Ultimate robot preservation
+    (crew_death_crisis
+     (set-heating 0.80)
+     (set-isru 0.15)
+     (set-greenhouse 0.05)
+     (set-repair 25.0)
+     (log "🚨🤖💀 CREW DEATH CRISIS: Maximum robot preservation"))
+     
+    ;; POWER CRISIS - Emergency power generation
+    (power_crisis
+     (set-heating 0.85)
+     (set-isru 0.12)
+     (set-greenhouse 0.03)
+     (set-repair adaptive_repair_multiplier)
+     (log "🚨⚡ POWER CRISIS: Emergency power generation"))
+     
+    ;; RESOURCE CRISIS - Emergency resource production
+    (resource_crisis
+     (set-heating 0.25)
+     (set-isru 0.70)
+     (set-greenhouse 0.05)
+     (set-repair adaptive_repair_multiplier)
+     (log "🚨📦 RESOURCE CRISIS: Emergency ISRU production"))
+    
+    ;; NORMAL - Adaptive allocation
+    (true
+     (set-heating final_heating)
+     (set-isru final_isru)
+     (set-greenhouse final_greenhouse)
+     (set-repair adaptive_repair_multiplier)))
+
+  ;; ═══ ADAPTIVE FOOD RATIONING ═══
+  (define adaptive_food_ration
+    (cond
+      ((< food_days 3.0) 0.60)                                 ;; Emergency rationing
+      ((< food_days cri_safe_food_days) 0.85)                  ;; Building to safe level
+      ((< food_days 15.0) 0.95)                                ;; Maintenance rationing
+      (true 1.0)))                                             ;; Full rations when abundant
+
+  (set-food-ration adaptive_food_ration)
+
+  ;; ═══ STATUS MONITORING ═══
+  (define robot_status
+    (cond
+      (crew_death_crisis "🤖💀DEATH_CRISIS")
+      (robot_health_emergency "🤖🚨EMERGENCY")
+      (robot_health_critical "🤖⚠️CRITICAL")
+      ((not robot_health_decent) "🤖🔴CONCERNING")
+      (robot_health_good "🤖🟡GOOD")
+      (robot_health_excellent "🤖✅EXCELLENT")
+      (true "🤖🌟PERFECT")))
+
+  (define cri_status
+    (cond
+      (cri_perfect "📊🌟PERFECT")
+      (cri_excellent "📊✅EXCELLENT")
+      (cri_target "📊🎯TARGET")
+      (cri_acceptable "📊🟡ACCEPTABLE")
+      (true "📊🚨WARNING")))
+
+  (define v6_phase_status
+    (cond
+      (v6_final_phase "🏁FINAL")
+      (v6_critical_phase "⚠️CRITICAL")
+      (v6_initial_phase "🚀INITIAL")
+      (v6_preparation "🔧PREP")
+      (v6_early_prep "📋EARLY_PREP")
+      (post_v6 "🏆POST_V6")
+      (true "🌍NORMAL")))
+
+  ;; Score projection (target: 110,000+)
+  (define current_score_projection
+    (+ 87000                                                    ;; Max sols
+       (* crew_count 500)                                       ;; Current crew score  
+       1200                                                     ;; Max module score
+       20000                                                    ;; Max survival score
+       (* colony_risk_index -10)))                              ;; CRI penalty
+
+  (log (concat "  🎯 Target: " cri_status " | Robots:" (string crew_count) " | Proj:" (string current_score_projection)))
+  (log (concat "  🤖 Robots: " robot_status " | AvgHP:" (string (round robot_avg_hp 1)) " | MinHP:" (string (round robot_min_hp 1))))
+  (log (concat "  📊 CRI: " (string colony_risk_index) " | Phase: " v6_phase_status " | Repair:" (string adaptive_repair_multiplier) "x"))
+  (log (concat "  🔧 Thermal: " (string adaptive_thermal_protection) " | Power:" (string (round power)) "/" (string cri_safe_power)))
+  (log (concat "  📦 Resources: O2:" (string (round o2_days 1)) " H2O:" (string (round h2o_days 1)) " Food:" (string (round food_days 1))))
+
+  ;; Success indicators
+  (if (and (>= crew_count 3) cri_target (>= power cri_safe_power))
+    (log "🚀🏆🤖✅ ULTIMATE BREAKTHROUGH SUCCESS: 110,000+ trajectory!")
+    (log "🚀📊🔧 Adaptive optimization in progress..."))
+
+  ;; Return adaptive allocations
+  (list final_heating final_isru final_greenhouse 0.0 adaptive_food_ration)
+)

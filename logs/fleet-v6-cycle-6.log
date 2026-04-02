@@ -1,0 +1,16 @@
+● Read RULES.md
+  └ 210 lines read
+
+● Change to the project directory (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && pwd
+  └ 2 lines...
+
+Now let me understand the current strategy situation and test the gauntlet to see the current performance:
+
+● List directory .
+  └ 296 files found
+
+● Quick test to see current performance with small sample (shell)
+  │ node tools/gauntlet.js --monte-carlo 3
+  └ 28 lines...
+
