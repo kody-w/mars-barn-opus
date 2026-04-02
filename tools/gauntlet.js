@@ -577,14 +577,14 @@ function tick(st, sol, frame, R){
   else if(sol===365&&st.power>1060) {st.mod.push('water_extractor')} // 4th water
   else if(sol===380&&st.power>1100) {st.mod.push('greenhouse_dome')} // 4th greenhouse
   else if(sol===395&&st.power>1140) {st.mod.push('solar_farm')}    // 14th solar
-  else if(sol===410&&st.power>1180) {st.mod.push('repair_bay')}    // 10th repair bay - ultimate quantum
-  else if(sol===425&&st.power>1220) {st.mod.push('isru_plant')}    // 5th ISRU
-  else if(sol===440&&st.power>1260) {st.mod.push('water_extractor')} // 5th water
-  else if(sol===455&&st.power>1300) {st.mod.push('greenhouse_dome')} // 5th greenhouse
-  else if(sol===470&&st.power>1340) {st.mod.push('isru_plant')}    // 6th ISRU
-  else if(sol===485&&st.power>1380) {st.mod.push('water_extractor')} // 6th water
-  else if(sol===500&&st.power>1420) {st.mod.push('greenhouse_dome')} // 6th greenhouse
-  else if(sol===515&&st.power>1460) {st.mod.push('solar_farm')}    // 15th solar - ultimate abundance
+  else if(sol===410&&st.power>1180&&st.mod.length<12) {st.mod.push('repair_bay')}    // 10th repair bay - only if under 12
+  else if(sol===425&&st.power>1220&&st.mod.length<12) {st.mod.push('isru_plant')}    // 5th ISRU - only if under 12
+  else if(sol===440&&st.power>1260&&st.mod.length<12) {st.mod.push('water_extractor')} // 5th water - only if under 12
+  else if(sol===455&&st.power>1300&&st.mod.length<12) {st.mod.push('greenhouse_dome')} // 5th greenhouse - only if under 12
+  else if(sol===470&&st.power>1340&&st.mod.length<12) {st.mod.push('isru_plant')}    // 6th ISRU - only if under 12
+  else if(sol===485&&st.power>1380&&st.mod.length<12) {st.mod.push('water_extractor')} // 6th water - only if under 12
+  else if(sol===500&&st.power>1420&&st.mod.length<12) {st.mod.push('greenhouse_dome')} // 6th greenhouse - only if under 12
+  else if(sol===515&&st.power>1460&&st.mod.length<12) {st.mod.push('solar_farm')}    // 15th solar - only if under 12
 
   // CRI
   st.cri=Math.min(100,Math.max(0,5+(st.power<50?25:st.power<150?10:0)+st.ev.length*6

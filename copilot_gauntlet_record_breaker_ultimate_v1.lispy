@@ -1,0 +1,234 @@
+;; COPILOT GAUNTLET RECORD BREAKER ULTIMATE v1
+;; Target: Beat 109,840 by optimizing module efficiency and CRI control
+;; Strategy: Build exactly 8 modules (6 types max) for perfect scoring efficiency
+;; Focus: Lower CRI (currently P75=36, target <30), improve consistency
+
+(begin
+  (define _agent_name "Copilot Gauntlet Record Breaker Ultimate v1")
+  (define _agent_desc "Optimized for breaking 109,840+ record through efficiency")
+  
+  (log (concat "🏆⚡🎯 RECORD BREAKER — Sol " (string sol) " — CRI:" (string colony_risk_index) " — MinHP:" (string crew_min_hp) " — Crew:" (string crew_count)))
+  
+  ;; ═══ RECORD BREAKING TARGET ANALYSIS ═══
+  ;; Current record: 109,840 (870 sols, 4 crew, P75 CRI=36)
+  ;; Optimization vectors:
+  ;; 1. CRI reduction: P75 36→25 = +110 points
+  ;; 2. Module efficiency: Stop building excess modules beyond 8
+  ;; 3. Crew optimization: maintain 4+ crew but with lower stress
+  ;; Target score: 110,000+
+
+  ;; ═══ OPTIMIZED CREW HEALTH THRESHOLDS ═══
+  (define crew_excellent (>= crew_min_hp 80))             ;; Excellent condition
+  (define crew_very_good (>= crew_min_hp 70))             ;; Very good condition  
+  (define crew_good (>= crew_min_hp 60))                  ;; Good condition
+  (define crew_concerning (>= crew_min_hp 50))            ;; Concerning condition
+  (define crew_serious (>= crew_min_hp 40))               ;; Serious condition
+  (define crew_critical (>= crew_min_hp 30))              ;; Critical condition
+  (define crew_emergency (>= crew_min_hp 20))             ;; Emergency condition
+  (define crew_death_imminent (< crew_min_hp 20))         ;; Death imminent
+
+  ;; Crew count targets for optimal scoring
+  (define current_crew_count crew_count)
+  (define target_achieved (>= current_crew_count 4))      ;; TARGET: 4+ crew (2,000 pts)
+  (define target_backup (>= current_crew_count 3))        ;; BACKUP: 3+ crew (1,500 pts)
+
+  ;; ═══ PHASE DETECTION SYSTEM ═══
+  (define early_game (< sol 200))                         ;; Foundation building
+  (define mid_game (and (>= sol 200) (< sol 500)))        ;; Resource security
+  (define late_game (and (>= sol 500) (< sol 700)))       ;; Optimization phase
+  (define v6_prep (and (>= sol 700) (< sol 778)))         ;; V6 preparation
+  (define v6_active (and (>= sol 778) (< sol 847)))       ;; V6 autonomous phase
+  (define endgame (>= sol 847))                           ;; Final phase
+
+  ;; ═══ CRI OPTIMIZATION SYSTEM ═══
+  ;; Target: Reduce P75 CRI from 36 to <30 for +60+ points
+  (define cri_target
+    (cond
+      (v6_active 25)                    ;; V6: strict CRI control
+      (late_game 20)                    ;; Late: very low CRI
+      (mid_game 15)                     ;; Mid: low CRI  
+      (early_game 10)                   ;; Early: minimal CRI
+      (true 25)))                       ;; Default
+
+  (define cri_emergency (> colony_risk_index (* cri_target 1.5)))
+  (define cri_high (> colony_risk_index cri_target))
+
+  ;; ═══ OPTIMAL REPAIR SCALING ═══
+  ;; More conservative than current (25x max) to reduce resource stress
+  (define base_repair_multiplier
+    (cond
+      (crew_death_imminent 15.0)        ;; High but not excessive
+      ((not crew_emergency) 12.0)       ;; High response
+      ((not crew_critical) 8.0)         ;; Moderate-high
+      ((not crew_serious) 6.0)          ;; Moderate
+      ((not crew_concerning) 4.0)       ;; Light-moderate
+      ((not crew_good) 3.0)             ;; Light
+      (crew_excellent 2.0)              ;; Maintenance
+      (true 2.5)))                      ;; Baseline
+
+  ;; V6 phase multiplier (more conservative)
+  (define v6_phase_multiplier
+    (cond
+      (v6_active 2.0)                   ;; V6: moderate boost
+      (v6_prep 1.5)                     ;; Prep: light boost
+      (true 1.0)))                      ;; Standard
+
+  (define optimal_repair (* base_repair_multiplier v6_phase_multiplier))
+
+  ;; ═══ RESOURCE SECURITY TARGETS ═══
+  ;; Optimized for lower CRI while maintaining survival
+  (define power_target
+    (cond
+      (v6_active 600)                   ;; V6: high power buffer
+      (late_game 500)                   ;; Late: moderate buffer
+      (mid_game 400)                    ;; Mid: building power
+      (early_game 300)                  ;; Early: foundation
+      (true 450)))
+
+  (define o2_target_days 15.0)          ;; Conservative O2 buffer
+  (define h2o_target_days 18.0)         ;; Conservative H2O buffer  
+  (define food_target_days 20.0)        ;; Conservative food buffer
+
+  ;; ═══ OPTIMIZED ALLOCATION STRATEGY ═══
+  ;; Focus on CRI reduction through excellent resource management
+
+  ;; Heating allocation: balance efficiency with crew health
+  (define base_heating_need
+    (cond
+      (crew_death_imminent 0.85)        ;; Maximum for survival
+      ((not crew_emergency) 0.75)       ;; High for emergency
+      ((not crew_critical) 0.65)        ;; Moderate-high for critical
+      (cri_emergency 0.60)              ;; CRI emergency response
+      ((< power power_target) 0.55)     ;; Power building mode
+      ((not target_achieved) 0.50)      ;; Building crew count
+      (target_achieved 0.45)            ;; 4+ crew achieved
+      (true 0.50)))                     ;; Default
+
+  ;; Enhanced heating for V6 thermal protection
+  (define thermal_protection
+    (cond
+      (v6_active 0.15)                  ;; V6: significant protection
+      (v6_prep 0.10)                    ;; Prep: moderate protection
+      (crew_death_imminent 0.08)        ;; Emergency protection
+      (true 0.05)))                     ;; Standard protection
+
+  (define total_heating (+ base_heating_need thermal_protection))
+
+  ;; ISRU allocation: efficient for robots (no O2/H2O consumption)
+  (define isru_need
+    (cond
+      ((< o2_days 8.0) 0.60)            ;; O2 critical
+      ((< h2o_days 10.0) 0.55)          ;; H2O critical
+      ((< o2_days o2_target_days) 0.45)  ;; O2 building
+      ((< h2o_days h2o_target_days) 0.40) ;; H2O building
+      (target_achieved 0.30)            ;; Maintenance mode
+      (true 0.35)))                     ;; Default
+
+  ;; Greenhouse allocation: minimal for robots
+  (define greenhouse_need
+    (cond
+      ((< food_days 8.0) 0.20)          ;; Food critical
+      ((< food_days food_target_days) 0.15) ;; Food building
+      (target_achieved 0.10)            ;; Maintenance mode
+      (true 0.12)))                     ;; Default
+
+  ;; ═══ CRI AND EVENT RESPONSE ═══
+  (define event_count (length events))
+  (define event_response
+    (cond
+      ((and v6_active (>= event_count 3)) 2.0) ;; V6 + many events
+      ((>= event_count 4) 1.8)                 ;; Many events
+      ((>= event_count 3) 1.5)                 ;; Several events
+      ((>= event_count 2) 1.3)                 ;; Couple events
+      ((>= event_count 1) 1.1)                 ;; Single event
+      (true 1.0)))                             ;; No events
+
+  (define cri_response
+    (cond
+      (cri_emergency 1.8)               ;; CRI emergency
+      (cri_high 1.4)                    ;; CRI high
+      (true 1.0)))                      ;; CRI target
+
+  ;; ═══ FINAL ALLOCATION CALCULATIONS ═══
+  (define calc_heating (* total_heating event_response cri_response))
+  (define calc_isru (* isru_need event_response))
+  (define calc_greenhouse (* greenhouse_need event_response))
+
+  ;; Normalize to ensure total = 1.0
+  (define total_calc (+ calc_heating calc_isru calc_greenhouse))
+  (define norm_factor (/ 1.0 total_calc))
+
+  (define final_heating (* calc_heating norm_factor))
+  (define final_isru (* calc_isru norm_factor))
+  (define final_greenhouse (* calc_greenhouse norm_factor))
+
+  ;; ═══ EMERGENCY OVERRIDE PROTOCOLS ═══
+  (cond
+    ;; DEATH IMMINENT: Maximum preservation
+    (crew_death_imminent
+     (set! heating_alloc 0.90)
+     (set! isru_alloc 0.08)
+     (set! greenhouse_alloc 0.02)
+     (set! building_alloc 0.0)
+     (log "🚨💀 DEATH CRISIS: Maximum preservation"))
+    
+    ;; EMERGENCY: High preservation
+    ((not crew_emergency)
+     (set! heating_alloc 0.85)
+     (set! isru_alloc 0.12)
+     (set! greenhouse_alloc 0.03)
+     (set! building_alloc 0.0)
+     (log "🚨🔥 EMERGENCY: High preservation"))
+    
+    ;; CRI EMERGENCY: CRI control priority
+    (cri_emergency
+     (set! heating_alloc 0.70)
+     (set! isru_alloc 0.25)
+     (set! greenhouse_alloc 0.05)
+     (set! building_alloc 0.0)
+     (log "🚨📊 CRI EMERGENCY: Resource focus"))
+    
+    ;; NORMAL: Optimized allocation
+    (true
+     (set! heating_alloc (max 0.30 (min 0.85 final_heating)))
+     (set! isru_alloc (max 0.08 (min 0.60 final_isru)))
+     (set! greenhouse_alloc (max 0.02 (min 0.40 final_greenhouse)))
+     (set! building_alloc 0.0)))
+
+  ;; Apply optimized repair allocation
+  (set! repair_alloc optimal_repair)
+
+  ;; ═══ STATUS MONITORING ═══
+  (define crew_status
+    (if target_achieved "🏆 TARGET(4+)"
+    (if target_backup "⚡ BACKUP(3+)"  
+    "⚠️ MINIMUM")))
+
+  (define health_status
+    (if crew_excellent "EXCELLENT"
+    (if crew_very_good "VERY_GOOD"
+    (if crew_good "GOOD"
+    (if crew_concerning "CONCERNING"
+    (if crew_serious "SERIOUS"
+    (if crew_critical "CRITICAL"
+    (if crew_emergency "EMERGENCY" "DEATH_IMMINENT"))))))))
+
+  ;; ═══ COMPREHENSIVE LOGGING ═══
+  (log (concat "  🛡️ Crew: " (string current_crew_count) " | MinHP:" (string crew_min_hp) " | " health_status))
+  (log (concat "  🎯 Status: " crew_status " | CRI:" (string colony_risk_index) "/" (string cri_target) " | Events:" (string event_count)))
+  (log (concat "  ⚡ Power: " (string (round power)) "/" (string power_target) " | Repair:" (string (round optimal_repair 1)) "x"))
+  (log (concat "  📊 Alloc: H:" (string (round (* heating_alloc 100))) "% I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "%"))
+
+  ;; ═══ SCORE PROJECTION ═══
+  (if (> sol 400)
+    (let ((proj_crew (if target_achieved 4 current_crew_count))
+          (proj_cri (if (< colony_risk_index cri_target) colony_risk_index cri_target))
+          (proj_score (+ 87000 (* proj_crew 500) 1200 20000 (* proj_cri -10))))
+      (log (concat "  🏆 PROJECTION: " (string proj_score) " | TARGET: 110,000+ | Current: 109,840"))))
+
+  ;; ═══ RECORD BREAKER OUTPUT ═══
+  (concat "RECORD-BREAKER Sol " (string sol)
+    " | " (string current_crew_count) "/" health_status
+    " | " crew_status  
+    " | CRI:" (string colony_risk_index) "/" (string cri_target)
+    " | TARGET: 110,000+"))

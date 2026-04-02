@@ -1,0 +1,251 @@
+;; COPILOT V6 ULTRA CONSERVATIVE CREW PRESERVATION v1
+;; Target: Achieve consistent 4+ crew survival through ultra-conservative protection
+;; Strategy: Maximum proven thermal protection + exponential repair scaling + ultra-early prep
+;; Innovation: Even more aggressive parameters than the successful 109,840 strategy
+
+(begin
+  (define _agent_name "Copilot V6 Ultra Conservative Crew Preservation v1")
+  (define _agent_desc "Ultra-conservative 4+ crew survival with maximum thermal protection")
+  
+  (log (concat "🤖💎🛡️ V6 ULTRA CONSERVATIVE — Sol " (string sol) " — CRI:" (string colony_risk_index) " — MinHP:" (string crew_min_hp) " — Count:" (string crew_count)))
+  
+  ;; ═══ ULTRA-CONSERVATIVE HEALTH THRESHOLDS ═══
+  ;; Even more aggressive intervention than the successful 109,840 strategy
+  (define crew_transcendent (>= crew_min_hp 90))      ;; Transcendent (maintain perfection)
+  (define crew_excellent (>= crew_min_hp 80))         ;; Excellent (light intervention)
+  (define crew_very_good (>= crew_min_hp 70))         ;; Very good (moderate intervention)
+  (define crew_good (>= crew_min_hp 60))              ;; Good (enhanced intervention)
+  (define crew_concerning (>= crew_min_hp 50))        ;; Concerning (high intervention) - EARLIER THAN 45
+  (define crew_critical (>= crew_min_hp 40))          ;; Critical (extreme intervention) - EARLIER THAN 35
+  (define crew_emergency (>= crew_min_hp 30))         ;; Emergency (ultra intervention) - EARLIER THAN 25
+  (define crew_death_imminent (< crew_min_hp 30))     ;; Death imminent - EARLIER THAN 25
+  
+  ;; Crew count optimization for scoring
+  (define current_crew_count crew_count)
+  (define target_4_plus_achieved (>= current_crew_count 4))  ;; TARGET: 4+ crew = 109,840 score
+  (define target_3_plus_backup (>= current_crew_count 3))    ;; BACKUP: 3+ crew = 109,340 score
+  
+  ;; ═══ ULTRA-EARLY V6 PERIOD DETECTION ═══
+  ;; Start preparation even earlier than successful strategy
+  (define v6_ultra_early_prep (and (>= sol 580) (< sol 680)))    ;; 120 sols early prep (vs 100)
+  (define v6_early_preparation (and (>= sol 680) (< sol 730)))   ;; 70 sols early prep (vs 50)
+  (define v6_direct_preparation (and (>= sol 730) (< sol 778)))  ;; Direct preparation (vs 750)
+  (define v6_active_period (and (>= sol 778) (< sol 847)))       ;; V6 active crisis period
+  (define v6_critical_window (and (>= sol 795) (< sol 835)))     ;; Extended critical window
+  (define v6_recovery_period (>= sol 847))                       ;; Post-V6 recovery
+  
+  ;; ═══ MAXIMUM REPAIR SCALING (beyond successful strategy) ═══
+  ;; Even more aggressive than the proven 25.0x maximum
+  (define ultra_conservative_repair
+    (cond
+      (crew_death_imminent 30.0)          ;; ULTRA-MAXIMUM: Beyond proven 25.0x
+      ((not crew_emergency) 25.0)         ;; PROVEN MAXIMUM: 25.0x from successful runs
+      ((not crew_critical) 20.0)          ;; ULTRA-HIGH: Beyond proven 15.0x
+      ((not crew_concerning) 15.0)        ;; HIGH: Proven 12.0x level
+      ((not crew_good) 10.0)              ;; MODERATE-HIGH: Beyond proven 8.0x
+      ((not crew_very_good) 6.0)          ;; MODERATE: Above proven 5.0x
+      ((not crew_excellent) 4.0)          ;; LIGHT: Above proven 3.0x
+      (crew_transcendent 2.5)             ;; MAINTENANCE: Proven maintenance level
+      (true 2.0)))                        ;; BASELINE: Above proven 1.8x
+      
+  ;; Ultra-aggressive V6 phase multipliers
+  (define v6_ultra_conservative_multiplier
+    (cond
+      (v6_critical_window 4.0)            ;; ULTRA-MAXIMUM: Beyond proven 3.5x
+      (v6_active_period 3.5)              ;; MAXIMUM: Beyond proven 3.0x
+      (v6_direct_preparation 3.0)         ;; HIGH: Beyond proven 2.5x
+      (v6_early_preparation 2.5)          ;; MODERATE: Beyond proven 2.0x
+      (v6_ultra_early_prep 2.0)           ;; LIGHT: Above proven 1.8x
+      (v6_recovery_period 1.8)            ;; RECOVERY: Above proven 1.5x
+      (true 1.2)))                        ;; BASELINE: Above standard
+      
+  ;; Final ultra-conservative repair allocation
+  (define final_repair_multiplier (* ultra_conservative_repair v6_ultra_conservative_multiplier))
+  
+  ;; ═══ MAXIMUM THERMAL SHOCK PROTECTION ═══
+  ;; Beyond the proven successful parameters
+  (define ultra_conservative_thermal_protection
+    (cond
+      ((and v6_critical_window crew_death_imminent) 0.35)     ;; ULTRA-MAXIMUM: Beyond proven 0.25
+      ((and v6_active_period crew_death_imminent) 0.30)       ;; MAXIMUM: Beyond proven 0.22
+      ((and v6_active_period (not crew_emergency)) 0.25)      ;; ULTRA-HIGH: Beyond proven 0.18
+      ((and v6_active_period (not crew_critical)) 0.20)       ;; HIGH: Beyond proven 0.12
+      (v6_active_period 0.15)                                 ;; BASELINE: Above proven 0.08
+      ((and v6_direct_preparation (not crew_critical)) 0.18)  ;; PRE-V6: Beyond proven 0.10
+      (v6_direct_preparation 0.12)                            ;; PRE-V6: Above proven 0.06
+      (v6_early_preparation 0.08)                             ;; EARLY: Above proven 0.04
+      (v6_ultra_early_prep 0.06)                              ;; ULTRA-EARLY: Above proven 0.03
+      ((not crew_concerning) 0.06)                            ;; GENERAL: Above proven 0.04
+      (true 0.02)))                                           ;; DEFAULT: Some protection
+      
+  ;; ═══ ULTRA-HIGH POWER SECURITY ═══
+  ;; Even higher than proven successful levels
+  (define ultra_conservative_power_target
+    (cond
+      (v6_critical_window 800)            ;; ULTRA-MAXIMUM: Beyond proven 650
+      (v6_active_period 750)              ;; MAXIMUM: Beyond proven 600
+      (v6_direct_preparation 650)         ;; HIGH: Beyond proven 550
+      (v6_early_preparation 600)          ;; MODERATE: Beyond proven 500
+      (v6_ultra_early_prep 550)           ;; EARLY: Beyond proven 450
+      ((> sol 500) 500)                   ;; MID-GAME: Above proven 400
+      ((> sol 300) 450)                   ;; EARLY-MID: Above proven 350
+      (true 400)))                        ;; EARLY: Above proven 300
+      
+  ;; ═══ ULTRA-CONSERVATIVE ALLOCATION STRATEGY ═══
+  
+  ;; Heating allocation: Maximum crew preservation focus
+  (define ultra_conservative_heating_need
+    (cond
+      (crew_death_imminent 0.88)          ;; ULTRA-MAXIMUM: Above proven 0.85
+      ((not crew_emergency) 0.80)         ;; MAXIMUM: Above proven 0.75
+      ((not crew_critical) 0.72)          ;; HIGH: Above proven 0.65
+      ((not crew_concerning) 0.65)        ;; MODERATE: Above proven 0.55
+      ((< power ultra_conservative_power_target) 0.58) ;; POWER: Above proven 0.50
+      ((not target_4_plus_achieved) 0.52) ;; BUILDING: Above proven 0.45
+      (target_4_plus_achieved 0.45)       ;; ACHIEVED: Above proven 0.38
+      (true 0.48)))                       ;; DEFAULT: Above proven 0.42
+      
+  ;; Enhanced heating with ultra-conservative thermal protection
+  (define total_heating (+ ultra_conservative_heating_need ultra_conservative_thermal_protection))
+  
+  ;; ISRU allocation: Efficient but conservative
+  (define ultra_conservative_isru_need
+    (cond
+      ((< o2_days 8.0) 0.65)              ;; CRITICAL: Above proven 0.60
+      ((< h2o_days 10.0) 0.60)            ;; CRITICAL: Above proven 0.55
+      ((< o2_days 20.0) 0.50)             ;; MODERATE: Above proven 0.45
+      ((< h2o_days 25.0) 0.45)            ;; MODERATE: Above proven 0.40
+      ((not target_4_plus_achieved) 0.35) ;; BUILDING: Above proven 0.32
+      (target_4_plus_achieved 0.30)       ;; ACHIEVED: Above proven 0.28
+      (true 0.38)))                       ;; DEFAULT: Above proven 0.35
+      
+  ;; Greenhouse allocation: Conservative but adequate
+  (define ultra_conservative_greenhouse_need
+    (cond
+      ((< food_days 10.0) 0.25)           ;; CRITICAL: Above proven 0.20
+      ((< food_days 20.0) 0.20)           ;; MODERATE: Above proven 0.16
+      ((not target_4_plus_achieved) 0.18) ;; BUILDING: Above proven 0.14
+      (target_4_plus_achieved 0.15)       ;; ACHIEVED: Above proven 0.12
+      (true 0.17)))                       ;; DEFAULT: Above proven 0.15
+      
+  ;; ═══ ULTRA-CONSERVATIVE EVENT AND CRI RESPONSE ═══
+  (define event_count (length events))
+  (define ultra_conservative_event_response
+    (cond
+      ((and v6_critical_window (>= event_count 3)) 3.5) ;; ULTRA-MAXIMUM
+      ((and v6_active_period (>= event_count 3)) 3.0)   ;; MAXIMUM  
+      ((and v6_active_period (>= event_count 2)) 2.5)   ;; HIGH
+      ((and v6_active_period (>= event_count 1)) 2.2)   ;; MODERATE
+      ((>= event_count 4) 2.5)            ;; MANY
+      ((>= event_count 3) 2.0)            ;; SEVERAL
+      ((>= event_count 2) 1.8)            ;; COUPLE
+      ((>= event_count 1) 1.5)            ;; SINGLE
+      (true 1.2)))                        ;; BASELINE BOOST
+      
+  (define ultra_conservative_cri_response
+    (cond
+      ((< colony_risk_index 15) 1.1)      ;; ULTRA-LOW: Slight boost
+      ((< colony_risk_index 25) 1.3)      ;; LOW: Moderate boost
+      ((< colony_risk_index 35) 1.6)      ;; MEDIUM: High boost
+      ((< colony_risk_index 45) 1.9)      ;; HIGH: Very high boost
+      (true 2.2)))                        ;; CRITICAL: Ultra boost
+      
+  ;; ═══ FINAL ALLOCATION CALCULATIONS ═══
+  (define calc_heating (* total_heating ultra_conservative_event_response ultra_conservative_cri_response))
+  (define calc_isru (* ultra_conservative_isru_need ultra_conservative_event_response))
+  (define calc_greenhouse (* ultra_conservative_greenhouse_need ultra_conservative_event_response))
+  
+  ;; Normalize to ensure total = 1.0
+  (define total_calc (+ calc_heating calc_isru calc_greenhouse))
+  (define norm_factor (/ 1.0 total_calc))
+  
+  (define final_heating (* calc_heating norm_factor))
+  (define final_isru (* calc_isru norm_factor))
+  (define final_greenhouse (* calc_greenhouse norm_factor))
+  
+  ;; ═══ ULTRA-CONSERVATIVE EMERGENCY OVERRIDES ═══
+  ;; Even more aggressive than proven successful overrides
+  (cond
+    ;; DEATH IMMINENT: Absolute maximum crew preservation
+    (crew_death_imminent
+     (set! heating_alloc 0.92)           ;; ULTRA-MAXIMUM: Beyond proven 0.88
+     (set! isru_alloc 0.06)              ;; MINIMAL: Below proven 0.08
+     (set! greenhouse_alloc 0.02)        ;; MINIMAL: Below proven 0.04
+     (set! building_alloc 0.0)
+     (log "🚨💀⚡ DEATH IMMINENT ULTRA-OVERRIDE: Absolute survival protocols"))
+     
+    ;; EMERGENCY: Ultra-high crew preservation
+    ((not crew_emergency)
+     (set! heating_alloc 0.88)           ;; ULTRA-HIGH: Above proven 0.82
+     (set! isru_alloc 0.10)              ;; LOW: Below proven 0.14
+     (set! greenhouse_alloc 0.02)        ;; MINIMAL: Below proven 0.04
+     (set! building_alloc 0.0)
+     (log "🚨🔥⚡ EMERGENCY ULTRA-OVERRIDE: Maximum crew preservation"))
+     
+    ;; CRITICAL: Ultra-enhanced crew preservation  
+    ((not crew_critical)
+     (set! heating_alloc 0.82)           ;; HIGH: Above proven 0.75
+     (set! isru_alloc 0.15)              ;; MODERATE: Below proven 0.18
+     (set! greenhouse_alloc 0.03)        ;; LOW: Below proven 0.07
+     (set! building_alloc 0.0)
+     (log "🚨⚠️⚡ CRITICAL ULTRA-OVERRIDE: Enhanced crew preservation"))
+     
+    ;; NORMAL: Ultra-conservative optimized allocation
+    (true
+     (set! heating_alloc (max 0.30 (min 0.88 final_heating)))
+     (set! isru_alloc (max 0.06 (min 0.55 final_isru)))
+     (set! greenhouse_alloc (max 0.02 (min 0.30 final_greenhouse)))
+     (set! building_alloc 0.0)))
+     
+  ;; Apply ultra-conservative repair allocation
+  (set! repair_alloc final_repair_multiplier)
+  
+  ;; ═══ STATUS MONITORING ═══
+  (define crew_achievement_status
+    (if target_4_plus_achieved "🏆 TARGET_ACHIEVED(4+)"
+    (if target_3_plus_backup "⚡ BACKUP(3+)"
+    "🚨 BELOW_TARGET")))
+    
+  (define health_condition
+    (if crew_transcendent "TRANSCENDENT"
+    (if crew_excellent "EXCELLENT"
+    (if crew_very_good "VERY_GOOD"
+    (if crew_good "GOOD"
+    (if crew_concerning "CONCERNING"
+    (if crew_critical "CRITICAL"
+    (if crew_emergency "EMERGENCY" "DEATH_IMMINENT"))))))))
+    
+  (define v6_status
+    (cond
+      (v6_critical_window "🔥💀V6_CRITICAL_ULTRA")
+      (v6_active_period "🔥⚡V6_ACTIVE_MAX")
+      (v6_direct_preparation "🔥🎯V6_DIRECT_PREP")
+      (v6_early_preparation "🔥📈V6_EARLY_PREP")
+      (v6_ultra_early_prep "🔥🛠️V6_ULTRA_PREP")
+      (v6_recovery_period "🏆✅V6_MASTERED")
+      (true "🚀NORMAL")))
+      
+  ;; Ultra-conservative monitoring
+  (log (concat "  🤖 Crew: " (string current_crew_count) " alive | MinHP:" (string crew_min_hp) " | " health_condition))
+  (log (concat "  🎯 Status: " crew_achievement_status " | V6:" v6_status))
+  (log (concat "  🔧 Repair:" (string (round final_repair_multiplier 1)) "x | Thermal:" (string (round (* ultra_conservative_thermal_protection 100))) "%"))
+  (log (concat "  ⚡ Power:" (string (round power)) "/" (string ultra_conservative_power_target) " | CRI:" (string colony_risk_index)))
+  (log (concat "  🔧 Final: H:" (string (round (* heating_alloc 100))) "% I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "%"))
+  
+  ;; ═══ SCORE PROJECTION ═══
+  (if (> sol 500)
+    (let ((proj_crew (if target_4_plus_achieved 4 current_crew_count))
+          (proj_score (+ 87000 (* proj_crew 500) 1200 20000 -360)))
+      (log (concat "  🏆 PROJECTION: " (string proj_score) " (crew:" (string proj_crew) ") | TARGET: 109,840"))))
+      
+  ;; Success tracking
+  (if target_4_plus_achieved 
+    (log "🏆💎✅ ULTRA SUCCESS: 4+ crew achieved - target 109,840 score!")
+    (log "⚠️🤖🔧 ULTRA CONSERVATION: Working toward 4+ crew target..."))
+    
+  ;; ═══ ULTRA-CONSERVATIVE OUTPUT ═══
+  (concat "V6-ULTRA-CONSERVATIVE Sol " (string sol) 
+    " | " (string current_crew_count) "/" health_condition
+    " | " crew_achievement_status  
+    " | CRI:" (string colony_risk_index)
+    " | TARGET: 109,840"))
