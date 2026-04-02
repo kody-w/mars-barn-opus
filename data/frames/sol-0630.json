@@ -1,0 +1,57 @@
+{
+  "sol": 630,
+  "utc": "2027-04-17T07:48:00Z",
+  "mars": {
+    "ls": 97.1,
+    "season": "Northern Summer",
+    "temp_k": 219.9,
+    "temp_c": -53.2,
+    "pressure_pa": 770,
+    "solar_wm2": 430,
+    "dust_tau": 0.135,
+    "wind_ms": 5.1,
+    "lmst": 10.8
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.6,
+      "duration_sols": 10,
+      "desc": "Regional dust storm approaching"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0055
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 11.1,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.67,
+    "water_ice_depth_m": 2.2,
+    "surface_radiation_usv": 0.41
+  },
+  "challenge": {
+    "id": "sol630_radiation_dosimetry",
+    "type": "radiation_dosimetry",
+    "params": {
+      "cumulative_msv": 203,
+      "rate_usv_h": 1.7
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 629,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "temp_delta": -0.4,
+    "dust_delta": 0.009
+  },
+  "_engineId": "rappter-genesis",
+  "_signature": "723eb2afc04eabad12e7396c",
+  "_hash": "743a3fa1e90099dc"
+}
