@@ -88,6 +88,9 @@ runs ALL versions sequentially. State carries forward. Damage accumulates.
 | v10 System Dependencies | 978-1007 | System cascade failures, water recycler → humidity → greenhouse → O₂ → power → thermal dependencies, Apollo 13 style failures, micro-failure accumulation |
 | v11 Earth-Mars Supply Windows | 1008-1057 | Supply window missed, cargo delivery failure, cargo retrieval missions, manifest planning errors, ISRU dependency crisis |
 | v12 Individual Crew Physiology | 1038-1067 | Radiation storms, bone fractures, muscle weakness, circadian disruption, exercise equipment failures, caloric deficiency |
+| v13 Crew Psychology | 1058-1067 | Third-quarter syndrome, circadian misalignment cascade, crew conflicts, communication delay stress, productivity degradation |
+| v14 Mars GCM Weather | 1058-1117 | Atmospheric pressure variation, enhanced dust storm physics, orbital solar variation, UV material degradation, atmospheric density effects |
+| v15 Site-Specific Geology | 1068-1117 | Regolith bearing failure, subsurface ice instability, enhanced perchlorate corrosion, slope instability hazard, geological ISRU inefficiency |
 
 ### Retroactive echo enrichment:
 - Past frames get richer data layers WITHOUT changing (additive overlay files)
@@ -101,6 +104,9 @@ runs ALL versions sequentially. State carries forward. Damage accumulates.
 - v10 enrichment: cumulative micro-failure stress accumulation from Sol 1 (Apollo 13 precursor events analysis)
 - v11 enrichment: None (new mechanic) - supply chain planning is additive from Sol 1008+
 - v12 enrichment: cumulative radiation dose tracking, bone/muscle loss baselines, circadian disruption accumulation from Sol 1
+- v13 enrichment: cumulative stress accumulation, morale degradation tracking, circadian disruption from Sol 1  
+- v14 enrichment: cumulative UV damage, seasonal atmospheric pressure effects, dust storm enhancement factors from Sol 1
+- v15 enrichment: geological site characterization, perchlorate accumulation, foundation stress analysis, ISRU geology factors from Sol 1
 
 ### v5 Entropy Collapse — what it counters:
 - **Complacency Drift**: Static allocations (same every sol) cause morale + efficiency loss. Crew needs variety.
@@ -123,6 +129,33 @@ This is not optional. This is the mission architecture. Robots go first. Always.
 - **Sensor Blindness**: Dust on cameras, UV-degraded lidar, IMU drift. Blind robots guess.
 - **Thermal Shock**: 140°C daily swing cracks solder, warps PCBs, loosens connectors.
 - **Regolith Entrapment**: Spirit got stuck at Sol 1892. Never got out. One wrong turn = permanent.
+
+### v15 Site-Specific Geology — location matters:
+Mars geology varies dramatically by site. The sim now tracks realistic site-specific parameters that affect construction, ISRU, and operations.
+
+**Real NASA site data:**
+- **Perchlorate concentrations**: 0.4-0.6 wt% baseline (Phoenix/Curiosity). Higher concentrations accelerate corrosion.
+- **Regolith bearing strength**: 300-400 kPa baseline (Phoenix). Insufficient bearing capacity causes foundation failures.
+- **Subsurface ice depth**: 0.5-30m (SHARAD radar). Shallow ice (<2m) enables easy ISRU but creates foundation instability.
+- **Terrain slopes**: >7° unsafe for construction (NASA landing site criteria). Equipment slides, foundations fail.
+
+**Geological hazard types:**
+- **Regolith Bearing Failure**: Infrastructure load exceeds geological bearing capacity. Modules sink, foundations crack.
+- **Subsurface Ice Instability**: Ice freeze-thaw cycles create ground heave. Foundations shift, equipment damaged.
+- **Enhanced Perchlorate Corrosion**: Site-specific perchlorate levels above 0.6 wt% cause accelerated equipment degradation.
+- **Slope Instability**: Construction/operations on slopes >7° create equipment loss and safety hazards.
+- **Geological ISRU Inefficiency**: Real regolith composition reduces ISRU efficiency below laboratory conditions.
+
+**Site types (real Mars locations):**
+- **Arcadia Planitia**: Abundant shallow ice (0.8m), flat terrain (<4° slopes), excellent for ISRU but foundation challenges.
+- **Deuteronilus Mensae**: Deep glacial ice (2.2m), varied terrain (3-8° slopes), consolidated geology, excellent bearing strength.
+- **Hellas Basin**: Minimal surface ice (4.5m depth), enhanced perchlorate (1.3× baseline), soft basin sediments.
+- **Jezero Crater**: Variable geology, moderate ice (3.0m), varied terrain including crater slopes (2-12°).
+
+**Strategic implications:**
+- Site selection now affects entire mission: ice access, construction feasibility, corrosion rates, ISRU efficiency.
+- Foundation engineering required: bearing capacity analysis, slope stability, thermal ground effects.
+- Geological monitoring: long-term foundation integrity, ISRU adaptation to local conditions.
 - **Cable Wear**: Repeated motion frays cables. Perchlorate corrodes connectors. Intermittent faults are worst.
 - **Autonomous Logic Failure**: No human in loop. Robot drives into crater. Misinterprets data. Wastes days.
 - **Dust Storm Immobilization**: Opportunity died after 14 years to a global dust storm. Solar drops 60-95%.

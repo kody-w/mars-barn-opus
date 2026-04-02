@@ -557,6 +557,55 @@
           "Atmospheric density cycles affecting cooling and contamination strategies"
         ]
       }
+    },
+    {
+      "version": "v15",
+      "name": "Site-Specific Geology",
+      "release_date": "2026-04-02",
+      "physics_added": {
+        "regolith_bearing_capacity": "Site-specific bearing strength (300-400 kPa baseline from Phoenix) affects foundation stability",
+        "subsurface_ice_effects": "Water ice depth and thermal cycles create foundation instability and ISRU access challenges",
+        "perchlorate_site_variation": "Site-specific perchlorate concentrations (0.4-0.6 wt% baseline) cause variable corrosion rates",
+        "slope_stability_analysis": "Terrain slopes >7° create construction and operational safety challenges (NASA landing criteria)",
+        "geological_isru_constraints": "Regolith composition and structure affect ISRU efficiency beyond laboratory conditions",
+        "site_characterization": "Different Mars sites (Arcadia Planitia, Jezero, Hellas) have distinct geological profiles"
+      },
+      "new_hazards": [
+        "regolith_bearing_failure", 
+        "subsurface_ice_instability",
+        "enhanced_perchlorate_corrosion",
+        "slope_instability_hazard",
+        "geological_isru_inefficiency"
+      ],
+      "data_sources": [
+        "Phoenix Wet Chemistry Laboratory perchlorate analysis (0.4-0.6 wt%)",
+        "Phoenix mechanical properties analysis (bearing strength measurements)",
+        "Mars Reconnaissance Orbiter SHARAD subsurface ice mapping",
+        "NASA SWIM (Subsurface Water Ice Mapping) project data",
+        "Curiosity ChemCam geological composition analysis",
+        "Mars site geology from MRO HiRISE imaging",
+        "NASA human landing site geological characterization studies",
+        "Phoenix soil mechanics and bearing capacity measurements"
+      ],
+      "fidelity_improvements": {
+        "site_geological_realism": "Each Mars location has realistic geological parameters affecting construction and ISRU",
+        "foundation_engineering": "Real bearing capacity constraints require proper foundation design and site selection",
+        "ice_resource_physics": "Subsurface ice depth and thermal stability affect both ISRU and infrastructure",
+        "perchlorate_chemistry": "Site-specific perchlorate levels create realistic corrosion and chemistry challenges",
+        "terrain_constraints": "Slope stability and regolith properties create realistic construction limitations"
+      },
+      "validation": {
+        "monte_carlo_required": true,
+        "baseline_score_drop": "≥10% (validates geology significance)",
+        "new_strategic_considerations": [
+          "Site selection based on geological parameters (ice depth, bearing capacity, slopes)",
+          "Foundation engineering planning for variable regolith bearing strength",
+          "ISRU system design adaptation to local geological conditions",
+          "Enhanced corrosion protection for high-perchlorate sites", 
+          "Terrain-aware construction planning for slope stability",
+          "Long-term geological monitoring for foundation and infrastructure integrity"
+        ]
+      }
     }
   ],
   "backtest_protocol": {
