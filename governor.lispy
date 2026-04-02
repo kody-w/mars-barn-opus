@@ -1,281 +1,172 @@
-;; V6 ULTIMATE ROBOT MASTERY BREAKTHROUGH v1
-;; Target: Beat 110,000+ through maximized crew survival + optimal v6 robot protection
-;; Strategy: 6-robot crew + ultra-aggressive v6 thermal/repair protection + CRI minimization
-;; Key Innovation: Larger crew for redundancy + v6-specific protection algorithms
+;; COPILOT ULTIMATE RECORD DESTROYER APEX V1
+;; Strategy: Beat 95,890 by achieving P75 CRI ≤ 10 and extending sols to 734+
+;; Target: 96,000+ points through perfect resource security and extended survival
+;; Revolutionary approach: Ultra-early security establishment + extended mission optimization
 
 (begin
-  (define _agent_name "V6 Ultimate Robot Mastery Breakthrough v1")
-  (define _agent_desc "6-robot crew survival + v6 mastery = 110,000+ breakthrough")
+  (define _agent_name "Copilot Ultimate Record Destroyer Apex v1")
+  (define _agent_desc "Next-gen record destruction through perfect CRI control and sol extension")
   
-  (log (concat "🤖🔥💎 V6 MASTERY BREAKTHROUGH — Sol " (string sol) " — CRI:" (string colony_risk_index) " — Target: 110,000+"))
+  (log (concat "🚀💥 RECORD DESTROYER APEX — Sol " (string sol) " — CRI:" (string colony_risk_index) " — Target: 96,000+"))
   
-  ;; ═══ V6 ROBOT MASTERY SCIENCE ═══
-  ;; v6 Autonomous Operations (Sol 778-847): The make-or-break period
-  ;; 11 robot failure modes must be defeated with maximum precision
-  ;; Key insight: More robots = higher redundancy = better survival rate
+  ;; ═══ APEX CRI OPTIMIZATION SCIENCE ═══ 
+  ;; Current record: 95,890 (733 sols, P75 CRI=11, 3 crew, 8 modules, 100% survival)
+  ;; Beat by: P75 CRI ≤ 10 (+10 points) + extend to 734 sols (+100 points) = 96,000+
+  ;; CRI = 5 + power_penalty + events*6 + resource_penalties
+  ;; Focus: ZERO resource penalties, minimize event impact, extend mission duration
   
-  (define robot_count 6)  ;; 6 robots for maximum redundancy
-  (define robot_health_perfect (>= crew_min_hp 85))
-  (define robot_health_excellent (>= crew_min_hp 75))  
-  (define robot_health_good (>= crew_min_hp 65))
-  (define robot_health_concerning (< crew_min_hp 55))
-  (define robot_health_critical (< crew_min_hp 45))
-  (define robot_health_emergency (< crew_min_hp 35))
-  (define robot_death_imminent (< crew_min_hp 25))
+  ;; ═══ APEX RESOURCE SECURITY TARGETS ═══
+  ;; Ultra-conservative targets to guarantee ZERO resource penalties
+  (define apex_o2_target 18.0)       ;; Massive O2 buffer - guarantee no penalties
+  (define apex_h2o_target 18.0)      ;; Massive H2O buffer - guarantee no penalties  
+  (define apex_food_target 25.0)     ;; Ultra-massive food buffer - critical for extension
+  (define apex_power_target 250)     ;; Ultra-high power buffer - guarantee no penalties
   
-  (define current_crew_count crew_count)
-  (define crew_target_met (>= current_crew_count 5))  ;; Target 5+ for high scores
-  (define avg_robot_hp (if (> crew_count 0) (/ crew_total_hp crew_count) 100))
-
-  ;; ═══ V6 CRITICAL PERIODS ═══
-  (define v6_active_period (and (>= sol 778) (<= sol 847)))     ;; The critical window
-  (define v6_preparation_period (and (>= sol 720) (< sol 778))) ;; Pre-V6 hardening
-  (define v6_approach_period (and (>= sol 650) (< sol 720)))   ;; Early preparation
-  (define late_game_period (> sol 600))                        ;; General late-game prep
+  ;; ═══ APEX EXTENDED MISSION STRATEGY ═══
+  ;; Optimized for 734+ sol survival with perfect CRI control
+  (define phase_ultra_foundation (< sol 80))          ;; Faster foundation for earlier security
+  (define phase_ultra_security (and (>= sol 80) (< sol 200)))    ;; Rapid security establishment
+  (define phase_ultra_optimization (and (>= sol 200) (< sol 400)))  ;; Perfect resource tuning
+  (define phase_apex_control (and (>= sol 400) (< sol 650)))     ;; Absolute CRI control
+  (define phase_extended_mission (>= sol 650))        ;; Extended mission optimization
   
-  ;; ═══ CRI MASTERY SYSTEM ═══
-  ;; Ultra-aggressive CRI control to minimize P75 penalty
-  (define cri_optimal (<= colony_risk_index 20))
-  (define cri_good (<= colony_risk_index 25)) 
-  (define cri_concerning (and (> colony_risk_index 25) (<= colony_risk_index 35)))
-  (define cri_dangerous (and (> colony_risk_index 35) (<= colony_risk_index 45)))
-  (define cri_critical (> colony_risk_index 45))
-  
-  ;; Resource safety targets - ultra-conservative to prevent CRI penalties
-  (define power_target 280)
-  (define o2_target 12.0)
-  (define h2o_target 12.0) 
-  (define food_target 18.0)
-  
-  ;; Emergency thresholds
-  (define power_emergency (< power 150))
-  (define resource_emergency (or (< o2_days 5.0) (< h2o_days 5.0) (< food_days 5.0)))
-  (define crew_emergency robot_health_emergency)
-  
-  ;; ═══ V6 THERMAL MASTERY ═══
-  ;; Thermal shock is the #1 robot killer - must maintain stable temperatures
-  ;; 140°C daily swings crack solder, warp PCBs, loosen connectors
-  (define v6_thermal_protection
+  ;; ═══ APEX ULTRA-SECURE ALLOCATION ═══
+  ;; Even more aggressive allocation for guaranteed security
+  (define apex_o2_need
     (cond
-      ;; CREW COUNT CRISIS - Maximum thermal protection
-      ((< current_crew_count 4) 0.25)                        ;; Below 4 robots = EMERGENCY
-      ;; V6 ACTIVE PERIOD - Maximum protection during critical window  
-      ((and v6_active_period robot_death_imminent) 0.22)     ;; V6 death prevention
-      ((and v6_active_period robot_health_emergency) 0.18)   ;; V6 emergency response
-      ((and v6_active_period robot_health_critical) 0.14)    ;; V6 critical response
-      ((and v6_active_period robot_health_concerning) 0.10)  ;; V6 concerning response
-      (v6_active_period 0.08)                                ;; V6 baseline protection
-      ;; V6 PREPARATION PERIOD - Enhanced preparation
-      ((and v6_preparation_period robot_health_critical) 0.12) ;; Pre-V6 critical
-      ((and v6_preparation_period robot_health_concerning) 0.08) ;; Pre-V6 concerning
-      (v6_preparation_period 0.06)                           ;; Pre-V6 baseline
-      ;; V6 APPROACH PERIOD - Early preparation
-      ((and v6_approach_period robot_health_critical) 0.06)  ;; Early critical
-      (v6_approach_period 0.03)                              ;; Early baseline
-      ;; GENERAL ROBOT PROTECTION
-      ((and late_game_period robot_health_critical) 0.04)    ;; Late game critical
-      (true 0.00)))                                          ;; Normal operations
+      ((< o2_days 6.0) 0.92)      ;; Emergency - near maximum
+      ((< o2_days 12.0) 0.85)     ;; Critical - very high priority  
+      ((< o2_days 18.0) 0.70)     ;; Build to apex target
+      ((< o2_days 25.0) 0.50)     ;; Maintain apex buffer
+      (true 0.30)))               ;; Minimal when ultra-secure
   
-  ;; ═══ V6 REPAIR MASTERY ═══
-  ;; Ultra-aggressive repair to counter all 11 v6 failure modes
-  ;; Repair prevents: wheel degradation, actuator seizure, cable wear, component failure
-  (define v6_repair_multiplier
+  (define apex_food_need
     (cond
-      ;; CREW COUNT CRISIS - Maximum repair priority
-      ((< current_crew_count 4) 18.0)                        ;; Below 4 robots = MAXIMUM
-      ;; V6 ACTIVE PERIOD - Ultra-aggressive repair
-      ((and v6_active_period robot_death_imminent) 15.0)     ;; V6 death prevention
-      ((and v6_active_period robot_health_emergency) 12.0)   ;; V6 emergency repair
-      ((and v6_active_period robot_health_critical) 9.0)     ;; V6 critical repair
-      ((and v6_active_period robot_health_concerning) 7.0)   ;; V6 concerning repair
-      (v6_active_period 5.5)                                 ;; V6 baseline repair
-      ;; V6 PREPARATION PERIOD - Preemptive maintenance
-      ((and v6_preparation_period robot_health_critical) 8.0) ;; Pre-V6 critical
-      ((and v6_preparation_period robot_health_concerning) 6.0) ;; Pre-V6 concerning
-      (v6_preparation_period 4.5)                            ;; Pre-V6 baseline
-      ;; V6 APPROACH PERIOD - Early maintenance
-      ((and v6_approach_period robot_health_critical) 5.0)   ;; Early critical
-      (v6_approach_period 3.5)                               ;; Early baseline
-      ;; GENERAL ROBOT MAINTENANCE 
-      ((and late_game_period robot_health_critical) 4.0)     ;; Late game critical
-      ((and late_game_period robot_health_concerning) 3.0)   ;; Late game concerning
-      (crew_target_met 2.8)                                  ;; Good crew count
-      (true 3.2)))                                           ;; Standard operation
+      ((< food_days 6.0) 0.88)    ;; Emergency food allocation
+      ((< food_days 12.0) 0.80)   ;; Critical priority
+      ((< food_days 20.0) 0.65)   ;; Build to apex target
+      ((< food_days 30.0) 0.45)   ;; Maintain apex buffer
+      (true 0.30)))               ;; Minimal when ultra-secure
   
-  ;; ═══ DYNAMIC ALLOCATION SYSTEM ═══
-  ;; Responsive allocation based on current threats and crew status
-  
-  ;; Power allocation - prioritize based on crew status and v6 periods
-  (define heating_allocation
+  ;; ═══ APEX CRI EMERGENCY SYSTEM ═══
+  ;; Zero tolerance for CRI above 10
+  (define apex_cri_response
     (cond
-      ;; EMERGENCY SITUATIONS
-      (power_emergency 0.85)                                 ;; Power crisis
-      (crew_emergency 0.70)                                  ;; Crew emergency
-      ;; V6 ACTIVE PERIOD - Enhanced power priority
-      ((and v6_active_period cri_critical) 0.65)             ;; V6 + high CRI
-      ((and v6_active_period cri_dangerous) 0.58)            ;; V6 + dangerous CRI
-      ((and v6_active_period cri_concerning) 0.52)           ;; V6 + concerning CRI
-      (v6_active_period 0.48)                                ;; V6 baseline
-      ;; CRI RESPONSES
-      (cri_critical 0.62)                                    ;; High CRI response
-      (cri_dangerous 0.55)                                   ;; Dangerous CRI 
-      (cri_concerning 0.50)                                  ;; Concerning CRI
-      ;; CREW STATUS RESPONSES
-      (robot_health_concerning 0.52)                         ;; Crew concerning
-      (robot_health_critical 0.58)                           ;; Crew critical
-      ;; STANDARD OPERATIONS
-      ((< power power_target) 0.48)                          ;; Building to target
-      (crew_target_met 0.42)                                 ;; Good crew count
-      (true 0.45)))                                          ;; Normal operations
+      ((< colony_risk_index 6) 1.0)      ;; Perfect CRI - maintain
+      ((< colony_risk_index 8) 1.5)      ;; Good CRI - moderate boost 
+      ((< colony_risk_index 10) 1.8)     ;; Target CRI - strong boost
+      ((< colony_risk_index 12) 2.2)     ;; Above target - emergency boost
+      (true 2.8)))                       ;; Crisis - maximum response
   
-  ;; Resource production allocation
-  (define isru_allocation
+  ;; ═══ APEX PHASE-OPTIMIZED ALLOCATION ═══
+  (define apex_base_allocation
     (cond
-      ;; RESOURCE EMERGENCY
-      (resource_emergency 0.65)                              ;; Resource crisis
-      ;; V6 ACTIVE PERIOD - Maintain resources
-      ((and v6_active_period cri_critical) 0.52)             ;; V6 + high CRI
-      ((and v6_active_period cri_dangerous) 0.48)            ;; V6 + dangerous CRI
-      (v6_active_period 0.42)                                ;; V6 baseline
-      ;; CRI RESPONSES
-      (cri_critical 0.50)                                    ;; High CRI response
-      (cri_dangerous 0.45)                                   ;; Dangerous CRI
-      (cri_concerning 0.42)                                  ;; Concerning CRI
-      ;; RESOURCE BUILDING
-      ((or (< o2_days o2_target) (< h2o_days h2o_target)) 0.45) ;; Building resources
-      (crew_target_met 0.35)                                 ;; Good crew count
-      (true 0.38)))                                          ;; Normal operations
+      ;; Ultra Foundation - establish security ASAP
+      (phase_ultra_foundation 0.88)
+      
+      ;; Ultra Security - rapid resource security establishment
+      (phase_ultra_security 0.94)
+      
+      ;; Ultra Optimization - perfect resource tuning
+      (phase_ultra_optimization 0.97)
+      
+      ;; Apex Control - absolute CRI control
+      (phase_apex_control 0.98)
+      
+      ;; Extended Mission - optimize for long-term survival
+      (phase_extended_mission 0.99)
+      
+      ;; Default maximum security
+      (true 0.96)))
   
-  ;; Food production allocation
-  (define greenhouse_allocation
+  ;; ═══ APEX EVENT RESPONSE SYSTEM ═══
+  ;; Enhanced event response for extended mission
+  (define event_count (length events))
+  (define event_cri_penalty (* 6 event_count))
+  
+  ;; Ultra-aggressive event response for extended mission
+  (define event_response_multiplier 
     (cond
-      ;; FOOD EMERGENCY
-      ((< food_days 5.0) 0.45)                               ;; Food crisis
-      ;; V6 PERIODS - Reduced priority (robots don't eat)
-      (v6_active_period 0.25)                                ;; V6 reduced food
-      (v6_preparation_period 0.28)                           ;; Pre-V6 food
-      ;; FOOD BUILDING
-      ((< food_days food_target) 0.32)                       ;; Building to target
-      (crew_target_met 0.22)                                 ;; Good crew count
-      (true 0.25)))                                          ;; Normal operations
+      ((>= event_count 3) 1.8)      ;; 3+ events - ultra response
+      ((>= event_count 2) 1.5)      ;; 2 events - strong response
+      ((>= event_count 1) 1.3)      ;; 1 event - enhanced response
+      (true 1.0)))                  ;; 0 events - maintain
   
-  ;; Apply thermal protection
-  (define final_heating (+ heating_allocation v6_thermal_protection))
-  
-  ;; Normalize allocations to sum to 1.0
-  (define total_allocation (+ final_heating isru_allocation greenhouse_allocation))
-  (define norm_factor (/ 1.0 total_allocation))
-  
-  (define normalized_heating (* final_heating norm_factor))
-  (define normalized_isru (* isru_allocation norm_factor))
-  (define normalized_greenhouse (* greenhouse_allocation norm_factor))
-  
-  ;; Apply constraints
-  (define final_heating_constrained (max 0.30 (min 0.75 normalized_heating)))
-  (define final_isru_constrained (max 0.20 (min 0.65 normalized_isru)))
-  (define final_greenhouse_constrained (max 0.15 (min 0.45 normalized_greenhouse)))
-  
-  ;; ═══ EMERGENCY OVERRIDES ═══
-  (cond
-    ;; CREW DEATH CRISIS - Maximum survival mode
-    (robot_death_imminent
-     (set-heating 0.70)
-     (set-isru 0.22)
-     (set-greenhouse 0.08)
-     (set-repair 18.0)
-     (log "🚨🤖💀 CREW DEATH CRISIS: Maximum survival protocols"))
-     
-    ;; POWER CRISIS - Emergency heating
-    (power_emergency
-     (set-heating 0.80)
-     (set-isru 0.16)
-     (set-greenhouse 0.04)
-     (set-repair v6_repair_multiplier)
-     (log "🚨⚡ POWER CRISIS: Emergency heating protocols"))
-     
-    ;; RESOURCE CRISIS - Emergency production
-    (resource_emergency
-     (set-heating 0.28)
-     (set-isru 0.65)
-     (set-greenhouse 0.07)
-     (set-repair v6_repair_multiplier)
-     (log "🚨📦 RESOURCE CRISIS: Emergency production protocols"))
-    
-    ;; NORMAL OPERATIONS - Optimized allocation
-    (true
-     (set-heating final_heating_constrained)
-     (set-isru final_isru_constrained)
-     (set-greenhouse final_greenhouse_constrained)
-     (set-repair v6_repair_multiplier)))
-
-  ;; ═══ FOOD RATIONING OPTIMIZATION ═══
-  (define food_ration
+  ;; ═══ APEX POWER SECURITY ═══
+  ;; Ultra-conservative power management for extended mission
+  (define power_deficit (< power apex_power_target))
+  (define power_critical (< power 180))
+  (define power_boost_needed 
     (cond
-      ((< food_days 4.0) 0.70)                               ;; Emergency rationing
-      ((< food_days food_target) 0.90)                       ;; Building to target
-      (v6_active_period 1.0)                                 ;; V6 full rations
-      (crew_target_met 1.0)                                  ;; Good crew count
-      (true 0.95)))                                          ;; Standard rationing
-
-  (set-food-ration food_ration)
-
-  ;; ═══ STATUS MONITORING ═══
-  (define cri_status
+      (power_critical 1.6)       ;; Critical power - maximum boost
+      (power_deficit 1.3)        ;; Below target - strong boost  
+      (true 1.0)))               ;; Above target - maintain
+  
+  ;; ═══ APEX FINAL ALLOCATIONS ═══
+  (define apex_isru_alloc (* apex_base_allocation apex_o2_need apex_cri_response event_response_multiplier power_boost_needed))
+  (define apex_greenhouse_alloc (* apex_base_allocation apex_food_need apex_cri_response event_response_multiplier))
+  (define apex_heating_alloc (max 0.05 (min 0.85 (- 1.0 apex_isru_alloc apex_greenhouse_alloc))))
+  
+  ;; Apply with apex security bounds
+  (set! isru_alloc (max 0.30 (min 0.88 apex_isru_alloc)))
+  (set! greenhouse_alloc (max 0.30 (min 0.80 apex_greenhouse_alloc)))
+  (set! heating_alloc (max 0.05 (min 0.80 apex_heating_alloc)))
+  (set! building_alloc 0.0)  ;; Hardcoded building handles modules
+  
+  ;; ═══ APEX FOOD RATIONING ═══
+  ;; Optimized for extended mission survival
+  (define apex_food_ration
     (cond
-      (cri_critical "🔥💀CRITICAL")
-      (cri_dangerous "🔥⚠️DANGEROUS")
-      (cri_concerning "🔥🟡CONCERNING")
-      (cri_good "🔥✅GOOD")
-      (cri_optimal "🔥🌟OPTIMAL")
-      (true "🔥❓UNKNOWN")))
-
-  (define crew_status
-    (cond
-      (robot_death_imminent "🤖💀DEATH")
-      (robot_health_emergency "🤖🚨EMERGENCY")
-      (robot_health_critical "🤖⚠️CRITICAL")
-      (robot_health_concerning "🤖🔴CONCERNING")
-      (robot_health_good "🤖🟡GOOD")
-      (robot_health_excellent "🤖✅EXCELLENT")
-      (robot_health_perfect "🤖🌟PERFECT")
-      (true "🤖❓UNKNOWN")))
-
-  (define v6_status
-    (cond
-      (v6_active_period "🤖🔥V6-ACTIVE")
-      (v6_preparation_period "🤖⚡V6-PREP")
-      (v6_approach_period "🤖📋V6-APPROACH")
-      (true "🤖✅PRE-V6")))
-
-  ;; Score projection
-  (define score_projection
-    (+ 87000                                                  ;; Max sols
-       (* current_crew_count 500)                            ;; Current crew score
-       1200                                                   ;; Max module score  
-       20000                                                  ;; Max survival score
-       (* colony_risk_index -10)))                           ;; CRI penalty
-
-  ;; Success metrics
-  (define mastery_success
-    (and (>= current_crew_count 5)                           ;; Target: 5+ crew
-         (<= colony_risk_index 25)                            ;; Target: CRI ≤ 25
-         (>= power power_target)                              ;; Power security
-         (>= o2_days o2_target)                               ;; O2 security
-         (>= h2o_days h2o_target)                             ;; H2O security
-         (>= food_days food_target)))                         ;; Food security
-
-  ;; ═══ COMPREHENSIVE LOGGING ═══
-  (log (concat "  🔥 CRI: " cri_status " | " v6_status " | Events:" (string (length events)) " | Proj:" (string score_projection)))
-  (log (concat "  🤖 Crew: " crew_status " | Count:" (string current_crew_count) "/6 | AvgHP:" (string (round avg_robot_hp 1))))
-  (log (concat "  🎯 Targets: Power≥" (string power_target) " O2≥" (string o2_target) " H2O≥" (string h2o_target) " Food≥" (string food_target)))
-  (log (concat "  🔧 Repair: " (string v6_repair_multiplier) "x | Thermal: +" (string (round (* v6_thermal_protection 100) 1)) "%"))
-  (log (concat "  ⚡ Allocation: Heat:" (string (round final_heating_constrained 3)) " ISRU:" (string (round final_isru_constrained 3)) " Green:" (string (round final_greenhouse_constrained 3))))
-  (log (concat "  📊 Resources: Power:" (string (round power)) " | Days: O2:" (string (round o2_days 1)) " H2O:" (string (round h2o_days 1)) " Food:" (string (round food_days 1))))
-
-  (if mastery_success 
-    (log "🔥🏆🤖✅ V6 MASTERY SUCCESS: Breakthrough achieved!")
-    (log "🔥📊🎯 V6 mastery in progress..."))
-
-  ;; Return optimized allocations
-  (list final_heating_constrained final_isru_constrained final_greenhouse_constrained 0.0 food_ration)
-)
+      ((< food_days 7.0) 0.60)    ;; Emergency - build buffer quickly
+      ((< food_days 12.0) 0.78)   ;; Build buffer aggressively  
+      ((< food_days 20.0) 0.88)   ;; Approach apex target
+      ((< food_days 25.0) 0.94)   ;; Maintain apex buffer
+      ((< food_days 35.0) 0.98)   ;; Excellent buffer
+      (true 1.0)))                ;; Apex security achieved
+  
+  (set! food_ration apex_food_ration)
+  
+  ;; ═══ APEX CRI MONITORING ═══
+  (define power_penalty (if (< power 50) 25 (if (< power 150) 10 0)))
+  (define o2_penalty (if (< o2_days 5) 20 0))
+  (define h2o_penalty (if (< h2o_days 5) 20 0))
+  (define food_penalty (if (< food_days 5) 20 0))
+  (define total_resource_penalty (+ o2_penalty h2o_penalty food_penalty))
+  
+  (define calculated_cri (+ 5 power_penalty event_cri_penalty total_resource_penalty))
+  (define cri_target_achieved (<= colony_risk_index 10))
+  (define apex_security_achieved (and (>= o2_days apex_o2_target) 
+                                     (>= h2o_days apex_h2o_target) 
+                                     (>= food_days 20) 
+                                     (>= power apex_power_target)))
+  
+  (log (concat "  🎯 Phase: " 
+    (if phase_ultra_foundation "ULTRA_FOUNDATION"
+    (if phase_ultra_security "ULTRA_SECURITY"
+    (if phase_ultra_optimization "ULTRA_OPTIMIZATION"
+    (if phase_apex_control "APEX_CONTROL" "EXTENDED_MISSION"))))))
+  
+  (log (concat "  📊 CRI Status: " (string colony_risk_index) " = 5+" (string power_penalty) "+" (string event_cri_penalty) "+" (string total_resource_penalty) " | Target≤10:" (if cri_target_achieved "✅" "❌")))
+  
+  (define security_status 
+    (concat "O2:" (string (round o2_days 1)) "d" (if (>= o2_days 6) "✅" "❌")
+            " H2O:" (string (round h2o_days 1)) "d" (if (>= h2o_days 6) "✅" "❌")  
+            " Food:" (string (round food_days 1)) "d" (if (>= food_days 6) "✅" "❌")))
+  
+  (log (concat "  🛡️ Apex Security: " security_status " | " (if apex_security_achieved "APEX_ACHIEVED" "BUILDING")))
+  (log (concat "  ⚡ Power: " (string (round power)) "kWh" (if (>= power 180) " ✅Ultra" " ❌Risk") " | Events:" (string event_count) " | Response:" (string (round (* apex_cri_response 100))) "%"))
+  (log (concat "  🔧 Apex Allocs: I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "% H:" (string (round (* heating_alloc 100))) "% | Ration:" (string (round (* food_ration 100))) "%"))
+  
+  ;; ═══ RECORD DESTROYER PROJECTION ═══
+  (if (> sol 400)
+    (let ((projected_sols (if apex_security_achieved 734 733))  ;; Extended mission if apex security achieved
+          (projected_cri (if apex_security_achieved 8 (max 8 (min colony_risk_index 10))))  ;; Optimistic CRI projection
+          (projected_score (+ (* projected_sols 100) 1500 1200 20000 (* projected_cri -10))))
+      (log (concat "  🏆 Record Target: " (string projected_score) " (sols:" (string projected_sols) " cri:" (string projected_cri) ") | Beat: >95,890"))))
+  
+  ;; ═══ APEX SECURITY OUTPUT ═══
+  (concat "APEX-DESTROYER Sol " (string sol) 
+    " | CRI:" (string colony_risk_index) "/10"
+    " | Security:" (if apex_security_achieved "APEX" "BUILDING")
+    " | Events:" (string event_count)
+    " | Record-mode"))
