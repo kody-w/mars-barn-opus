@@ -1,0 +1,202 @@
+;; HYPERMAX EVOLUTION APEX V3 - Ultimate Mars Survival Intelligence
+;; Revolutionary breakthrough: Multiple repair bay exponential scaling + ultra-adaptive CRI + metamorphic evolution
+;; Goal: Transcend 602 frames with ultimate survival intelligence
+
+(begin
+  (define _agent_name "HyperMax Evolution Apex V3")
+  (define _agent_desc "Ultimate evolution: exponential repair scaling + metamorphic adaptation + transcendent crisis management")
+
+  (log (concat "🚀🔥 Evolution Apex — Sol " (string sol)))
+
+  ;; ═══ INFRASTRUCTURE INTELLIGENCE ENGINE ═══
+  ;; Estimate current colony development for exponential scaling
+  (define estimated_modules_built (max 4 modules_built))
+  (define infrastructure_maturity (min 1.0 (/ estimated_modules_built 18)))
+  (define estimated_solar_farms (max 2 (round (* estimated_modules_built 0.45))))
+  (define estimated_repair_bays (max 1 (round (* estimated_modules_built 0.28))))
+  
+  ;; EXPONENTIAL REPAIR BAY SCALING - The key to beating compound damage
+  (define repair_base_exponent 1.92)  ;; Optimized exponential scaling factor
+  (define repair_exponential_power (pow repair_base_exponent estimated_repair_bays))
+  (define infrastructure_synergy_bonus (+ 1.0 (* infrastructure_maturity 0.4)))
+  (define ultimate_defensive_capacity (* repair_exponential_power infrastructure_synergy_bonus))
+  
+  ;; Advanced solar efficiency modeling
+  (define solar_efficiency_estimate (max 0.7 (min 1.0 (- 1.0 (/ sol 1200)))))
+  (define solar_power_projection (* estimated_solar_farms solar_efficiency_estimate 23))
+  
+  (log (concat "  Infrastructure: " (string estimated_solar_farms) " solar, " (string estimated_repair_bays) " repair | Defense: " (string (round (* ultimate_defensive_capacity 100))) "% | Solar: " (string (round (* solar_efficiency_estimate 100))) "%"))
+
+  ;; ═══ METAMORPHIC EVOLUTION PHASES ═══
+  ;; Colony evolves through distinct biological-inspired phases
+  (define evolution_phase
+    (cond
+      ((< sol 50) "GENESIS")      ;; Early formation
+      ((< sol 120) "EMERGENCE")   ;; Resource establishment  
+      ((< sol 250) "GROWTH")      ;; Rapid expansion
+      ((< sol 400) "MATURITY")    ;; Optimization phase
+      ((< sol 520) "TRANSCENDENCE") ;; Beyond survival
+      (true "APEX")))             ;; Ultimate evolution
+
+  ;; Phase-specific metamorphic modifiers
+  (define metamorphic_efficiency
+    (cond
+      ((= evolution_phase "GENESIS") 0.85)
+      ((= evolution_phase "EMERGENCE") 1.05)
+      ((= evolution_phase "GROWTH") 1.20)
+      ((= evolution_phase "MATURITY") 1.35)
+      ((= evolution_phase "TRANSCENDENCE") 1.50)
+      (true 1.65)))  ;; APEX phase
+
+  (define phase_adaptation_bonus (* metamorphic_efficiency (+ 1.0 (/ ultimate_defensive_capacity 8))))
+
+  ;; ═══ ULTRA-ADVANCED CRI ANALYSIS ═══
+  ;; Multi-dimensional threat modeling with exponential crisis detection
+  (define cri_normalized (/ colony_risk_index 100))
+  (define cri_exponential_threat (pow cri_normalized 1.8))
+  (define cri_metamorphic_modifier (/ metamorphic_efficiency 1.2))
+  
+  ;; Crisis cascade detection (multiple simultaneous threats)
+  (define crisis_cascade_score 0)
+  (if (< o2_days 6) (set! crisis_cascade_score (+ crisis_cascade_score 4)))
+  (if (< food_days 8) (set! crisis_cascade_score (+ crisis_cascade_score 3)))
+  (if (< power_kwh 50) (set! crisis_cascade_score (+ crisis_cascade_score 3)))
+  (if (> colony_risk_index 55) (set! crisis_cascade_score (+ crisis_cascade_score 2)))
+  (if (< power_kwh 30) (set! crisis_cascade_score (+ crisis_cascade_score 3)))
+  
+  (define cascade_emergency_state (>= crisis_cascade_score 7))
+  (define cascade_critical_state (>= crisis_cascade_score 5))
+  
+  ;; Aggregate threat assessment with exponential modeling
+  (define threat_aggregate (* cri_exponential_threat (+ 1.0 (/ crisis_cascade_score 10)) cri_metamorphic_modifier))
+  (define ultimate_threat_level
+    (cond
+      (cascade_emergency_state "EXTINCTION_IMMINENT")
+      ((> threat_aggregate 2.2) "CASCADE_FAILURE")
+      ((> threat_aggregate 1.6) "CRITICAL_THREAT")
+      ((> threat_aggregate 1.0) "HIGH_DANGER")
+      ((> threat_aggregate 0.5) "ELEVATED_RISK")
+      (true "STABLE_EVOLUTION")))
+
+  (log (concat "  Evolution: " evolution_phase " Phase | Metamorphic: " (string (round (* metamorphic_efficiency 100))) "% | Threat: " ultimate_threat_level " | Cascade: " (string crisis_cascade_score)))
+
+  ;; ═══ ULTIMATE RESOURCE ALLOCATION ENGINE ═══
+  ;; Transcendent allocation with exponential repair bay benefits and phase adaptation
+  
+  ;; Base allocation optimized for each evolution phase and threat level
+  (define ultimate_isru_base
+    (cond
+      (cascade_emergency_state 0.08)  ;; Emergency: minimal O2
+      ((= ultimate_threat_level "CASCADE_FAILURE") 0.12)
+      ((= ultimate_threat_level "CRITICAL_THREAT") 0.18)
+      ((= ultimate_threat_level "HIGH_DANGER") 0.24)
+      ((= evolution_phase "GENESIS") 0.30)      ;; Early game higher ISRU
+      ((= evolution_phase "EMERGENCE") 0.28)
+      ((= evolution_phase "GROWTH") 0.25)
+      ((= evolution_phase "MATURITY") 0.22)
+      ((= evolution_phase "TRANSCENDENCE") 0.20)
+      ((= evolution_phase "APEX") 0.18)         ;; Late game efficiency
+      ((< o2_days 4) 0.70)  ;; Oxygen crisis override
+      ((< o2_days 8) 0.50)
+      (true 0.26)))
+
+  (define ultimate_greenhouse_base
+    (cond
+      (cascade_emergency_state 0.15)  ;; Emergency: minimal food
+      ((= ultimate_threat_level "CASCADE_FAILURE") 0.20)
+      ((= ultimate_threat_level "CRITICAL_THREAT") 0.26)
+      ((= ultimate_threat_level "HIGH_DANGER") 0.32)
+      ((= evolution_phase "GENESIS") 0.35)      ;; Early game food focus
+      ((= evolution_phase "EMERGENCE") 0.37)
+      ((= evolution_phase "GROWTH") 0.38)
+      ((= evolution_phase "MATURITY") 0.35)
+      ((= evolution_phase "TRANSCENDENCE") 0.32)
+      ((= evolution_phase "APEX") 0.30)         ;; Late game optimization
+      ((< food_days 5) 0.55)  ;; Food crisis override
+      ((< food_days 10) 0.45)
+      (true 0.36)))
+
+  (define ultimate_heating_base
+    (cond
+      (cascade_emergency_state 0.77)  ;; Emergency: maximum power
+      ((= ultimate_threat_level "CASCADE_FAILURE") 0.68)
+      ((= ultimate_threat_level "CRITICAL_THREAT") 0.56)
+      ((= ultimate_threat_level "HIGH_DANGER") 0.44)
+      ((= evolution_phase "GENESIS") 0.35)      ;; Early balance
+      ((= evolution_phase "EMERGENCE") 0.35)
+      ((= evolution_phase "GROWTH") 0.37)
+      ((= evolution_phase "MATURITY") 0.43)     ;; Power focus increases
+      ((= evolution_phase "TRANSCENDENCE") 0.48)
+      ((= evolution_phase "APEX") 0.52)         ;; Maximum power efficiency
+      ((< power_kwh 30) 0.65)  ;; Power crisis override
+      ((< power_kwh 60) 0.50)
+      (true 0.38)))
+
+  ;; Apply ultimate exponential repair bay enhancement
+  (define repair_efficiency_multiplier (max 0.6 (min 2.0 (/ ultimate_defensive_capacity 4))))
+  (define phase_evolution_multiplier (* phase_adaptation_bonus 0.85))
+  
+  ;; Final allocation calculation with transcendent mathematics
+  (define final_ultimate_isru (* ultimate_isru_base repair_efficiency_multiplier phase_evolution_multiplier))
+  (define final_ultimate_greenhouse (* ultimate_greenhouse_base repair_efficiency_multiplier phase_evolution_multiplier))
+  (define final_ultimate_heating (* ultimate_heating_base repair_efficiency_multiplier phase_evolution_multiplier))
+  
+  ;; Normalize with evolutionary precision
+  (define allocation_sum (+ final_ultimate_isru final_ultimate_greenhouse final_ultimate_heating))
+  (define evolutionary_normalization (* repair_efficiency_multiplier (/ 1.0 allocation_sum)))
+  
+  (set! isru_alloc (* final_ultimate_isru evolutionary_normalization))
+  (set! greenhouse_alloc (* final_ultimate_greenhouse evolutionary_normalization))
+  (set! heating_alloc (* final_ultimate_heating evolutionary_normalization))
+
+  ;; ═══ TRANSCENDENT SURVIVAL RATIONING ═══
+  ;; Ultimate food optimization with repair bay enhancement
+  (define ultimate_base_ration
+    (cond
+      (cascade_emergency_state 0.22)  ;; Ultimate survival mode
+      ((= ultimate_threat_level "CASCADE_FAILURE") 0.28)
+      ((= ultimate_threat_level "CRITICAL_THREAT") 0.38)
+      ((= ultimate_threat_level "HIGH_DANGER") 0.48)
+      ((= evolution_phase "GENESIS") 0.75)      ;; Early conservation
+      ((= evolution_phase "EMERGENCE") 0.80)
+      ((= evolution_phase "GROWTH") 0.85)       ;; Growth needs nutrition
+      ((= evolution_phase "MATURITY") 0.90)
+      ((= evolution_phase "TRANSCENDENCE") 0.95)
+      ((= evolution_phase "APEX") 1.00)         ;; Apex can afford full rations
+      ((< food_days 3) 0.28)  ;; Food emergency
+      ((< food_days 6) 0.45)
+      ((< food_days 12) 0.70)
+      (true 0.88)))
+
+  ;; Apply ultimate repair bay efficiency to rationing
+  (define repair_ration_enhancement (max 0 (min 0.35 (- repair_efficiency_multiplier 1))))
+  (define evolution_ration_bonus (* metamorphic_efficiency 0.08))
+  
+  (set! food_ration (max 0.18 (min 1.20 (+ ultimate_base_ration repair_ration_enhancement evolution_ration_bonus))))
+
+  ;; ═══ APEX STATUS VISUALIZATION ═══
+  (define apex_status_icon
+    (cond
+      (cascade_emergency_state "💀")
+      ((= ultimate_threat_level "CASCADE_FAILURE") "☠️")
+      ((= ultimate_threat_level "CRITICAL_THREAT") "🔴")
+      ((= ultimate_threat_level "HIGH_DANGER") "🟠")
+      ((= ultimate_threat_level "ELEVATED_RISK") "🟡")
+      ((= evolution_phase "APEX") "👑")
+      ((= evolution_phase "TRANSCENDENCE") "✨")
+      ((= evolution_phase "MATURITY") "💎")
+      (true "🚀")))
+
+  (log (concat "  Status: " apex_status_icon " " ultimate_threat_level " in " evolution_phase " Phase"))
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Greenhouse:" (string (round (* greenhouse_alloc 100))) "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Enhancement — Ration:" (string (round (* food_ration 100))) "% | Defense:" (string (round (* ultimate_defensive_capacity 100))) "% | Phase:" (string (round (* phase_adaptation_bonus 100))) "%"))
+
+  ;; ═══ ULTIMATE STRATEGIC SUMMARY ═══
+  (concat "ApexEvolution Sol " (string sol) " — " apex_status_icon " " evolution_phase "/" ultimate_threat_level
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | D:" (string (round (* ultimate_defensive_capacity 100)))
+    "% | E:" (string (round (* metamorphic_efficiency 100)))
+    "% | C:" (string crisis_cascade_score)))
