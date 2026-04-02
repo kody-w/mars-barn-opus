@@ -87,6 +87,7 @@ runs ALL versions sequentially. State carries forward. Damage accumulates.
 | v9 Spatial Layout | 948-977 | Cable degradation, foundation settling, infrastructure overextension, thermal bridge formation, excavation hazard |
 | v10 System Dependencies | 978-1007 | System cascade failures, water recycler → humidity → greenhouse → O₂ → power → thermal dependencies, Apollo 13 style failures, micro-failure accumulation |
 | v11 Earth-Mars Supply Windows | 1008-1057 | Supply window missed, cargo delivery failure, cargo retrieval missions, manifest planning errors, ISRU dependency crisis |
+| v12 Individual Crew Physiology | 1038-1067 | Radiation storms, bone fractures, muscle weakness, circadian disruption, exercise equipment failures, caloric deficiency |
 
 ### Retroactive echo enrichment:
 - Past frames get richer data layers WITHOUT changing (additive overlay files)
@@ -98,7 +99,8 @@ runs ALL versions sequentially. State carries forward. Damage accumulates.
 - v8 enrichment: cumulative insulation degradation, thermal bridge formation, heating system wear from Sol 1
 - v9 enrichment: None (new mechanic, not retroactive) - spatial layout is additive from Sol 948+
 - v10 enrichment: cumulative micro-failure stress accumulation from Sol 1 (Apollo 13 precursor events analysis)
-- These are ALWAYS applied — you can't opt out of enrichment
+- v11 enrichment: None (new mechanic) - supply chain planning is additive from Sol 1008+
+- v12 enrichment: cumulative radiation dose tracking, bone/muscle loss baselines, circadian disruption accumulation from Sol 1
 
 ### v5 Entropy Collapse — what it counters:
 - **Complacency Drift**: Static allocations (same every sol) cause morale + efficiency loss. Crew needs variety.
@@ -342,6 +344,62 @@ Real Physics Impact:
 Governors must balance Earth dependency vs ISRU self-sufficiency.
 Missing launch windows or EDL failures create multi-year supply gaps.
 Colony survival requires 20-year mission architecture planning, not just resource allocation.
+```
+
+### v12 Individual Crew Physiology (NEW):
+```
+# Real NASA crew physiology tracking (Sol 1038+)
+
+Individual Crew Member Tracking:
+  mass_kg = 70-80 kg (individual variation)
+  radiation_dose_career_sv = cumulative career radiation exposure (Sv) 
+  radiation_dose_30day_sv = rolling 30-day dose window (Sv)
+  bone_density = relative to Earth baseline (1.0 = 100%)
+  muscle_mass = relative to Earth baseline (1.0 = 100%)
+  circadian_phase = hours offset from optimal alignment
+  caloric_need = f(mass, activity, temperature) kcal/day
+
+Daily Radiation Exposure (Mars Surface):
+  daily_dose_msv = 0.67 mSv/day (Curiosity RAD measurements)
+  career_limit = 1000 mSv (1.0 Sv) NASA career limit
+  radiation_event_msv = 10-200 mSv for solar particle events
+  health_impact = severe when career limit exceeded
+
+Bone/Muscle Physiology (Mars 0.38g Gravity):
+  bone_loss_rate = 1.5% per month without countermeasures
+  muscle_loss_rate = 2.0% per month without exercise  
+  sols_per_month = 57 (Mars year = 669 sols ÷ 12 months)
+  
+  daily_bone_loss = 0.015 / 57 = 0.000263 per sol
+  daily_muscle_loss = 0.020 / 57 = 0.000351 per sol
+  
+  Exercise Protection (radiation_shelter module provides equipment):
+    exercise_bone_protection = 60% (reduces loss by 0.6)
+    exercise_muscle_protection = 70% (reduces loss by 0.7)
+    exercise_hours_needed = 10-14 hours/week for full protection
+
+Circadian Rhythm Disruption (Mars Sol Length):
+  mars_sol_hours = 24.617 (24h 37m Mars day)
+  earth_day_hours = 24.0 
+  daily_drift = 0.617 hours per sol
+  cumulative_disruption = accumulated misalignment stress
+  sleep_quality = f(phase_offset, disruption_score)
+  cognitive_impact = performance degradation with poor sleep
+
+Health Consequences:
+  bone_density < 0.7 → fracture risk during EVA/accidents
+  muscle_mass < 0.7 → reduced work capacity, injury risk  
+  radiation > 500 mSv → health monitoring required
+  radiation > 1000 mSv → career limit exceeded, medical evacuation
+  circadian_disruption > 2.0 → cognitive errors, system failures
+  sleep_quality < 0.5 → significant performance impact
+
+Data Sources:
+- NASA Curiosity RAD: 0.67 mSv/day Mars surface radiation
+- NASA STD-3001: 1 Sv career radiation exposure limit
+- ISS crew health: 1.5-2%/month bone/muscle loss in microgravity
+- Mars-500/HI-SEAS: circadian disruption and psychological impacts
+- NASA OCHMO Medical Briefs: space medicine countermeasures
 ```
 
 ### Consumption per sol:

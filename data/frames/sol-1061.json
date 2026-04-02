@@ -1,26 +1,18 @@
 {
-  "sol": 1038,
+  "sol": 1061,
   "version": 12,
   "name": "Individual Crew Physiology",
   "environment": {
-    "temperature_k": 224.8,
-    "temperature_c": -48.4,
-    "pressure_pa": 578.2,
-    "solar_irradiance": 609.8,
+    "temperature_k": 227.7,
+    "temperature_c": -45.4,
+    "pressure_pa": 558.6,
+    "solar_irradiance": 597.6,
     "dust_storm": false,
-    "solar_longitude": 198.6,
+    "solar_longitude": 210.9,
     "season": "Northern Autumn",
-    "wind_speed_ms": 21.4
+    "wind_speed_ms": 17.4
   },
-  "hazards": [
-    {
-      "type": "radiation_storm",
-      "severity": 0.493,
-      "dose_msv": 123.9,
-      "description": "Solar particle event: 123.9 mSv radiation exposure",
-      "data_source": "NASA Space Radiation Analysis Group, solar cycle modeling"
-    }
-  ],
+  "hazards": [],
   "events": [],
   "challenges": [],
   "physiology": {

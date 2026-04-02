@@ -1,43 +1,65 @@
 {
   "sol": 1040,
-  "version": 11,
-  "name": "Earth-Mars Transfer Windows",
+  "version": 12,
+  "name": "Individual Crew Physiology",
   "environment": {
-    "temperature_k": 194.1,
-    "temperature_c": -79.0,
-    "pressure_pa": 571.4,
-    "solar_irradiance": 500.5,
+    "temperature_k": 225.0,
+    "temperature_c": -48.1,
+    "pressure_pa": 576.4,
+    "solar_irradiance": 609.1,
     "dust_storm": false,
     "solar_longitude": 199.6,
     "season": "Northern Autumn",
-    "wind_speed_ms": 11.0
+    "wind_speed_ms": 17.2
   },
-  "hazards": [],
+  "hazards": [
+    {
+      "type": "muscle_weakness_incident",
+      "severity": 0.703,
+      "muscle_mass_threshold": 0.7,
+      "description": "Work injury or reduced EVA capacity due to muscle atrophy",
+      "data_source": "ISS crew muscle mass studies, Mars analog data"
+    }
+  ],
   "events": [],
   "challenges": [],
-  "supply_chain": {
-    "description": "v11 implements real Earth-Mars orbital mechanics and cargo logistics",
-    "window_phase": "inter_window_period",
-    "transfer_window_physics": {
-      "synodic_period_days": 779.9,
-      "transit_time_range_days": "180-270",
-      "cargo_capacity_tons": 100,
-      "landing_accuracy_km": "\u00b110",
-      "edl_success_rate": 0.5
+  "physiology": {
+    "description": "v12 implements real NASA crew physiology tracking and health hazards",
+    "radiation_physics": {
+      "mars_surface_dose_rate": "0.67 mSv/day",
+      "career_limit": "1.0 Sv (NASA STD-3001)",
+      "solar_particle_events": "10-200 mSv per event",
+      "cumulative_tracking": "Individual crew member dose accumulation"
+    },
+    "bone_muscle_physics": {
+      "mars_gravity": "0.38g (3.71 m/s\u00b2)",
+      "bone_loss_rate": "1.5% per month without countermeasures",
+      "muscle_loss_rate": "2.0% per month without exercise",
+      "exercise_protection": "Exercise reduces loss by 60-70% (ISS data)",
+      "fracture_risk": "Increased with bone density <70% of baseline"
+    },
+    "circadian_physics": {
+      "sol_length": "24.65 hours (37 minutes longer than Earth day)",
+      "daily_drift": "0.027 phase shift per sol",
+      "sleep_disruption": "Accumulates over mission duration without countermeasures",
+      "cognitive_impact": "Performance degradation and error rate increase"
     },
     "data_sources": [
-      "NASA Mars Design Reference Architecture 5.0",
-      "SpaceX Starship payload specifications",
-      "NASA Mars mission orbital mechanics studies",
-      "Historical Mars EDL success/failure rates",
-      "Hohmann transfer orbit calculations"
+      "NASA OCHMO Technical Brief: Bone Loss (NASA/TB-2022-030)",
+      "Curiosity Mars Science Laboratory Radiation Assessment Detector (RAD)",
+      "ISS crew health and countermeasures database",
+      "Mars-500 isolation study psychological and physiological data",
+      "HI-SEAS analog mission crew health monitoring",
+      "NASA Fatigue Countermeasures Laboratory circadian research"
     ]
   },
   "physics_constants": {
-    "earth_mars_synodic_period": "779.9 days (26 months)",
-    "hohmann_transfer_window": "Every 779.9 days when planets align for efficient transfer",
-    "cargo_transit_time": "180-270 days depending on trajectory optimization",
-    "landing_accuracy": "\u00b110km (requires rover retrieval operations)",
-    "supply_dependency": "Colony must plan 2-3 years ahead for Earth supplies"
+    "mars_radiation_daily": "0.67 mSv/day",
+    "nasa_career_limit": "1.0 Sv",
+    "bone_loss_mars_gravity": "0.015 fraction per month",
+    "muscle_loss_mars_gravity": "0.020 fraction per month",
+    "circadian_drift_daily": "0.027000 phase hours per sol",
+    "exercise_bone_protection": "0.60 (60% reduction in bone loss)",
+    "exercise_muscle_protection": "0.70 (70% reduction in muscle loss)"
   }
 }
