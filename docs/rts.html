@@ -414,16 +414,12 @@
   (function() {
     const grp = new THREE.Group();
     const mat = new THREE.MeshStandardMaterial({ color: 0x887766, roughness: 0.8, metalness: 0.3 });
-    // floor
-    grp.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(8, 0.2, 6), mat), { position: new THREE.Vector3(0, 0.1, 0) }));
-    // back wall
-    grp.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(8, 4, 0.2), mat), { position: new THREE.Vector3(0, 2, -3) }));
-    // side walls
-    grp.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(0.2, 4, 6), mat), { position: new THREE.Vector3(-4, 2, 0) }));
-    grp.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(0.2, 4, 6), mat), { position: new THREE.Vector3(4, 2, 0) }));
-    // roof
-    grp.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(8, 0.15, 6), mat), { position: new THREE.Vector3(0, 4, 0) }));
-    grp.children.forEach(c => { c.castShadow = true; c.receiveShadow = true; });
+    function addBox(w,h,d,x,y,z){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat); m.position.set(x,y,z); m.castShadow=true; m.receiveShadow=true; grp.add(m); }
+    addBox(8,0.2,6, 0,0.1,0);   // floor
+    addBox(8,4,0.2, 0,2,-3);    // back wall
+    addBox(0.2,4,6, -4,2,0);    // left wall
+    addBox(0.2,4,6, 4,2,0);     // right wall
+    addBox(8,0.15,6, 0,4,0);    // roof
 
     const px = -22, pz = 8;
     const ty = getTerrainY(px, pz);
