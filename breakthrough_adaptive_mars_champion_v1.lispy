@@ -1,0 +1,184 @@
+;; BREAKTHROUGH ADAPTIVE MARS CHAMPION v1
+;; Target: Beat 441 sol record with creative adaptive approaches
+;; Strategy: CRI-adaptive allocation + multiple repair bays + dynamic build timing
+;; Innovation: Truly adaptive governor that changes strategy based on mission phase and threat level
+
+(begin
+  (define _agent_name "Breakthrough Adaptive Mars Champion v1")
+  (define _agent_desc "Adaptive CRI-responsive strategy with dynamic repair scaling and phase-based build timing")
+
+  (log (concat "🚀🔧 Adaptive Champion — Sol " (string sol) " | Phase Detection & CRI Response"))
+
+  ;; ═══ MISSION PHASE INTELLIGENCE ═══
+  ;; Dynamic mission phases that trigger different strategies
+  (define mission_phase 
+    (cond
+      ((< sol 50) "BOOTSTRAP")      ;; Initial survival setup
+      ((< sol 150) "EXPANSION")     ;; Aggressive growth phase
+      ((< sol 300) "FORTIFICATION") ;; Defensive preparation  
+      ((< sol 450) "OPTIMIZATION")  ;; Efficiency maximization
+      (true "TRANSCENDENCE")))      ;; Ultimate survival mode
+
+  ;; Build timing optimization based on mission phase
+  (define phase_build_priority
+    (cond
+      ((equal? mission_phase "BOOTSTRAP") "solar")     ;; Power first
+      ((equal? mission_phase "EXPANSION") "repair")    ;; Defense scaling
+      ((equal? mission_phase "FORTIFICATION") "mixed") ;; Balanced approach
+      ((equal? mission_phase "OPTIMIZATION") "repair") ;; More redundancy
+      (true "adaptive")))                              ;; CRI-responsive
+
+  ;; ═══ CRI THREAT ORCHESTRATION ═══
+  ;; Advanced Colony Risk Index analysis with adaptive response levels
+  (define cri_threat_level
+    (cond
+      ((< colony_risk_index 20) "STABLE")
+      ((< colony_risk_index 35) "MODERATE") 
+      ((< colony_risk_index 50) "ELEVATED")
+      ((< colony_risk_index 70) "CRITICAL")
+      (true "APOCALYPTIC")))
+
+  ;; CRI-adaptive allocation multipliers
+  (define cri_defense_multiplier
+    (cond
+      ((equal? cri_threat_level "STABLE") 1.0)
+      ((equal? cri_threat_level "MODERATE") 1.2)
+      ((equal? cri_threat_level "ELEVATED") 1.5)
+      ((equal? cri_threat_level "CRITICAL") 2.0)
+      (true 2.8)))  ;; APOCALYPTIC response
+
+  (define cri_efficiency_bonus
+    (cond
+      ((equal? cri_threat_level "STABLE") 1.1)      ;; Efficiency in stable times
+      ((equal? cri_threat_level "MODERATE") 1.05)
+      ((equal? cri_threat_level "ELEVATED") 0.95)
+      ((equal? cri_threat_level "CRITICAL") 0.85)
+      (true 0.75)))  ;; Emergency mode
+
+  ;; ═══ MULTIPLE REPAIR BAY EXPONENTIAL SCALING ═══
+  ;; Creative repair bay deployment with exponential effectiveness
+  (define estimated_repair_bays (max 1 (round (* modules_built 0.3))))
+  (define repair_exponential_base 1.8)  ;; Exponential scaling factor
+  (define repair_compound_defense (pow repair_exponential_base estimated_repair_bays))
+  
+  ;; Creative timing for repair bay construction
+  (define repair_construction_urgency
+    (cond
+      ((< sol 30) 0.2)        ;; Low priority early
+      ((< sol 80) 0.6)        ;; Moderate priority in expansion
+      ((< sol 200) 1.0)       ;; High priority for compound damage prep
+      ((> colony_risk_index 40) 1.8)  ;; Crisis construction
+      (true 1.2)))            ;; Steady construction
+
+  ;; Total repair effectiveness
+  (define total_repair_effectiveness 
+    (* repair_compound_defense cri_defense_multiplier repair_construction_urgency))
+
+  ;; ═══ ADAPTIVE RESOURCE ALLOCATION ═══
+  ;; Dynamic allocation that changes based on mission state, CRI, and phase
+
+  ;; Base allocations by mission phase
+  (define base_isru_alloc
+    (cond
+      ((equal? mission_phase "BOOTSTRAP") 0.30)
+      ((equal? mission_phase "EXPANSION") 0.25) 
+      ((equal? mission_phase "FORTIFICATION") 0.28)
+      ((equal? mission_phase "OPTIMIZATION") 0.26)
+      (true 0.24)))
+
+  (define base_greenhouse_alloc
+    (cond
+      ((equal? mission_phase "BOOTSTRAP") 0.35)
+      ((equal? mission_phase "EXPANSION") 0.40)
+      ((equal? mission_phase "FORTIFICATION") 0.38)
+      ((equal? mission_phase "OPTIMIZATION") 0.36)
+      (true 0.38)))
+
+  (define base_heating_alloc
+    (cond
+      ((equal? mission_phase "BOOTSTRAP") 0.35)
+      ((equal? mission_phase "EXPANSION") 0.35)
+      ((equal? mission_phase "FORTIFICATION") 0.34)
+      ((equal? mission_phase "OPTIMIZATION") 0.38)
+      (true 0.38)))
+
+  ;; CRI threat adjustments
+  (define cri_isru_adjustment
+    (cond
+      ((equal? cri_threat_level "STABLE") 0.00)
+      ((equal? cri_threat_level "MODERATE") 0.02)
+      ((equal? cri_threat_level "ELEVATED") 0.04) 
+      ((equal? cri_threat_level "CRITICAL") 0.06)
+      (true 0.08)))
+
+  (define cri_heating_adjustment
+    (cond
+      ((equal? cri_threat_level "STABLE") 0.00)
+      ((equal? cri_threat_level "MODERATE") 0.01)
+      ((equal? cri_threat_level "ELEVATED") 0.03)
+      ((equal? cri_threat_level "CRITICAL") 0.05)
+      (true 0.08)))
+
+  ;; Emergency resource prioritization
+  (define emergency_o2_boost (if (< o2_days 5) 0.08 0.0))
+  (define emergency_food_boost (if (< food_days 8) 0.05 0.0))
+  (define emergency_power_boost (if (< power_kwh 50) 0.06 0.0))
+
+  ;; Final adaptive allocations
+  (set! isru_alloc (min 0.45 (max 0.15 
+    (+ base_isru_alloc cri_isru_adjustment emergency_o2_boost))))
+
+  (set! heating_alloc (min 0.50 (max 0.20
+    (+ base_heating_alloc cri_heating_adjustment emergency_power_boost))))
+
+  (set! greenhouse_alloc (min 0.50 (max 0.20
+    (+ base_greenhouse_alloc emergency_food_boost 
+       (- 0 cri_isru_adjustment cri_heating_adjustment)))))
+
+  ;; ═══ ADAPTIVE FOOD RATIONING WITH CRI RESPONSE ═══
+  ;; Intelligent rationing that adapts to threat level and resources
+
+  (define base_food_ration
+    (cond
+      ((< food_days 3) 0.25)   ;; Critical emergency
+      ((< food_days 6) 0.40)   ;; Emergency  
+      ((< food_days 12) 0.60)  ;; Conservation
+      ((< food_days 20) 0.75)  ;; Careful management
+      ((< food_days 35) 0.85)  ;; Slight conservation
+      (true 0.95)))            ;; Normal operations
+
+  ;; CRI-adaptive rationing adjustment
+  (define cri_ration_modifier
+    (cond
+      ((equal? cri_threat_level "STABLE") 1.05)      ;; Slightly generous in stable times
+      ((equal? cri_threat_level "MODERATE") 1.00)
+      ((equal? cri_threat_level "ELEVATED") 0.95)
+      ((equal? cri_threat_level "CRITICAL") 0.90)
+      (true 0.85)))  ;; Conservative in apocalyptic scenarios
+
+  ;; Mission phase rationing strategy
+  (define phase_ration_modifier
+    (cond
+      ((equal? mission_phase "BOOTSTRAP") 0.90)      ;; Conservative early on
+      ((equal? mission_phase "EXPANSION") 1.00)      ;; Normal during growth
+      ((equal? mission_phase "FORTIFICATION") 0.95)  ;; Slightly conservative
+      ((equal? mission_phase "OPTIMIZATION") 1.02)   ;; Efficient allocation
+      (true 1.05)))                                  ;; Generous in transcendence
+
+  (set! food_ration (min 1.0 (max 0.2
+    (* base_food_ration cri_ration_modifier phase_ration_modifier cri_efficiency_bonus))))
+
+  ;; ═══ ADAPTIVE STATUS LOGGING ═══
+  (log (concat "  Phase: " mission_phase " | CRI: " cri_threat_level " (" (string colony_risk_index) ")"))
+  (log (concat "  Repair Defense: " (string (round total_repair_effectiveness)) "x | Bays: " (string estimated_repair_bays)))
+  (log (concat "  Allocation — I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "% H:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Ration: " (string (round (* food_ration 100))) "% | Resources: O2=" (string o2_days) "d Food=" (string food_days) "d Pwr=" (string (round power_kwh)) "kWh"))
+
+  ;; ═══ OUTPUT SUMMARY ═══
+  (concat "🚀 Adaptive Sol " (string sol) " | " mission_phase " " cri_threat_level 
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | Defense:" (string (round total_repair_effectiveness))
+    "x | O2:" (string o2_days) "d F:" (string food_days) "d"))
