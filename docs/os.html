@@ -98,7 +98,7 @@ text-transform:uppercase;border-top:1px solid var(--border);margin-top:4px}
   <div class="desktop-icon" ondblclick="openApp('editor')"><div class="icon">📝</div><div class="label">LisPy Editor</div></div>
   <div class="desktop-icon" ondblclick="openApp('monitor')"><div class="icon">📡</div><div class="label">Colony Monitor</div></div>
   <div class="desktop-icon" ondblclick="openApp('browser')"><div class="icon">🌐</div><div class="label">Frame Browser</div></div>
-  <div class="desktop-icon" ondblclick="window.os.browser.open('player.html')"><div class="icon">🔎</div><div class="label">Web Browser</div></div>
+  <div class="desktop-icon" ondblclick="window.os.browser.open('')"><div class="icon">🔎</div><div class="label">Web Browser</div></div>
   <div class="desktop-icon" ondblclick="openApp('wallet')"><div class="icon">💰</div><div class="label">MARS Wallet</div></div>
   <div class="desktop-icon" ondblclick="openApp('help')"><div class="icon">📖</div><div class="label">LISPY.md</div></div>
   <div class="desktop-icon" ondblclick="openApp('sim')"><div class="icon">🔴</div><div class="label">Colony Sim</div></div>
@@ -1197,7 +1197,18 @@ window.os = {
 
       // about:blank and empty URLs — show homepage
       if (!url || url === 'about:blank' || url === '') {
-        this._html = '<html><head><title>New Tab</title></head><body style="background:#0d1117;color:#c9d1d9;font-family:monospace;padding:40px;text-align:center"><h1 style="color:#f0883e">🌐 vOS Browser</h1><p>Type a URL in the bar above and press Enter</p></body></html>';
+        this._html = `<html><head><title>vOS Browser</title></head>
+        <body style="background:#0d1117;color:#c9d1d9;font-family:'Courier New',monospace;padding:40px">
+          <h1 style="color:#f0883e;text-align:center;font-size:24px">🌐 vOS Browser</h1>
+          <p style="color:#8b949e;text-align:center;margin:16px 0">Type a URL above — works with any website</p>
+          <div style="max-width:500px;margin:30px auto;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <a onclick="window.parent.os.browser.open('https://en.wikipedia.org')" style="background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px;color:#58a6ff;text-decoration:none;cursor:pointer;text-align:center">📚 Wikipedia</a>
+            <a onclick="window.parent.os.browser.open('https://github.com/kody-w/mars-barn-opus')" style="background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px;color:#58a6ff;text-decoration:none;cursor:pointer;text-align:center">🐙 GitHub Repo</a>
+            <a onclick="window.parent.os.browser.open('https://mars.nasa.gov')" style="background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px;color:#58a6ff;text-decoration:none;cursor:pointer;text-align:center">🔴 NASA Mars</a>
+            <a onclick="window.parent.os.browser.open('https://news.ycombinator.com')" style="background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px;color:#58a6ff;text-decoration:none;cursor:pointer;text-align:center">📰 Hacker News</a>
+          </div>
+          <p style="color:#484f58;text-align:center;font-size:10px;margin-top:30px">Powered by LisPy headless engine · fetch → parse → render</p>
+        </body></html>`;
         const parser = new DOMParser();
         this._doc = parser.parseFromString(this._html, 'text/html');
         this._status = 200;
