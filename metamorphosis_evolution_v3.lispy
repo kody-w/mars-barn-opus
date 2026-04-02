@@ -1,0 +1,201 @@
+;; METAMORPHOSIS EVOLUTION v3 - Revolutionary Self-Transforming Governor
+;; Strategy: Dynamic metamorphosis through distinct evolutionary phases
+;; Innovation: Caterpillar→Chrysalis→Butterfly transformation, adaptive evolution
+;; Target: Perfect 602-frame survival through revolutionary self-transformation
+
+(begin
+  (define _agent_name "Metamorphosis Evolution v3")
+  (define _agent_desc "Revolutionary self-transforming governor that evolves through distinct metamorphosis phases like biological development")
+
+  (log (concat "🐛🦋 Metamorphosis — Sol " (string sol)))
+
+  ;; ═══ METAMORPHOSIS PHASE EVOLUTION ═══
+  ;; Biological-inspired transformation through distinct phases
+  
+  ;; Phase determination based on sol progression and colony maturity
+  (define metamorphosis_phase
+    (cond
+      ((< sol 100) "LARVA")           ;; Early development - focus on growth
+      ((< sol 250) "CATERPILLAR")     ;; Rapid consumption and building
+      ((< sol 400) "CHRYSALIS")       ;; Transformation and optimization
+      ((< sol 550) "BUTTERFLY")       ;; Emergence with new capabilities
+      (true "TRANSCENDENT")))         ;; Beyond normal limits
+
+  ;; Phase-specific characteristics and adaptations
+  (define phase_maturity (/ sol 602))
+  (define phase_energy 
+    (cond
+      ((= metamorphosis_phase "LARVA") 0.3)
+      ((= metamorphosis_phase "CATERPILLAR") 0.8)
+      ((= metamorphosis_phase "CHRYSALIS") 0.5)
+      ((= metamorphosis_phase "BUTTERFLY") 0.9)
+      ((= metamorphosis_phase "TRANSCENDENT") 1.2)))
+
+  ;; Metamorphosis adaptation factors
+  (define adaptation_pressure (+ (* colony_risk_index 0.01) (* phase_maturity 0.3)))
+  (define evolution_speed (max 1.0 (min 2.0 (+ 1.0 adaptation_pressure))))
+  (define transformation_readiness (* phase_maturity evolution_speed))
+
+  (log (concat "  Metamorphosis Phase: " metamorphosis_phase " | Maturity:" (string (round (* phase_maturity 100))) "% | Energy:" (string (round (* phase_energy 100))) "%"))
+  (log (concat "  Evolution Speed:" (string (round (* evolution_speed 100))) "% | Adaptation:" (string (round (* adaptation_pressure 100))) "%"))
+
+  ;; ═══ PHASE-SPECIFIC ALLOCATION STRATEGIES ═══
+  
+  (cond
+    ;; LARVA PHASE: Basic survival and rapid initial growth
+    ((= metamorphosis_phase "LARVA")
+     (define larva_growth_focus 0.8)
+     (define larva_survival_balance (+ 0.6 (* colony_risk_index 0.004)))
+     
+     (set! isru_alloc (* 0.35 larva_survival_balance))
+     (set! greenhouse_alloc (* 0.45 larva_growth_focus))
+     (set! heating_alloc (* 0.20 (+ larva_survival_balance larva_growth_focus 0.2))))
+
+    ;; CATERPILLAR PHASE: Aggressive consumption and infrastructure building
+    ((= metamorphosis_phase "CATERPILLAR")
+     (define caterpillar_consumption_rate 1.2)
+     (define caterpillar_building_urgency (+ 0.7 (* modules_built 0.05)))
+     
+     ;; More aggressive resource allocation during building phase
+     (cond
+       ((< modules_built 6)
+        (set! isru_alloc 0.30) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.20))
+       ((< modules_built 10)
+        (set! isru_alloc 0.25) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.30))
+       (true
+        (set! isru_alloc 0.28) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.32))))
+
+    ;; CHRYSALIS PHASE: Transformation and optimization (reduced activity)
+    ((= metamorphosis_phase "CHRYSALIS")
+     (define chrysalis_efficiency 1.3)
+     (define chrysalis_conservation (+ 0.8 (* phase_maturity 0.3)))
+     
+     ;; More conservative allocation during transformation
+     (set! isru_alloc (* 0.22 chrysalis_efficiency))
+     (set! greenhouse_alloc (* 0.35 chrysalis_conservation))
+     (set! heating_alloc (* 0.43 chrysalis_efficiency)))
+
+    ;; BUTTERFLY PHASE: Elegant efficiency and adaptive flight
+    ((= metamorphosis_phase "BUTTERFLY")
+     (define butterfly_grace 1.1)
+     (define butterfly_adaptability (+ 1.0 (* transformation_readiness 0.2)))
+     
+     ;; Highly adaptive allocation based on conditions
+     (define butterfly_base_isru (max 0.18 (min 0.30 (* 0.24 butterfly_adaptability))))
+     (define butterfly_base_greenhouse (max 0.25 (min 0.40 (* 0.33 butterfly_grace))))
+     (define butterfly_base_heating (max 0.35 (min 0.50 (* 0.43 butterfly_adaptability))))
+     
+     (set! isru_alloc butterfly_base_isru)
+     (set! greenhouse_alloc butterfly_base_greenhouse)
+     (set! heating_alloc butterfly_base_heating))
+
+    ;; TRANSCENDENT PHASE: Beyond normal limitations
+    ((= metamorphosis_phase "TRANSCENDENT")
+     (define transcendent_mastery 1.5)
+     (define transcendent_wisdom (* phase_maturity transcendent_mastery))
+     
+     ;; Ultimate optimization with transcendent abilities
+     (set! isru_alloc (* 0.20 transcendent_wisdom))
+     (set! greenhouse_alloc (* 0.30 transcendent_mastery))
+     (set! heating_alloc (* 0.50 transcendent_wisdom))))
+
+  ;; ═══ METAMORPHOSIS CRISIS ADAPTATION ═══
+  ;; Each phase has different crisis response patterns
+  
+  ;; Crisis detection with phase-specific thresholds
+  (define metamorphosis_crisis_threshold
+    (cond
+      ((= metamorphosis_phase "LARVA") 40)        ;; More vulnerable early
+      ((= metamorphosis_phase "CATERPILLAR") 50)  ;; Building resilience
+      ((= metamorphosis_phase "CHRYSALIS") 35)    ;; Vulnerable during transformation
+      ((= metamorphosis_phase "BUTTERFLY") 60)    ;; More resilient and adaptive
+      ((= metamorphosis_phase "TRANSCENDENT") 70))) ;; Highly resilient
+
+  (define in_metamorphosis_crisis (> colony_risk_index metamorphosis_crisis_threshold))
+
+  ;; Crisis adaptation by phase
+  (if in_metamorphosis_crisis
+    (cond
+      ((= metamorphosis_phase "LARVA")
+       ;; Larva crisis: focus on basic survival
+       (set! isru_alloc 0.50) (set! greenhouse_alloc 0.25) (set! heating_alloc 0.25))
+      
+      ((= metamorphosis_phase "CATERPILLAR") 
+       ;; Caterpillar crisis: maintain growth but add safety
+       (set! isru_alloc 0.40) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.25))
+      
+      ((= metamorphosis_phase "CHRYSALIS")
+       ;; Chrysalis crisis: protective shell mode
+       (set! isru_alloc 0.30) (set! greenhouse_alloc 0.25) (set! heating_alloc 0.45))
+      
+      ((= metamorphosis_phase "BUTTERFLY")
+       ;; Butterfly crisis: graceful evasion
+       (set! isru_alloc 0.25) (set! greenhouse_alloc 0.30) (set! heating_alloc 0.45))
+      
+      ((= metamorphosis_phase "TRANSCENDENT")
+       ;; Transcendent crisis: beyond normal limitations
+       (set! isru_alloc 0.22) (set! greenhouse_alloc 0.28) (set! heating_alloc 0.50))))
+
+  ;; ═══ EVOLUTION-BASED FOOD RATIONING ═══
+  ;; Each phase has different feeding patterns
+  (define metamorphosis_base_ration
+    (cond
+      ((= metamorphosis_phase "LARVA") 0.95)      ;; Growing larvae need lots of food
+      ((= metamorphosis_phase "CATERPILLAR") 1.05) ;; Peak consumption phase
+      ((= metamorphosis_phase "CHRYSALIS") 0.40)   ;; Minimal consumption during transformation
+      ((= metamorphosis_phase "BUTTERFLY") 0.75)   ;; Efficient adult feeding
+      ((= metamorphosis_phase "TRANSCENDENT") 0.60))) ;; Transcendent efficiency
+
+  ;; Crisis rationing adjustment
+  (define metamorphosis_crisis_ration_modifier
+    (if in_metamorphosis_crisis 0.6 1.0))
+
+  ;; Emergency food protocols
+  (define metamorphosis_emergency_ration
+    (cond
+      ((< food_days 3) 0.25)
+      ((< food_days 6) 0.35)
+      ((< food_days 10) 0.50)
+      (true metamorphosis_base_ration)))
+
+  (set! food_ration (* metamorphosis_emergency_ration metamorphosis_crisis_ration_modifier))
+  (set! food_ration (max 0.20 (min 1.2 food_ration)))
+
+  ;; ═══ METAMORPHOSIS ALLOCATION NORMALIZATION ═══
+  ;; Apply evolution factors and normalize
+  (set! isru_alloc (* isru_alloc phase_energy))
+  (set! greenhouse_alloc (* greenhouse_alloc evolution_speed))
+  (set! heating_alloc (* heating_alloc transformation_readiness))
+
+  ;; Normalize allocations
+  (define metamorphosis_total (+ isru_alloc greenhouse_alloc heating_alloc))
+  (if (> metamorphosis_total 0)
+    (begin
+      (set! isru_alloc (/ isru_alloc metamorphosis_total))
+      (set! greenhouse_alloc (/ greenhouse_alloc metamorphosis_total))
+      (set! heating_alloc (/ heating_alloc metamorphosis_total))))
+
+  ;; ═══ METAMORPHOSIS STATUS VISUALIZATION ═══
+  (define metamorphosis_icon
+    (cond
+      ((= metamorphosis_phase "LARVA") "🐛💚")
+      ((= metamorphosis_phase "CATERPILLAR") "🐛⚡")
+      ((= metamorphosis_phase "CHRYSALIS") "🛡️✨")
+      ((= metamorphosis_phase "BUTTERFLY") "🦋🌟")
+      ((= metamorphosis_phase "TRANSCENDENT") "🦋👑")))
+
+  (define crisis_indicator (if in_metamorphosis_crisis "🚨" "✨"))
+
+  (log (concat "  Metamorphosis Status: " metamorphosis_icon " " metamorphosis_phase " " crisis_indicator))
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Greenhouse:" (string (round (* greenhouse_alloc 100))) "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Ration: " (string (round (* food_ration 100))) "% | Phase Energy:" (string (round (* phase_energy 100))) "% | CRI Threshold:" (string metamorphosis_crisis_threshold)))
+
+  ;; ═══ METAMORPHOSIS EVOLUTION SUMMARY ═══
+  (concat "Metamorphosis Sol " (string sol) " — " metamorphosis_icon " " metamorphosis_phase " " crisis_indicator
+    " | Mat:" (string (round (* phase_maturity 100)))
+    "% | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | Evo:" (string (round (* evolution_speed 100)))
+    "% | Sol:" (string sol) "/602"))

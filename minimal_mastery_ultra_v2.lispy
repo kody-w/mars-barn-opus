@@ -1,0 +1,155 @@
+;; MINIMAL MASTERY ULTRA v2 - Revolutionary Efficiency Approach
+;; Strategy: Ultra-minimal module count with maximum efficiency optimization
+;; Innovation: 3-4 modules max, perfect resource optimization, emergency protocols
+;; Target: Beat 496 wall through efficiency, not infrastructure abundance
+
+(begin
+  (define _agent_name "Minimal Mastery Ultra v2") 
+  (define _agent_desc "Ultra-minimal 3-4 module strategy with perfect efficiency optimization and emergency survival protocols")
+
+  (log (concat "⚡🎯 Minimal Ultra — Sol " (string sol)))
+
+  ;; ═══ MINIMAL MODULE INTELLIGENCE ═══ 
+  ;; Extreme efficiency with minimal infrastructure
+  (define target_modules 4)  ;; Ultra-minimal target
+  (define modules_ratio (min 1.0 (/ modules_built target_modules)))
+  (define efficiency_multiplier (+ 1.5 (* (- 1 modules_ratio) 0.8)))  ;; Bonus for staying minimal
+  
+  ;; Estimated current infrastructure (conservative)
+  (define estimated_solar (max 2 (min 3 (round (* modules_built 0.6)))))  ;; Fewer solar farms
+  (define estimated_repair (max 0 (min 2 (round (* modules_built 0.3)))))  ;; Minimal repair bays
+  
+  ;; Minimal efficiency scaling (different approach)
+  (define minimal_efficiency_base 1.4)
+  (define efficiency_shield (pow minimal_efficiency_base (+ 1 estimated_repair)))
+  (define total_efficiency (* efficiency_shield efficiency_multiplier))
+  
+  (log (concat "  Minimal Build: " (string estimated_solar) " solar, " (string estimated_repair) " repair | Efficiency:" (string (round (* total_efficiency 100))) "%"))
+
+  ;; ═══ CRISIS-FOCUSED ALLOCATION ═══
+  ;; Ultra-reactive to immediate survival needs
+  (define immediate_danger_o2 (< o2_days 4))
+  (define immediate_danger_food (< food_days 6))
+  (define immediate_danger_power (< power_kwh 30))
+  (define dust_storm_crisis (> dust_tau 5.0))
+  (define high_cri_crisis (> colony_risk_index 60))
+  
+  ;; Count total immediate threats
+  (define immediate_threats 0)
+  (if immediate_danger_o2 (set! immediate_threats (+ immediate_threats 1)))
+  (if immediate_danger_food (set! immediate_threats (+ immediate_threats 1)))
+  (if immediate_danger_power (set! immediate_threats (+ immediate_threats 1)))
+  (if dust_storm_crisis (set! immediate_threats (+ immediate_threats 1)))
+  (if high_cri_crisis (set! immediate_threats (+ immediate_threats 1)))
+  
+  ;; Crisis mode determination
+  (define crisis_mode
+    (cond
+      ((>= immediate_threats 3) "MULTIPLE_CRISIS")
+      ((>= immediate_threats 2) "DUAL_CRISIS") 
+      ((>= immediate_threats 1) "SINGLE_CRISIS")
+      ((> colony_risk_index 35) "HIGH_RISK")
+      ((> sol 400) "ENDGAME")
+      ((> sol 300) "LATE_PHASE")
+      (true "STABLE")))
+
+  ;; Ultra-minimal allocation strategy
+  (cond
+    ;; EMERGENCY PROTOCOLS - Single focus to survive immediate threats
+    ((= crisis_mode "MULTIPLE_CRISIS")
+     (cond
+       (immediate_danger_o2 
+        (set! isru_alloc 0.88) (set! greenhouse_alloc 0.06) (set! heating_alloc 0.06))
+       (immediate_danger_power
+        (set! isru_alloc 0.08) (set! greenhouse_alloc 0.08) (set! heating_alloc 0.84))
+       (true  ;; Default multi-crisis: balance critically
+        (set! isru_alloc 0.45) (set! greenhouse_alloc 0.20) (set! heating_alloc 0.35))))
+    
+    ((= crisis_mode "DUAL_CRISIS")
+     (cond
+       ((and immediate_danger_o2 immediate_danger_power)
+        (set! isru_alloc 0.55) (set! greenhouse_alloc 0.08) (set! heating_alloc 0.37))
+       ((and immediate_danger_food immediate_danger_power)
+        (set! isru_alloc 0.12) (set! greenhouse_alloc 0.48) (set! heating_alloc 0.40))
+       ((and immediate_danger_o2 immediate_danger_food)
+        (set! isru_alloc 0.52) (set! greenhouse_alloc 0.38) (set! heating_alloc 0.10))
+       (true  ;; Other dual crisis combinations
+        (set! isru_alloc 0.35) (set! greenhouse_alloc 0.25) (set! heating_alloc 0.40))))
+    
+    ((= crisis_mode "SINGLE_CRISIS")
+     (cond
+       (immediate_danger_o2
+        (set! isru_alloc 0.72) (set! greenhouse_alloc 0.18) (set! heating_alloc 0.10))
+       (immediate_danger_food  
+        (set! isru_alloc 0.15) (set! greenhouse_alloc 0.65) (set! heating_alloc 0.20))
+       (immediate_danger_power
+        (set! isru_alloc 0.12) (set! greenhouse_alloc 0.15) (set! heating_alloc 0.73))
+       (dust_storm_crisis
+        (set! isru_alloc 0.25) (set! greenhouse_alloc 0.25) (set! heating_alloc 0.50))
+       (high_cri_crisis
+        (set! isru_alloc 0.20) (set! greenhouse_alloc 0.20) (set! heating_alloc 0.60))
+       (true
+        (set! isru_alloc 0.28) (set! greenhouse_alloc 0.32) (set! heating_alloc 0.40))))
+    
+    ;; STABLE OPERATIONS - Optimized minimal allocation
+    ((= crisis_mode "ENDGAME")
+     (set! isru_alloc 0.22) (set! greenhouse_alloc 0.28) (set! heating_alloc 0.50))
+    
+    ((= crisis_mode "LATE_PHASE") 
+     (set! isru_alloc 0.25) (set! greenhouse_alloc 0.30) (set! heating_alloc 0.45))
+    
+    ((= crisis_mode "HIGH_RISK")
+     (set! isru_alloc 0.24) (set! greenhouse_alloc 0.28) (set! heating_alloc 0.48))
+     
+    (true  ;; STABLE - balanced minimal allocation
+     (set! isru_alloc 0.28) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.37)))
+
+  ;; Apply efficiency multiplier to improve all allocations
+  (define efficiency_boost (max 1.0 (min 1.3 total_efficiency)))
+  (set! isru_alloc (min 0.90 (* isru_alloc efficiency_boost)))
+  (set! greenhouse_alloc (min 0.80 (* greenhouse_alloc efficiency_boost)))
+  (set! heating_alloc (min 0.95 (* heating_alloc efficiency_boost)))
+
+  ;; ═══ ULTRA-AGGRESSIVE RATIONING ═══
+  ;; Minimal strategy needs aggressive food management
+  (define minimal_base_ration
+    (cond
+      ((= crisis_mode "MULTIPLE_CRISIS") 0.20)
+      ((= crisis_mode "DUAL_CRISIS") 0.25)
+      ((= crisis_mode "SINGLE_CRISIS") 0.35)
+      ((< food_days 3) 0.25)
+      ((< food_days 6) 0.40)
+      ((< food_days 10) 0.55)
+      ((< food_days 15) 0.70)
+      ((= crisis_mode "ENDGAME") 0.50)
+      ((= crisis_mode "LATE_PHASE") 0.65)
+      (true 0.85)))
+
+  ;; Efficiency bonus allows better rationing 
+  (define efficiency_ration_boost (max 0 (min 0.25 (- efficiency_boost 1))))
+  (set! food_ration (max 0.15 (min 1.0 (+ minimal_base_ration efficiency_ration_boost))))
+
+  ;; ═══ STATUS DISPLAY ═══
+  (define crisis_icon
+    (cond
+      ((= crisis_mode "MULTIPLE_CRISIS") "💀⚡")
+      ((= crisis_mode "DUAL_CRISIS") "🔴🚨") 
+      ((= crisis_mode "SINGLE_CRISIS") "🟠⚠️")
+      ((= crisis_mode "HIGH_RISK") "🟡⚡")
+      ((= crisis_mode "ENDGAME") "🔵🎯")
+      ((= crisis_mode "LATE_PHASE") "🟢⏰")
+      (true "🟢✨")))
+
+  (log (concat "  Status: " crisis_icon " " crisis_mode " | Threats:" (string immediate_threats)))
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Greenhouse:" (string (round (* greenhouse_alloc 100))) "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Ration: " (string (round (* food_ration 100))) "% | Efficiency:" (string (round (* efficiency_boost 100))) "% | Target Modules:" (string target_modules)))
+
+  ;; ═══ MINIMAL STRATEGY SUMMARY ═══
+  (concat "MinimalUltra Sol " (string sol) " — " crisis_icon " " crisis_mode
+    " | T:" (string immediate_threats)
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | Eff:" (string (round (* efficiency_boost 100)))
+    "% | M:" (string modules_built) "/" (string target_modules)))

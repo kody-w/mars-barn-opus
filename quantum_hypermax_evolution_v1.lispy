@@ -1,0 +1,203 @@
+;; QUANTUM HYPERMAX EVOLUTION v1 - Beat 496 Sol Wall with Revolutionary Approach
+;; Strategy: Ultra-adaptive multi-phase governor with quantum-level CRI sensitivity
+;; Innovation: Dynamic phase detection + exponential repair scaling + predictive allocation
+;; Target: 500+ sols through revolutionary adaptive intelligence
+
+(begin
+  (define _agent_name "Quantum HyperMax Evolution v1")
+  (define _agent_desc "Revolutionary multi-phase adaptive governor with quantum CRI sensitivity and predictive allocation matrices")
+
+  (log (concat "🚀⚡ Quantum HyperMax — Sol " (string sol)))
+
+  ;; ═══ QUANTUM INFRASTRUCTURE INTELLIGENCE ═══
+  ;; Advanced infrastructure modeling with predictive analysis
+  (define modules_ratio (min 1.0 (/ modules_built 15)))
+  (define estimated_solar (max 2 (round (* modules_built 0.45))))
+  (define estimated_repair (max 1 (round (* modules_built 0.30))))
+  
+  ;; Quantum repair bay scaling with ultra-enhanced exponential effects
+  (define quantum_repair_base 1.95)  ;; Higher than champion's 1.75
+  (define quantum_shield_strength (pow quantum_repair_base estimated_repair))
+  (define infrastructure_quantum_boost (+ 1 (* modules_ratio 0.45)))
+  (define total_quantum_capacity (* quantum_shield_strength infrastructure_quantum_boost))
+  
+  ;; Predictive infrastructure analysis
+  (define infrastructure_phase
+    (cond
+      ((< modules_built 3) "GENESIS")
+      ((< modules_built 7) "EXPANSION") 
+      ((< modules_built 12) "CONSOLIDATION")
+      (true "TRANSCENDENCE")))
+  
+  (log (concat "  Infrastructure: " infrastructure_phase " | Solar:" (string estimated_solar) " Repair:" (string estimated_repair) " | Quantum Shield:" (string (round (* quantum_shield_strength 100))) "%"))
+
+  ;; ═══ ULTRA-ENHANCED CRI QUANTUM ANALYSIS ═══
+  ;; Revolutionary CRI modeling with predictive phase detection
+  (define cri_normalized (/ colony_risk_index 100))
+  (define cri_volatility_factor (max 0.12 (/ colony_risk_index 75)))
+  
+  ;; Multi-phase crisis detection with quantum sensitivity
+  (define ultra_crisis_multiplier 
+    (cond
+      ((and (> colony_risk_index 65) (> sol 380)) 3.5)  ;; End-game ultra crisis
+      ((> colony_risk_index 60) 2.8)                    ;; Ultra-high threat
+      ((> colony_risk_index 45) 1.8)                    ;; High threat (lowered threshold)
+      ((> colony_risk_index 25) 1.2)                    ;; Medium threat (ultra-sensitive)
+      (true 1.0)))
+  
+  ;; Aggregate quantum threat calculation
+  (define quantum_threat_level (* cri_normalized cri_volatility_factor ultra_crisis_multiplier))
+  
+  ;; Advanced phase detection with earlier critical zone recognition
+  (define game_phase
+    (cond
+      ((> sol 420) "SURVIVAL_CRITICAL")     ;; Earlier than 450
+      ((> sol 350) "END_GAME")              ;; Earlier than 380
+      ((> sol 250) "LATE_GAME")             ;; Earlier than 300
+      ((> sol 150) "MID_GAME")
+      ((> sol 80) "EARLY_EXPANSION")
+      (true "FOUNDATION")))
+  
+  ;; Quantum threat classification
+  (define quantum_threat_class
+    (cond
+      ((> quantum_threat_level 2.5) "EXTINCTION")
+      ((> quantum_threat_level 1.8) "CRITICAL")
+      ((> quantum_threat_level 1.2) "HIGH")
+      ((> quantum_threat_level 0.6) "MODERATE")
+      (true "STABLE")))
+
+  ;; Multi-factor crisis detection with enhanced sensitivity
+  (define crisis_score 0)
+  (if (< o2_days 8) (set! crisis_score (+ crisis_score 4)))      ;; More weight
+  (if (< food_days 12) (set! crisis_score (+ crisis_score 3)))   ;; More weight
+  (if (< power_kwh 80) (set! crisis_score (+ crisis_score 3)))   ;; Higher threshold
+  (if (> dust_tau 3.5) (set! crisis_score (+ crisis_score 2)))   ;; Earlier threshold
+  (if (> colony_risk_index 40) (set! crisis_score (+ crisis_score 3)))  ;; Lower threshold
+  
+  ;; Phase-specific crisis amplifiers
+  (if (= game_phase "SURVIVAL_CRITICAL") (set! crisis_score (* crisis_score 1.5)))
+  (if (= game_phase "END_GAME") (set! crisis_score (* crisis_score 1.3)))
+  
+  (define quantum_emergency_state (>= crisis_score 6))
+  
+  (log (concat "  Phase: " game_phase " | Threat: " quantum_threat_class " | Crisis: " (string (round crisis_score)) (if quantum_emergency_state " 🚨🚨" "")))
+
+  ;; ═══ QUANTUM ADAPTIVE RESOURCE ALLOCATION ═══
+  ;; Revolutionary allocation with quantum shield efficiency and phase-aware optimization
+  (define quantum_efficiency_bonus (min 2.0 (max 0.6 (/ total_quantum_capacity 4))))
+  
+  ;; Ultra-dynamic allocation targets with quantum threat modeling
+  (define quantum_isru_base
+    (cond
+      (quantum_emergency_state 0.08)                     ;; Ultra-emergency: minimal O2
+      ((= quantum_threat_class "EXTINCTION") 0.12)
+      ((= quantum_threat_class "CRITICAL") 0.18)
+      ((= quantum_threat_class "HIGH") 0.22)
+      ((< o2_days 5) 0.78)                              ;; Oxygen crisis override
+      ((< o2_days 9) 0.52)                              ;; Expanded crisis range
+      ((< o2_days 14) 0.38)                             ;; Higher threshold
+      ((= game_phase "FOUNDATION") 0.32)                 ;; Phase-specific base
+      ((= game_phase "EARLY_EXPANSION") 0.28)
+      ((= game_phase "MID_GAME") 0.25)
+      ((= game_phase "LATE_GAME") 0.22)
+      ((= game_phase "END_GAME") 0.20)
+      ((= game_phase "SURVIVAL_CRITICAL") 0.15)
+      (true 0.26)))
+
+  (define quantum_greenhouse_base
+    (cond
+      (quantum_emergency_state 0.15)                     ;; Emergency: reduced food
+      ((= quantum_threat_class "EXTINCTION") 0.20)
+      ((= quantum_threat_class "CRITICAL") 0.26)
+      ((= quantum_threat_class "HIGH") 0.32)
+      ((< food_days 7) 0.65)                            ;; Food crisis override
+      ((< food_days 14) 0.48)                           ;; Expanded crisis range
+      ((< food_days 20) 0.42)                           ;; Higher threshold
+      ((= game_phase "FOUNDATION") 0.38)                 ;; Phase-specific optimization
+      ((= game_phase "EARLY_EXPANSION") 0.35)
+      ((= game_phase "MID_GAME") 0.33)
+      ((= game_phase "LATE_GAME") 0.30)
+      ((= game_phase "END_GAME") 0.28)
+      ((= game_phase "SURVIVAL_CRITICAL") 0.25)
+      (true 0.34)))
+
+  (define quantum_heating_base
+    (cond
+      (quantum_emergency_state 0.77)                     ;; Emergency: maximum power
+      ((= quantum_threat_class "EXTINCTION") 0.68)
+      ((= quantum_threat_class "CRITICAL") 0.56)
+      ((= quantum_threat_class "HIGH") 0.46)
+      ((< power_kwh 50) 0.72)                           ;; Power crisis override
+      ((< power_kwh 90) 0.52)                           ;; Higher threshold
+      ((> dust_tau 4.5) 0.46)                          ;; Lower dust threshold
+      ((= game_phase "FOUNDATION") 0.30)                 ;; Phase-specific targets
+      ((= game_phase "EARLY_EXPANSION") 0.37)
+      ((= game_phase "MID_GAME") 0.42)
+      ((= game_phase "LATE_GAME") 0.48)
+      ((= game_phase "END_GAME") 0.52)
+      ((= game_phase "SURVIVAL_CRITICAL") 0.60)
+      (true 0.40)))
+
+  ;; Apply quantum efficiency and normalize with enhanced calculation
+  (define allocation_sum (+ quantum_isru_base quantum_greenhouse_base quantum_heating_base))
+  (define quantum_normalization (/ quantum_efficiency_bonus allocation_sum))
+  
+  ;; Advanced normalization with phase-specific multipliers
+  (define phase_multiplier
+    (cond
+      ((= game_phase "SURVIVAL_CRITICAL") 1.15)
+      ((= game_phase "END_GAME") 1.10)
+      ((= game_phase "LATE_GAME") 1.05)
+      (true 1.0)))
+  
+  (define final_normalization (* quantum_normalization phase_multiplier))
+  
+  (set! isru_alloc (max 0.05 (min 0.85 (* quantum_isru_base final_normalization))))
+  (set! greenhouse_alloc (max 0.10 (min 0.80 (* quantum_greenhouse_base final_normalization))))
+  (set! heating_alloc (max 0.15 (min 0.90 (* quantum_heating_base final_normalization))))
+
+  ;; ═══ QUANTUM SURVIVAL RATIONING PROTOCOL ═══
+  ;; Ultra-advanced rationing with quantum shield protection
+  (define quantum_base_ration
+    (cond
+      (quantum_emergency_state 0.22)                     ;; Ultra-emergency survival
+      ((= quantum_threat_class "EXTINCTION") 0.28)
+      ((= quantum_threat_class "CRITICAL") 0.38)
+      ((= quantum_threat_class "HIGH") 0.48)
+      ((< food_days 5) 0.32)                            ;; Food emergency
+      ((< food_days 9) 0.48)                            ;; Expanded emergency range
+      ((< food_days 17) 0.68)                           ;; Higher threshold
+      ((< food_days 28) 0.83)                           ;; Conservative rationing
+      ((= game_phase "SURVIVAL_CRITICAL") 0.45)          ;; Phase-specific rationing
+      ((= game_phase "END_GAME") 0.65)
+      ((= game_phase "LATE_GAME") 0.80)
+      (true 0.92)))
+
+  ;; Quantum shield allows better rationing when defenses are ultra-strong
+  (define quantum_ration_boost (max 0 (min 0.35 (- quantum_efficiency_bonus 1))))
+  (set! food_ration (max 0.18 (min 1.15 (+ quantum_base_ration quantum_ration_boost))))
+
+  ;; ═══ QUANTUM STATUS VISUALIZATION ═══
+  (define quantum_status_icon
+    (cond
+      (quantum_emergency_state "💀💀")
+      ((= quantum_threat_class "EXTINCTION") "☠️⚡")
+      ((= quantum_threat_class "CRITICAL") "🔴🚨")
+      ((= quantum_threat_class "HIGH") "🟠⚠️")
+      ((= quantum_threat_class "MODERATE") "🟡✨")
+      (true "🟢⚡")))
+
+  (log (concat "  Quantum Status: " quantum_status_icon " " quantum_threat_class " | Shield:" (string (round (* total_quantum_capacity 100))) "% | Phase:" game_phase))
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Greenhouse:" (string (round (* greenhouse_alloc 100))) "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Ration: " (string (round (* food_ration 100))) "% | Efficiency:" (string (round (* quantum_efficiency_bonus 100))) "% | Crisis:" (string (round crisis_score))))
+
+  ;; ═══ QUANTUM STRATEGIC SUMMARY ═══
+  (concat "QuantumMax Sol " (string sol) " — " quantum_status_icon " " quantum_threat_class
+    " | " game_phase
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | QShield:" (string (round (* total_quantum_capacity 100)))
+    "% | C:" (string (round crisis_score))))

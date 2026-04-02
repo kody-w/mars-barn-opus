@@ -1,0 +1,205 @@
+;; SWARM INTELLIGENCE HIVE v3 - Revolutionary Collective Intelligence Approach
+;; Strategy: Biomimetic swarm decision-making with emergent optimization patterns
+;; Innovation: Multiple decision agents, collective intelligence, adaptive swarming
+;; Target: Perfect 602-frame survival + maximum score optimization through swarm behavior
+
+(begin
+  (define _agent_name "Swarm Intelligence Hive v3")
+  (define _agent_desc "Revolutionary swarm-based collective intelligence governor with emergent optimization and biomimetic decision patterns")
+
+  (log (concat "🐝🧠 Swarm Hive — Sol " (string sol)))
+
+  ;; ═══ SWARM COLLECTIVE INTELLIGENCE FRAMEWORK ═══
+  ;; Multiple specialized agents make collective decisions
+  
+  ;; AGENT 1: Resource Scout (focuses on immediate survival needs)
+  (define scout_o2_urgency (max 0 (min 1 (/ (- 8 o2_days) 8))))
+  (define scout_food_urgency (max 0 (min 1 (/ (- 12 food_days) 12))))
+  (define scout_power_urgency (max 0 (min 1 (/ (- 80 power_kwh) 80))))
+  (define scout_total_urgency (+ scout_o2_urgency scout_food_urgency scout_power_urgency))
+  
+  (define scout_recommendation
+    (cond
+      ((> scout_o2_urgency 0.7) "OXYGEN_CRISIS")
+      ((> scout_food_urgency 0.6) "FOOD_CRISIS")
+      ((> scout_power_urgency 0.5) "POWER_CRISIS")
+      ((> scout_total_urgency 1.2) "MULTI_RESOURCE_STRESS")
+      (true "RESOURCE_STABLE")))
+
+  ;; AGENT 2: Risk Assessor (evaluates threats and danger patterns)
+  (define assessor_cri_threat (/ colony_risk_index 100))
+  (define assessor_phase_risk
+    (cond
+      ((> sol 500) 0.9)
+      ((> sol 400) 0.7)
+      ((> sol 300) 0.5)
+      ((> sol 200) 0.3)
+      (true 0.1)))
+  (define assessor_compound_risk (* assessor_cri_threat assessor_phase_risk))
+  
+  (define assessor_recommendation
+    (cond
+      ((> assessor_compound_risk 0.8) "EXTREME_DANGER")
+      ((> assessor_compound_risk 0.6) "HIGH_DANGER")
+      ((> assessor_compound_risk 0.4) "MODERATE_DANGER")
+      ((> assessor_compound_risk 0.2) "LOW_DANGER")
+      (true "MINIMAL_DANGER")))
+
+  ;; AGENT 3: Efficiency Optimizer (maximizes resource allocation efficiency)
+  (define optimizer_efficiency_score (+ modules_built (* sol 0.001)))
+  (define optimizer_growth_potential (max 0 (min 1 (/ (- 15 modules_built) 15))))
+  (define optimizer_conservation_need (max 0 (min 1 (/ sol 500))))
+  
+  (define optimizer_recommendation
+    (cond
+      ((and (< modules_built 8) (< sol 200)) "AGGRESSIVE_GROWTH")
+      ((and (> optimizer_efficiency_score 10) (> sol 300)) "CONSERVATION_MODE")
+      ((> optimizer_growth_potential 0.7) "MODERATE_EXPANSION")
+      (true "BALANCED_OPTIMIZATION")))
+
+  ;; AGENT 4: Pattern Recognizer (learns from sol patterns and cycles)
+  (define pattern_sol_cycle (% sol 10))
+  (define pattern_long_cycle (% sol 50))
+  (define pattern_phase_completion (/ sol 602))
+  
+  (define pattern_recommendation
+    (cond
+      ((= pattern_sol_cycle 0) "MAINTENANCE_CYCLE")
+      ((= pattern_sol_cycle 5) "PRODUCTION_BOOST")
+      ((= pattern_long_cycle 0) "STRATEGIC_REVIEW")
+      ((> pattern_phase_completion 0.8) "ENDGAME_PROTOCOLS")
+      (true "STANDARD_OPERATIONS")))
+
+  ;; ═══ SWARM DECISION FUSION ═══
+  ;; Collective intelligence emerges from agent interactions
+  (define swarm_danger_consensus
+    (+ (* (if (= scout_recommendation "OXYGEN_CRISIS") 3 0) 1)
+       (* (if (= scout_recommendation "FOOD_CRISIS") 2 0) 1)
+       (* (if (= scout_recommendation "POWER_CRISIS") 2 0) 1)
+       (* (if (= assessor_recommendation "EXTREME_DANGER") 4 0) 1)
+       (* (if (= assessor_recommendation "HIGH_DANGER") 3 0) 1)
+       (* (if (= assessor_recommendation "MODERATE_DANGER") 2 0) 1)))
+
+  (define swarm_growth_consensus
+    (+ (* (if (= optimizer_recommendation "AGGRESSIVE_GROWTH") 3 0) 1)
+       (* (if (= optimizer_recommendation "MODERATE_EXPANSION") 2 0) 1)
+       (* (if (= scout_recommendation "RESOURCE_STABLE") 1 0) 1)
+       (* (if (= assessor_recommendation "MINIMAL_DANGER") 1 0) 1)))
+
+  (define swarm_efficiency_consensus
+    (+ (* (if (= optimizer_recommendation "CONSERVATION_MODE") 3 0) 1)
+       (* (if (= pattern_recommendation "MAINTENANCE_CYCLE") 2 0) 1)
+       (* (if (= pattern_recommendation "ENDGAME_PROTOCOLS") 2 0) 1)))
+
+  ;; Swarm collective decision
+  (define swarm_mode
+    (cond
+      ((>= swarm_danger_consensus 6) "EMERGENCY_SWARM")
+      ((>= swarm_danger_consensus 3) "DEFENSIVE_SWARM")
+      ((>= swarm_growth_consensus 4) "EXPANSION_SWARM")
+      ((>= swarm_efficiency_consensus 4) "OPTIMIZATION_SWARM")
+      (true "BALANCED_SWARM")))
+
+  (log (concat "  Swarm Agents: Scout[" scout_recommendation "] Risk[" assessor_recommendation "] Opt[" optimizer_recommendation "] Pattern[" pattern_recommendation "]"))
+  (log (concat "  Swarm Consensus: Danger:" (string swarm_danger_consensus) " Growth:" (string swarm_growth_consensus) " Efficiency:" (string swarm_efficiency_consensus)))
+  (log (concat "  Swarm Mode: " swarm_mode))
+
+  ;; ═══ SWARM ALLOCATION MATRICES ═══
+  ;; Each swarm mode has specialized allocation patterns
+  (cond
+    ;; EMERGENCY SWARM: All agents focus on immediate survival
+    ((= swarm_mode "EMERGENCY_SWARM")
+     (cond
+       ((> scout_o2_urgency 0.7)
+        (set! isru_alloc 0.85) (set! greenhouse_alloc 0.08) (set! heating_alloc 0.07))
+       ((> scout_food_urgency 0.6)
+        (set! isru_alloc 0.15) (set! greenhouse_alloc 0.75) (set! heating_alloc 0.10))
+       ((> scout_power_urgency 0.5)
+        (set! isru_alloc 0.10) (set! greenhouse_alloc 0.10) (set! heating_alloc 0.80))
+       (true
+        (set! isru_alloc 0.40) (set! greenhouse_alloc 0.25) (set! heating_alloc 0.35))))
+
+    ;; DEFENSIVE SWARM: Coordinated defense against multiple threats
+    ((= swarm_mode "DEFENSIVE_SWARM")
+     (set! isru_alloc 0.28)
+     (set! greenhouse_alloc 0.30)
+     (set! heating_alloc 0.42))
+
+    ;; EXPANSION SWARM: Coordinated growth and infrastructure development  
+    ((= swarm_mode "EXPANSION_SWARM")
+     (set! isru_alloc 0.25)
+     (set! greenhouse_alloc 0.40)
+     (set! heating_alloc 0.35))
+
+    ;; OPTIMIZATION SWARM: Fine-tuned efficiency maximization
+    ((= swarm_mode "OPTIMIZATION_SWARM")
+     (set! isru_alloc 0.22)
+     (set! greenhouse_alloc 0.33) 
+     (set! heating_alloc 0.45))
+
+    ;; BALANCED SWARM: Democratic allocation from all agents
+    (true
+     (set! isru_alloc 0.26)
+     (set! greenhouse_alloc 0.36)
+     (set! heating_alloc 0.38)))
+
+  ;; ═══ SWARM FOOD RATIONING PROTOCOL ═══
+  ;; Collective food management with swarm intelligence
+  (define swarm_base_ration
+    (cond
+      ((= swarm_mode "EMERGENCY_SWARM") 0.25)
+      ((= swarm_mode "DEFENSIVE_SWARM") 0.45)
+      ((= scout_recommendation "FOOD_CRISIS") 0.35)
+      ((= pattern_recommendation "MAINTENANCE_CYCLE") 0.60)
+      ((= pattern_recommendation "ENDGAME_PROTOCOLS") 0.50)
+      ((< food_days 5) 0.30)
+      ((< food_days 10) 0.50)
+      ((< food_days 15) 0.70)
+      (true 0.88)))
+
+  ;; Swarm collective ration adjustment
+  (define swarm_ration_bonus
+    (+ (* (if (= optimizer_recommendation "CONSERVATION_MODE") 0.15 0) 1)
+       (* (if (= assessor_recommendation "MINIMAL_DANGER") 0.10 0) 1)
+       (* (if (= scout_recommendation "RESOURCE_STABLE") 0.08 0) 1)))
+
+  (set! food_ration (max 0.20 (min 1.1 (+ swarm_base_ration swarm_ration_bonus))))
+
+  ;; ═══ SWARM ADAPTIVE LEARNING ═══
+  ;; Emergent intelligence from agent pattern recognition
+  (define swarm_learning_factor
+    (+ 1.0 (* pattern_phase_completion 0.2)))  ;; Learn over time
+
+  ;; Apply swarm learning to allocations
+  (set! isru_alloc (* isru_alloc swarm_learning_factor))
+  (set! greenhouse_alloc (* greenhouse_alloc swarm_learning_factor))
+  (set! heating_alloc (* heating_alloc swarm_learning_factor))
+
+  ;; Normalize with swarm intelligence
+  (define swarm_total (+ isru_alloc greenhouse_alloc heating_alloc))
+  (set! isru_alloc (/ isru_alloc swarm_total))
+  (set! greenhouse_alloc (/ greenhouse_alloc swarm_total))
+  (set! heating_alloc (/ heating_alloc swarm_total))
+
+  ;; ═══ SWARM STATUS VISUALIZATION ═══
+  (define swarm_icon
+    (cond
+      ((= swarm_mode "EMERGENCY_SWARM") "🐝💀")
+      ((= swarm_mode "DEFENSIVE_SWARM") "🐝🛡️")
+      ((= swarm_mode "EXPANSION_SWARM") "🐝🌱")
+      ((= swarm_mode "OPTIMIZATION_SWARM") "🐝⚡")
+      (true "🐝🧠")))
+
+  (log (concat "  Swarm Status: " swarm_icon " " swarm_mode))
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Greenhouse:" (string (round (* greenhouse_alloc 100))) "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Ration: " (string (round (* food_ration 100))) "% | Learning:" (string (round (* swarm_learning_factor 100))) "% | Phase:" (string (round (* pattern_phase_completion 100))) "%"))
+
+  ;; ═══ SWARM COLLECTIVE SUMMARY ═══
+  (concat "SwarmHive Sol " (string sol) " — " swarm_icon " " swarm_mode
+    " | Agents[" (string (+ swarm_danger_consensus swarm_growth_consensus swarm_efficiency_consensus)) "]"
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | Learn:" (string (round (* swarm_learning_factor 100)))
+    "% | Sol:" (string sol) "/602"))
