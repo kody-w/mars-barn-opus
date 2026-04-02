@@ -1,0 +1,197 @@
+;; QUANTUM SCORE MAXIMIZER ULTRA v1
+;; Innovation: Extreme score optimization focusing on modules, crew health, and survival consistency
+;; Goal: Maximum possible score achievement with revolutionary efficiency
+;; Features: Module-density optimization, crew health maximization, ultra-aggressive food production
+
+(begin
+  (define _agent_name "Quantum Score Maximizer Ultra v1")
+  (define _agent_desc "Quantum-optimized strategy targeting maximum scoring potential with revolutionary module production")
+
+  (log (concat "🌌💎🚀⚡ QUANTUM MAXIMIZER — Sol " (string sol) " — Ultimate Score Protocol"))
+
+  ;; ═══ QUANTUM SCORE ANALYSIS SYSTEM ═══
+  ;; Based on scoring formula: median_sols×100 + min_crew_alive×500 + median_modules×150 + survival_rate×200×100
+  ;; Focus: Maximize modules (×150) and maintain perfect survival/crew health
+
+  ;; Module production targets by phase
+  (define target_modules_per_sol
+    (cond
+      ((< sol 50) 0.8)        ;; Ultra-aggressive early building
+      ((< sol 150) 0.6)       ;; High building rate
+      ((< sol 300) 0.5)       ;; Sustained building
+      ((< sol 500) 0.4)       ;; Consistent building
+      (true 0.3)))            ;; Maintenance building
+
+  (define current_module_efficiency (if (> sol 0) (/ modules_built sol) 0))
+  (define module_target_met (>= current_module_efficiency target_modules_per_sol))
+
+  ;; Crew health maximization (critical for min_crew_alive×500)
+  (define crew_health_critical (< crew_hp 85))
+  (define crew_health_optimal (>= crew_hp 95))
+
+  ;; ═══ ULTRA-PHASES FOR MODULE MAXIMIZATION ═══
+  (define ultra_genesis_phase (< sol 15))         ;; Hyperfast startup
+  (define mega_build_phase (and (>= sol 15) (< sol 60)))      ;; Maximum module production
+  (define hyper_expansion_phase (and (>= sol 60) (< sol 150))) ;; Sustained expansion
+  (define efficiency_phase (and (>= sol 150) (< sol 350)))    ;; Balanced efficiency
+  (define perfection_phase (>= sol 350))         ;; Score perfection
+
+  ;; ═══ QUANTUM CRI RESPONSE ═══
+  (define cri_minimal (< cri 8))
+  (define cri_low (and (>= cri 8) (< cri 20)))
+  (define cri_moderate (and (>= cri 20) (< cri 40)))
+  (define cri_high (and (>= cri 40) (< cri 70)))
+  (define cri_critical (>= cri 70))
+
+  ;; ═══ QUANTUM ALLOCATION MATRIX ═══
+  ;; Optimized for maximum module production while maintaining crew health
+
+  ;; Ultra Genesis: Rapid resource accumulation
+  (define ultra_genesis_allocation
+    (cond
+      (cri_critical (begin (set! isru_alloc 0.70) (set! greenhouse_alloc 0.20) (set! heating_alloc 0.10)))
+      (cri_high (begin (set! isru_alloc 0.60) (set! greenhouse_alloc 0.25) (set! heating_alloc 0.15)))
+      (cri_moderate (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.20)))
+      (cri_low (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.20)))
+      (cri_minimal (begin (set! isru_alloc 0.25) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.20)))
+      (true (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.20)))))
+
+  ;; Mega Build: Maximum module production focus
+  (define mega_build_allocation
+    (let ((module_boost (if module_target_met 0.0 0.10)))  ;; Extra greenhouse if behind on modules
+      (cond
+        (cri_critical (begin (set! isru_alloc 0.55) (set! greenhouse_alloc (+ 0.30 module_boost)) (set! heating_alloc 0.15)))
+        (cri_high (begin (set! isru_alloc 0.45) (set! greenhouse_alloc (+ 0.40 module_boost)) (set! heating_alloc 0.15)))
+        (cri_moderate (begin (set! isru_alloc 0.30) (set! greenhouse_alloc (+ 0.55 module_boost)) (set! heating_alloc 0.15)))
+        (cri_low (begin (set! isru_alloc 0.20) (set! greenhouse_alloc (+ 0.65 module_boost)) (set! heating_alloc 0.15)))
+        (cri_minimal (begin (set! isru_alloc 0.15) (set! greenhouse_alloc (+ 0.70 module_boost)) (set! heating_alloc 0.15)))
+        (true (begin (set! isru_alloc 0.25) (set! greenhouse_alloc (+ 0.60 module_boost)) (set! heating_alloc 0.15))))))
+
+  ;; Hyper Expansion: Sustained high module production
+  (define hyper_expansion_allocation
+    (let ((health_boost (if crew_health_critical 0.15 0.0)))  ;; Extra food if crew health low
+      (cond
+        (cri_critical (begin (set! isru_alloc 0.50) (set! greenhouse_alloc (+ 0.35 health_boost)) (set! heating_alloc 0.15)))
+        (cri_high (begin (set! isru_alloc 0.35) (set! greenhouse_alloc (+ 0.50 health_boost)) (set! heating_alloc 0.15)))
+        (cri_moderate (begin (set! isru_alloc 0.25) (set! greenhouse_alloc (+ 0.60 health_boost)) (set! heating_alloc 0.15)))
+        (cri_low (begin (set! isru_alloc 0.18) (set! greenhouse_alloc (+ 0.67 health_boost)) (set! heating_alloc 0.15)))
+        (cri_minimal (begin (set! isru_alloc 0.15) (set! greenhouse_alloc (+ 0.70 health_boost)) (set! heating_alloc 0.15)))
+        (true (begin (set! isru_alloc 0.22) (set! greenhouse_alloc (+ 0.63 health_boost)) (set! heating_alloc 0.15))))))
+
+  ;; Efficiency Phase: Balanced for score optimization
+  (define efficiency_allocation
+    (cond
+      (cri_critical (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.15)))
+      (cri_high (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.15)))
+      (cri_moderate (begin (set! isru_alloc 0.22) (set! greenhouse_alloc 0.63) (set! heating_alloc 0.15)))
+      (cri_low (begin (set! isru_alloc 0.18) (set! greenhouse_alloc 0.67) (set! heating_alloc 0.15)))
+      (cri_minimal (begin (set! isru_alloc 0.15) (set! greenhouse_alloc 0.70) (set! heating_alloc 0.15)))
+      (true (begin (set! isru_alloc 0.20) (set! greenhouse_alloc 0.65) (set! heating_alloc 0.15)))))
+
+  ;; Perfection Phase: Maximum score maintenance
+  (define perfection_allocation
+    (cond
+      (cri_critical (begin (set! isru_alloc 0.42) (set! greenhouse_alloc 0.43) (set! heating_alloc 0.15)))
+      (cri_high (begin (set! isru_alloc 0.28) (set! greenhouse_alloc 0.57) (set! heating_alloc 0.15)))
+      (cri_moderate (begin (set! isru_alloc 0.20) (set! greenhouse_alloc 0.65) (set! heating_alloc 0.15)))
+      (cri_low (begin (set! isru_alloc 0.16) (set! greenhouse_alloc 0.69) (set! heating_alloc 0.15)))
+      (cri_minimal (begin (set! isru_alloc 0.13) (set! greenhouse_alloc 0.72) (set! heating_alloc 0.15)))
+      (true (begin (set! isru_alloc 0.18) (set! greenhouse_alloc 0.67) (set! heating_alloc 0.15)))))
+
+  ;; Execute phase allocation
+  (cond
+    (ultra_genesis_phase ultra_genesis_allocation)
+    (mega_build_phase mega_build_allocation)
+    (hyper_expansion_phase hyper_expansion_allocation)
+    (efficiency_phase efficiency_allocation)
+    (perfection_phase perfection_allocation)
+    (true efficiency_allocation))
+
+  ;; ═══ QUANTUM FOOD RATIONING SYSTEM ═══
+  ;; Optimize for crew health (critical for score) while supporting module production
+  (define quantum_food_ration
+    (cond
+      ;; Emergency situations
+      ((< food_days 2) 0.20)
+      ((< food_days 4) 0.30)
+      ((< food_days 8) 0.50)
+      ;; Health-optimized rationing
+      (crew_health_critical 0.95)     ;; Maximum ration if health low
+      (crew_health_optimal 0.80)      ;; Standard ration if health good
+      ;; Module production support
+      ((and mega_build_phase (>= food_days 15)) 0.75)  ;; Slight reduction during mega build if food secure
+      ;; Standard operations
+      ((< food_days 15) 0.85)
+      ((< food_days 30) 0.90)
+      (true 1.0)))                    ;; Maximum health ration when food abundant
+
+  (set! food_ration quantum_food_ration)
+
+  ;; ═══ QUANTUM REPAIR BAY STRATEGY ═══
+  ;; Strategic repair deployment for survival guarantee
+  (define quantum_repair_strategy
+    (cond
+      ;; Early repairs for compound damage
+      ((and (>= sol 40) (< sol 55) (< repair_bays 1)) "BUILD_REPAIR_1")
+      ((and (>= sol 80) (< sol 95) (< repair_bays 2)) "BUILD_REPAIR_2")
+      ;; Additional repairs for high threat situations
+      ((and (>= sol 130) (< sol 150) (< repair_bays 3) (or cri_high cri_critical)) "BUILD_REPAIR_3")
+      ((and (>= sol 200) (< sol 220) (< repair_bays 4) cri_critical) "BUILD_REPAIR_4")
+      ;; Score optimization repairs
+      ((and (>= sol 280) (< sol 310) (< repair_bays 5) perfection_phase) "BUILD_REPAIR_5")
+      (true "MAINTAIN_REPAIRS")))
+
+  ;; ═══ QUANTUM STATUS REPORTING ═══
+  (log (concat "  Phase: " 
+    (cond 
+      (ultra_genesis_phase "ULTRA_GENESIS")
+      (mega_build_phase "MEGA_BUILD") 
+      (hyper_expansion_phase "HYPER_EXPANSION")
+      (efficiency_phase "EFFICIENCY")
+      (perfection_phase "PERFECTION")
+      (true "UNKNOWN"))
+    " | CRI Level: "
+    (cond
+      (cri_critical "CRITICAL")
+      (cri_high "HIGH")
+      (cri_moderate "MODERATE") 
+      (cri_low "LOW")
+      (cri_minimal "MINIMAL")
+      (true "UNKNOWN"))))
+
+  (log (concat "  Module Efficiency — Current:" (string (round (* current_module_efficiency 1000))) 
+               "/1000 | Target:" (string (round (* target_modules_per_sol 1000))) 
+               "/1000 | Status:" (if module_target_met "✅ ON_TARGET" "🔥 BEHIND")))
+
+  (log (concat "  Crew Health — HP:" (string crew_hp) 
+               " | Status:" (cond 
+                              (crew_health_optimal "✅ OPTIMAL")
+                              (crew_health_critical "⚠️ CRITICAL") 
+                              (true "🔄 NORMAL"))))
+
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) 
+               "% | Greenhouse:" (string (round (* greenhouse_alloc 100))) 
+               "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+
+  (log (concat "  Resources — Food Ration:" (string (round (* food_ration 100))) 
+               "% | O2 Days:" (string o2_days) 
+               " | Food Days:" (string food_days)))
+
+  ;; ═══ QUANTUM OUTPUT SUMMARY ═══
+  (concat "🌌 QUANTUM MAXIMIZER Sol " (string sol) " — " 
+    (cond 
+      (ultra_genesis_phase "UltraGen")
+      (mega_build_phase "MegaBuild") 
+      (hyper_expansion_phase "HyperExp")
+      (efficiency_phase "Efficiency")
+      (perfection_phase "Perfection")
+      (true "Unknown"))
+    " | Modules:" (string modules_built) 
+    " (Eff:" (string (round (* current_module_efficiency 1000))) "/1000)"
+    " | Crew:" (string crew_hp) "HP"
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | CRI:" (string cri) 
+    " | RB:" (string repair_bays)))

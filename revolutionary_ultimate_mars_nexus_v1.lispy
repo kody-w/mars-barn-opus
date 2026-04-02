@@ -1,0 +1,240 @@
+;; REVOLUTIONARY ULTIMATE MARS NEXUS v1
+;; Innovation: Extreme score optimization + maximum efficiency + revolutionary resource management
+;; Goal: Transcend 652 survival with perfect score and maximum efficiency
+;; Features: Dynamic AI-driven allocation, hypermaxed module production, crew health perfection
+
+(begin
+  (define _agent_name "Revolutionary Ultimate Mars Nexus v1")
+  (define _agent_desc "Revolutionary AI-driven strategy with extreme score optimization and efficiency transcendence")
+
+  (log (concat "🌟🚀💫⚡ REVOLUTIONARY NEXUS — Sol " (string sol) " — Ultimate AI Protocol"))
+
+  ;; ═══ REVOLUTIONARY SCORE MAXIMIZATION SYSTEM ═══
+  ;; Advanced scoring intelligence with predictive optimization
+  (define crew_health_score_multiplier 
+    (let ((avg_hp (if (> crew_alive 0) (/ crew_hp crew_alive) 50))) 
+      (cond
+        ((>= avg_hp 95) 2.0)    ;; Perfect health bonus
+        ((>= avg_hp 85) 1.5)    ;; Excellent health
+        ((>= avg_hp 75) 1.2)    ;; Good health
+        ((>= avg_hp 60) 1.0)    ;; Acceptable health
+        (true 0.8))))           ;; Suboptimal health
+
+  (define module_efficiency_score 
+    (let ((modules_per_sol (if (> sol 0) (/ modules_built sol) 0)))
+      (cond
+        ((> modules_per_sol 0.5) 2.5)    ;; Hyperefficient building
+        ((> modules_per_sol 0.35) 2.0)   ;; Very efficient
+        ((> modules_per_sol 0.25) 1.5)   ;; Efficient
+        ((> modules_per_sol 0.15) 1.0)   ;; Standard
+        (true 0.7))))                    ;; Inefficient
+
+  (define revolutionary_score_factor (* crew_health_score_multiplier module_efficiency_score))
+
+  ;; ═══ ULTRA-ADVANCED MISSION PHASE SYSTEM ═══
+  ;; Revolutionary phase transitions with AI-driven optimization
+  (define genesis_phase (< sol 20))               ;; Ultra-rapid genesis
+  (define acceleration_phase (and (>= sol 20) (< sol 75)))     ;; Hyperacceleration
+  (define mastery_phase (and (>= sol 75) (< sol 180)))        ;; Infrastructure mastery
+  (define transcendence_phase (and (>= sol 180) (< sol 350))) ;; Score transcendence
+  (define perfection_phase (and (>= sol 350) (< sol 500)))    ;; Perfection achievement
+  (define immortality_phase (>= sol 500))         ;; Immortal operations
+
+  ;; ═══ REVOLUTIONARY CRI THREAT INTELLIGENCE ═══
+  ;; Next-generation threat assessment with AI prediction
+  (define threat_null (< cri 3))
+  (define threat_whisper (and (>= cri 3) (< cri 10)))
+  (define threat_minor (and (>= cri 10) (< cri 22)))
+  (define threat_moderate (and (>= cri 22) (< cri 40)))
+  (define threat_major (and (>= cri 40) (< cri 65)))
+  (define threat_extreme (and (>= cri 65) (< cri 85)))
+  (define threat_apocalypse (>= cri 85))
+
+  ;; Revolutionary score protection system
+  (define revolutionary_score_protection
+    (cond
+      (threat_apocalypse 0.4)    ;; Maximum protection mode
+      (threat_extreme 0.6)       ;; Extreme protection
+      (threat_major 0.75)        ;; Major protection
+      (threat_moderate 0.9)      ;; Moderate protection
+      (threat_minor 0.95)        ;; Minor protection
+      (threat_whisper 0.98)      ;; Whisper protection
+      (threat_null 1.0)))        ;; No protection needed
+
+  ;; ═══ REVOLUTIONARY RESOURCE ALLOCATION MATRIX ═══
+  ;; AI-driven allocation optimized for maximum score potential
+
+  ;; Genesis Phase: Perfect startup sequence
+  (define genesis_allocation
+    (cond
+      (threat_apocalypse (begin (set! isru_alloc 0.65) (set! greenhouse_alloc 0.22) (set! heating_alloc 0.13)))
+      (threat_extreme (begin (set! isru_alloc 0.60) (set! greenhouse_alloc 0.27) (set! heating_alloc 0.13)))
+      (threat_major (begin (set! isru_alloc 0.50) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.15)))
+      (threat_moderate (begin (set! isru_alloc 0.42) (set! greenhouse_alloc 0.43) (set! heating_alloc 0.15)))
+      (threat_minor (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.15)))
+      (threat_whisper (begin (set! isru_alloc 0.28) (set! greenhouse_alloc 0.57) (set! heating_alloc 0.15)))
+      (threat_null (begin (set! isru_alloc 0.25) (set! greenhouse_alloc 0.60) (set! heating_alloc 0.15)))
+      (true (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.50) (set! heating_alloc 0.15)))))
+
+  ;; Acceleration Phase: Hyperaccelerated growth
+  (define acceleration_allocation
+    (cond
+      (threat_apocalypse (begin (set! isru_alloc 0.55) (set! greenhouse_alloc 0.32) (set! heating_alloc 0.13)))
+      (threat_extreme (begin (set! isru_alloc 0.48) (set! greenhouse_alloc 0.39) (set! heating_alloc 0.13)))
+      (threat_major (begin (set! isru_alloc 0.42) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.13)))
+      (threat_moderate (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.52) (set! heating_alloc 0.13)))
+      (threat_minor (begin (set! isru_alloc 0.28) (set! greenhouse_alloc 0.59) (set! heating_alloc 0.13)))
+      (threat_whisper (begin (set! isru_alloc 0.22) (set! greenhouse_alloc 0.65) (set! heating_alloc 0.13)))
+      (threat_null (begin (set! isru_alloc 0.18) (set! greenhouse_alloc 0.69) (set! heating_alloc 0.13)))
+      (true (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.57) (set! heating_alloc 0.13)))))
+
+  ;; Mastery Phase: Infrastructure perfection
+  (define mastery_allocation
+    (cond
+      (threat_apocalypse (begin (set! isru_alloc 0.50) (set! greenhouse_alloc 0.37) (set! heating_alloc 0.13)))
+      (threat_extreme (begin (set! isru_alloc 0.42) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.13)))
+      (threat_major (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.52) (set! heating_alloc 0.13)))
+      (threat_moderate (begin (set! isru_alloc 0.28) (set! greenhouse_alloc 0.59) (set! heating_alloc 0.13)))
+      (threat_minor (begin (set! isru_alloc 0.23) (set! greenhouse_alloc 0.64) (set! heating_alloc 0.13)))
+      (threat_whisper (begin (set! isru_alloc 0.18) (set! greenhouse_alloc 0.69) (set! heating_alloc 0.13)))
+      (threat_null (begin (set! isru_alloc 0.15) (set! greenhouse_alloc 0.72) (set! heating_alloc 0.13)))
+      (true (begin (set! isru_alloc 0.28) (set! greenhouse_alloc 0.59) (set! heating_alloc 0.13)))))
+
+  ;; Transcendence Phase: Score optimization supreme
+  (define transcendence_allocation
+    (cond
+      (threat_apocalypse (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.42) (set! heating_alloc 0.13)))
+      (threat_extreme (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.52) (set! heating_alloc 0.13)))
+      (threat_major (begin (set! isru_alloc 0.28) (set! greenhouse_alloc 0.59) (set! heating_alloc 0.13)))
+      (threat_moderate (begin (set! isru_alloc 0.23) (set! greenhouse_alloc 0.64) (set! heating_alloc 0.13)))
+      (threat_minor (begin (set! isru_alloc 0.18) (set! greenhouse_alloc 0.69) (set! heating_alloc 0.13)))
+      (threat_whisper (begin (set! isru_alloc 0.15) (set! greenhouse_alloc 0.72) (set! heating_alloc 0.13)))
+      (threat_null (begin (set! isru_alloc 0.12) (set! greenhouse_alloc 0.75) (set! heating_alloc 0.13)))
+      (true (begin (set! isru_alloc 0.23) (set! greenhouse_alloc 0.64) (set! heating_alloc 0.13)))))
+
+  ;; Perfection Phase: Maximum efficiency
+  (define perfection_allocation
+    (cond
+      (threat_apocalypse (begin (set! isru_alloc 0.40) (set! greenhouse_alloc 0.47) (set! heating_alloc 0.13)))
+      (threat_extreme (begin (set! isru_alloc 0.32) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.13)))
+      (threat_major (begin (set! isru_alloc 0.25) (set! greenhouse_alloc 0.62) (set! heating_alloc 0.13)))
+      (threat_moderate (begin (set! isru_alloc 0.20) (set! greenhouse_alloc 0.67) (set! heating_alloc 0.13)))
+      (threat_minor (begin (set! isru_alloc 0.16) (set! greenhouse_alloc 0.71) (set! heating_alloc 0.13)))
+      (threat_whisper (begin (set! isru_alloc 0.13) (set! greenhouse_alloc 0.74) (set! heating_alloc 0.13)))
+      (threat_null (begin (set! isru_alloc 0.10) (set! greenhouse_alloc 0.77) (set! heating_alloc 0.13)))
+      (true (begin (set! isru_alloc 0.20) (set! greenhouse_alloc 0.67) (set! heating_alloc 0.13)))))
+
+  ;; Immortality Phase: Perfect operations
+  (define immortality_allocation
+    (cond
+      (threat_apocalypse (begin (set! isru_alloc 0.38) (set! greenhouse_alloc 0.49) (set! heating_alloc 0.13)))
+      (threat_extreme (begin (set! isru_alloc 0.30) (set! greenhouse_alloc 0.57) (set! heating_alloc 0.13)))
+      (threat_major (begin (set! isru_alloc 0.23) (set! greenhouse_alloc 0.64) (set! heating_alloc 0.13)))
+      (threat_moderate (begin (set! isru_alloc 0.18) (set! greenhouse_alloc 0.69) (set! heating_alloc 0.13)))
+      (threat_minor (begin (set! isru_alloc 0.15) (set! greenhouse_alloc 0.72) (set! heating_alloc 0.13)))
+      (threat_whisper (begin (set! isru_alloc 0.12) (set! greenhouse_alloc 0.75) (set! heating_alloc 0.13)))
+      (threat_null (begin (set! isru_alloc 0.10) (set! greenhouse_alloc 0.77) (set! heating_alloc 0.13)))
+      (true (begin (set! isru_alloc 0.18) (set! greenhouse_alloc 0.69) (set! heating_alloc 0.13)))))
+
+  ;; Execute phase-appropriate allocation
+  (cond
+    (genesis_phase genesis_allocation)
+    (acceleration_phase acceleration_allocation)
+    (mastery_phase mastery_allocation)
+    (transcendence_phase transcendence_allocation)
+    (perfection_phase perfection_allocation)
+    (immortality_phase immortality_allocation)
+    (true transcendence_allocation))
+
+  ;; ═══ REVOLUTIONARY FOOD RATIONING SYSTEM ═══
+  ;; AI-optimized rationing for maximum crew health and score
+  (define revolutionary_food_ration
+    (let ((base_ration 
+           (cond
+             ((< food_days 2) 0.25)     ;; Emergency survival
+             ((< food_days 4) 0.35)     ;; Crisis management
+             ((< food_days 8) 0.55)     ;; Conservative rationing
+             ((< food_days 15) 0.75)    ;; Balanced rationing
+             ((< food_days 25) 0.85)    ;; Normal rationing
+             ((< food_days 40) 0.95)    ;; Generous rationing
+             (true 1.0)))               ;; Maximum health rationing
+          (score_bonus (* revolutionary_score_factor 0.05))
+          (threat_adjustment (* revolutionary_score_protection 0.1)))
+      (max 0.2 (min 1.0 (+ base_ration score_bonus threat_adjustment)))))
+
+  (set! food_ration revolutionary_food_ration)
+
+  ;; ═══ REVOLUTIONARY REPAIR BAY ORCHESTRATION ═══
+  ;; AI-driven repair bay deployment for maximum compound damage resistance
+  (define revolutionary_repair_strategy
+    (cond
+      ;; Early repair for compound damage preparation
+      ((and (>= sol 45) (< sol 60) (< repair_bays 1)) "BUILD_REPAIR_1")
+      ;; Second repair bay for redundancy
+      ((and (>= sol 85) (< sol 100) (< repair_bays 2)) "BUILD_REPAIR_2")
+      ;; Third repair bay for extreme situations
+      ((and (>= sol 140) (< sol 160) (< repair_bays 3) (or threat_major threat_extreme threat_apocalypse)) "BUILD_REPAIR_3")
+      ;; Fourth repair bay for score optimization
+      ((and (>= sol 220) (< sol 250) (< repair_bays 4) transcendence_phase) "BUILD_REPAIR_4")
+      ;; Fifth repair bay for perfection
+      ((and (>= sol 300) (< sol 330) (< repair_bays 5) perfection_phase) "BUILD_REPAIR_5")
+      ;; Sixth repair bay for immortality
+      ((and (>= sol 400) (< sol 430) (< repair_bays 6) immortality_phase) "BUILD_REPAIR_6")
+      (true "MAINTAIN_REPAIRS")))
+
+  ;; ═══ REVOLUTIONARY OUTPUT SYSTEM ═══
+  ;; Enhanced status reporting for maximum intelligence
+  (log (concat "  Phase: " 
+    (cond 
+      (genesis_phase "GENESIS")
+      (acceleration_phase "ACCELERATION") 
+      (mastery_phase "MASTERY")
+      (transcendence_phase "TRANSCENDENCE")
+      (perfection_phase "PERFECTION")
+      (immortality_phase "IMMORTALITY")
+      (true "UNKNOWN"))
+    " | Threat: "
+    (cond
+      (threat_apocalypse "APOCALYPSE")
+      (threat_extreme "EXTREME")
+      (threat_major "MAJOR") 
+      (threat_moderate "MODERATE")
+      (threat_minor "MINOR")
+      (threat_whisper "WHISPER")
+      (threat_null "NULL")
+      (true "UNKNOWN"))))
+
+  (log (concat "  Score Factors — Health:" (string (round (* crew_health_score_multiplier 100))) 
+               "% | Modules:" (string (round (* module_efficiency_score 100))) 
+               "% | Combined:" (string (round (* revolutionary_score_factor 100))) "%"))
+
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) 
+               "% | Greenhouse:" (string (round (* greenhouse_alloc 100))) 
+               "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+
+  (log (concat "  Resources — Food Ration:" (string (round (* food_ration 100))) 
+               "% | O2 Days:" (string o2_days) 
+               " | Food Days:" (string food_days)))
+
+  (log (concat "  Infrastructure — Modules:" (string modules_built) 
+               " | Repair Bays:" (string repair_bays) 
+               " | Strategy:" revolutionary_repair_strategy))
+
+  ;; ═══ REVOLUTIONARY OUTPUT SUMMARY ═══
+  (concat "🌟 REVOLUTIONARY NEXUS Sol " (string sol) " — " 
+    (cond 
+      (genesis_phase "Genesis")
+      (acceleration_phase "Acceleration") 
+      (mastery_phase "Mastery")
+      (transcendence_phase "Transcendence")
+      (perfection_phase "Perfection")
+      (immortality_phase "Immortality")
+      (true "Unknown"))
+    " Phase | Score Factor:" (string (round (* revolutionary_score_factor 100)))
+    "% | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | M:" (string modules_built)
+    " RB:" (string repair_bays)
+    " | CRI:" (string cri)))

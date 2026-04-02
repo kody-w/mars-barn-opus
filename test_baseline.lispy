@@ -1,0 +1,39 @@
+;; BASELINE 441 STRATEGY - Simple 2 bots, 3 solar, late repair
+;; This represents the current record to beat: 441 sols
+;; Strategy: 2 bots, 3 solar farms, repair bay added late
+
+(begin
+  (define _agent_name "Baseline 441 Strategy")
+  (define _agent_desc "Simple 2-bot colony with 3 solar farms and late repair bay deployment")
+
+  (log (concat "🔧 Baseline — Sol " (string sol)))
+
+  ;; ═══ BASIC RESOURCE ALLOCATION ═══
+  ;; Simple fixed ratios, no dynamic adaptation
+  (set! isru_alloc 0.25)      ;; 25% to O2 production
+  (set! greenhouse_alloc 0.35) ;; 35% to food production  
+  (set! heating_alloc 0.40)    ;; 40% to power/heating
+  
+  ;; ═══ BASIC FOOD RATIONING ═══
+  ;; Conservative rationing strategy
+  (define base_ration
+    (cond
+      ((< food_days 3) 0.30)    ;; Emergency rationing
+      ((< food_days 7) 0.50)    ;; Crisis rationing
+      ((< food_days 15) 0.75)   ;; Conservative rationing
+      (true 0.85)))             ;; Normal operations
+  
+  (set! food_ration base_ration)
+
+  ;; ═══ STATUS DISPLAY ═══
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Greenhouse:" (string (round (* greenhouse_alloc 100))) "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Food Ration: " (string (round (* food_ration 100))) "% | Days: O2=" (string o2_days) " Food=" (string food_days)))
+
+  ;; ═══ OUTPUT SUMMARY ═══
+  (concat "Baseline Sol " (string sol) " — Simple strategy"
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | O2:" (string o2_days)
+    "d F:" (string food_days) "d"))
