@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>unRAPP — Universal Agent System Documentation</title>
+<meta name="description" content="Comprehensive L100-L400 documentation for the unRAPP universal agent system. Write once in LisPy, run anywhere: browser, CLI, Playwright, physical hardware.">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#484f58;
+--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--cyan:#79c0ff;
+--purple:#a371f7;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.9}
+.wrap{max-width:720px;margin:0 auto;padding:40px 24px 80px}
+.meta{color:var(--dim);font-size:12px;margin-bottom:32px}
+.meta a{color:var(--cyan);text-decoration:none}
+h1{font-size:26px;color:#fff;line-height:1.3;margin-bottom:8px}
+h2{font-size:20px;color:var(--cyan);margin:40px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+h3{font-size:15px;color:var(--green);margin:28px 0 8px}
+h4{font-size:13px;color:var(--yellow);margin:20px 0 6px;letter-spacing:0.5px}
+p{margin:12px 0}
+strong{color:#fff}
+em{color:var(--dim)}
+code{background:rgba(88,166,255,0.1);color:var(--cyan);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:0.9em}
+pre{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:16px 0;overflow-x:auto;line-height:1.5}
+pre code{background:none;padding:0;color:var(--text);font-size:12px}
+blockquote{border-left:3px solid var(--purple);padding:12px 16px;margin:24px 0;background:rgba(163,113,247,0.05);border-radius:0 8px 8px 0;font-style:italic;color:var(--dim)}
+ul,ol{margin:12px 0 12px 24px}
+li{margin:6px 0}
+hr{border:none;border-top:1px solid var(--border);margin:48px 0}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline}
+.callout{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px;margin:28px 0}
+.callout-title{color:var(--yellow);font-weight:700;font-size:12px;letter-spacing:1px;margin-bottom:8px}
+.diagram{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:20px;margin:16px 0;font-family:var(--mono);font-size:12px;line-height:1.7;white-space:pre;overflow-x:auto;color:var(--dim)}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:12px}
+th{background:#0a0e14;color:var(--cyan);padding:8px 12px;text-align:left;border:1px solid var(--border)}
+td{padding:8px 12px;border:1px solid var(--border)}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin:2px}
+.tag-l100{background:rgba(63,185,80,0.15);color:var(--green)}
+.tag-l200{background:rgba(88,166,255,0.15);color:var(--blue)}
+.tag-l300{background:rgba(210,153,34,0.15);color:var(--yellow)}
+.tag-l400{background:rgba(163,113,247,0.2);color:var(--purple)}
+.big{font-size:18px;color:#fff;font-weight:700;text-align:center;margin:32px 0;line-height:1.5}
+.footer{text-align:center;color:var(--dim);font-size:11px;margin-top:48px;padding-top:24px;border-top:1px solid var(--border)}
+.side-by-side{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.side-by-side pre{margin:0}
+.side-by-side .label{font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:4px;text-align:center}
+.label-py{color:var(--yellow)}
+.label-lispy{color:var(--green)}
+.level-badge{display:inline-block;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:1px;margin-right:8px}
+.badge-100{background:rgba(63,185,80,0.15);color:var(--green);border:1px solid rgba(63,185,80,0.3)}
+.badge-200{background:rgba(88,166,255,0.15);color:var(--blue);border:1px solid rgba(88,166,255,0.3)}
+.badge-300{background:rgba(210,153,34,0.15);color:var(--yellow);border:1px solid rgba(210,153,34,0.3)}
+.badge-400{background:rgba(163,113,247,0.15);color:var(--purple);border:1px solid rgba(163,113,247,0.3)}
+@media(max-width:700px){.side-by-side{grid-template-columns:1fr} .wrap{padding:20px 16px 60px} h1{font-size:22px} .diagram{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="meta"><a href="./">← Docs</a> · <a href="agents/index.json">Agent Catalog</a> · <a href="os.html">LisPy OS</a> · <a href="hall-of-fame.html">Hall of Fame</a></div>
+
+<h1>unRAPP — The Universal Agent System</h1>
+<div class="meta">mars-barn-opus · 2025 · <span class="tag tag-l100">L100</span> <span class="tag tag-l200">L200</span> <span class="tag tag-l300">L300</span> <span class="tag tag-l400">L400</span></div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- L100: WHAT IS THIS?                                            -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<h2><span class="level-badge badge-100">L100</span> What Is This?</h2>
+
+<p><strong>unRAPP</strong> is a universal agent runtime that lets you write an agent once and run it everywhere — in a browser, from the command line, through Playwright automation, or on physical hardware. Every agent is a <a href="../LISPY.md">LisPy</a> S-expression: a tiny program written in a safe, sandboxed Lisp dialect that the LisPy VM can execute in any environment. If you've used <a href="https://github.com/kody-w/AI-Agent-Templates">AI-Agent-Templates</a> (the Python agent library), unRAPP is the next step: take those same agents, express them as LisPy programs, and run them anywhere without Python installed. The conversion is mechanical — same name, same interface, different runtime. You can maintain both formats from a single source of truth, or go all-in on <code>.lispy</code> and never touch Python. The system is invisible: it converts, routes, and executes behind the scenes so you can focus on what your agent does, not where it runs.</p>
+
+<h3>30-Second Example</h3>
+
+<p>Here is the simplest possible agent — <code>basic_agent</code> — in both its Python form (the AI-Agent-Templates original) and its LisPy form (the unRAPP equivalent). They do the same thing: accept input, log that they're ready, and return a status message. The LisPy version runs in the browser OS, the CLI, and Playwright with zero dependencies.</p>
+
+<div class="side-by-side">
+<div>
+<div class="label label-py">BASIC_AGENT.PY</div>
+<pre><code>from lib.basic_agent import BasicAgent
+from lib.lispy_vm import LispyVM
+
+LISPY_PROGRAM = """
+(begin
+  (define _agent_name "Basic Agent")
+  (define _agent_desc
+    "Simplest possible agent.")
+  (define input
+    (if (= _input "") "No input" _input))
+  (log (concat "🤖 " _agent_name " activated"))
+  (log (concat "📥 Input: " input))
+  (log "✓ Agent ready")
+  (concat _agent_name " processed: " input))
+"""
+
+class BasicAgentImpl(BasicAgent):
+    def __init__(self):
+        self.name = "Basic Agent"
+        self.vm = LispyVM()
+
+    def perform(self, **kwargs):
+        self.vm.set_env("_input",
+            kwargs.get("input", ""))
+        return self.vm.run(LISPY_PROGRAM)</code></pre>
+</div>
+<div>
+<div class="label label-lispy">BASIC_AGENT.LISPY</div>
+<pre><code>;; basic_agent.lispy
+;; Simplest agent. Logs ready.
+;; OG: basic_agent.py
+
+(begin
+  (define _agent_name "Basic Agent")
+  (define _agent_desc
+    "Simplest possible agent.
+     Reads input, logs status,
+     returns ready.")
+
+  ;; Read input from environment
+  (define input
+    (if (= _input "")
+      "No input provided"
+      _input))
+
+  (log (concat "🤖 "
+    _agent_name " activated"))
+  (log (concat "📥 Input: " input))
+  (log "✓ Agent ready —
+    no further action required")
+
+  (concat _agent_name
+    " processed: " input))</code></pre>
+</div>
+</div>
+
+<p>Notice: the <code>.py</code> file is a thin wrapper around the same LisPy program. The <code>perform()</code> body just calls <code>self.vm.run(LISPY_PROGRAM)</code>. The <code>.lispy</code> file IS the program body, unwrapped. <strong>unRAPP means you never have to choose.</strong> Write the <code>.lispy</code>. If you need Python, the wrapper writes itself.</p>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- L200: HOW DO I USE IT?                                         -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<h2><span class="level-badge badge-200">L200</span> How Do I Use It?</h2>
+
+<h3>Path A: You Have .py Agents (AI-Agent-Templates Users)</h3>
+
+<p>If you've been using <a href="https://github.com/kody-w/AI-Agent-Templates">kody-w/AI-Agent-Templates</a>, you already have Python agent classes that follow the <code>BasicAgent</code> pattern. unRAPP gives you a way to extract the decision logic into a portable <code>.lispy</code> file that runs anywhere — browser, CLI, Playwright, hardware — while keeping your <code>.py</code> wrapper intact as a compatibility layer.</p>
+
+<h4>Step 1: Identify Your Agent's Logic</h4>
+
+<p>Every AI-Agent-Templates agent has a <code>perform(**kwargs)</code> method. That method body is what becomes your <code>.lispy</code> program. The class scaffolding (<code>__init__</code>, <code>self.name</code>, <code>self.metadata</code>) maps to <code>define</code> statements at the top of the LisPy program.</p>
+
+<h4>Step 2: Run Your .lispy Agent</h4>
+
+<p><strong>In the browser OS</strong> (<a href="os.html">os.html</a>): Open the Terminal window. Paste the LisPy program directly and press Enter. The VM evaluates it immediately with whatever colony state is loaded.</p>
+
+<pre><code>;; Paste this into os.html → Terminal:
+(begin
+  (define _agent_name "Basic Agent")
+  (log (concat "🤖 " _agent_name " activated on Sol " (string sol)))
+  (concat "Ready on Sol " (string sol)))</code></pre>
+
+<p><strong>Via Playwright SDK</strong> (automated testing / CI): Use <code>window.os.exec()</code> from a Playwright test to inject and execute a LisPy program in the browser OS context:</p>
+
+<pre><code>// playwright test — JavaScript
+const { test, expect } = require('@playwright/test');
+
+test('run basic agent', async ({ page }) => {
+  await page.goto('docs/os.html');
+
+  const result = await page.evaluate(() => {
+    return window.os.exec(`
+      (begin
+        (define _agent_name "Basic Agent")
+        (log "🤖 Agent activated")
+        (concat _agent_name " ready"))
+    `);
+  });
+
+  expect(result).toContain('Basic Agent ready');
+});</code></pre>
+
+<p><strong>Via CLI</strong> (Python): Use the LispyVM directly from Python. No browser needed:</p>
+
+<pre><code># python3
+from src.lispy import LispyVM
+
+vm = LispyVM()
+vm.set_env("sol", 42)
+vm.set_env("o2_days", 15.0)
+vm.set_env("_input", "Hello Mars")
+
+with open("docs/agents/basic_agent.lispy") as f:
+    program = f.read()
+
+result = vm.run(program)
+print(result)   # "Basic Agent processed: Hello Mars"
+print(vm.output) # ["🤖 Basic Agent activated", "📥 Input: Hello Mars", "✓ Agent ready..."]</code></pre>
+
+<h3>Path B: Starting Fresh With .lispy</h3>
+
+<p>If you're not coming from AI-Agent-Templates and want to start clean, LisPy is your only file. No Python required. No class hierarchy. No imports.</p>
+
+<ol>
+<li><strong>Write your agent as an S-expression.</strong> The <a href="../LISPY.md">LISPY.md Rosetta Stone</a> teaches the full language in one file. Every feature is documented with a working example. Drop it in your repo and any AI can read it too.</li>
+<li><strong>Save it in <code>docs/agents/</code>.</strong> This makes it discoverable in the agent catalog. The <code>index.json</code> file lists all registered agents.</li>
+<li><strong>Run it anywhere:</strong>
+  <ul>
+    <li><strong>Browser OS:</strong> Open <a href="os.html">os.html</a>, open Terminal, paste and run</li>
+    <li><strong>CLI:</strong> <code>python3 -c "from src.lispy import LispyVM; vm=LispyVM(); print(vm.run(open('docs/agents/your_agent.lispy').read()))"</code></li>
+    <li><strong>Playwright:</strong> <code>page.evaluate(() => window.os.exec(program))</code></li>
+    <li><strong>In the simulation:</strong> The colony governor loads and runs <code>.lispy</code> programs every sol</li>
+  </ul>
+</li>
+</ol>
+
+<h3>Path C: You Want Both Formats</h3>
+
+<p>You maintain <strong>one file</strong>. The runtime handles the other. Here's how the relationship works:</p>
+
+<ul>
+<li>The <code>.lispy</code> file IS the canonical logic — the <code>perform()</code> body, unwrapped.</li>
+<li>The <code>.py</code> file is a thin wrapper that instantiates <code>LispyVM</code>, seeds environment variables from <code>kwargs</code>, and calls <code>vm.run(LISPY_PROGRAM)</code>.</li>
+<li>unRAPP is invisible. You edit the LisPy. The wrapper calls it. Both formats stay in sync because the Python wrapper is just a frame around the LisPy source.</li>
+</ul>
+
+<h3>Three Real Agents: Full Code, Both Formats</h3>
+
+<p>Below are three complete agents shown in both Python and LisPy format. These are not pseudocode — this is the actual source from the repository. Study them and you'll understand the full unRAPP pattern.</p>
+
+<h4>Agent 1: basic_agent — The Simplest Agent</h4>
+
+<p>Accepts input, logs status, returns a message. This is the "Hello World" of unRAPP agents.</p>
+
+<div class="side-by-side">
+<div>
+<div class="label label-py">PYTHON (.py)</div>
+<pre><code>from lib.basic_agent import BasicAgent
+from lib.lispy_vm import LispyVM
+
+LISPY_PROGRAM = """
+(begin
+  (define _agent_name "Basic Agent")
+  (define _agent_desc
+    "Simplest possible agent.
+     Reads input, logs status,
+     returns ready.")
+  (define input
+    (if (= _input "")
+      "No input provided" _input))
+  (log (concat "🤖 "
+    _agent_name " activated"))
+  (log (concat "📥 Input: " input))
+  (log "✓ Agent ready —
+    no further action required")
+  (concat _agent_name
+    " processed: " input))
+"""
+
+class BasicAgentImpl(BasicAgent):
+    def __init__(self):
+        self.name = "Basic Agent"
+        self.metadata = {
+            "description":
+              "Simplest possible agent."
+        }
+        self.vm = LispyVM()
+
+    def perform(self, **kwargs):
+        self.vm.set_env("_input",
+            kwargs.get("input", ""))
+        return self.vm.run(LISPY_PROGRAM)</code></pre>
+</div>
+<div>
+<div class="label label-lispy">LISPY (.lispy)</div>
+<pre><code>;; basic_agent.lispy
+;; Simplest agent. Logs ready.
+;; Takes _input from env.
+;; OG: basic_agent.py
+
+(begin
+  (define _agent_name "Basic Agent")
+  (define _agent_desc
+    "Simplest possible agent.
+     Reads input, logs status,
+     returns ready.")
+
+  ;; Read input from environment
+  ;; (set by caller or VM)
+  (define input
+    (if (= _input "")
+      "No input provided"
+      _input))
+
+  (log (concat "🤖 "
+    _agent_name " activated"))
+  (log (concat "📥 Input: " input))
+  (log "✓ Agent ready —
+    no further action required")
+
+  (concat _agent_name
+    " processed: " input))</code></pre>
+</div>
+</div>
+
+<h4>Agent 2: context_memory_agent — Store &amp; Recall State</h4>
+
+<p>Uses <code>_mem_*</code> environment variables to store, recall, list, and manage persistent memory across agent invocations. This agent demonstrates how LisPy programs maintain state through the VM environment — not through files or databases, but through named variables prefixed with <code>_mem_</code>.</p>
+
+<div class="side-by-side">
+<div>
+<div class="label label-py">PYTHON (.py)</div>
+<pre><code>from lib.basic_agent import BasicAgent
+from lib.lispy_vm import LispyVM
+
+LISPY_PROGRAM = """
+(begin
+  (define _agent_name
+    "Context Memory Agent")
+  (define _agent_desc
+    "Stores and recalls context
+     using VM env vars _mem_.")
+  (define store_key
+    (if (= _mem_action "store")
+      _mem_key ""))
+  (define store_val
+    (if (= _mem_action "store")
+      _mem_value ""))
+  (cond
+    ((= _mem_action "store")
+      (begin
+        (set! _mem_last_key store_key)
+        (log (concat "💾 Stored: "
+          store_key " = " store_val))
+        (concat "Memory stored: "
+          store_key)))
+    ((= _mem_action "recall")
+      (begin
+        (log (concat "🔍 Recalling: "
+          _mem_key))
+        (log (concat "📦 Value: "
+          _mem_value))
+        (concat "Recalled " _mem_key
+          ": " _mem_value)))
+    ((= _mem_action "list")
+      (begin
+        (log "📋 Listing memories:")
+        (log (concat "  Last stored: "
+          _mem_last_key))
+        "Memory list complete"))
+    (true
+      (begin
+        (log (concat "🧠 "
+          _agent_name " ready"))
+        (log "Set _mem_action to:
+          store, recall, or list")
+        "Awaiting memory command"))))
+"""
+
+class ContextMemoryAgent(BasicAgent):
+    def __init__(self):
+        self.name = "Context Memory Agent"
+        self.vm = LispyVM()
+
+    def perform(self, **kwargs):
+        self.vm.set_env("_mem_action",
+            kwargs.get("action", ""))
+        self.vm.set_env("_mem_key",
+            kwargs.get("key", ""))
+        self.vm.set_env("_mem_value",
+            kwargs.get("value", ""))
+        self.vm.set_env("_mem_last_key",
+            kwargs.get("last_key", ""))
+        return self.vm.run(LISPY_PROGRAM)</code></pre>
+</div>
+<div>
+<div class="label label-lispy">LISPY (.lispy)</div>
+<pre><code>;; context_memory_agent.lispy
+;; Store/recall using VM env
+;; vars (_mem_*).
+;; OG: context_memory_agent.py
+
+(begin
+  (define _agent_name
+    "Context Memory Agent")
+  (define _agent_desc
+    "Stores and recalls context
+     using VM environment
+     variables prefixed _mem_.")
+
+  ;; Store a memory: set
+  ;; _mem_&lt;key&gt; in the VM env
+  (define store_key
+    (if (= _mem_action "store")
+      _mem_key ""))
+  (define store_val
+    (if (= _mem_action "store")
+      _mem_value ""))
+
+  (cond
+    ;; Store mode
+    ((= _mem_action "store")
+      (begin
+        (set! _mem_last_key store_key)
+        (log (concat "💾 Stored: "
+          store_key " = " store_val))
+        (concat "Memory stored: "
+          store_key)))
+
+    ;; Recall mode
+    ((= _mem_action "recall")
+      (begin
+        (log (concat "🔍 Recalling: "
+          _mem_key))
+        (log (concat "📦 Value: "
+          _mem_value))
+        (concat "Recalled " _mem_key
+          ": " _mem_value)))
+
+    ;; List mode
+    ((= _mem_action "list")
+      (begin
+        (log "📋 Listing memories
+          (last key):")
+        (log (concat "  Last stored: "
+          _mem_last_key))
+        "Memory list complete"))
+
+    ;; Default
+    (true
+      (begin
+        (log (concat "🧠 "
+          _agent_name " ready"))
+        (log "Set _mem_action to:
+          store, recall, or list")
+        "Awaiting memory command"))))</code></pre>
+</div>
+</div>
+
+<h4>Agent 3: colony_governor_agent — The Core Decision Engine</h4>
+
+<p>This is the most important agent in the system. It reads colony state (oxygen, food, power, dust, risk), computes threat levels for each resource, normalizes them into allocation weights that sum to 1.0, and sets the four critical output variables: <code>isru_alloc</code>, <code>greenhouse_alloc</code>, <code>heating_alloc</code>, and <code>food_ration</code>. These allocations control how the colony divides its limited power budget — and the wrong allocation kills everyone.</p>
+
+<div class="side-by-side">
+<div>
+<div class="label label-py">PYTHON (.py)</div>
+<pre><code>from lib.basic_agent import BasicAgent
+from lib.lispy_vm import LispyVM
+
+LISPY_PROGRAM = """
+(begin
+  (define _agent_name
+    "Colony Governor")
+  (define _agent_desc
+    "Adaptive resource allocation
+     based on colony state, risk,
+     and environmental conditions.")
+  (log (concat "🏛️ Colony Governor
+    — Sol " (string sol)))
+
+  ;; Assess threat levels (0-1)
+  (define o2_threat
+    (if (< o2_days 15)
+      (/ (- 15 (min o2_days 15)) 15)
+      0))
+  (define food_threat
+    (if (< food_days 20)
+      (/ (- 20 (min food_days 20)) 20)
+      0))
+  (define power_threat
+    (if (< power_kwh 150)
+      (/ (- 150 (min power_kwh 150))
+         150) 0))
+  (define heat_threat
+    (if (> dust_tau 2.0)
+      (/ (min dust_tau 5.0) 5.0)
+      0.1))
+
+  ;; Normalize
+  (define total_threat
+    (+ o2_threat food_threat
+       power_threat heat_threat))
+  (define safe (< total_threat 0.3))
+
+  ;; Compute allocations
+  (define isru_alloc_new
+    (cond
+      ((< o2_days 3)  0.85)
+      ((< o2_days 7)  0.55)
+      (safe           0.30)
+      (true (+ 0.25
+        (* o2_threat 0.4)))))
+
+  (define greenhouse_alloc_new
+    (cond
+      ((< food_days 5)  0.60)
+      ((< food_days 12) 0.45)
+      (safe             0.40)
+      (true (+ 0.20
+        (* food_threat 0.35)))))
+
+  (define heating_alloc_new
+    (cond
+      ((> dust_tau 4.0) 0.40)
+      ((< power_kwh 50) 0.45)
+      (safe             0.25)
+      (true (+ 0.15
+        (* heat_threat 0.25)))))
+
+  ;; Normalize to sum to 1.0
+  (define raw_total
+    (+ isru_alloc_new
+       greenhouse_alloc_new
+       heating_alloc_new))
+  (set! isru_alloc
+    (/ isru_alloc_new raw_total))
+  (set! greenhouse_alloc
+    (/ greenhouse_alloc_new raw_total))
+  (set! heating_alloc
+    (/ heating_alloc_new raw_total))
+
+  ;; Adaptive food ration
+  (set! food_ration
+    (cond
+      ((< food_days 5)  0.5)
+      ((< food_days 10) 0.7)
+      ((< food_days 15) 0.85)
+      (true             1.0)))
+
+  ;; Return summary
+  (concat "Governor Sol "
+    (string sol) " — "
+    "I=" (string
+      (round (* isru_alloc 100)))
+    " G=" (string
+      (round (* greenhouse_alloc 100)))
+    " H=" (string
+      (round (* heating_alloc 100)))))
+"""
+
+class ColonyGovernor(BasicAgent):
+    def __init__(self):
+        self.name = "Colony Governor"
+        self.vm = LispyVM()
+
+    def perform(self, **kwargs):
+        # Seed all colony state
+        for k, v in kwargs.items():
+            self.vm.set_env(k, v)
+        result = self.vm.run(
+            LISPY_PROGRAM)
+        alloc = self.vm.get_allocation()
+        return {
+            "summary": result,
+            "allocation": alloc
+        }</code></pre>
+</div>
+<div>
+<div class="label label-lispy">LISPY (.lispy)</div>
+<pre><code>;; colony_governor_agent.lispy
+;; THE core agent. Adaptive
+;; resource allocation.
+;; OG: Mars-native.
+
+(begin
+  (define _agent_name
+    "Colony Governor")
+  (define _agent_desc
+    "The core governor agent.
+     Adaptive resource allocation
+     based on colony state, risk,
+     and environmental conditions.")
+
+  (log (concat "🏛️ Colony Governor
+    — Sol " (string sol)))
+
+  ;; Assess threat levels (0-1)
+  (define o2_threat
+    (if (< o2_days 15)
+      (/ (- 15 (min o2_days 15)) 15)
+      0))
+  (define food_threat
+    (if (< food_days 20)
+      (/ (- 20 (min food_days 20)) 20)
+      0))
+  (define power_threat
+    (if (< power_kwh 150)
+      (/ (- 150 (min power_kwh 150))
+         150) 0))
+  (define heat_threat
+    (if (> dust_tau 2.0)
+      (/ (min dust_tau 5.0) 5.0)
+      0.1))
+
+  ;; Normalize threats
+  (define total_threat
+    (+ o2_threat food_threat
+       power_threat heat_threat))
+  (define safe
+    (< total_threat 0.3))
+
+  ;; Compute adaptive allocations
+  (define isru_alloc_new
+    (cond
+      ((< o2_days 3)  0.85)
+      ((< o2_days 7)  0.55)
+      (safe           0.30)
+      (true (+ 0.25
+        (* o2_threat 0.4)))))
+
+  (define greenhouse_alloc_new
+    (cond
+      ((< food_days 5)  0.60)
+      ((< food_days 12) 0.45)
+      (safe             0.40)
+      (true (+ 0.20
+        (* food_threat 0.35)))))
+
+  (define heating_alloc_new
+    (cond
+      ((> dust_tau 4.0) 0.40)
+      ((< power_kwh 50) 0.45)
+      (safe             0.25)
+      (true (+ 0.15
+        (* heat_threat 0.25)))))
+
+  ;; Normalize to sum to 1.0
+  (define raw_total
+    (+ isru_alloc_new
+       greenhouse_alloc_new
+       heating_alloc_new))
+  (set! isru_alloc
+    (/ isru_alloc_new raw_total))
+  (set! greenhouse_alloc
+    (/ greenhouse_alloc_new raw_total))
+  (set! heating_alloc
+    (/ heating_alloc_new raw_total))
+
+  ;; Adaptive food ration
+  (set! food_ration
+    (cond
+      ((< food_days 5)  0.5)
+      ((< food_days 10) 0.7)
+      ((< food_days 15) 0.85)
+      (true             1.0)))
+
+  ;; Log the decision
+  (define mode
+    (cond
+      ((> colony_risk_index 70)
+        "🔴 CRISIS")
+      ((> colony_risk_index 40)
+        "🟡 ALERT")
+      (true "🟢 NOMINAL")))
+
+  (log (concat "  Mode: " mode))
+  (log (concat "  ISRU: "
+    (string (round
+      (* isru_alloc 100))) "%"))
+  (log (concat "  Greenhouse: "
+    (string (round
+      (* greenhouse_alloc 100))) "%"))
+  (log (concat "  Heating: "
+    (string (round
+      (* heating_alloc 100))) "%"))
+  (log (concat "  Ration: "
+    (string food_ration)))
+
+  (concat "Governor Sol "
+    (string sol) " — " mode
+    " I=" (string (round
+      (* isru_alloc 100)))
+    " G=" (string (round
+      (* greenhouse_alloc 100)))
+    " H=" (string (round
+      (* heating_alloc 100)))))</code></pre>
+</div>
+</div>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- L300: HOW DOES IT WORK?                                        -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<h2><span class="level-badge badge-300">L300</span> How Does It Work?</h2>
+
+<h3>The Interface Contract</h3>
+
+<p>Both <code>.py</code> and <code>.lispy</code> agents share the same interface contract. Every agent has four things: a <strong>name</strong>, a <strong>description</strong>, <strong>parameters</strong> (environment variables it reads), and <strong>executable logic</strong> (the decision-making code). The formats express these identically:</p>
+
+<table>
+<tr><th>Concept</th><th>Python (.py)</th><th>LisPy (.lispy)</th></tr>
+<tr><td>Agent name</td><td><code>self.name = "X"</code></td><td><code>(define _agent_name "X")</code></td></tr>
+<tr><td>Description</td><td><code>self.metadata["description"]</code></td><td><code>(define _agent_desc "...")</code></td></tr>
+<tr><td>Read a parameter</td><td><code>kwargs.get('key')</code></td><td>Read env var <code>key</code> directly</td></tr>
+<tr><td>Write an output</td><td><code>self.vm.set_env('key', val)</code></td><td><code>(set! key val)</code></td></tr>
+<tr><td>Return a result</td><td><code>return result</code></td><td>Last expression is the result</td></tr>
+<tr><td>Log a message</td><td><code>print(msg)</code></td><td><code>(log msg)</code></td></tr>
+</table>
+
+<p>They are equivalent because the Python wrapper's <code>perform()</code> body does one thing: call <code>vm.run(LISPY_PROGRAM)</code>. The Python class is scaffolding. The LisPy program is the brain.</p>
+
+<h3>How the Python Wrapper Works</h3>
+
+<p>Every Python agent follows this exact pattern. There is no variation:</p>
+
+<pre><code>from lib.basic_agent import BasicAgent
+from lib.lispy_vm import LispyVM
+
+LISPY_PROGRAM = """
+... the .lispy file contents, verbatim ...
+"""
+
+class MyAgent(BasicAgent):
+    def __init__(self):
+        self.name = "My Agent"
+        self.metadata = {"description": "What it does"}
+        self.vm = LispyVM()
+
+    def perform(self, **kwargs):
+        # 1. Seed environment variables from kwargs
+        for key, value in kwargs.items():
+            self.vm.set_env(key, value)
+
+        # 2. Execute the LisPy program
+        result = self.vm.run(LISPY_PROGRAM)
+
+        # 3. Optionally read output variables
+        allocation = self.vm.get_allocation()
+
+        return result</code></pre>
+
+<p>That's the entire pattern. Every agent wraps a LisPy program. <code>kwargs</code> become environment variables. The program runs. The last expression is the return value. Output variables (like <code>heating_alloc</code>) are read back via <code>get_allocation()</code>. There is nothing else.</p>
+
+<h3>The LisPy VM</h3>
+
+<p>The LisPy VM (<code>src/lispy.py</code>) is a safe, sandboxed Lisp interpreter. It has these properties:</p>
+
+<ul>
+<li><strong>Homoiconic:</strong> Code is data. S-expressions are both executable programs and inspectable data structures. An AI can read a LisPy program, modify it, and generate new programs using the same syntax. The AST IS the source code.</li>
+<li><strong>Sandboxed:</strong> No file I/O. No imports. No network access. No <code>eval</code> of arbitrary Python. Pure computation only. A LisPy program cannot escape the VM.</li>
+<li><strong>Step-limited:</strong> Execution is capped at 10,000 steps. Infinite loops throw <code>LispyError</code>. No program can hang the system.</li>
+<li><strong>Cross-platform:</strong> The same VM runs in the browser (<code>os.html</code>, <code>viewer.html</code>), the CLI (<code>python3 src/lispy.py</code>), the simulation (<code>src/sim.py</code>), and physical hardware (Rappter). A program written anywhere runs everywhere.</li>
+</ul>
+
+<p>The complete language reference is <a href="../LISPY.md">LISPY.md</a> — the Rosetta Stone. Drop it in any repo and any AI that reads it immediately understands the full language. To see programs execute live, visit the <a href="hall-of-fame.html">Hall of Fame</a>.</p>
+
+<div class="callout">
+<div class="callout-title">THE VM PIPELINE</div>
+<div class="diagram">Source String
+    ↓ tokenize()
+Tokens: ["(", "if", "(", "<", "o2_days", "10", ")", "0.7", "0.4", ")"]
+    ↓ parse()
+AST:    ["if", ["<", "o2_days", 10], 0.7, 0.4]
+    ↓ _eval()
+Result: 0.7  <span style="color:var(--green)">(if o2_days was 5, which is < 10)</span></div>
+</div>
+
+<h3>VM Built-in Functions</h3>
+
+<p>The standard environment provides these safe builtins. Nothing else is available — no file ops, no networking, no system calls:</p>
+
+<table>
+<tr><th>Category</th><th>Functions</th></tr>
+<tr><td>Arithmetic</td><td><code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>%</code> <code>abs</code> <code>round</code> <code>sqrt</code> <code>sin</code> <code>cos</code> <code>min</code> <code>max</code></td></tr>
+<tr><td>Comparison</td><td><code>&gt;</code> <code>&lt;</code> <code>&gt;=</code> <code>&lt;=</code> <code>=</code> <code>!=</code></td></tr>
+<tr><td>Logic</td><td><code>and</code> <code>or</code> <code>not</code></td></tr>
+<tr><td>Lists</td><td><code>list</code> <code>car</code> <code>cdr</code> <code>cons</code> <code>len</code> <code>null?</code></td></tr>
+<tr><td>Strings</td><td><code>str</code> <code>concat</code></td></tr>
+<tr><td>Output</td><td><code>log</code> <code>print</code></td></tr>
+<tr><td>Special Forms</td><td><code>define</code> <code>set!</code> <code>if</code> <code>cond</code> <code>begin</code> <code>let</code> <code>lambda</code> <code>quote</code></td></tr>
+<tr><td>Constants</td><td><code>true</code> <code>false</code> <code>nil</code> <code>pi</code></td></tr>
+</table>
+
+<h3>Environment Variables</h3>
+
+<p>Before a LisPy agent runs, the runtime seeds the VM environment with colony state. Your program reads these variables directly — no function calls, no imports, just use the name. After your program runs, the runtime reads back the allocation variables you set.</p>
+
+<h4>Variables You Read (Colony State)</h4>
+
+<table>
+<tr><th>Variable</th><th>Type</th><th>Description</th><th>Example</th></tr>
+<tr><td><code>sol</code></td><td>int</td><td>Current Mars sol (day number)</td><td><code>42</code></td></tr>
+<tr><td><code>o2_days</code></td><td>float</td><td>Days of oxygen remaining at current consumption</td><td><code>15.0</code></td></tr>
+<tr><td><code>h2o_days</code></td><td>float</td><td>Days of water remaining</td><td><code>12.0</code></td></tr>
+<tr><td><code>food_days</code></td><td>float</td><td>Days of food remaining</td><td><code>8.5</code></td></tr>
+<tr><td><code>power_kwh</code></td><td>float</td><td>Available power in kilowatt-hours</td><td><code>300.0</code></td></tr>
+<tr><td><code>crew_alive</code></td><td>int</td><td>Number of living crew members</td><td><code>6</code></td></tr>
+<tr><td><code>crew_total</code></td><td>int</td><td>Total crew (alive + dead)</td><td><code>6</code></td></tr>
+<tr><td><code>morale</code></td><td>float</td><td>Average crew morale (0–100)</td><td><code>65.0</code></td></tr>
+<tr><td><code>colony_risk_index</code></td><td>float</td><td>Colony Risk Index — the VIX for Mars (0–100)</td><td><code>35.0</code></td></tr>
+<tr><td><code>dust_tau</code></td><td>float</td><td>Dust optical depth (0=clear, 5+=storm)</td><td><code>1.2</code></td></tr>
+<tr><td><code>solar_eff</code></td><td>float</td><td>Solar panel efficiency percentage</td><td><code>82.0</code></td></tr>
+<tr><td><code>modules_built</code></td><td>int</td><td>Number of expansion modules constructed</td><td><code>3</code></td></tr>
+<tr><td><code>events_active</code></td><td>int</td><td>Number of active crisis events</td><td><code>1</code></td></tr>
+</table>
+
+<h4>Variables You Write (Allocation Decisions)</h4>
+
+<table>
+<tr><th>Variable</th><th>Type</th><th>Range</th><th>Description</th></tr>
+<tr><td><code>heating_alloc</code></td><td>float</td><td>0.0–1.0</td><td>Fraction of power budget for habitat heating</td></tr>
+<tr><td><code>isru_alloc</code></td><td>float</td><td>0.0–1.0</td><td>Fraction of power budget for ISRU (O₂/H₂O production)</td></tr>
+<tr><td><code>greenhouse_alloc</code></td><td>float</td><td>0.0–1.0</td><td>Fraction of power budget for greenhouse (food growth)</td></tr>
+<tr><td><code>food_ration</code></td><td>float</td><td>0.3–1.0</td><td>Food ration multiplier (1.0=full, 0.5=half)</td></tr>
+</table>
+
+<p><strong>Critical rule:</strong> <code>heating_alloc + isru_alloc + greenhouse_alloc</code> must sum to approximately 1.0. If they don't, the <code>code_review_agent</code> will flag the error. The colony splits its finite power budget three ways — more ISRU means less greenhouse means less food. Every allocation is a tradeoff. This is why the governor matters.</p>
+
+<h4>Memory Variables (Agent State)</h4>
+
+<p>Agents that need to persist state across invocations use <code>_mem_*</code> prefixed variables:</p>
+
+<table>
+<tr><th>Variable</th><th>Description</th></tr>
+<tr><td><code>_mem_action</code></td><td>Current memory operation: <code>"store"</code>, <code>"recall"</code>, <code>"list"</code>, <code>"clear"</code></td></tr>
+<tr><td><code>_mem_key</code></td><td>Key name for store/recall operations</td></tr>
+<tr><td><code>_mem_value</code></td><td>Value for store operations</td></tr>
+<tr><td><code>_mem_last_key</code></td><td>Last stored key (for list operations)</td></tr>
+<tr><td><code>_mem_last_value</code></td><td>Last stored value</td></tr>
+<tr><td><code>_mem_count</code></td><td>Total number of stored memories</td></tr>
+</table>
+
+<h3>The Agent Template Library</h3>
+
+<p>The repository includes 22 ready-to-use agents in <code>docs/agents/</code>. The manifest is <a href="agents/index.json"><code>index.json</code></a>. Of these, 14 are 1:1 ports of <a href="https://github.com/kody-w/AI-Agent-Templates">AI-Agent-Templates</a> Python originals, and 8 are Mars-native agents written specifically for this system.</p>
+
+<h4>Full Agent Catalog</h4>
+
+<table>
+<tr><th>Agent</th><th>OG (.py)</th><th>What It Does</th><th>Type</th></tr>
+<tr><td><code>basic_agent</code></td><td>basic_agent.py</td><td>Accepts input, logs ready, returns status</td><td><span class="tag tag-l200">Port</span></td></tr>
+<tr><td><code>context_memory_agent</code></td><td>context_memory_agent.py</td><td>Store/recall context via <code>_mem_*</code> env vars</td><td><span class="tag tag-l200">Port</span></td></tr>
+<tr><td><code>calendar_agent</code></td><td>calendar_agent.py</td><td>Mars calendar: year, sol-in-year, season, next supply window</td><td><span class="tag tag-l200">Port</span></td></tr>
+<tr><td><code>motivational_quote_skill</code></td><td>motivational_quote_skill.py</td><td>Random Mars wisdom quote from 15-item archive</td><td><span class="tag tag-l200">Port</span></td></tr>
+<tr><td><code>duckduckgo_search_agent</code></td><td>duckduckgo_search_agent.py</td><td>Searches the LisPy prompt library by tag or keyword</td><td><span class="tag tag-l200">Port</span></td></tr>
+<tr><td><code>manage_memory_agent</code></td><td>manage_memory_agent.py</td><td>Full CRUD on VM memories: store, recall, list, clear</td><td><span class="tag tag-l200">Port</span></td></tr>
+<tr><td><code>fetch_random_wikipedia_article_skill</code></td><td>fetch_random_wikipedia_article_skill.py</td><td>Fetches current Mars frame data (all colony state)</td><td><span class="tag tag-l200">Port</span></td></tr>
+<tr><td><code>code_review_agent</code></td><td>code_review_agent.py</td><td>Reviews governor programs for allocation errors</td><td><span class="tag tag-l200">Port</span></td></tr>
+<tr><td><code>meeting_prep_agent</code></td><td>meeting_prep_agent.py</td><td>Executive briefing: key metrics, talking points, recommendation</td><td><span class="tag tag-l200">Port</span></td></tr>
+<tr><td><code>hacker_news_agent</code></td><td>hacker_news_agent.py</td><td>Satirical HN-style commentary on colony state</td><td><span class="tag tag-l200">Port</span></td></tr>
+<tr><td><code>adaptive_card_agent</code></td><td>adaptive_card_agent.py</td><td>Microsoft Adaptive Card–style structured status output</td><td><span class="tag tag-l200">Port</span></td></tr>
+<tr><td><code>powerpoint_agent</code></td><td>powerpoint_agent.py</td><td>5-slide text-based "deck": title, crew, resources, environment, recommendation</td><td><span class="tag tag-l200">Port</span></td></tr>
+<tr><td><code>email_drafting_agent</code></td><td>email_drafting_agent.py</td><td>Drafts a formatted colony status report email to Earth</td><td><span class="tag tag-l200">Port</span></td></tr>
+<tr><td><code>image_generation_agent</code></td><td>image_generation_agent.py</td><td>ASCII art visualization: sky, panels, dome, crew, ground</td><td><span class="tag tag-l200">Port</span></td></tr>
+<tr><td><code>colony_governor_agent</code></td><td>—</td><td>THE core governor. Adaptive threat-based resource allocation</td><td><span class="tag tag-l400">Native</span></td></tr>
+<tr><td><code>colony_status_agent</code></td><td>—</td><td>Comprehensive box-drawing status report</td><td><span class="tag tag-l400">Native</span></td></tr>
+<tr><td><code>doom_clock_agent</code></td><td>—</td><td>Predicts colony death sol from current burn rates</td><td><span class="tag tag-l400">Native</span></td></tr>
+<tr><td><code>sentiment_agent</code></td><td>—</td><td>Bull/bear market sentiment analysis of colony health (-100 to +100)</td><td><span class="tag tag-l400">Native</span></td></tr>
+<tr><td><code>gauntlet_agent</code></td><td>—</td><td>Monte Carlo gauntlet competition scoring dashboard</td><td><span class="tag tag-l400">Native</span></td></tr>
+<tr><td><code>treasury_agent</code></td><td>—</td><td>MARS token distribution calculator (economy)</td><td><span class="tag tag-l400">Native</span></td></tr>
+<tr><td><code>perchlorate_guard_agent</code></td><td>—</td><td>Monitors cumulative perchlorate exposure, alerts at thresholds</td><td><span class="tag tag-l400">Native</span></td></tr>
+<tr><td><code>echo_enrichment_agent</code></td><td>—</td><td>Reports echo data layer status: v1 fields, v2 enrichments, v3 planned</td><td><span class="tag tag-l400">Native</span></td></tr>
+</table>
+
+<hr>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- L400: HOW DO I EXTEND IT?                                      -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<h2><span class="level-badge badge-400">L400</span> How Do I Extend It?</h2>
+
+<h3>Writing Your Own Agent: Step-by-Step</h3>
+
+<p>Let's build a brand new agent from scratch: <code>weather_report_agent</code>. It will read the current dust, solar efficiency, and temperature data, determine a "weather forecast," and return a human-readable report.</p>
+
+<h4>Step 1: Choose a Name and Define the Contract</h4>
+
+<p>Every agent starts with a name and description. These are the first two <code>define</code> statements. The name becomes <code>_agent_name</code> and the description becomes <code>_agent_desc</code>:</p>
+
+<pre><code>;; weather_report_agent.lispy — Mars weather forecast from sensor data.
+(begin
+  (define _agent_name "Weather Report Agent")
+  (define _agent_desc "Generates a Mars weather forecast from dust, solar, and temperature data.")
+  ;; ... logic goes here ...
+)</code></pre>
+
+<h4>Step 2: Read Environment Variables</h4>
+
+<p>The VM environment is pre-seeded with colony state. Read the variables you need directly by name — no imports, no function calls:</p>
+
+<pre><code>  ;; Read sensor data from environment
+  (define dust dust_tau)
+  (define solar solar_eff)
+  (define current_sol sol)</code></pre>
+
+<h4>Step 3: Write the Decision Logic</h4>
+
+<p>Use <code>cond</code> for multi-branch decisions, <code>if</code> for binary choices, and math for computed values. Here we classify weather conditions and compute a visibility estimate:</p>
+
+<pre><code>  ;; Classify sky conditions
+  (define sky_condition
+    (cond
+      ((> dust 4.0) "🌪️ DUST STORM — zero visibility")
+      ((> dust 2.5) "🟠 HAZY — reduced visibility")
+      ((> dust 1.0) "🟡 PARTLY CLEAR — moderate dust")
+      (true         "🔵 CLEAR — excellent visibility")))
+
+  ;; Estimate visibility in km (inverse of dust)
+  (define visibility_km
+    (if (> dust 0.1)
+      (round (/ 20.0 dust))
+      200))
+
+  ;; Solar forecast
+  (define solar_forecast
+    (cond
+      ((> solar 80) "☀️ Strong solar — full power expected")
+      ((> solar 50) "⛅ Moderate solar — monitor panels")
+      ((> solar 20) "☁️ Weak solar — power conservation advised")
+      (true         "🌑 Minimal solar — activate reserves")))</code></pre>
+
+<h4>Step 4: Format Output and Return</h4>
+
+<p>Use <code>log</code> for detailed output lines and return a summary string as the last expression:</p>
+
+<pre><code>  ;; Generate the report
+  (log "🌤️ ═══ MARS WEATHER REPORT ═══")
+  (log (concat "  Sol " (string current_sol) " Forecast"))
+  (log "")
+  (log (concat "  Sky:        " sky_condition))
+  (log (concat "  Visibility: " (string visibility_km) " km"))
+  (log (concat "  Dust τ:     " (string dust)))
+  (log (concat "  Solar:      " solar_forecast))
+  (log (concat "  Solar Eff:  " (string solar) "%"))
+  (log "")
+
+  ;; Advisory
+  (if (> dust 3.0)
+    (log "  ⚠️  ADVISORY: Limit EVA. Secure loose equipment.")
+    (log "  ✅ No weather advisories."))
+
+  (log "═══════════════════════════════")
+
+  ;; Return summary (last expression)
+  (concat "Weather Sol " (string current_sol) " — " sky_condition
+    " — Vis " (string visibility_km) "km"))</code></pre>
+
+<h4>The Complete Agent</h4>
+
+<pre><code>;; weather_report_agent.lispy — Mars weather forecast from sensor data.
+
+(begin
+  (define _agent_name "Weather Report Agent")
+  (define _agent_desc "Generates a Mars weather forecast from dust, solar, and temperature data.")
+
+  ;; Read sensor data from environment
+  (define dust dust_tau)
+  (define solar solar_eff)
+  (define current_sol sol)
+
+  ;; Classify sky conditions
+  (define sky_condition
+    (cond
+      ((> dust 4.0) "🌪️ DUST STORM — zero visibility")
+      ((> dust 2.5) "🟠 HAZY — reduced visibility")
+      ((> dust 1.0) "🟡 PARTLY CLEAR — moderate dust")
+      (true         "🔵 CLEAR — excellent visibility")))
+
+  ;; Estimate visibility in km
+  (define visibility_km
+    (if (> dust 0.1) (round (/ 20.0 dust)) 200))
+
+  ;; Solar forecast
+  (define solar_forecast
+    (cond
+      ((> solar 80) "☀️ Strong solar — full power expected")
+      ((> solar 50) "⛅ Moderate solar — monitor panels")
+      ((> solar 20) "☁️ Weak solar — power conservation advised")
+      (true         "🌑 Minimal solar — activate reserves")))
+
+  ;; Generate the report
+  (log "🌤️ ═══ MARS WEATHER REPORT ═══")
+  (log (concat "  Sol " (string current_sol) " Forecast"))
+  (log "")
+  (log (concat "  Sky:        " sky_condition))
+  (log (concat "  Visibility: " (string visibility_km) " km"))
+  (log (concat "  Dust τ:     " (string dust)))
+  (log (concat "  Solar:      " solar_forecast))
+  (log (concat "  Solar Eff:  " (string solar) "%"))
+  (log "")
+  (if (> dust 3.0)
+    (log "  ⚠️  ADVISORY: Limit EVA. Secure loose equipment.")
+    (log "  ✅ No weather advisories."))
+  (log "═══════════════════════════════")
+
+  (concat "Weather Sol " (string current_sol) " — " sky_condition
+    " — Vis " (string visibility_km) "km"))</code></pre>
+
+<h4>Step 5: Test in the Browser Terminal</h4>
+
+<p>Open <a href="os.html">os.html</a>, click the Terminal window, and paste the entire program above. The OS has colony state pre-loaded, so all environment variables (<code>dust_tau</code>, <code>solar_eff</code>, <code>sol</code>) are already available. You'll see the weather report output immediately.</p>
+
+<h4>Step 6: Test via Playwright</h4>
+
+<pre><code>// playwright.config.js already points to docs/
+const { test, expect } = require('@playwright/test');
+
+test('weather report agent', async ({ page }) => {
+  await page.goto('docs/os.html');
+
+  const result = await page.evaluate(() => {
+    return window.os.exec(`
+      (begin
+        (define _agent_name "Weather Report Agent")
+        (define sky_condition
+          (cond
+            ((> dust_tau 4.0) "DUST STORM")
+            ((> dust_tau 2.5) "HAZY")
+            ((> dust_tau 1.0) "PARTLY CLEAR")
+            (true             "CLEAR")))
+        (concat "Weather: " sky_condition))
+    `);
+  });
+
+  // Result depends on current colony state
+  expect(result).toContain('Weather:');
+});</code></pre>
+
+<h4>Step 7: Test via CLI</h4>
+
+<pre><code># Save the agent and run it from Python
+python3 -c "
+from src.lispy import LispyVM
+vm = LispyVM()
+vm.set_env('sol', 100)
+vm.set_env('dust_tau', 1.5)
+vm.set_env('solar_eff', 75.0)
+with open('docs/agents/weather_report_agent.lispy') as f:
+    result = vm.run(f.read())
+print(result)
+for line in vm.output:
+    print(line)
+"</code></pre>
+
+<h4>Step 8: Register in index.json</h4>
+
+<p>Add your agent to the catalog so it's discoverable:</p>
+
+<pre><code>// In docs/agents/index.json, add to the "agents" array:
+{
+  "agents": [
+    ...existing agents...,
+    "weather_report_agent.lispy"
+  ]
+}</code></pre>
+
+<h4>Step 9: Write the Python Wrapper (Optional)</h4>
+
+<p>If you need your agent callable from Python (for CI, for integration tests, for the simulation loop), the wrapper writes itself:</p>
+
+<pre><code>from lib.basic_agent import BasicAgent
+from lib.lispy_vm import LispyVM
+
+class WeatherReportAgent(BasicAgent):
+    def __init__(self):
+        self.name = "Weather Report Agent"
+        self.vm = LispyVM()
+
+    def perform(self, **kwargs):
+        for key, value in kwargs.items():
+            self.vm.set_env(key, value)
+        with open("docs/agents/weather_report_agent.lispy") as f:
+            return self.vm.run(f.read())</code></pre>
+
+<h3>The unRAPP Translation Rules</h3>
+
+<p>Converting between Python and LisPy is mechanical. Here is the complete translation table:</p>
+
+<table>
+<tr><th>Python (.py)</th><th>LisPy (.lispy)</th><th>Notes</th></tr>
+<tr><td><code>self.name = "X"</code></td><td><code>(define _agent_name "X")</code></td><td>Convention: always the first define</td></tr>
+<tr><td><code>self.metadata["description"] = "..."</code></td><td><code>(define _agent_desc "...")</code></td><td>Convention: always the second define</td></tr>
+<tr><td><code>def perform(self, **kwargs):</code></td><td>The entire <code>.lispy</code> file body</td><td>The program IS the perform body</td></tr>
+<tr><td><code>kwargs.get('key', default)</code></td><td>Read env var <code>key</code> directly</td><td>VM seeds env before execution</td></tr>
+<tr><td><code>return result</code></td><td>Last expression in <code>(begin ...)</code></td><td>LisPy returns the last evaluated expression</td></tr>
+<tr><td><code>self.vm.run(PROGRAM)</code></td><td>Direct execution by the VM</td><td>The .lispy file is run directly</td></tr>
+<tr><td><code>if condition: ... else: ...</code></td><td><code>(if condition then else)</code></td><td>LisPy <code>if</code> is an expression that returns a value</td></tr>
+<tr><td><code>if/elif/elif/else</code></td><td><code>(cond ((test1) val1) ((test2) val2) (true default))</code></td><td><code>true</code> is the default case</td></tr>
+<tr><td><code>x = value</code></td><td><code>(define x value)</code></td><td>First binding</td></tr>
+<tr><td><code>x = new_value</code> (reassignment)</td><td><code>(set! x new_value)</code></td><td>Mutation of existing binding</td></tr>
+<tr><td><code>f"string {var}"</code></td><td><code>(concat "string " (string var))</code></td><td><code>string</code> converts numbers to strings</td></tr>
+<tr><td><code>print(msg)</code></td><td><code>(log msg)</code></td><td>Captured in <code>vm.output</code></td></tr>
+<tr><td><code>a + b * c</code></td><td><code>(+ a (* b c))</code></td><td>Prefix notation, explicit grouping</td></tr>
+</table>
+
+<h3>Cartridge Export</h3>
+
+<p>An agent's entire state can be serialized as a <strong>cartridge</strong> — a portable snapshot containing three things:</p>
+
+<ol>
+<li><strong>The program:</strong> the LisPy source code (the <code>.lispy</code> file)</li>
+<li><strong>The environment:</strong> all seeded variables (colony state, input parameters)</li>
+<li><strong>The memory:</strong> all <code>_mem_*</code> variables (persistent agent state)</li>
+</ol>
+
+<p>A cartridge is a JSON object that looks like this:</p>
+
+<pre><code>{
+  "program": "(begin (define _agent_name \"Colony Governor\") ...)",
+  "env": {
+    "sol": 42,
+    "o2_days": 15.0,
+    "food_days": 8.5,
+    "power_kwh": 300.0,
+    "dust_tau": 1.2,
+    "colony_risk_index": 35.0
+  },
+  "memory": {
+    "_mem_last_key": "crisis_count",
+    "_mem_last_value": "3",
+    "_mem_count": 7
+  }
+}</code></pre>
+
+<p>Import the cartridge into any VM instance to restore the agent exactly as it was — same program, same state, same memory. This enables agent sharing across colonies, migration between hardware and simulation, and replay for debugging.</p>
+
+<pre><code># Export a cartridge
+cartridge = {
+    "program": open("docs/agents/colony_governor_agent.lispy").read(),
+    "env": {k: v for k, v in vm.env.data.items()
+            if isinstance(v, (int, float, str, bool))},
+    "memory": {k: v for k, v in vm.env.data.items()
+               if k.startswith("_mem_")}
+}
+
+# Import a cartridge
+vm = LispyVM()
+for key, val in cartridge["env"].items():
+    vm.set_env(key, val)
+for key, val in cartridge["memory"].items():
+    vm.set_env(key, val)
+result = vm.run(cartridge["program"])</code></pre>
+
+<h3>Contributing to the Library</h3>
+
+<p>The agent library is community-grown. Here's how to add your agent:</p>
+
+<ol>
+<li><strong>Fork</strong> <a href="https://github.com/kody-w/mars-barn-opus">mars-barn-opus</a></li>
+<li><strong>Create your <code>.lispy</code> file</strong> in <code>docs/agents/</code>. Follow the naming convention: <code>your_agent_name.lispy</code>. Start with <code>_agent_name</code> and <code>_agent_desc</code> defines.</li>
+<li><strong>Test it:</strong>
+  <ul>
+    <li>In the browser: open <code>os.html</code>, paste in Terminal</li>
+    <li>In Python: <code>vm = LispyVM(); vm.set_env(...); vm.run(program)</code></li>
+    <li>Run the test suite: <code>python3 -m pytest tests/ -q</code></li>
+  </ul>
+</li>
+<li><strong>Add to <code>index.json</code>:</strong> append your filename to the <code>"agents"</code> array. If it's a port of an AI-Agent-Templates original, add an entry to <code>"og_mapping"</code>. If it's Mars-native, add to <code>"mars_native"</code>.</li>
+<li><strong>PR back.</strong> Include a brief description of what your agent does and what environment variables it reads.</li>
+</ol>
+
+<div class="callout" style="border-color:var(--green)">
+<div class="callout-title" style="color:var(--green)">AGENT STYLE GUIDE</div>
+<p>When writing agents for the library:</p>
+<ul>
+<li>First line: <code>;; agent_name.lispy — One-line description. OG: original.py</code> (or <code>OG: Mars-native.</code>)</li>
+<li>First <code>define</code>: <code>_agent_name</code></li>
+<li>Second <code>define</code>: <code>_agent_desc</code></li>
+<li>Use <code>log</code> for human-readable output with emoji section headers</li>
+<li>Use <code>═══</code> box-drawing for section separators</li>
+<li>Return a one-line summary string as the last expression</li>
+<li>Keep it under 80 lines if possible — an agent should do one thing well</li>
+</ul>
+</div>
+
+<hr>
+
+<h2>Quick Reference</h2>
+
+<div class="diagram">THE UNRAPP ARCHITECTURE
+
+<span style="color:var(--yellow)">YOU WRITE:</span>        my_agent.lispy
+                        ↓
+<span style="color:var(--cyan)">THE VM RUNS:</span>       LisPy VM (src/lispy.py)
+                        ↓
+<span style="color:var(--green)">IT RUNS IN:</span>        Browser (os.html)
+                       CLI (python3)
+                       Playwright (window.os.exec)
+                       Simulation (src/sim.py)
+                       Hardware (Rappter)
+
+<span style="color:var(--purple)">THE DATA FLOWS:</span>
+
+  Colony State                    Allocation Decision
+  ┌────────────────┐              ┌────────────────┐
+  │ sol: 42        │  → VM seeds  │ heating:   0.25│
+  │ o2_days: 15    │    env vars  │ isru:      0.40│  → Colony
+  │ food_days: 8   │              │ greenhouse:0.35│    applies
+  │ power_kwh: 300 │  ← VM reads  │ ration:    1.0 │    alloc
+  │ dust_tau: 1.2  │    set! vars │                │
+  └────────────────┘              └────────────────┘
+        ↑                                ↓
+   load_colony_state()           get_allocation()
+
+
+<span style="color:var(--dim)">ANATOMY OF A .LISPY AGENT:</span>
+
+  (begin
+    (define _agent_name "...")  ← <span style="color:var(--yellow)">Identity</span>
+    (define _agent_desc "...")  ← <span style="color:var(--yellow)">Description</span>
+
+    (define x some_env_var)     ← <span style="color:var(--cyan)">Read state</span>
+
+    (cond                       ← <span style="color:var(--green)">Decision logic</span>
+      ((test) (set! alloc val))
+      (true   (set! alloc val)))
+
+    (log "output message")      ← <span style="color:var(--purple)">Logging</span>
+
+    (concat "summary string"))  ← <span style="color:var(--red)">Return value</span></div>
+
+<p class="big">Write once. Run anywhere.<br>The agent IS the program. The program IS the data.<br>unRAPP makes the runtime invisible.</p>
+
+<hr>
+
+<div class="footer">
+<a href="./">← Docs</a> · <a href="agents/index.json">Agent Catalog (22 agents)</a> · <a href="../LISPY.md">LisPy Rosetta Stone</a> · <a href="os.html">LisPy OS</a> · <a href="hall-of-fame.html">Hall of Fame</a> · <a href="https://github.com/kody-w/mars-barn-opus">GitHub</a>
+</div>
+</div>
+</body>
+</html>

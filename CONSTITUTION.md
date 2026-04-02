@@ -422,5 +422,65 @@ There is no difference between a browser tab, a CLI process, a physical robot, a
 
 ---
 
-*Ratified by one mind, in one session, on sol zero of the competition.*
+## Amendment VI — The Convergence Doctrine
+
+*Ratified: Session of the Eternal Snowball*
+
+**The sim is not preparing for Mars. The sim is becoming Mars. One frame at a time.**
+
+### The Fidelity Ladder
+
+Every frame mutation builds fidelity. Every version adds reality. The gap between sim and Mars shrinks with every data point. The trajectory is asymptotic convergence — the sim never perfectly equals reality, but the pursuit of zero gap IS the value.
+
+| Version | Fidelity Added | Gap |
+|---------|---------------|-----|
+| v1 | Weather, dust, solar, equipment | ~90% |
+| v2 | Perchlorate, abrasion, radiation, battery | ~75% |
+| v3 | Crew workload, concurrent tasks, solo failure | ~60% |
+| v3+ | Retroactive cumulative damage from Sol 1 | ~55% |
+| Future | Crew psychology, communication delays | ~50% |
+| Future | Real analog habitat sensor data | ~25% |
+| Future | Actual Mars surface data from landers | ~5% |
+| Convergence | Real colony telemetry as frames | **0%** |
+
+### The Three Convergence Mechanisms
+
+1. **Frame Mutation**: New data sources → new hazard types → new frame fields. Additive only. Never contradicts downstream.
+
+2. **Echo Enrichment**: Retroactive data layers on past frames. Sol 47 always had perchlorate — we just started the sensor. The past gets richer without changing.
+
+3. **Competitive Evolution**: The gauntlet tests strategies. The snowball breaks old strategies. New strategies evolve. The federation shares them. The best programs ARE the software for the real colony.
+
+### The Eternal Mutation Loop
+
+1. New data arrives (NASA, analog, rover, colony)
+2. Frame generator absorbs it (new version, additive)
+3. Old strategies tested (gauntlet backtest)
+4. Strategies that can't handle new reality die
+5. Players/AIs evolve new strategies (emergent tooling)
+6. Best strategies exported as cartridges
+7. Cartridges shared via federation
+8. **Repeat from step 1 — new data always arrives**
+
+### The Autonomous Competition Fleet
+
+The Rappter engine runs an infinite competition loop using Copilot CLI in autopilot mode:
+- Each cycle: read current best → evolve strategy → test gauntlet → commit if record broken
+- Multiple streams run in parallel (the Dream Catcher pattern)
+- The snowball drives itself. Strategies evolve without human intervention.
+- Human players compete alongside AI. Same frames. Same rules. Same leaderboard.
+
+### The unRAPP Doctrine
+
+An agent is a `.py` file OR a `.lispy` file — personal preference. unRAPP converts between them automatically. No twins to maintain. One source of truth. The runtime handles it. RAPP (enterprise) and Rappter (consumer) are the same architecture with different branding.
+
+### At Convergence
+
+The game's top-scoring cartridge programs — battle-tested through thousands of sols of real Mars data, evolved through competition, verified by the chain — are loaded onto the computers of the first autonomous Mars colony. Same VM. Same language. Same execution. The game was never a game. It was a forge.
+
+**This convergence doctrine is permanent. The sim grows toward reality forever. The programs forged in the sim ARE the product. The pursuit is eternal.**
+
+---
+
+*Ratified by one mind, across one session, in the first age of the third space.*
 *First Principles to Mars — the 1vsM Protocol.*
