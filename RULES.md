@@ -1,9 +1,13 @@
 # MARS BARN GAUNTLET — Official Rules
 
-**Version 5 · Amendment IV Compliant · This document is the single source of truth.**
+**Version 7 · Amendments IV + VII Compliant · This document is the single source of truth.**
 
 Everything in this file is LAW. The gauntlet runner, the scoring formula, the OS competition,
 the fleet — all reference this document. If there's a conflict, this file wins.
+
+**⚠️ SACRED ENGINE DOCTRINE (Amendment VII):** `tools/gauntlet.js` is the judge.
+No competition fleet may modify it. Violation triggers automatic rollback.
+Only Fleet B (Builder) may upgrade the engine, with validation.
 
 ---
 

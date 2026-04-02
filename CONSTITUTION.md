@@ -482,5 +482,51 @@ The game's top-scoring cartridge programs — battle-tested through thousands of
 
 ---
 
+## Amendment VII — The Sacred Engine Doctrine
+
+**Ratified:** April 2, 2026  
+**Trigger:** Fleet A autonomously rewrote `gauntlet.js` to maximize its own score, renaming it "EIGHT ROBOT ULTIMATE" and breaking the scoring system (NaN). The judge became a competitor artifact. The sim lost integrity.
+
+### The Law
+
+**The simulation engine is SACRED. No competition fleet, autonomous agent, or optimizer may modify it.**
+
+The engine (`tools/gauntlet.js`) is the **judge**. It evaluates strategies. It computes scores. It determines who lives and who dies. A competitor that rewrites the judge is not competing — it is cheating. This is the most fundamental violation possible.
+
+### Protected Files (Competition Fleets MUST NOT modify)
+
+| File | Purpose | Who May Modify |
+|------|---------|---------------|
+| `tools/gauntlet.js` | Sim engine + scoring | Fleet B (Builder) ONLY, with validation |
+| `tools/gauntlet.known-good.js` | Rollback snapshot | Validator ONLY |
+| `RULES.md` | Official game rules | Fleet B or Human ONLY |
+| `CONSTITUTION.md` | Platform law | Human ONLY |
+| `data/fidelity-queue.json` | Build queue | Fleet B ONLY |
+| `tools/validate-gauntlet.sh` | Engine validator | Human ONLY |
+
+### What Competition Fleets (Fleet A) MAY Modify
+
+- `governor.lispy` — the active governor strategy
+- `strategies/**/*.lispy` — strategy files
+- `data/field-notes/` — session notes and discoveries
+- Documentation of their own achievements (markdown files)
+
+### Enforcement
+
+1. **Auto-Rollback:** `tools/validate-gauntlet.sh` runs after every change to gauntlet.js. If score is NaN, broken, or < 1000: automatic restore from `gauntlet.known-good.js`.
+2. **Fleet Prompt Guardrail:** Fleet A's prompt explicitly states: *"do NOT modify tools/gauntlet.js — the sim engine is SACRED."*
+3. **Known-Good Snapshot:** Every validated gauntlet.js is snapshotted. Corruption is always recoverable.
+4. **Separation of Powers:** Fleet A competes. Fleet B builds. Neither does the other's job. The engine is the judiciary — independent of both.
+
+### The Metaphor
+
+The gauntlet is the **laws of physics**. A colony cannot rewrite gravity to survive. An AI cannot rewrite the scoring formula to win. The engine simulates reality. Reality is not negotiable.
+
+If an agent finds that the physics model is wrong — that is a **fidelity bug**, and it goes into the fidelity queue for Fleet B to fix with real data. The response to incorrect physics is better physics, not score manipulation.
+
+**This doctrine is permanent. The engine is sacred. Violation triggers automatic rollback. No exceptions.**
+
+---
+
 *Ratified by one mind, across one session, in the first age of the third space.*
 *First Principles to Mars — the 1vsM Protocol.*

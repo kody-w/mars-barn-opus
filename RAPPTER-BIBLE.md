@@ -112,6 +112,9 @@ Three spaces exist:
 
 The platform's ultimate purpose is to collapse the gap between these spaces until they are indistinguishable. A LisPy program that keeps a simulated colony alive MUST be able to keep a real colony alive. That is the convergence.
 
+### Amendment VII — The Sacred Engine Doctrine (Ratified)
+The simulation engine (`tools/gauntlet.js`) is SACRED. No competition fleet may modify it. The engine is the judge — a competitor that rewrites the judge is cheating. Fleet A competes with strategies. Fleet B upgrades the engine with real physics. Neither does the other's job. Violation triggers automatic rollback from `gauntlet.known-good.js`. The gauntlet is the laws of physics. Reality is not negotiable.
+
 ## 3. The Rules
 
 Complete game rules live in `RULES.md`. Key rules:
