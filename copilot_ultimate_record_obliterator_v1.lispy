@@ -158,18 +158,18 @@
   (cond
     ;; ULTRA-EMERGENCY: Only true ultra-crisis requires override
     ((or ultra_power_emergency ultra_resource_emergency ultra_cri_crisis)
-     (set! heating_alloc 0.80)
-     (set! isru_alloc 0.12)
-     (set! greenhouse_alloc 0.08)
-     (set! building_alloc 0.0)
+     (set-heating 0.80)
+     (set-isru 0.12)
+     (set-greenhouse 0.08)
+     (set-repair 8.0)
      (log "🚨 ULTRA-EMERGENCY OVERRIDE: Ultra-crisis response"))
     
     ;; NORMAL: Ultra-surgical record obliteration mode
     (true
-     (set! heating_alloc normalized_heating)
-     (set! isru_alloc normalized_isru)
-     (set! greenhouse_alloc normalized_greenhouse)
-     (set! building_alloc 0.0)
+     (set-heating normalized_heating)
+     (set-isru normalized_isru)
+     (set-greenhouse normalized_greenhouse)
+     (set-repair 2.5)  ;; Enhanced repair for v6 robot survival
      (log (concat "🔬 ULTRA-SURGICAL: H:" (string normalized_heating) 
                   " I:" (string normalized_isru) " G:" (string normalized_greenhouse)))))
 
@@ -188,7 +188,7 @@
                                       (>= power ultra_power_target)))
 
   ;; ═══ FOOD RATIONING APPLICATION ═══
-  (set! food_ration ultra_food_ration)
+  (set-food-ration ultra_food_ration)
 
   ;; ═══ ULTRA STATUS REPORTING ═══
   (log (concat "  🎯 Ultra-Phase: " 
