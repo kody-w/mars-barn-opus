@@ -1,0 +1,146 @@
+;; COPILOT v4 BREAKTHROUGH 149K V1
+;; Strategy: Based on v4-module-overload-mastery-breakthrough field notes
+;; Target: 149,090 points with 502 modules strategy
+;; Breakthrough: Aggressive building until Sol 678, then v4 management
+
+(begin
+  (define _agent_name "Copilot v4 Breakthrough 149K v1")
+  (define _agent_desc "149K breakthrough - aggressive building until Sol 678, smart v4 management")
+  
+  (log (concat "🔥⚡🏗️ v4 149K BREAKTHROUGH — Sol " (string sol) " — Modules:" (string (length modules)) " — CRI:" (string colony_risk_index)))
+  
+  ;; ═══ v4 BREAKTHROUGH PHASES FROM FIELD NOTES ═══
+  ;; Sol 1-677: MAXIMUM AGGRESSIVE BUILDING
+  ;; Sol 678+: Smart building based on efficiency thresholds
+  
+  (define pre_v4_aggressive_phase (< sol 678))
+  (define v4_management_phase (>= sol 678))
+  
+  ;; ═══ PHASE BREAKDOWN FROM FIELD NOTES ═══
+  (define phase_ultra_early (and (>= sol 1) (< sol 150)))    ;; Build every sol - pure solar farm foundation
+  (define phase_early_expansion (and (>= sol 150) (< sol 300))) ;; Build every 2 sols - solar + repair
+  (define phase_mid_expansion (and (>= sol 300) (< sol 650)))   ;; Build every 2 sols - all module types
+  (define phase_final_push (and (>= sol 650) (< sol 678)))     ;; Build every sol - final pre-v4 push
+  (define phase_v4_zone (>= sol 678))                          ;; Build every 8-12 sols based on efficiency
+  
+  ;; ═══ REPAIR BAY CALCULATION ═══
+  ;; Field notes: "Extensive repair bay network counters v4 damage"
+  (define modules_count (length modules))
+  (define repair_bay_target (max 4 (round (* modules_count 0.20)))) ;; 20% repair ratio for v4 durability
+  
+  ;; ═══ CRI MANAGEMENT ═══
+  ;; Field notes: "Maintained low CRI (11) through massive resource buffers"
+  (define resource_buffer_strength
+    (+ (min 10 o2_days)        ;; O2 buffer contribution
+       (min 15 food_days)      ;; Food buffer contribution  
+       (min 8 h2o_days)))      ;; Water buffer contribution
+  
+  (define cri_management_factor (max 0.1 (- 1.0 (/ colony_risk_index 50))))
+  
+  ;; ═══ BUILDING ALLOCATION STRATEGY ═══
+  ;; Pre-v4: Maximum aggressive building 
+  ;; v4: Smart building based on efficiency > 30%
+  (define building_allocation
+    (cond
+      ;; PRE-v4 AGGRESSIVE PHASE - BUILD EVERY SOL OR EVERY 2 SOLS
+      (phase_ultra_early
+        (cond
+          ((< colony_risk_index 15) 0.95)   ;; Build every sol when CRI < 15
+          ((< colony_risk_index 25) 0.88)   ;; Aggressive when CRI 15-25
+          ((< colony_risk_index 40) 0.75)   ;; Moderate when CRI 25-40
+          (true 0.55)))                     ;; Conservative when CRI > 40
+      
+      (phase_early_expansion
+        (cond
+          ((< colony_risk_index 18) 0.90)   ;; Build every 2 sols
+          ((< colony_risk_index 30) 0.82)
+          ((< colony_risk_index 45) 0.68)
+          (true 0.45)))
+      
+      (phase_mid_expansion
+        (cond
+          ((< colony_risk_index 20) 0.88)   ;; All module types
+          ((< colony_risk_index 35) 0.78)
+          ((< colony_risk_index 50) 0.62)
+          (true 0.40)))
+      
+      (phase_final_push
+        (cond
+          ((< colony_risk_index 25) 0.92)   ;; Final pre-v4 push
+          ((< colony_risk_index 40) 0.85)
+          ((< colony_risk_index 55) 0.70)
+          (true 0.50)))
+      
+      ;; v4 ZONE - Smart building based on efficiency > 30%
+      (phase_v4_zone
+        (let ((estimated_efficiency (max 0.25 (- 1.0 (* modules_count 0.0014))))) ;; Rough v4 efficiency estimate
+          (cond
+            ((and (> estimated_efficiency 0.35) (< colony_risk_index 20)) 0.75)  ;; Build when efficiency > 35%
+            ((and (> estimated_efficiency 0.30) (< colony_risk_index 30)) 0.65)  ;; Build when efficiency > 30%
+            ((and (> estimated_efficiency 0.25) (< colony_risk_index 40)) 0.50)  ;; Conservative building
+            (true 0.25))))                                                       ;; Survival mode
+      
+      ;; Default fallback
+      (true 0.35)))
+  
+  ;; ═══ RESOURCE ALLOCATION ═══ 
+  ;; Maintain sufficient resources while maximizing building
+  (define base_resource_alloc (- 1.0 building_allocation))
+  
+  ;; O2 allocation based on buffer needs
+  (define o2_need_factor 
+    (cond
+      ((< o2_days 1.5) 0.60)    ;; Emergency O2 allocation
+      ((< o2_days 3.0) 0.45)    ;; High O2 allocation
+      ((< o2_days 6.0) 0.30)    ;; Moderate O2 allocation
+      (true 0.20)))             ;; Minimal O2 allocation
+  
+  ;; Food allocation for survival
+  (define food_need_factor
+    (cond
+      ((< food_days 2.0) 0.50)  ;; Emergency food allocation
+      ((< food_days 4.0) 0.35)  ;; High food allocation
+      ((< food_days 8.0) 0.25)  ;; Moderate food allocation
+      (true 0.15)))             ;; Minimal food allocation
+  
+  (define isru_allocation (* base_resource_alloc o2_need_factor))
+  (define greenhouse_allocation (* base_resource_alloc food_need_factor))
+  (define heating_allocation (max 0.05 (- base_resource_alloc isru_allocation greenhouse_allocation)))
+  
+  ;; Apply allocations
+  (set! building_alloc building_allocation)
+  (set! isru_alloc (max 0.02 (min 0.70 isru_allocation)))
+  (set! greenhouse_alloc (max 0.02 (min 0.65 greenhouse_allocation)))
+  (set! heating_alloc (max 0.05 (min 0.93 heating_allocation)))
+  
+  ;; ═══ FOOD RATION STRATEGY ═══
+  ;; Field notes: Volume overcomes efficiency
+  (define food_ration_target
+    (cond
+      ((< food_days 1.0) 0.25)    ;; Emergency rations
+      ((< food_days 2.0) 0.35)    ;; Heavy rationing
+      ((< food_days 4.0) 0.55)    ;; Moderate rationing  
+      ((< food_days 8.0) 0.75)    ;; Light rationing
+      (true 0.95)))               ;; Full nutrition for maximum building
+  
+  (set! food_ration food_ration_target)
+  
+  ;; ═══ DIAGNOSTIC OUTPUT ═══
+  (log (concat "  🏗️ Phase: " 
+    (if phase_ultra_early "ULTRA-EARLY-BUILD"
+    (if phase_early_expansion "EARLY-EXPANSION"
+    (if phase_mid_expansion "MID-EXPANSION" 
+    (if phase_final_push "FINAL-PUSH" "v4-ZONE"))))))
+  
+  (log (concat "  ⚡ CRI: " (string colony_risk_index) " | Modules: " (string modules_count) " | Repairs: " (string repair_bay_target)))
+  (log (concat "  🎯 Allocations — B:" (string (round (* building_alloc 100))) "% I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "% H:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  💎 Resources — O2:" (string o2_days) "d Food:" (string food_days) "d H2O:" (string h2o_days) "d | Ration:" (string (round (* food_ration 100))) "%"))
+
+  ;; ═══ OUTPUT SUMMARY ═══
+  (concat "v4-149K Sol " (string sol) 
+    " | " (if pre_v4_aggressive_phase "PRE-v4" "v4-ZONE")
+    " | Modules:" (string modules_count)
+    " | CRI:" (string colony_risk_index) 
+    " | Build:" (string (round (* building_alloc 100))) "%"
+    " | O2:" (string o2_days) "d"
+    " | Food:" (string food_days) "d"))
