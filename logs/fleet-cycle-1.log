@@ -280,3 +280,19 @@ Let me update the field notes and commit this breakthrough:
 
 Now let me commit this breakthrough to git:
 
+● Stage all changes for commit (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && git add .
+  └ 1 line...
+
+● Check what's being committed (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && git status
+  └ 18 lines...
+
+● Commit breakthrough record (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && git commit -m "BREAKTHROUGH: Mars Barn
+  │ gauntlet record broken 441→457 sols
+  │
+  │ 🚀 NEW RECORD: 457 sols (consistent across 10 Monte Carlo runs)
+  │ 📈 IMPROVEMENT: +16 sols over previous 441 record  …
+  └ 39 lines...
+
