@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Mars Barn — Cinematic Sim Player</title>
+<style>
+:root{--bg:#060810;--panel:#0d1117;--border:#1b2230;--text:#c9d1d9;--dim:#484f58;
+--orange:#f0883e;--green:#3fb950;--red:#da3633;--blue:#58a6ff;--cyan:#79c0ff;--purple:#a371f7;--yellow:#d29922}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;overflow:hidden;height:100vh}
+
+/* Scanlines */
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+background:repeating-linear-gradient(0deg,rgba(0,0,0,0.12) 0px,rgba(0,0,0,0.12) 1px,transparent 1px,transparent 3px);
+pointer-events:none;z-index:9999}
+
+/* Layout */
+.app{display:grid;grid-template-rows:48px 1fr 200px;grid-template-columns:280px 1fr 260px;height:100vh}
+
+/* Header */
+header{grid-column:1/-1;background:var(--panel);border-bottom:1px solid var(--border);
+display:flex;align-items:center;padding:0 16px;gap:16px}
+header h1{font-size:15px;color:var(--orange);letter-spacing:2px;text-transform:uppercase}
+.sol-display{font-size:22px;font-weight:bold;color:var(--cyan);margin-left:auto}
+.speed-controls{display:flex;gap:4px;margin-left:16px}
+.speed-controls button{background:var(--border);border:1px solid var(--dim);color:var(--text);
+padding:4px 10px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:11px}
+.speed-controls button.active{background:var(--orange);color:#000;border-color:var(--orange)}
+.play-btn{background:var(--green)!important;color:#000!important;font-weight:bold;padding:4px 16px!important;border-color:var(--green)!important}
+.play-btn.paused{background:var(--yellow)!important;border-color:var(--yellow)!important}
+
+/* Left panel: colony state */
+.left-panel{background:var(--panel);border-right:1px solid var(--border);padding:12px;overflow-y:auto}
+.meter{margin-bottom:10px}
+.meter-label{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;display:flex;justify-content:space-between}
+.meter-val{font-size:10px;color:var(--cyan)}
+.meter-bar{height:6px;background:#1a1f2b;border-radius:3px;margin-top:3px;overflow:hidden}
+.meter-fill{height:100%;border-radius:3px;transition:width 0.3s ease}
+.meter-fill.green{background:var(--green)}.meter-fill.orange{background:var(--orange)}
+.meter-fill.red{background:var(--red)}.meter-fill.blue{background:var(--blue)}
+.meter-fill.purple{background:var(--purple)}.meter-fill.cyan{background:var(--cyan)}
+
+.crew-list{margin-top:12px}
+.crew-member{display:flex;align-items:center;gap:6px;padding:4px;margin-bottom:4px;
+border:1px solid var(--border);border-radius:4px;font-size:10px}
+.crew-member.dead{opacity:0.3;text-decoration:line-through}
+.crew-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.crew-dot.alive{background:var(--green)}.crew-dot.dead{background:var(--red)}
+
+.module-list{margin-top:12px}
+.module-item{font-size:9px;color:var(--cyan);padding:2px 6px;background:#1a1f2b;
+border-radius:3px;display:inline-block;margin:2px}
+
+/* Center: cinematic view */
+.center{position:relative;overflow:hidden;background:#000}
+.mars-surface{position:absolute;inset:0;background:linear-gradient(180deg,#1a0800 0%,#2d1500 40%,#4a2000 70%,#3a1800 100%)}
+.horizon-glow{position:absolute;bottom:30%;left:0;right:0;height:60px;
+background:radial-gradient(ellipse at 50% 100%,rgba(240,136,62,0.15) 0%,transparent 70%)}
+.stars{position:absolute;top:0;left:0;right:0;height:40%;overflow:hidden}
+
+/* Narrative overlay */
+.narrative{position:absolute;bottom:0;left:0;right:0;padding:16px 24px;
+background:linear-gradient(transparent,rgba(0,0,0,0.9));color:var(--text);font-size:13px;
+line-height:1.6;min-height:80px;display:flex;flex-direction:column;justify-content:flex-end}
+.narrative .sol-tag{font-size:10px;color:var(--orange);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px}
+.narrative .event-tag{display:inline-block;padding:2px 8px;background:rgba(218,54,51,0.3);
+border:1px solid var(--red);border-radius:3px;font-size:9px;color:var(--red);margin:2px}
+.narrative .event-tag.warn{background:rgba(210,153,34,0.3);border-color:var(--yellow);color:var(--yellow)}
+.narrative .event-tag.ok{background:rgba(63,185,80,0.2);border-color:var(--green);color:var(--green)}
+.narrative .hazard-tag{display:inline-block;padding:2px 8px;background:rgba(163,113,247,0.2);
+border:1px solid var(--purple);border-radius:3px;font-size:9px;color:var(--purple);margin:2px}
+
+/* Colony dome visualization */
+.dome-vis{position:absolute;bottom:25%;left:50%;transform:translateX(-50%);text-align:center}
+.dome{width:120px;height:60px;border:2px solid rgba(88,166,255,0.4);border-radius:60px 60px 0 0;
+background:radial-gradient(ellipse at 50% 100%,rgba(88,166,255,0.08) 0%,transparent 80%);position:relative}
+.dome-label{font-size:9px;color:var(--dim);margin-top:4px}
+.dome-glow{position:absolute;inset:-4px;border-radius:64px 64px 0 0;
+background:radial-gradient(ellipse at 50% 80%,rgba(88,166,255,0.1) 0%,transparent 60%);transition:all 1s}
+.dome-glow.danger{background:radial-gradient(ellipse at 50% 80%,rgba(218,54,51,0.2) 0%,transparent 60%)}
+
+/* Letterbox */
+.letterbox-top,.letterbox-bot{position:absolute;left:0;right:0;background:#000;z-index:10;transition:height 0.5s}
+.letterbox-top{top:0;height:40px}
+.letterbox-bot{bottom:0;height:40px}
+
+/* Right panel: allocs + log */
+.right-panel{background:var(--panel);border-left:1px solid var(--border);padding:12px;overflow-y:auto}
+.alloc-bar{margin-bottom:8px}
+.alloc-label{font-size:10px;color:var(--dim);display:flex;justify-content:space-between}
+.alloc-bar-track{height:10px;background:#1a1f2b;border-radius:5px;margin-top:3px;overflow:hidden;display:flex}
+.alloc-seg{height:100%;transition:width 0.3s}
+.log-box{margin-top:12px;font-size:9px;color:var(--dim);max-height:300px;overflow-y:auto;line-height:1.5}
+.log-box .entry{margin-bottom:2px}.log-box .warn{color:var(--yellow)}.log-box .crit{color:var(--red)}
+.log-box .ok{color:var(--green)}.log-box .score-line{color:var(--orange);font-weight:bold}
+
+/* Bottom: timeline + score */
+.bottom{grid-column:1/-1;background:var(--panel);border-top:1px solid var(--border);
+display:grid;grid-template-columns:1fr 280px;gap:1px}
+.timeline{padding:12px;position:relative}
+.timeline canvas{width:100%;height:100%}
+.score-panel{background:var(--panel);padding:16px;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.score-val{font-size:36px;font-weight:bold;color:var(--orange)}
+.score-label{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px}
+.grade-badge{font-size:16px;font-weight:bold;padding:4px 16px;border-radius:4px;margin-top:8px}
+.grade-badge.Sp{background:rgba(240,136,62,0.2);color:var(--orange);border:1px solid var(--orange)}
+.grade-badge.S{background:rgba(88,166,255,0.2);color:var(--blue)}
+.grade-badge.A{background:rgba(63,185,80,0.2);color:var(--green)}
+.grade-badge.B{background:rgba(210,153,34,0.2);color:var(--yellow)}
+.grade-badge.F{background:rgba(218,54,51,0.2);color:var(--red)}
+
+/* Load overlay */
+.load-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:100;
+display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px}
+.load-overlay.hidden{display:none}
+.load-overlay h2{color:var(--orange);font-size:20px;letter-spacing:3px;text-transform:uppercase}
+.load-overlay p{color:var(--dim);font-size:12px;max-width:500px;text-align:center}
+.cart-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;
+max-width:700px;width:100%;padding:0 20px}
+.cart-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px;
+cursor:pointer;transition:all 0.2s;text-align:center}
+.cart-card:hover{border-color:var(--orange);transform:translateY(-2px)}
+.cart-card h3{font-size:13px;color:var(--cyan);margin-bottom:6px}
+.cart-card .score{font-size:20px;color:var(--orange);font-weight:bold}
+.cart-card .meta{font-size:10px;color:var(--dim);margin-top:6px}
+.load-btn{padding:10px 24px;background:var(--orange);color:#000;border:none;border-radius:6px;
+font-family:inherit;font-size:13px;font-weight:bold;cursor:pointer;margin-top:8px}
+.load-btn:hover{opacity:0.9}
+.drop-zone{border:2px dashed var(--border);border-radius:12px;padding:30px 40px;text-align:center;
+cursor:pointer;transition:all 0.3s;max-width:500px;width:100%}
+.drop-zone:hover{border-color:var(--cyan)}
+.drop-zone.dragover{border-color:var(--green);background:rgba(63,185,80,0.05)}
+</style>
+</head>
+<body>
+
+<!-- Load overlay -->
+<div class="load-overlay" id="loadOverlay">
+  <h2>🚀 Mars Barn Sim Player</h2>
+  <p>Watch strategies play out cinematically sol-by-sol. Load a cartridge from the leaderboard or drop your own.</p>
+
+  <div class="cart-grid" id="cartGrid">
+    <div class="cart-card" onclick="loadBuiltin('champion')">
+      <h3>🏆 Fleet Champion</h3>
+      <div class="score">96,150</div>
+      <div class="meta">S+ · 735 sols · CRI Perfectionist</div>
+    </div>
+    <div class="cart-card" onclick="loadBuiltin('balanced')">
+      <h3>⚖️ Balanced Growth</h3>
+      <div class="score">~80,000</div>
+      <div class="meta">S · Conservative · Good starter</div>
+    </div>
+    <div class="cart-card" onclick="loadBuiltin('aggressive')">
+      <h3>⚡ Aggressive Builder</h3>
+      <div class="score">~60,000</div>
+      <div class="meta">A · Module rush · High risk</div>
+    </div>
+  </div>
+
+  <div class="drop-zone" id="dropZone"
+    ondragover="event.preventDefault();this.classList.add('dragover')"
+    ondragleave="this.classList.remove('dragover')"
+    ondrop="handleDrop(event)">
+    <h3 style="color:var(--cyan);font-size:13px">📂 Drop .cartridge.json or .lispy here</h3>
+    <p style="color:var(--dim);font-size:10px;margin-top:6px">Or paste a governor program below</p>
+  </div>
+
+  <textarea id="pasteArea" rows="3" placeholder="Paste LisPy governor code here..."
+    style="max-width:500px;width:100%;background:var(--panel);border:1px solid var(--border);
+    color:var(--text);font-family:inherit;font-size:11px;padding:10px;border-radius:6px;resize:vertical"></textarea>
+  <button class="load-btn" onclick="loadFromPaste()">▶ PLAY</button>
+</div>
+
+<!-- Main app -->
+<div class="app" id="mainApp" style="display:none">
+  <header>
+    <h1>🚀 Sim Player</h1>
+    <div class="speed-controls">
+      <button class="play-btn" id="playBtn" onclick="togglePlay()">▶ PLAY</button>
+      <button onclick="setSpeed(1)" id="s1">1×</button>
+      <button onclick="setSpeed(5)" id="s5" class="active">5×</button>
+      <button onclick="setSpeed(20)" id="s20">20×</button>
+      <button onclick="setSpeed(100)" id="s100">100×</button>
+    </div>
+    <div class="sol-display" id="solDisplay">SOL 0</div>
+  </header>
+
+  <!-- Left: Colony State -->
+  <div class="left-panel">
+    <div class="meter"><div class="meter-label">⚡ Power <span class="meter-val" id="mPower">0</span></div><div class="meter-bar"><div class="meter-fill blue" id="bPower" style="width:50%"></div></div></div>
+    <div class="meter"><div class="meter-label">🫁 Oxygen <span class="meter-val" id="mO2">0d</span></div><div class="meter-bar"><div class="meter-fill cyan" id="bO2" style="width:50%"></div></div></div>
+    <div class="meter"><div class="meter-label">💧 Water <span class="meter-val" id="mH2O">0d</span></div><div class="meter-bar"><div class="meter-fill blue" id="bH2O" style="width:50%"></div></div></div>
+    <div class="meter"><div class="meter-label">🌾 Food <span class="meter-val" id="mFood">0d</span></div><div class="meter-bar"><div class="meter-fill green" id="bFood" style="width:50%"></div></div></div>
+    <div class="meter"><div class="meter-label">🌡️ Temp <span class="meter-val" id="mTemp">293K</span></div><div class="meter-bar"><div class="meter-fill orange" id="bTemp" style="width:50%"></div></div></div>
+    <div class="meter"><div class="meter-label">😊 Morale <span class="meter-val" id="mMorale">70</span></div><div class="meter-bar"><div class="meter-fill purple" id="bMorale" style="width:70%"></div></div></div>
+    <div class="meter"><div class="meter-label">⚠️ CRI <span class="meter-val" id="mCRI">5</span></div><div class="meter-bar"><div class="meter-fill red" id="bCRI" style="width:5%"></div></div></div>
+    <div class="meter"><div class="meter-label">☀️ Solar Eff <span class="meter-val" id="mSE">100%</span></div><div class="meter-bar"><div class="meter-fill orange" id="bSE" style="width:100%"></div></div></div>
+    <div class="meter"><div class="meter-label">⚙️ ISRU Eff <span class="meter-val" id="mIE">100%</span></div><div class="meter-bar"><div class="meter-fill cyan" id="bIE" style="width:100%"></div></div></div>
+
+    <div class="crew-list" id="crewList"></div>
+    <div class="module-list" id="moduleList"></div>
+  </div>
+
+  <!-- Center: cinematic view -->
+  <div class="center">
+    <div class="letterbox-top"></div>
+    <div class="mars-surface"></div>
+    <div class="horizon-glow"></div>
+    <div class="stars" id="stars"></div>
+    <div class="dome-vis">
+      <div class="dome"><div class="dome-glow" id="domeGlow"></div></div>
+      <div class="dome-label" id="domeLabel">Colony Alpha</div>
+    </div>
+    <div class="narrative" id="narrative">
+      <div class="sol-tag">Awaiting launch...</div>
+    </div>
+    <div class="letterbox-bot"></div>
+  </div>
+
+  <!-- Right: allocations + log -->
+  <div class="right-panel">
+    <h3 style="font-size:11px;color:var(--dim);margin-bottom:10px;letter-spacing:1px">ALLOCATIONS</h3>
+    <div class="alloc-bar"><div class="alloc-label">ISRU <span id="aISRU">40%</span></div>
+      <div class="alloc-bar-track"><div class="alloc-seg" id="abISRU" style="width:40%;background:var(--cyan)"></div></div></div>
+    <div class="alloc-bar"><div class="alloc-label">Greenhouse <span id="aGreen">40%</span></div>
+      <div class="alloc-bar-track"><div class="alloc-seg" id="abGreen" style="width:40%;background:var(--green)"></div></div></div>
+    <div class="alloc-bar"><div class="alloc-label">Heating <span id="aHeat">20%</span></div>
+      <div class="alloc-bar-track"><div class="alloc-seg" id="abHeat" style="width:20%;background:var(--orange)"></div></div></div>
+    <div class="alloc-bar"><div class="alloc-label">Ration <span id="aRation">100%</span></div>
+      <div class="alloc-bar-track"><div class="alloc-seg" id="abRation" style="width:100%;background:var(--yellow)"></div></div></div>
+
+    <h3 style="font-size:11px;color:var(--dim);margin:16px 0 8px;letter-spacing:1px">EVENT LOG</h3>
+    <div class="log-box" id="logBox"></div>
+  </div>
+
+  <!-- Bottom: timeline + score -->
+  <div class="bottom">
+    <div class="timeline"><canvas id="timelineCanvas"></canvas></div>
+    <div class="score-panel">
+      <div class="score-label">Score</div>
+      <div class="score-val" id="scoreVal">0</div>
+      <div class="grade-badge F" id="gradeBadge">F</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// SIM ENGINE — Ported from tools/gauntlet.js
+// ═══════════════════════════════════════════════════════════
+const PA=15, EF=0.22, SH=12.3, ISRU_O2=2.8, ISRU_H2O=1.2, GK=3500;
+const OP=0.84, HP=2.5, FP=2500, PCRIT=50;
+
+function rng32(s){let t=s&0xFFFFFFFF;return()=>{t=(t*1664525+1013904223)&0xFFFFFFFF;return(t>>>0)/0xFFFFFFFF}}
+function solIrr(sol,dust){const y=sol%669,a=2*Math.PI*(y-445)/669;return 589*(1+0.09*Math.cos(a))*Math.max(0.3,Math.cos(2*Math.PI*y/669)*0.5+0.5)*(dust?0.25:1)}
+
+function createState(){
+  return {
+    o2:0, h2o:0, food:0, power:800, se:1, ie:1, ge:1, it:293, cri:5, morale:70,
+    crew:[
+      {n:'CDR',bot:false,hp:100,a:true},
+      {n:'ENG',bot:false,hp:100,a:true},
+      {n:'SCI',bot:false,hp:100,a:true},
+      {n:'BOT-1',bot:true,hp:100,a:true}
+    ],
+    ev:[], mod:[], _prevAlloc:{h:0,i:0,g:0},
+    alloc:{h:0.20,i:0.40,g:0.40,r:1}
+  };
+}
+
+// ═══════════════════════════════════════════════════════════
+// LISPY VM — For running governor programs
+// ═══════════════════════════════════════════════════════════
+class LispyVM{constructor(){this.env={};this.output=[];this.steps=0;this.maxSteps=500000}
+setEnv(k,v){this.env[k]=v}
+tokenize(s){const t=[];let i=0;while(i<s.length){const c=s[i];if(' \t\n\r'.includes(c)){i++;continue}if(c===';'){while(i<s.length&&s[i]!=='\n')i++;continue}if('()'.includes(c)){t.push(c);i++;continue}if(c==='"'){let x='"';i++;while(i<s.length&&s[i]!=='"'){if(s[i]==='\\')x+=s[i++];x+=s[i++]}if(i<s.length)i++;t.push(x+'"');continue}let x='';while(i<s.length&&!' \t\n\r();'.includes(s[i])){x+=s[i++]}if(x)t.push(x)}return t}
+parse(t,p={i:0}){if(p.i>=t.length)throw new Error('EOF');const x=t[p.i++];if(x==='('){const l=[];while(p.i<t.length&&t[p.i]!==')')l.push(this.parse(t,p));if(p.i<t.length)p.i++;return l}if(x[0]==='"')return{__str:true,v:x.slice(1,-1)};const n=Number(x);return isNaN(n)?x:n}
+eval(e){if(++this.steps>this.maxSteps)throw new Error('Step limit');if(typeof e==='number')return e;if(e&&e.__str)return e.v;if(typeof e==='string'){if(e==='true')return true;if(e==='false')return false;if(e in this.env)return this.env[e];return 0}if(!Array.isArray(e)||!e.length)return e;const[o,...a]=e;if(o==='begin'){let r;for(const x of a)r=this.eval(x);return r}if(o==='define'){this.env[a[0]]=this.eval(a[1]);return this.env[a[0]]}if(o==='set!'){this.env[a[0]]=this.eval(a[1]);return this.env[a[0]]}if(o==='if')return this.eval(a[0])?this.eval(a[1]):(a.length>2?this.eval(a[2]):false);if(o==='cond'){for(const c of a){if(this.eval(c[0])){let r;for(const b of c.slice(1))r=this.eval(b);return r}}return false}if(o==='let'){const bindings=a[0],body=a.slice(1);const saved={};if(Array.isArray(bindings[0])){for(const p of bindings){saved[p[0]]=this.env[p[0]];this.env[p[0]]=this.eval(p[1])}}else{for(let i=0;i<bindings.length;i+=2){saved[bindings[i]]=this.env[bindings[i]];this.env[bindings[i]]=this.eval(bindings[i+1])}}let r;for(const b of body)r=this.eval(b);for(const k in saved)this.env[k]=saved[k];return r}if(o==='repeat'){const n=this.eval(a[0]);let r;for(let i=0;i<n;i++){this.env['_i']=i;r=this.eval(a[1])}return r}if(o==='log'||o==='print'){const v=a.map(x=>String(this.eval(x))).join(' ');this.output.push(v);return v}if(o==='concat')return a.map(x=>String(this.eval(x))).join('');if(o==='string')return String(this.eval(a[0]));if(o==='number')return Number(this.eval(a[0]));if(o==='length'){const v=this.eval(a[0]);return typeof v==='string'?v.length:Array.isArray(v)?v.length:0}if(o==='list')return a.map(x=>this.eval(x));if(o==='nth'){const l=this.eval(a[0]);return Array.isArray(l)?l[this.eval(a[1])]||null:null}if(o==='range'){const x=this.eval(a[0]),y=a.length>1?this.eval(a[1]):null;const s=y!==null?x:0,end=y!==null?y:x;const r=[];for(let i=s;i<end;i++)r.push(i);return r}if(o==='map'){const f=a[0],l=this.eval(a[1]);return Array.isArray(l)?l.map(x=>{this.env['_']=x;return this.eval(f)}):[]}if(o==='filter'){const f=a[0],l=this.eval(a[1]);return Array.isArray(l)?l.filter(x=>{this.env['_']=x;return this.eval(f)}):[]}
+const v=a.map(x=>this.eval(x));const ops={'+':()=>v.reduce((a,b)=>a+b,0),'-':()=>v.length===1?-v[0]:v[0]-v[1],'*':()=>v.reduce((a,b)=>a*b,1),'/':()=>v[0]/v[1],'%':()=>v[0]%v[1],'<':()=>v[0]<v[1],'>':()=>v[0]>v[1],'<=':()=>v[0]<=v[1],'>=':()=>v[0]>=v[1],'=':()=>v[0]===v[1],'!=':()=>v[0]!==v[1],'min':()=>Math.min(...v),'max':()=>Math.max(...v),'abs':()=>Math.abs(v[0]),'round':()=>Math.round(v[0]),'floor':()=>Math.floor(v[0]),'ceil':()=>Math.ceil(v[0]),'pow':()=>Math.pow(v[0],v[1]),'sqrt':()=>Math.sqrt(v[0]),'sin':()=>Math.sin(v[0]),'cos':()=>Math.cos(v[0]),'pi':()=>Math.PI,'random':()=>Math.random(),'mod':()=>v[0]%v[1],'and':()=>v.every(Boolean),'or':()=>v.some(Boolean),'not':()=>!v[0]};if(o in ops)return ops[o]();return 0}
+run(s){this.steps=0;this.output=[];try{const t=this.tokenize(s);const p={i:0};const exprs=[];while(p.i<t.length)exprs.push(this.parse(t,p));let r;for(const e of exprs)r=this.eval(e);return{ok:true,result:r,output:this.output}}catch(e){return{ok:false,error:e.message,output:this.output}}}
+seedColonyState(st,sol){const ac=st.crew.filter(c=>c.a),nh=ac.filter(c=>!c.bot).length;this.env.sol=sol;this.env.o2_days=nh>0?st.o2/(OP*nh):999;this.env.h2o_days=nh>0?st.h2o/(HP*nh):999;this.env.food_days=nh>0?st.food/(FP*nh):999;this.env.power_kwh=st.power;this.env.power=st.power;this.env.crew_alive=ac.length;this.env.crew_total=st.crew.length;this.env.morale=st.morale||70;this.env.colony_risk_index=st.cri;this.env.solar_eff=st.se;this.env.isru_eff=st.ie;this.env.modules_built=st.mod.length;this.env.events_active=st.ev.length;this.env.events=st.ev;this.env.heating_alloc=st.alloc.h;this.env.isru_alloc=st.alloc.i;this.env.greenhouse_alloc=st.alloc.g;this.env.food_ration=st.alloc.r}}
+
+// ═══════════════════════════════════════════════════════════
+// SIM TICK — Full physics step
+// ═══════════════════════════════════════════════════════════
+function tick(st, sol, frame, R, govCode, vm){
+  const ac=st.crew.filter(c=>c.a), n=ac.length, nh=ac.filter(c=>!c.bot).length;
+  if(!n) return {alive:false, cause:'All crew lost'};
+
+  // Apply frame
+  if(frame){
+    if(frame.events) for(const e of frame.events)
+      if(!st.ev.some(x=>x.t===e.type)) st.ev.push({t:e.type,sv:e.severity||0.5,r:e.duration_sols||3,desc:e.desc||e.type});
+    if(frame.hazards) for(const h of frame.hazards){
+      const totalModules=st.mod.length, aliveCrew=ac.length;
+      if(h.type==='equipment_fatigue') st.se=Math.max(0.1,st.se-(h.degradation||0.005));
+      if(h.type==='dust_accumulation') st.se=Math.max(0.1,st.se-(h.degradation||0.01));
+      if(h.type==='perchlorate_corrosion') st.ie=Math.max(0.3,st.ie-(h.degradation||0.005));
+      if(h.type==='regolith_abrasion') st.se=Math.max(0.3,st.se-(h.degradation||0.003));
+      if(h.type==='electrostatic_dust') st.se=Math.max(0.3,st.se-(h.degradation||0.002));
+      if(h.type==='thermal_fatigue') st.power=Math.max(0,st.power-5);
+      if(h.type==='radiation_seu'){const t=ac.filter(c=>c.hp>0);if(t.length)t[0].hp-=3}
+      if(h.type==='battery_degradation') st.power*=0.98;
+      if(h.type==='module_cascade_failure'&&totalModules>=(h.min_modules||4)){const ex=totalModules-(h.min_modules||4);const d=(h.severity_per_module||0.005)*ex;st.se=Math.max(0.1,st.se-d);st.ie=Math.max(0.1,st.ie-d);st.power=Math.max(0,st.power-d*100)}
+      if(h.type==='power_grid_overload'&&totalModules>=(h.min_modules||5)){st.power=Math.max(0,st.power-(h.power_drain_per_module||3)*(totalModules-(h.min_modules||5)))}
+      if(h.type==='dust_infiltration'&&h.targets_all_modules){const d=(h.degradation_per_module||0.002)*totalModules;st.se=Math.max(0.1,st.se-d);st.ie=Math.max(0.1,st.ie-d)}
+      if(h.type==='supply_chain_bottleneck'&&aliveCrew>=(h.min_crew||3)&&totalModules>=(h.min_modules||3)){st.se=Math.max(0.1,st.se-(h.efficiency_penalty||0.015));st.ie=Math.max(0.1,st.ie-(h.efficiency_penalty||0.015))}
+      // v5 Entropy
+      if(h.type==='complacency_drift'){const prev=st._prevAlloc||{h:0,i:0,g:0};const d=Math.abs(st.alloc.h-prev.h)+Math.abs(st.alloc.i-prev.i)+Math.abs(st.alloc.g-prev.g);if(d<(h.allocation_variance_threshold||0.02)){st.morale=Math.max(0,(st.morale||70)-(h.morale_penalty||5));st.se=Math.max(0.1,st.se-(h.efficiency_penalty||0.02));st.ie=Math.max(0.1,st.ie-(h.efficiency_penalty||0.02))}}
+      if(h.type==='resource_decay'){st.food=Math.max(0,st.food*(1-(h.food_decay_rate||0.01)));st.o2=Math.max(0,st.o2*(1-(h.o2_leak_rate||0.005)));st.h2o=Math.max(0,st.h2o*(1-(h.h2o_contamination_rate||0.003)))}
+      if(h.type==='maintenance_avalanche'){const safe=h.safe_module_count||7;if(totalModules>safe){const ex=totalModules-safe;st.power=Math.max(0,st.power-(h.power_cost_per_module_squared||0.5)*ex*ex);if(R()<(h.failure_prob_per_excess_module||0.02)*ex)st.ie=Math.max(0.1,st.ie*0.9)}}
+      if(h.type==='crew_isolation_syndrome'){const ms=h.min_crew_for_stability||4;if(aliveCrew<ms){const m=ms-aliveCrew;st.morale=Math.max(0,(st.morale||70)-(h.morale_decay_per_missing_crew||5)*m);st.se=Math.max(0.1,st.se-(h.productivity_loss||0.08)*m);st.ie=Math.max(0.1,st.ie-(h.productivity_loss||0.08)*m)}}
+      if(h.type==='solar_degradation') st.se=Math.max(0.2,st.se-(h.cumulative_loss_per_100_sols||0.02)*(sol/100)*0.01);
+      if(h.type==='habitat_entropy'){st.se=Math.max(0.1,st.se-(h.system_degradation||0.004));st.ie=Math.max(0.1,st.ie-(h.system_degradation||0.004));st.power=Math.max(0,st.power-(h.repair_power_cost||10))}
+      if(h.type==='crew_conflict') st.morale=Math.max(0,(st.morale||70)+(h.morale_impact||-15));
+      if(h.type==='supply_cache_contamination') st.food=Math.max(0,st.food*(1-(h.food_loss_pct||0.15)));
+    }
+  }
+  st.ev=st.ev.filter(e=>{e.r--;return e.r>0});
+  if(R()<0.012*(1+st.cri/80)){st.ie*=(1-0.02);st.power=Math.max(0,st.power-2)}
+
+  // Run governor (LisPy program)
+  const a = st.alloc;
+  st._prevAlloc = {h:a.h, i:a.i, g:a.g};
+  if(govCode && vm){
+    vm.seedColonyState(st, sol);
+    const res = vm.run(govCode);
+    // Read back allocations
+    if(vm.env.heating_alloc!==undefined) a.h = Number(vm.env.heating_alloc)||a.h;
+    if(vm.env.isru_alloc!==undefined) a.i = Number(vm.env.isru_alloc)||a.i;
+    if(vm.env.greenhouse_alloc!==undefined) a.g = Number(vm.env.greenhouse_alloc)||a.g;
+    if(vm.env.food_ration!==undefined) a.r = Number(vm.env.food_ration)||a.r;
+  }
+
+  // Production
+  const isDust=st.ev.some(e=>e.t==='dust_storm');
+  const sb=1+st.mod.filter(x=>x==='solar_farm').length*0.4;
+  st.power+=solIrr(sol,isDust)*PA*EF*SH/1000*st.se*sb;
+  if(st.power>PCRIT*0.3){
+    const ib=1+st.mod.filter(x=>x==='isru_plant').length*0.4;
+    st.o2+=ISRU_O2*st.ie*Math.min(1.5,a.i*2)*ib;
+    st.h2o+=ISRU_H2O*st.ie*Math.min(1.5,a.i*2)*ib;
+  }
+  st.h2o+=st.mod.filter(x=>x==='water_extractor').length*3;
+  if(st.power>PCRIT*0.3&&st.h2o>5){
+    const gb=1+st.mod.filter(x=>x==='greenhouse_dome').length*0.5;
+    st.food+=GK*st.ge*Math.min(1.5,a.g*2)*gb;
+  }
+  // Repair
+  const rc=st.mod.filter(x=>x==='repair_bay').length;
+  if(rc>0){st.se=Math.min(1,st.se+0.005*rc);st.ie=Math.min(1,st.ie+0.003*rc)}
+
+  // Consumption
+  st.o2=Math.max(0,st.o2-nh*OP);
+  st.h2o=Math.max(0,st.h2o-nh*HP);
+  st.food=Math.max(0,st.food-nh*FP*a.r);
+  st.power=Math.max(0,st.power-n*5-st.mod.length*3);
+  st.it=Math.max(200,Math.min(310,st.it+(st.power*a.h*0.5>10?0.5:-0.5)));
+
+  // Crew health
+  ac.forEach(c=>{
+    if(!c.bot){if(st.o2<OP*2)c.hp-=5;if(st.food<FP*2)c.hp-=3}
+    if(st.it<250)c.hp-=(c.bot?0.3:2);
+    if(st.power<=0)c.hp-=(c.bot?1:0.5);
+    c.hp=Math.min(100,c.hp+(c.bot?0.5:0.3));
+    if(c.hp<=0)c.a=false;
+  });
+
+  // Build schedule
+  if(sol===3&&st.power>15) st.mod.push('solar_farm');
+  else if(sol===10&&st.power>30) st.mod.push('solar_farm');
+  else if(sol===20&&st.power>50) st.mod.push('repair_bay');
+  else if(sol===35&&st.power>80) st.mod.push('solar_farm');
+  else if(sol===55&&st.power>120) st.mod.push('isru_plant');
+  else if(sol===80&&st.power>170) st.mod.push('greenhouse_dome');
+  else if(sol===110&&st.power>220) st.mod.push('water_extractor');
+  else if(sol===150&&st.power>300) st.mod.push('repair_bay');
+
+  // CRI
+  const o2d=nh>0?st.o2/(OP*nh):999, hd=nh>0?st.h2o/(HP*nh):999, fd=nh>0?st.food/(FP*nh):999;
+  st.cri=Math.min(100,Math.max(0,5+(st.power<50?25:st.power<150?10:0)+st.ev.length*6+(o2d<5?20:0)+(hd<5?20:0)+(fd<5?20:0)));
+
+  // Death
+  if(st.o2<=0&&nh>0) return {alive:false,cause:'☠️ Suffocation — O₂ depleted'};
+  if(st.food<=0&&nh>0) return {alive:false,cause:'☠️ Starvation — Food exhausted'};
+  if(st.h2o<=0&&nh>0) return {alive:false,cause:'☠️ Dehydration — Water gone'};
+  if(!st.crew.filter(c=>c.a).length) return {alive:false,cause:'☠️ Total colony loss'};
+  return {alive:true};
+}
+
+// ═══════════════════════════════════════════════════════════
+// PLAYER ENGINE
+// ═══════════════════════════════════════════════════════════
+let FRAMES = null;
+let TOTAL_SOLS = 0;
+let STATE = null;
+let GOV_CODE = '';
+let VM = new LispyVM();
+let RNG = rng32(42);
+let currentSol = 0;
+let playing = false;
+let speed = 5; // sols per second
+let solHistory = [];
+let animFrame = null;
+let lastTick = 0;
+let deathCause = null;
+
+const FRAMES_URL = 'https://raw.githubusercontent.com/kody-w/mars-barn-opus/main/data/frames/frames.json';
+
+async function loadFrameData(){
+  try{
+    // Try local first
+    let resp = await fetch('../data/frames/frames.json');
+    if(!resp.ok) resp = await fetch(FRAMES_URL);
+    const data = await resp.json();
+    const raw = data.frames || data;
+    FRAMES = {};
+    for(const [sol,d] of Object.entries(raw)){
+      if(sol.startsWith('_')||sol==='frames') continue;
+      FRAMES[parseInt(sol)] = d;
+    }
+    TOTAL_SOLS = Math.max(...Object.keys(FRAMES).map(Number));
+    console.log(`Loaded ${Object.keys(FRAMES).length} frames (Sol 1-${TOTAL_SOLS})`);
+  }catch(e){
+    console.error('Frame load failed:', e);
+    TOTAL_SOLS = 777;
+    FRAMES = {};
+  }
+}
+
+function startSim(governor){
+  GOV_CODE = governor || '';
+  STATE = createState();
+  RNG = rng32(Date.now() & 0xFFFF);
+  currentSol = 0;
+  solHistory = [];
+  deathCause = null;
+  document.getElementById('loadOverlay').classList.add('hidden');
+  document.getElementById('mainApp').style.display = 'grid';
+  generateStars();
+  playing = true;
+  document.getElementById('playBtn').textContent = '⏸ PAUSE';
+  document.getElementById('playBtn').classList.add('paused');
+  lastTick = performance.now();
+  gameLoop();
+}
+
+function togglePlay(){
+  playing = !playing;
+  const btn = document.getElementById('playBtn');
+  btn.textContent = playing ? '⏸ PAUSE' : '▶ PLAY';
+  btn.classList.toggle('paused', playing);
+  if(playing){lastTick=performance.now();gameLoop()}
+}
+
+function setSpeed(s){
+  speed = s;
+  document.querySelectorAll('.speed-controls button:not(.play-btn)').forEach(b=>b.classList.remove('active'));
+  document.getElementById('s'+s).classList.add('active');
+}
+
+function gameLoop(){
+  if(!playing) return;
+  const now = performance.now();
+  const dt = (now - lastTick) / 1000;
+  const solsToRun = Math.floor(dt * speed);
+
+  if(solsToRun >= 1){
+    lastTick = now;
+    for(let i=0; i<solsToRun && currentSol<TOTAL_SOLS && !deathCause; i++){
+      currentSol++;
+      const frame = FRAMES[currentSol] || null;
+      const result = tick(STATE, currentSol, frame, RNG, GOV_CODE, VM);
+      const ac=STATE.crew.filter(c=>c.a), nh=ac.filter(c=>!c.bot).length;
+      solHistory.push({
+        sol:currentSol, cri:STATE.cri, power:STATE.power,
+        o2d:nh>0?STATE.o2/(OP*nh):999, fd:nh>0?STATE.food/(FP*nh):999,
+        crew:ac.length, modules:STATE.mod.length, alive:result.alive
+      });
+      if(!result.alive){
+        deathCause = result.cause;
+        playing = false;
+      }
+    }
+    updateUI();
+  }
+  if(playing) animFrame = requestAnimationFrame(gameLoop);
+}
+
+// ═══════════════════════════════════════════════════════════
+// UI UPDATES
+// ═══════════════════════════════════════════════════════════
+function updateUI(){
+  const st = STATE;
+  const ac = st.crew.filter(c=>c.a), nh = ac.filter(c=>!c.bot).length;
+  const o2d = nh>0 ? st.o2/(OP*nh) : 999;
+  const hd = nh>0 ? st.h2o/(HP*nh) : 999;
+  const fd = nh>0 ? st.food/(FP*nh) : 999;
+
+  // Sol display
+  document.getElementById('solDisplay').textContent = `SOL ${currentSol}`;
+
+  // Meters
+  setMeter('Power', st.power, 2000, Math.round(st.power)+'kWh');
+  setMeter('O2', o2d, 50, o2d.toFixed(1)+'d');
+  setMeter('H2O', hd, 50, hd.toFixed(1)+'d');
+  setMeter('Food', fd, 50, fd.toFixed(1)+'d');
+  setMeter('Temp', st.it-200, 110, Math.round(st.it)+'K');
+  setMeter('Morale', st.morale||70, 100, Math.round(st.morale||70));
+  setMeter('CRI', st.cri, 100, Math.round(st.cri));
+  setMeter('SE', st.se*100, 100, Math.round(st.se*100)+'%');
+  setMeter('IE', st.ie*100, 100, Math.round(st.ie*100)+'%');
+
+  // Allocations
+  const a = st.alloc;
+  document.getElementById('aISRU').textContent = Math.round(a.i*100)+'%';
+  document.getElementById('aGreen').textContent = Math.round(a.g*100)+'%';
+  document.getElementById('aHeat').textContent = Math.round(a.h*100)+'%';
+  document.getElementById('aRation').textContent = Math.round(a.r*100)+'%';
+  document.getElementById('abISRU').style.width = (a.i*100)+'%';
+  document.getElementById('abGreen').style.width = (a.g*100)+'%';
+  document.getElementById('abHeat').style.width = (a.h*100)+'%';
+  document.getElementById('abRation').style.width = Math.min(100,a.r*100)+'%';
+
+  // Crew
+  const crewEl = document.getElementById('crewList');
+  crewEl.innerHTML = '<div style="font-size:10px;color:var(--dim);margin-bottom:4px">CREW</div>' +
+    st.crew.map(c=>`<div class="crew-member${c.a?'':' dead'}"><div class="crew-dot ${c.a?'alive':'dead'}"></div>${c.n} ${c.bot?'🤖':'👤'} HP:${Math.round(c.hp)}</div>`).join('');
+
+  // Modules
+  const modEl = document.getElementById('moduleList');
+  const modNames = {solar_farm:'☀️Solar',repair_bay:'🔧Repair',isru_plant:'⚙️ISRU',greenhouse_dome:'🌱Green',water_extractor:'💧Water'};
+  modEl.innerHTML = '<div style="font-size:10px;color:var(--dim);margin-bottom:4px">MODULES ('+st.mod.length+')</div>' +
+    st.mod.map(m=>`<span class="module-item">${modNames[m]||m}</span>`).join('');
+
+  // Dome glow
+  document.getElementById('domeGlow').className = 'dome-glow' + (st.cri > 50 ? ' danger' : '');
+
+  // Narrative
+  updateNarrative();
+
+  // Score
+  updateScore();
+
+  // Timeline
+  drawTimeline();
+
+  // Death
+  if(deathCause){
+    document.getElementById('playBtn').textContent = '💀 DEAD';
+    addLog(deathCause, 'crit');
+  }
+}
+
+function setMeter(id, val, max, label){
+  const pct = Math.min(100, Math.max(0, (val/max)*100));
+  document.getElementById('m'+id).textContent = label;
+  document.getElementById('b'+id).style.width = pct+'%';
+  // Color based on danger
+  const bar = document.getElementById('b'+id);
+  if(id==='CRI'){
+    bar.style.background = val>60?'var(--red)':val>30?'var(--yellow)':'var(--green)';
+  }
+}
+
+function updateNarrative(){
+  const el = document.getElementById('narrative');
+  const frame = FRAMES[currentSol];
+  let html = `<div class="sol-tag">Sol ${currentSol} of ${TOTAL_SOLS}</div>`;
+
+  if(frame){
+    if(frame.narrative) html += `<div>${frame.narrative}</div>`;
+    if(frame.events?.length){
+      html += frame.events.map(e=>
+        `<span class="event-tag ${e.severity>0.5?'':'warn'}">${e.type.replace(/_/g,' ')} (${(e.severity*100).toFixed(0)}%)</span>`
+      ).join(' ');
+    }
+    if(frame.hazards?.length){
+      html += ' ' + frame.hazards.slice(0,3).map(h=>
+        `<span class="hazard-tag">${h.type.replace(/_/g,' ')}</span>`
+      ).join(' ');
+    }
+    if(frame.version && frame.version !== 'v1'){
+      html += ` <span class="hazard-tag" style="border-color:var(--orange);color:var(--orange)">${frame.version}</span>`;
+    }
+  }
+
+  if(deathCause){
+    html += `<div style="color:var(--red);font-size:18px;margin-top:8px;font-weight:bold">${deathCause}</div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+function updateScore(){
+  const ac = STATE.crew.filter(c=>c.a);
+  const survRate = solHistory.filter(s=>s.alive).length / Math.max(1,solHistory.length);
+  const medMods = STATE.mod.length;
+  const score = Math.round(
+    currentSol * 100 +
+    ac.length * 500 +
+    Math.min(medMods, 8) * 150 +
+    survRate * 20000 -
+    STATE.cri * 10
+  );
+  document.getElementById('scoreVal').textContent = score.toLocaleString();
+  const grade = score>=90000?'S+':score>=70000?'S':score>=50000?'A':score>=30000?'B':score>=15000?'C':score>=5000?'D':'F';
+  const badge = document.getElementById('gradeBadge');
+  badge.textContent = grade;
+  badge.className = 'grade-badge ' + (grade==='S+'?'Sp':grade);
+}
+
+function addLog(msg, cls=''){
+  const box = document.getElementById('logBox');
+  box.innerHTML += `<div class="entry ${cls}">Sol ${currentSol}: ${msg}</div>`;
+  box.scrollTop = box.scrollHeight;
+}
+
+function drawTimeline(){
+  const canvas = document.getElementById('timelineCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth * 2;
+  canvas.height = canvas.offsetHeight * 2;
+  const W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  if(solHistory.length < 2) return;
+
+  // CRI line
+  ctx.strokeStyle = '#da363380';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  solHistory.forEach((s,i)=>{
+    const x = (i/(TOTAL_SOLS-1))*W;
+    const y = H - (s.cri/100)*H;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // Power line
+  ctx.strokeStyle = '#58a6ff80';
+  ctx.beginPath();
+  const maxP = Math.max(100,...solHistory.map(s=>s.power));
+  solHistory.forEach((s,i)=>{
+    const x = (i/(TOTAL_SOLS-1))*W;
+    const y = H - (s.power/maxP)*H;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // Playhead
+  const px = (currentSol/(TOTAL_SOLS-1))*W;
+  ctx.strokeStyle = '#f0883e';
+  ctx.lineWidth = 3;
+  ctx.beginPath();ctx.moveTo(px,0);ctx.lineTo(px,H);ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = '#da3633';ctx.font = '18px Courier New';ctx.fillText('CRI', 8, 20);
+  ctx.fillStyle = '#58a6ff';ctx.fillText('PWR', 8, 40);
+}
+
+function generateStars(){
+  const el = document.getElementById('stars');
+  el.innerHTML = '';
+  for(let i=0;i<80;i++){
+    const star = document.createElement('div');
+    star.style.cssText = `position:absolute;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;
+    background:#fff;border-radius:50%;top:${Math.random()*100}%;left:${Math.random()*100}%;
+    opacity:${0.3+Math.random()*0.7};animation:twinkle ${2+Math.random()*4}s infinite`;
+    el.appendChild(star);
+  }
+  const style = document.createElement('style');
+  style.textContent = '@keyframes twinkle{0%,100%{opacity:0.3}50%{opacity:1}}';
+  document.head.appendChild(style);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CARTRIDGE / GOVERNOR LOADING
+// ═══════════════════════════════════════════════════════════
+
+// Built-in strategies
+const BUILTINS = {
+champion: `(begin
+  (define _agent_name "Fleet Champion")
+  (cond
+    ((< o2_days 5) (begin (set! isru_alloc 0.85) (set! greenhouse_alloc 0.05) (set! heating_alloc 0.10) (set! food_ration 0.5)))
+    ((< food_days 10) (begin (set! isru_alloc 0.25) (set! greenhouse_alloc 0.60) (set! heating_alloc 0.15)))
+    ((< power_kwh 80) (begin (set! heating_alloc 0.55) (set! isru_alloc 0.25) (set! greenhouse_alloc 0.20)))
+    ((> colony_risk_index 50) (begin (set! heating_alloc 0.45) (set! isru_alloc 0.35) (set! greenhouse_alloc 0.20)))
+    (true (begin (set! isru_alloc 0.35) (set! greenhouse_alloc 0.40) (set! heating_alloc 0.25)))))`,
+
+balanced: `(begin
+  (define _agent_name "Balanced Growth")
+  (cond
+    ((< o2_days 8) (begin (set! isru_alloc 0.70) (set! greenhouse_alloc 0.10) (set! heating_alloc 0.20)))
+    ((< food_days 12) (begin (set! isru_alloc 0.20) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.25)))
+    ((< power_kwh 100) (begin (set! heating_alloc 0.50) (set! isru_alloc 0.30) (set! greenhouse_alloc 0.20)))
+    (true (begin (set! isru_alloc 0.33) (set! greenhouse_alloc 0.34) (set! heating_alloc 0.33)))))`,
+
+aggressive: `(begin
+  (define _agent_name "Aggressive Builder")
+  (cond
+    ((< o2_days 3) (begin (set! isru_alloc 0.90) (set! greenhouse_alloc 0.05) (set! heating_alloc 0.05) (set! food_ration 0.3)))
+    ((< food_days 5) (begin (set! isru_alloc 0.15) (set! greenhouse_alloc 0.75) (set! heating_alloc 0.10)))
+    (true (begin (set! isru_alloc 0.45) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.20) (set! food_ration 0.8)))))`
+};
+
+async function loadBuiltin(name){
+  await loadFrameData();
+  startSim(BUILTINS[name]);
+}
+
+function handleDrop(e){
+  e.preventDefault();
+  e.target.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async (ev) => {
+    const text = ev.target.result;
+    await loadFrameData();
+    if(file.name.endsWith('.cartridge.json')){
+      try{
+        const cart = JSON.parse(text);
+        startSim(cart.governor || cart.boot?.init?.join('\n') || '');
+      }catch(e){ startSim(text); }
+    } else {
+      startSim(text);
+    }
+  };
+  reader.readAsText(file);
+}
+
+async function loadFromPaste(){
+  const code = document.getElementById('pasteArea').value.trim();
+  if(!code){
+    await loadBuiltin('balanced');
+    return;
+  }
+  await loadFrameData();
+  startSim(code);
+}
+
+// Boot
+loadFrameData();
+</script>
+</body>
+</html>
