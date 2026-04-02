@@ -658,10 +658,10 @@
     const my = getTerrainY(mx, mz);
 
     const tunnel = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.6, 0.6, length, 6),
+      new THREE.CylinderGeometry(1.8, 1.8, length, 8),
       tunnelMat
     );
-    tunnel.position.set(mx, my + 0.6, mz);
+    tunnel.position.set(mx, my + 1.8, mz);
     // Rotate cylinder Y-axis to lie along the XZ direction
     const dir = new THREE.Vector3(dx, 0, dz).normalize();
     tunnel.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
