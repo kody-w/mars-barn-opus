@@ -381,6 +381,31 @@
     ring.rotation.x = -Math.PI / 2;
     ring.position.set(0, getTerrainY(0, 0) + 0.1, 0);
     scene.add(ring);
+
+    // Mars flag near hab entrance
+    const flagGrp = new THREE.Group();
+    const flagPole = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.05, 0.05, 5, 6),
+      new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.8 })
+    );
+    flagPole.position.y = 2.5;
+    flagGrp.add(flagPole);
+
+    // Flag cloth — plane with vertex animation
+    const flagGeo = new THREE.PlaneGeometry(2, 1.2, 12, 6);
+    const flagMat = new THREE.MeshStandardMaterial({
+      color: 0xcc3300, emissive: 0x661100, emissiveIntensity: 0.2,
+      side: THREE.DoubleSide, roughness: 0.8
+    });
+    const flagMesh = new THREE.Mesh(flagGeo, flagMat);
+    flagMesh.position.set(1, 4.4, 0);
+    flagGrp.add(flagMesh);
+
+    const habTy = getTerrainY(9, 2);
+    flagGrp.position.set(9, habTy, 2);
+    scene.add(flagGrp);
+    // Store ref for animation
+    modules.flagMesh = flagMesh;
   })();
 
   // Solar Arrays — 6 panels south of hab
@@ -824,6 +849,48 @@
   const smoke = new THREE.Points(smokeGeo, smokeMat);
   scene.add(smoke);
 
+  // ─── SHOOTING STARS ──────────────────────────────────────────
+  const shootingStars = [];
+  function spawnShootingStar() {
+    const theta = Math.random() * Math.PI * 2;
+    const phi = 0.3 + Math.random() * 0.8;
+    const r = 300;
+    const start = new THREE.Vector3(
+      r * Math.sin(phi) * Math.cos(theta),
+      r * Math.cos(phi),
+      r * Math.sin(phi) * Math.sin(theta)
+    );
+    const dir = new THREE.Vector3(
+      -0.5 + Math.random(), -0.3 - Math.random() * 0.5, -0.5 + Math.random()
+    ).normalize();
+    const geo = new THREE.BufferGeometry().setFromPoints([
+      start, start.clone().add(dir.clone().multiplyScalar(15))
+    ]);
+    const mat = new THREE.LineBasicMaterial({
+      color: 0xffffff, transparent: true, opacity: 0.8
+    });
+    const line = new THREE.Line(geo, mat);
+    scene.add(line);
+    shootingStars.push({ line, dir, speed: 80 + Math.random() * 120, life: 0, maxLife: 0.8 + Math.random() * 0.5 });
+  }
+
+  // ─── ROVER TRACKS ────────────────────────────────────────────
+  const MAX_TRACK_POINTS = 200;
+  const trackLines = [];
+
+  function createTrackLine(color) {
+    const positions = new Float32Array(MAX_TRACK_POINTS * 3);
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setDrawRange(0, 0);
+    const mat = new THREE.LineBasicMaterial({
+      color: color, transparent: true, opacity: 0.15
+    });
+    const line = new THREE.Line(geo, mat);
+    scene.add(line);
+    return { line, geo, count: 0, lastX: null, lastZ: null };
+  }
+
   // ─── UNITS ────────────────────────────────────────────────────
   const units = [];
   const unitData = [
@@ -969,6 +1036,7 @@
       direction: new THREE.Vector3(0, 0, 1),
       task: null
     });
+    trackLines.push(createTrackLine(ud.color));
   });
 
   // ─── COLLISION OBSTACLES (buildings + radii) ────────────────
@@ -1896,11 +1964,15 @@
       pl.light.intensity = blink ? 1.2 : 0.1;
     });
 
-    // ── Comms dish rotation (slowly tracks) ──
+    // ── Comms dish tracks Earth ──
     const commsModule = modules.find(m => m.name === 'COMMS-ARRAY');
     if (commsModule && commsModule.mesh.userData.dish) {
-      commsModule.mesh.userData.dish.rotation.y = Math.sin(elapsed * 0.08) * 0.5;
-      commsModule.mesh.userData.dish.rotation.z = Math.PI + Math.sin(elapsed * 0.05) * 0.15;
+      const dishPos = commsModule.mesh.position;
+      const toEarth = new THREE.Vector3().subVectors(earth.position, dishPos).normalize();
+      const dishYaw = Math.atan2(toEarth.x, toEarth.z);
+      const dishPitch = Math.asin(Math.min(1, toEarth.y));
+      commsModule.mesh.userData.dish.rotation.y = dishYaw;
+      commsModule.mesh.userData.dish.rotation.x = Math.PI - dishPitch * 0.5;
     }
 
     // ── ISRU chimney smoke ──
@@ -1966,6 +2038,60 @@
       const wf = simState._windFactor || 1;
       window._marsAudio.windGain.gain.value = 0.03 + wf * 0.04;
       window._marsAudio.windFilter.frequency.value = 100 + wf * 150;
+    }
+
+    // ── Shooting stars ──
+    if (dayFrac < 0.3 && Math.random() < 0.003) spawnShootingStar();
+    for (let si = shootingStars.length - 1; si >= 0; si--) {
+      const ss = shootingStars[si];
+      ss.life += dt;
+      const positions = ss.line.geometry.attributes.position.array;
+      for (let j = 0; j < 6; j += 3) {
+        positions[j]   += ss.dir.x * ss.speed * dt;
+        positions[j+1] += ss.dir.y * ss.speed * dt;
+        positions[j+2] += ss.dir.z * ss.speed * dt;
+      }
+      ss.line.geometry.attributes.position.needsUpdate = true;
+      ss.line.material.opacity = Math.max(0, 1 - ss.life / ss.maxLife);
+      if (ss.life >= ss.maxLife) {
+        scene.remove(ss.line);
+        ss.line.geometry.dispose();
+        ss.line.material.dispose();
+        shootingStars.splice(si, 1);
+      }
+    }
+
+    // ── Rover tracks ──
+    units.forEach((u, ui) => {
+      const tl = trackLines[ui];
+      if (!tl) return;
+      const px = u.group.position.x, pz = u.group.position.z;
+      // Only add point if moved enough
+      if (tl.lastX === null || Math.abs(px - tl.lastX) + Math.abs(pz - tl.lastZ) > 1.5) {
+        const arr = tl.geo.attributes.position.array;
+        const idx = (tl.count % MAX_TRACK_POINTS) * 3;
+        arr[idx] = px;
+        arr[idx + 1] = getTerrainY(px, pz) + 0.05;
+        arr[idx + 2] = pz;
+        tl.count++;
+        tl.geo.attributes.position.needsUpdate = true;
+        tl.geo.setDrawRange(0, Math.min(tl.count, MAX_TRACK_POINTS));
+        tl.lastX = px;
+        tl.lastZ = pz;
+      }
+    });
+
+    // ── Flag cloth wave ──
+    const flagMesh = modules.flagMesh;
+    if (flagMesh) {
+      const fPos = flagMesh.geometry.attributes.position;
+      const windF = simState._windFactor || 1;
+      for (let fi = 0; fi < fPos.count; fi++) {
+        const fx = fPos.getX(fi);
+        const wave = Math.sin(fx * 3 + elapsed * 4 * windF) * 0.08 * (fx + 1) * windF;
+        fPos.setZ(fi, wave);
+      }
+      fPos.needsUpdate = true;
     }
 
     // ── Camera ──

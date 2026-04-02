@@ -6,7 +6,7 @@
 
 **For classrooms, robotics clubs, and anyone who wants to go to Mars.**
 
-**[Play it live](https://rappter2-ux.github.io/mars-barn-opus/)** | **[3D Viewer](https://rappter2-ux.github.io/mars-barn-opus/viewer.html)** | **[Split-Screen](https://rappter2-ux.github.io/mars-barn-opus/splitscreen.html)** | **[Timelapse](https://rappter2-ux.github.io/mars-barn-opus/timelapse.html)** | **[Multiplayer](https://rappter2-ux.github.io/mars-barn-opus/multiplayer.html)**
+**[Play it live](https://rappter2-ux.github.io/mars-barn-opus/)** | **[3D Colony RTS](https://rappter2-ux.github.io/mars-barn-opus/rts.html)** | **[3D Viewer](https://rappter2-ux.github.io/mars-barn-opus/viewer.html)** | **[Split-Screen](https://rappter2-ux.github.io/mars-barn-opus/splitscreen.html)** | **[Timelapse](https://rappter2-ux.github.io/mars-barn-opus/timelapse.html)** | **[Multiplayer](https://rappter2-ux.github.io/mars-barn-opus/multiplayer.html)**
 
 ## Why this exists
 
