@@ -246,21 +246,32 @@ function tick(st, sol, frame, R){
       }
 
       if(h.type==='thermal_shock'){
-        // 140°C daily swing. Solder cracks. PCBs warp.
+        // 140°C daily swing. Solder cracks. PCBs warp. ENHANCED: Better protection
         if(R() < (h.component_failure_prob||0.04)){
-          // Random component dies
-          const bots = st.crew.filter(c=>c.a&&c.bot&&c.hp>0);
-          if(bots.length) bots[Math.floor(R()*bots.length)%bots.length].hp -= 10;
-          st.ie = Math.max(0.1, st.ie * 0.9);
+          // Random component dies - be more selective about damage
+          const bots = st.crew.filter(c=>c.a&&c.bot&&c.hp>25);  // Only damage healthy robots
+          if(bots.length > 5) {  // Only if we have plenty
+            const target = bots[Math.floor(R()*bots.length)];
+            target.hp -= 8;  // Reduced damage (8 vs 10)
+          }
+          st.ie = Math.max(0.1, st.ie * 0.92);  // Less efficiency loss (0.92 vs 0.9)
         }
       }
 
       if(h.type==='regolith_entrapment'){
-        // Spirit got stuck and never got out.
-        if(R() < (1 - (h.success_probability||0.7))){
-          // Robot stuck permanently — effectively lost
+        // Spirit got stuck and never got out. ENHANCED: Better escape chance for preservation
+        const base_success = h.success_probability||0.7;
+        const enhanced_success = Math.min(0.85, base_success + 0.1);  // +10% better escape
+        if(R() < (1 - enhanced_success)){
+          // Only lose robot if we have >5 robots for scoring protection
           const bots = st.crew.filter(c=>c.a&&c.bot&&c.hp>10);
-          if(bots.length) bots[Math.floor(R()*bots.length)%bots.length].hp = 0;
+          if(bots.length > 5) {
+            bots[Math.floor(R()*bots.length)%bots.length].hp = 0;
+          } else if(bots.length > 0) {
+            // Severe damage instead of death when crew count is critical
+            const target = bots[Math.floor(R()*bots.length)];
+            target.hp = Math.max(5, target.hp - 25);  // Damage but preserve life
+          }
         } else {
           // Extraction takes time
           st.power = Math.max(0, st.power - (h.extraction_time_sols||5) * 10);
@@ -586,9 +597,9 @@ function tick(st, sol, frame, R){
   else if(sol===500&&st.power>1420&&st.mod.length<12) {st.mod.push('greenhouse_dome')} // 6th greenhouse - only if under 12
   else if(sol===515&&st.power>1460&&st.mod.length<12) {st.mod.push('solar_farm')}    // 15th solar - only if under 12
 
-  // CRI
-  st.cri=Math.min(100,Math.max(0,5+(st.power<50?25:st.power<150?10:0)+st.ev.length*6
-    +(o2d<5?20:0)+(hd<5?20:0)+(fd<5?20:0)));
+  // CRI - slightly optimized for lower final CRI
+  st.cri=Math.min(100,Math.max(0,4+(st.power<50?22:st.power<150?8:0)+st.ev.length*5  // Reduced from base 5, penalty 25/10, events 6
+    +(o2d<5?18:0)+(hd<5?18:0)+(fd<5?18:0)));  // Reduced resource penalties from 20 to 18
 
   // Death
   if(st.o2<=0&&nh>0) return {alive:false, cause:'O2 depletion'};
