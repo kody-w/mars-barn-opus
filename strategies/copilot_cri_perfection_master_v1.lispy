@@ -1,0 +1,254 @@
+;; CRI PERFECTION MASTER GOVERNOR v1
+;; Strategy: Minimize P75 CRI to absolute minimum for maximum score optimization
+;; Current: 144,470 with P75 CRI 23 → Target: P75 CRI ≤ 15 for 145,000+ score
+;; Innovation: Ultra-conservative resource management with perfect efficiency maintenance
+
+(begin
+  (log (concat "🎯🔥💎 CRI PERFECTION MASTER — Sol " (string sol) " — Target: CRI ≤ 15 for 145,000+ Score"))
+  
+  ;; ═══ CRI PERFECTION ANALYSIS ═══ 
+  ;; Current score: 144,470 with P75 CRI = 23
+  ;; Target: Reduce P75 CRI by 8 points = +80 score = 145,000+
+  ;; Strategy: Ultra-aggressive resource buffers + perfect efficiency maintenance
+  
+  ;; ═══ ENHANCED PHASE DETECTION ═══
+  (define infrastructure_phase (< sol 300))                          ;; Build core infrastructure
+  (define efficiency_mastery_phase (and (>= sol 300) (< sol 600)))   ;; Perfect efficiency focus
+  (define buffer_supremacy_phase (and (>= sol 600) (< sol 900)))     ;; Build massive resource buffers
+  (define cri_perfection_phase (and (>= sol 900) (< sol 1008)))      ;; Ultra-conservative CRI mode
+  (define ultimate_maintenance_phase (>= sol 1008))                  ;; Perfect maintenance forever
+  
+  ;; ═══ CRI PERFECTION RESOURCE TARGETS ═══
+  ;; Ultra-aggressive buffer targets for absolute CRI minimization
+  (define cri_perfect_o2_target 
+    (cond
+      (ultimate_maintenance_phase 80.0)    ;; Ultimate: 80+ days O2 buffer (ultra-safe)
+      (cri_perfection_phase 70.0)          ;; Perfection: 70+ days  
+      (buffer_supremacy_phase 60.0)        ;; Supremacy: 60+ days
+      (efficiency_mastery_phase 45.0)      ;; Mastery: 45+ days
+      (true 30.0)))                        ;; Infrastructure: 30+ days
+
+  (define cri_perfect_h2o_target
+    (cond
+      (ultimate_maintenance_phase 85.0)    ;; Ultimate: 85+ days H2O buffer (ultra-safe)
+      (cri_perfection_phase 75.0)          ;; Perfection: 75+ days
+      (buffer_supremacy_phase 65.0)        ;; Supremacy: 65+ days  
+      (efficiency_mastery_phase 50.0)      ;; Mastery: 50+ days
+      (true 35.0)))                        ;; Infrastructure: 35+ days
+
+  (define cri_perfect_food_target
+    (cond
+      (ultimate_maintenance_phase 90.0)    ;; Ultimate: 90+ days food buffer (ultra-safe)
+      (cri_perfection_phase 80.0)          ;; Perfection: 80+ days
+      (buffer_supremacy_phase 70.0)        ;; Supremacy: 70+ days
+      (efficiency_mastery_phase 55.0)      ;; Mastery: 55+ days
+      (true 40.0)))                        ;; Infrastructure: 40+ days
+
+  ;; ═══ CRI PERFECTION EFFICIENCY TARGETS ═══
+  (define efficiency_perfection_isru 0.95)      ;; Ultra-high ISRU efficiency target
+  (define efficiency_perfection_greenhouse 0.92) ;; Ultra-high greenhouse efficiency target  
+  (define efficiency_perfection_solar 0.88)      ;; Ultra-high solar efficiency target
+
+  ;; ═══ CRI RISK ASSESSMENT ═══
+  (define cri_target_achieved (and (<= colony_risk_index 10) 
+                                   (>= o2_days cri_perfect_o2_target)
+                                   (>= h2o_days cri_perfect_h2o_target)
+                                   (>= food_days cri_perfect_food_target)
+                                   (>= isru_eff efficiency_perfection_isru)
+                                   (>= greenhouse_eff efficiency_perfection_greenhouse)
+                                   (>= solar_eff efficiency_perfection_solar)))
+
+  (define cri_approaching_perfection (and (<= colony_risk_index 15)
+                                         (>= o2_days (* cri_perfect_o2_target 0.85))
+                                         (>= h2o_days (* cri_perfect_h2o_target 0.85))
+                                         (>= food_days (* cri_perfect_food_target 0.85))))
+
+  ;; ═══ ULTRA-CONSERVATIVE RESOURCE MANAGEMENT ═══
+  (define resource_buffer_strength
+    (+ (min 30 o2_days)         ;; Enhanced O2 buffer assessment (increased cap)
+       (min 35 h2o_days)        ;; Enhanced H2O buffer assessment (increased cap)
+       (min 40 food_days)))     ;; Enhanced food buffer assessment (increased cap)
+
+  (define cri_safety_multiplier 
+    (cond
+      ((< colony_risk_index 5) 1.0)       ;; Perfect conditions
+      ((< colony_risk_index 10) 0.95)     ;; Excellent conditions
+      ((< colony_risk_index 15) 0.85)     ;; Very good conditions
+      ((< colony_risk_index 20) 0.75)     ;; Good conditions
+      ((< colony_risk_index 30) 0.65)     ;; Moderate conditions
+      (true 0.55)))                       ;; Higher risk conditions
+
+  ;; ═══ RESOURCE URGENCY ASSESSMENT (ULTRA-CONSERVATIVE) ═══
+  (define o2_urgent (< o2_days 10.0))      ;; More conservative emergency threshold
+  (define h2o_urgent (< h2o_days 12.0))    ;; More conservative emergency threshold
+  (define food_urgent (< food_days 15.0))  ;; More conservative emergency threshold
+  (define any_resource_urgent (or o2_urgent h2o_urgent food_urgent))
+  
+  (define o2_low (< o2_days cri_perfect_o2_target))
+  (define h2o_low (< h2o_days cri_perfect_h2o_target))
+  (define food_low (< food_days cri_perfect_food_target))
+  
+  (define efficiency_suboptimal (or (< isru_eff efficiency_perfection_isru) 
+                                   (< greenhouse_eff efficiency_perfection_greenhouse) 
+                                   (< solar_eff efficiency_perfection_solar)))
+  (define crew_health_critical (< crew_min_hp 40))  ;; More conservative health threshold
+
+  ;; ═══ ENHANCED REPAIR STRATEGY ═══
+  (define modules_count (length modules))
+  (define repair_bay_target 
+    (cond
+      (ultimate_maintenance_phase (max 8 (round (* modules_count 0.30))))     ;; 30% in ultimate maintenance
+      (cri_perfection_phase (max 7 (round (* modules_count 0.28))))           ;; 28% in perfection phase
+      (buffer_supremacy_phase (max 6 (round (* modules_count 0.25))))         ;; 25% in supremacy phase
+      (efficiency_mastery_phase (max 5 (round (* modules_count 0.22))))       ;; 22% in mastery phase
+      (true (max 4 (round (* modules_count 0.20))))))                         ;; 20% in infrastructure
+
+  ;; ═══ CRI PERFECTION ALLOCATION STRATEGY ═══
+  (define allocation_strategy
+    (cond
+      ;; ULTRA-EMERGENCY - Any resource critical (always top priority)
+      (any_resource_urgent
+       (cond
+         (o2_urgent (list 0.05 0.85 0.10))      ;; Ultra-emergency O2 focus
+         (h2o_urgent (list 0.05 0.80 0.15))     ;; Ultra-emergency H2O focus
+         (food_urgent (list 0.08 0.62 0.30))    ;; Ultra-emergency food focus
+         (true (list 0.06 0.75 0.19))))         ;; General ultra-emergency
+
+      ;; ULTIMATE MAINTENANCE - Perfect CRI maintenance (most conservative)
+      (ultimate_maintenance_phase
+       (cond
+         ((or o2_low h2o_low) (list 0.10 0.70 0.20))    ;; ISRU focus for perfect buffers
+         (food_low (list 0.12 0.60 0.28))               ;; Food perfection focus
+         (efficiency_suboptimal (list 0.08 0.60 0.32))  ;; Efficiency perfection
+         (true (list 0.15 0.60 0.25))))                 ;; Standard ultimate maintenance
+
+      ;; CRI PERFECTION - Final optimization phase
+      (cri_perfection_phase
+       (cond
+         ((or o2_low h2o_low) (list 0.12 0.68 0.20))    ;; Perfection ISRU focus
+         (food_low (list 0.14 0.58 0.28))               ;; Perfection food focus
+         (efficiency_suboptimal (list 0.10 0.58 0.32))  ;; Efficiency optimization
+         (true (list 0.16 0.58 0.26))))                 ;; Standard perfection mode
+
+      ;; BUFFER SUPREMACY - Build massive resource reserves
+      (buffer_supremacy_phase
+       (cond
+         ((or o2_low h2o_low) (list 0.14 0.65 0.21))    ;; Buffer ISRU supremacy
+         (food_low (list 0.16 0.55 0.29))               ;; Buffer food supremacy  
+         (efficiency_suboptimal (list 0.12 0.55 0.33))  ;; Efficiency building
+         (true (list 0.18 0.55 0.27))))                 ;; Standard buffer supremacy
+
+      ;; EFFICIENCY MASTERY - Perfect efficiency focus
+      (efficiency_mastery_phase
+       (cond
+         ((or o2_low h2o_low) (list 0.16 0.62 0.22))    ;; Mastery ISRU focus
+         (food_low (list 0.18 0.52 0.30))               ;; Mastery food focus  
+         (efficiency_suboptimal (list 0.14 0.52 0.34))  ;; Efficiency mastery
+         (true (list 0.20 0.52 0.28))))                 ;; Standard mastery
+
+      ;; INFRASTRUCTURE - Early balanced building
+      (infrastructure_phase
+       (cond
+         ((< power 200) (list 0.06 0.59 0.35))          ;; Power emergency in early phase
+         ((or o2_low h2o_low) (list 0.18 0.54 0.28))    ;; Resource needs during building
+         (food_low (list 0.20 0.48 0.32))               ;; Food needs during building
+         (efficiency_suboptimal (list 0.16 0.50 0.34))  ;; Efficiency building
+         (crew_health_critical (list 0.22 0.48 0.30))   ;; Crew health priority
+         (true (list 0.20 0.50 0.30))))                 ;; Standard infrastructure
+
+      ;; Fallback
+      (true (list 0.18 0.55 0.27))))
+
+  (define heating_target (nth allocation_strategy 0))
+  (define isru_target (nth allocation_strategy 1))  
+  (define greenhouse_target (nth allocation_strategy 2))
+  
+  ;; ═══ ENHANCED REPAIR STRATEGY ═══
+  (define repair_multiplier
+    (cond
+      ((and ultimate_maintenance_phase crew_health_critical) 30.0)    ;; Emergency ultimate repair
+      ((and ultimate_maintenance_phase efficiency_suboptimal) 25.0)   ;; Efficiency ultimate repair
+      (ultimate_maintenance_phase 20.0)                               ;; Standard ultimate repair
+      ((and cri_perfection_phase efficiency_suboptimal) 20.0)         ;; Perfection efficiency repair
+      (cri_perfection_phase 15.0)                                     ;; Perfection standard repair
+      ((and buffer_supremacy_phase efficiency_suboptimal) 15.0)       ;; Supremacy efficiency repair
+      (buffer_supremacy_phase 12.0)                                   ;; Supremacy standard repair
+      ((and efficiency_mastery_phase efficiency_suboptimal) 12.0)     ;; Mastery efficiency repair
+      (efficiency_mastery_phase 10.0)                                 ;; Mastery standard repair
+      ((and infrastructure_phase crew_health_critical) 12.0)          ;; Infrastructure health crisis
+      ((and infrastructure_phase efficiency_suboptimal) 10.0)         ;; Infrastructure efficiency
+      (infrastructure_phase 8.0)                                      ;; Infrastructure standard
+      (true 6.0)))                                                    ;; Default
+
+  ;; ═══ ENHANCED FOOD RATIONING STRATEGY ═══
+  (define food_ration_target
+    (cond
+      (food_urgent 0.20)                                              ;; Food ultra-crisis rationing
+      ((and ultimate_maintenance_phase (< food_days 50)) 0.40)       ;; Ultra-conservative ultimate rationing
+      (ultimate_maintenance_phase 0.65)                              ;; Standard ultimate rationing
+      ((and cri_perfection_phase (< food_days 60)) 0.45)            ;; Conservative perfection rationing
+      (cri_perfection_phase 0.70)                                    ;; Standard perfection rationing
+      ((and buffer_supremacy_phase (< food_days 50)) 0.50)          ;; Conservative supremacy rationing
+      (buffer_supremacy_phase 0.75)                                  ;; Standard supremacy rationing
+      ((and efficiency_mastery_phase (< food_days 40)) 0.55)        ;; Conservative mastery rationing
+      (efficiency_mastery_phase 0.80)                                ;; Standard mastery rationing
+      ((and infrastructure_phase (< food_days 30)) 0.65)            ;; Conservative infrastructure rationing
+      (infrastructure_phase 0.85)                                    ;; Standard infrastructure rationing
+      ((< food_days 20) 0.70)                                        ;; General low food
+      (true 0.90)))                                                  ;; Standard operations
+
+  ;; ═══ APPLY ALLOCATIONS ═══
+  (set! heating_alloc heating_target)
+  (set! isru_alloc isru_target)
+  (set! greenhouse_alloc greenhouse_target)
+  (set! repair_alloc repair_multiplier)
+  (set! food_ration food_ration_target)
+  
+  ;; ═══ STATUS MONITORING ═══
+  (define phase_text
+    (cond
+      (ultimate_maintenance_phase "🌍💎 ULTIMATE")
+      (cri_perfection_phase "🎯💎 PERFECTION")
+      (buffer_supremacy_phase "🔋💎 SUPREMACY")
+      (efficiency_mastery_phase "⚙️💎 MASTERY")
+      (infrastructure_phase "🏗️💎 INFRASTRUCTURE")
+      (true "🛠️💎 STANDARD")))
+       
+  (define status_text
+    (cond
+      (any_resource_urgent "🚨💀 ULTRA-EMERGENCY")
+      (cri_target_achieved "✅🎯 CRI-PERFECT")
+      (cri_approaching_perfection "🎯⚡ CRI-APPROACHING")
+      (efficiency_suboptimal "⚙️🔴 EFFICIENCY-SUB")
+      (crew_health_critical "👥🔴 HEALTH-CRITICAL")
+      (true "🚧💎 OPTIMIZING")))
+  
+  ;; Enhanced resource tracking
+  (define resource_status (concat "O2:" (string (round o2_days 1)) "/" (string cri_perfect_o2_target) " H2O:" (string (round h2o_days 1)) "/" (string cri_perfect_h2o_target) " Food:" (string (round food_days 1)) "/" (string cri_perfect_food_target)))
+  (define efficiency_status (concat "IE:" (string (round (* isru_eff 100))) "/" (string (round (* efficiency_perfection_isru 100))) "% SE:" (string (round (* solar_eff 100))) "/" (string (round (* efficiency_perfection_solar 100))) "% GE:" (string (round (* greenhouse_eff 100))) "/" (string (round (* efficiency_perfection_greenhouse 100))) "%"))
+  
+  ;; Critical warnings
+  (if (and ultimate_maintenance_phase (not cri_target_achieved))
+    (log "🚨🎯💀 ULTIMATE MAINTENANCE: CRI targets not achieved - CRITICAL"))
+    
+  (if (and cri_perfection_phase (< colony_risk_index 12))
+    (log "🎯💎⚡ CRI PERFECTION: Excellent optimization window - MAXIMUM CONSERVE"))
+
+  ;; Enhanced status logging
+  (log (concat "  🎯 " phase_text " | " status_text " | CRI: " (string colony_risk_index)))
+  (log (concat "  📊 " resource_status))
+  (log (concat "  ⚙️ " efficiency_status))
+  (log (concat "  ⚡ Allocs: H:" (string (round (* heating_target 100))) "% I:" (string (round (* isru_target 100))) "% G:" (string (round (* greenhouse_target 100))) "% R:" (string repair_multiplier) "x"))
+  (log (concat "  🍽️ Ration: " (string (round (* food_ration_target 100))) "% | Power: " (string (round power)) " | Modules: " (string modules_count)))
+  
+  ;; Enhanced score prediction
+  (define predicted_score_base 
+    (+ 120000                             ;; Base survival score (1200 sols)
+       (* crew_count 500)                 ;; Crew score
+       1200                               ;; Module score (8 modules max)
+       20000                              ;; Survival rate bonus
+       (* colony_risk_index -10)))        ;; CRI benefit/penalty
+        
+  (log (concat "  💎 Predicted Score: " (string predicted_score_base) " | Current CRI: " (string colony_risk_index) " | Target CRI: ≤15 for 145,000+"))
+  
+  (concat "CRI-PERFECT Sol" (string sol) " " phase_text " " status_text " CRI:" (string colony_risk_index) " Score:" (string predicted_score_base) " Buffers:" (string (round o2_days 1)) "/" (string (round h2o_days 1)) "/" (string (round food_days 1))))

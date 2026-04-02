@@ -1,0 +1,239 @@
+;; POWER-FIRST CRI MINIMIZATION GOVERNOR v1.0 — Maximum Power for Minimum CRI
+;; Strategy: Focus primarily on power generation to achieve CRI ≤ 10 via power ≥ 150
+;; Target: 150,000+ by achieving power ≥ 150 (CRI base=3) + perfect resource management  
+;; Key insight: CRI = 3 + (power<150?7:0) + events*5 + resource_penalties*17 each
+
+(begin
+  (log (concat "⚡💎🎯 POWER-FIRST CRI MIN — Sol " (string sol) " — Power: " (string power) " | CRI: " (string colony_risk_index) " | Target: Power≥150"))
+  
+  ;; ═══ CRI CALCULATION UNDERSTANDING ═══
+  ;; CRI = 3 + (power<50?20 : power<150?7 : 0) + events*5 + resource_penalties
+  ;; Resource penalties: +17 each for O2<5d, H2O<5d, Food<5d
+  ;; TARGET: power≥150 + no resource penalties + minimize events = CRI ≤ 8
+  
+  (define power_cri_component
+    (cond
+      ((< power 50) 20)      ;; High penalty  
+      ((< power 150) 7)      ;; Medium penalty
+      (true 0)))             ;; No penalty - TARGET STATE
+      
+  (define resource_cri_penalties
+    (+ (if (< o2_days 5.0) 17 0)
+       (if (< h2o_days 5.0) 17 0)
+       (if (< food_days 5.0) 17 0)))
+       
+  (define estimated_cri (+ 3 power_cri_component resource_cri_penalties))
+  (define power_sufficient (>= power 150))
+  (define resources_safe (and (>= o2_days 5.0) (>= h2o_days 5.0) (>= food_days 5.0)))
+  
+  ;; ═══ POWER-FIRST PHASE DETECTION ═══
+  (define power_building_phase (< power 150))                   ;; Phase 1: Build power to 150+
+  (define power_maintenance_phase (and (>= power 150) (< power 200))) ;; Phase 2: Maintain power
+  (define power_abundance_phase (>= power 200))                ;; Phase 3: Power abundant
+  
+  ;; Frame version awareness for different challenges
+  (define v4_transition_phase (and (>= sol 678) (< sol 728)))
+  (define entropy_phase (and (>= sol 728) (< sol 778)))
+  (define autonomous_ops_phase (and (>= sol 778) (< sol 848)))
+  (define v11_preparation_phase (and (>= sol 950) (< sol 1008)))
+  (define v11_active_phase (>= sol 1008))
+  
+  ;; ═══ POWER-FOCUSED RESOURCE TARGETS ═══
+  ;; Maintain safe minimums to avoid CRI penalties, but prioritize power
+  (define o2_target_safe 6.0)    ;; Above 5-day CRI penalty threshold
+  (define h2o_target_safe 6.0)   ;; Above 5-day CRI penalty threshold  
+  (define food_target_safe 6.0)  ;; Above 5-day CRI penalty threshold
+  
+  ;; Higher targets when power is sufficient
+  (define o2_target
+    (cond
+      (power_abundance_phase 25.0)
+      (power_maintenance_phase 15.0)
+      (power_building_phase o2_target_safe)
+      (true o2_target_safe)))
+      
+  (define h2o_target
+    (cond
+      (power_abundance_phase 30.0)
+      (power_maintenance_phase 20.0)
+      (power_building_phase h2o_target_safe)
+      (true h2o_target_safe)))
+      
+  (define food_target
+    (cond
+      (power_abundance_phase 35.0)
+      (power_maintenance_phase 25.0)
+      (power_building_phase food_target_safe)
+      (true food_target_safe)))
+  
+  ;; ═══ RESOURCE STATUS ASSESSMENT ═══
+  (define o2_emergency (< o2_days 3.0))
+  (define h2o_emergency (< h2o_days 3.5))
+  (define food_emergency (< food_days 4.0))
+  (define any_emergency (or o2_emergency h2o_emergency food_emergency))
+  
+  (define o2_cri_risk (< o2_days 5.5))     ;; Near CRI penalty threshold
+  (define h2o_cri_risk (< h2o_days 5.5))   ;; Near CRI penalty threshold
+  (define food_cri_risk (< food_days 5.5)) ;; Near CRI penalty threshold
+  (define any_cri_risk (or o2_cri_risk h2o_cri_risk food_cri_risk))
+  
+  (define o2_low (< o2_days o2_target))
+  (define h2o_low (< h2o_days h2o_target))
+  (define food_low (< food_days food_target))
+  
+  (define efficiency_critical (or (< isru_eff 0.60) (< greenhouse_eff 0.60) (< solar_eff 0.60)))
+  (define efficiency_good (and (> isru_eff 0.85) (> greenhouse_eff 0.85) (> solar_eff 0.85)))
+  (define crew_health_critical (< crew_min_hp 25))
+  
+  ;; ═══ POWER-FIRST ALLOCATION STRATEGY ═══
+  (define allocation_strategy
+    (cond
+      ;; ABSOLUTE EMERGENCY - Life support failing
+      (any_emergency
+       (cond
+         (o2_emergency (list 0.05 0.90 0.05))     ;; Maximum O2 emergency
+         (h2o_emergency (list 0.05 0.85 0.10))    ;; Maximum H2O emergency  
+         (food_emergency (list 0.08 0.62 0.30))   ;; Maximum food emergency
+         (true (list 0.05 0.80 0.15))))           ;; General emergency
+         
+      ;; CRI RISK - Near penalty thresholds
+      (any_cri_risk
+       (cond
+         (o2_cri_risk (list 0.08 0.77 0.15))      ;; Prevent O2 CRI penalty
+         (h2o_cri_risk (list 0.08 0.75 0.17))     ;; Prevent H2O CRI penalty
+         (food_cri_risk (list 0.10 0.65 0.25))    ;; Prevent food CRI penalty
+         (true (list 0.08 0.72 0.20))))           ;; General CRI risk prevention
+         
+      ;; POWER BUILDING PHASE - Maximum ISRU for power generation
+      (power_building_phase
+       (cond
+         (any_cri_risk (list 0.08 0.75 0.17))     ;; CRI risk override
+         (efficiency_critical (list 0.12 0.63 0.25)) ;; Efficiency critical for power
+         (crew_health_critical (list 0.20 0.65 0.15)) ;; Health critical
+         ((< power 50) (list 0.05 0.85 0.10))     ;; Extreme power deficit
+         ((< power 100) (list 0.06 0.82 0.12))    ;; High power deficit
+         (true (list 0.08 0.78 0.14))))           ;; Standard power building
+         
+      ;; POWER MAINTENANCE PHASE - Maintain power ≥ 150
+      (power_maintenance_phase
+       (cond
+         (any_cri_risk (list 0.10 0.70 0.20))     ;; CRI risk override
+         (efficiency_critical (list 0.14 0.61 0.25)) ;; Efficiency maintenance
+         (crew_health_critical (list 0.22 0.58 0.20)) ;; Health maintenance
+         (true (list 0.16 0.64 0.20))))           ;; Standard maintenance
+         
+      ;; POWER ABUNDANCE PHASE - Optimize everything else  
+      (power_abundance_phase
+       (cond
+         (any_cri_risk (list 0.12 0.68 0.20))     ;; CRI risk override
+         (efficiency_critical (list 0.16 0.59 0.25)) ;; Efficiency optimization
+         (crew_health_critical (list 0.24 0.56 0.20)) ;; Health optimization
+         ((and resources_safe efficiency_good) (list 0.20 0.55 0.25)) ;; Perfect state
+         (true (list 0.18 0.57 0.25))))           ;; Standard abundance
+         
+      ;; Fallback - Conservative power focus
+      (true (list 0.10 0.70 0.20))))
+  
+  (define heating_target (nth allocation_strategy 0))
+  (define isru_target (nth allocation_strategy 1))  
+  (define greenhouse_target (nth allocation_strategy 2))
+  
+  ;; ═══ POWER-OPTIMIZED REPAIR STRATEGY ═══ 
+  ;; Solar efficiency is critical for power generation
+  (define repair_multiplier
+    (cond
+      ((and power_building_phase (< solar_eff 0.70)) 35.0)      ;; Critical solar repair for power
+      ((and power_building_phase efficiency_critical) 30.0)     ;; General efficiency repair for power
+      ((and power_building_phase crew_health_critical) 25.0)    ;; Health repair during power building
+      (power_building_phase 15.0)                               ;; Standard power building repair
+      ((and power_maintenance_phase (< solar_eff 0.80)) 25.0)   ;; Solar maintenance
+      ((and power_maintenance_phase efficiency_critical) 20.0)  ;; Efficiency maintenance
+      (power_maintenance_phase 12.0)                            ;; Standard maintenance repair
+      ((and power_abundance_phase efficiency_critical) 18.0)    ;; Optimization repair
+      (power_abundance_phase 10.0)                              ;; Standard abundance repair
+      (efficiency_critical 15.0)                                ;; General efficiency crisis
+      (crew_health_critical 12.0)                               ;; General health crisis
+      (true 8.0)))                                              ;; Standard repair
+  
+  ;; ═══ POWER-AWARE FOOD RATIONING ═══
+  (define food_ration_target
+    (cond
+      (food_emergency 0.10)                                     ;; Ultra-emergency rationing
+      (food_cri_risk 0.40)                                      ;; Prevent CRI penalty
+      (power_building_phase 0.80)                               ;; Moderate rationing during power focus
+      (power_maintenance_phase 0.90)                            ;; Higher rations during maintenance
+      (power_abundance_phase 0.95)                              ;; Full rations when power abundant
+      ((< food_days 8) 0.65)                                    ;; General low food rationing
+      (true 0.92)))                                             ;; Standard operations
+  
+  ;; ═══ APPLY ALLOCATIONS ═══
+  (set! heating_alloc heating_target)
+  (set! isru_alloc isru_target)
+  (set! greenhouse_alloc greenhouse_target)
+  (set! repair_alloc repair_multiplier)
+  (set! food_ration food_ration_target)
+  
+  ;; ═══ POWER-FIRST STATUS MONITORING ═══
+  (define phase_text
+    (cond
+      (power_abundance_phase "⚡💎 POWER-ABUNDANT")
+      (power_maintenance_phase "⚡🔧 POWER-MAINT")
+      (power_building_phase "⚡🏗️ POWER-BUILD")
+      (true "⚡🛠️ POWER-FOCUS")))
+      
+  (define status_text
+    (cond
+      (any_emergency "🚨💀 LIFE-EMERGENCY")
+      (any_cri_risk "⚠️🎯 CRI-RISK")
+      ((and power_sufficient resources_safe) "✅💎 CRI-OPTIMIZED")
+      (power_sufficient "✅⚡ POWER-TARGET-MET")
+      ((< power 50) "🚨⚡ POWER-CRISIS")
+      ((< power 100) "⚠️⚡ POWER-LOW")
+      (efficiency_critical "⚙️🔴 EFF-CRISIS")
+      (crew_health_critical "👥🔴 HEALTH-CRISIS")
+      (true "🚧⚡ BUILDING-POWER")))
+  
+  ;; ═══ POWER-CRI ANALYSIS ═══
+  (define current_score
+    (+ (* 1200 100)                                 ;; 1200 sols × 100
+       (* crew_count 500)                           ;; Crew alive bonus
+       1200                                         ;; 8+ modules × 150 (hardcoded max)
+       20000                                        ;; 100% survival rate (target)
+       (* colony_risk_index -10)))                  ;; CRI penalty
+       
+  (define target_score_power_150
+    (+ 120000                                       ;; Sol bonus
+       (* crew_count 500)                           ;; Crew bonus  
+       1200                                         ;; Module bonus
+       20000                                        ;; Survival bonus
+       -30))                                        ;; CRI=3 (base) penalty when power≥150
+       
+  (define score_gain_from_power_target (- target_score_power_150 current_score))
+  
+  ;; ═══ ENHANCED POWER-FOCUSED LOGGING ═══
+  (log (concat "  ⚡ " phase_text " | " status_text))
+  (log (concat "  🔋 Power: " (string power) "/150 | CRI Components: Base:3 + Power:" (string power_cri_component) " + Resources:" (string resource_cri_penalties) " = " (string estimated_cri)))
+  (log (concat "  📊 O2:" (string (round o2_days 1)) "/" (string o2_target) " H2O:" (string (round h2o_days 1)) "/" (string h2o_target) " Food:" (string (round food_days 1)) "/" (string food_target)))
+  (log (concat "  ⚡ Allocs: H:" (string (round (* heating_target 100))) "% I:" (string (round (* isru_target 100))) "% G:" (string (round (* greenhouse_target 100))) "% R:" (string repair_multiplier) "x"))
+  (log (concat "  🍽️ Ration: " (string (round (* food_ration_target 100))) "% | Crew: " (string crew_count) "/" (string crew_min_hp) "hp"))
+  (log (concat "  💎 Score: " (string current_score) " | Power≥150 Target: " (string target_score_power_150) " | Gain: +" (string score_gain_from_power_target)))
+  
+  ;; Power optimization progress tracking
+  (if (and power_sufficient resources_safe)
+    (log "🌟⚡💎 POWER TARGET ACHIEVED: Minimum CRI conditions met!"))
+    
+  (if (and (not power_sufficient) (> sol 200))
+    (log "⚠️⚡ POWER WARNING: Still below 150kW after sol 200 - CRI penalty active"))
+    
+  (if (and power_building_phase (< power 50))
+    (log "🚨⚡ POWER CRISIS: Below 50kW - taking maximum CRI penalty"))
+    
+  (if any_cri_risk
+    (log "⚠️🎯 CRI PENALTY RISK: Resource levels approaching penalty thresholds"))
+    
+  ;; Strategic power advice
+  (if (and power_sufficient (not resources_safe))
+    (log "✅⚡ POWER GOOD: Now focus on maintaining resource levels above CRI thresholds"))
+    
+  ;; Return status string
+  (concat "POWER-CRI-OPT Sol" (string sol) " " phase_text " " status_text " Power:" (string power) "/150 CRI:" (string colony_risk_index) " Gain:+" (string score_gain_from_power_target)))
