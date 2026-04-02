@@ -1,0 +1,64 @@
+;; BASIC ROBOT SURVIVAL GOVERNOR
+;; Simple strategy focused on keeping 8 robots alive
+;; Robots only need power and heating - no O2, H2O, or food
+
+(begin
+  (log (concat "🤖 ROBOT SURVIVAL Sol " (string sol) " — Crew:" (string crew_count) " MinHP:" (string crew_min_hp) " Power:" (string power)))
+  
+  ;; Emergency detection
+  (define crew_crisis (< crew_min_hp 40))
+  (define crew_low (< crew_count 6))
+  (define power_low (< power 100))
+  (define temp_cold (< interior_temp_k 260))
+  
+  ;; Phase detection
+  (define v6_phase (and (>= sol 778) (< sol 847)))
+  (define late_game (>= sol 600))
+  
+  ;; Robot-optimized allocations
+  (cond
+    ;; CRISIS: All heating for robot survival
+    ((or crew_crisis crew_low temp_cold)
+     (set! heating_alloc 0.95)
+     (set! isru_alloc 0.03)
+     (set! greenhouse_alloc 0.02)
+     (set! repair_alloc 50.0)
+     (print "ROBOT CRISIS"))
+    
+    ;; V6 AUTONOMOUS: Critical robot period
+    (v6_phase
+     (set! heating_alloc 0.85)
+     (set! isru_alloc 0.10)
+     (set! greenhouse_alloc 0.05)
+     (set! repair_alloc 25.0)
+     (print "V6 ROBOT SURVIVAL"))
+    
+    ;; POWER EMERGENCY: Need more power for heating
+    (power_low
+     (set! heating_alloc 0.75)
+     (set! isru_alloc 0.20)
+     (set! greenhouse_alloc 0.05)
+     (set! repair_alloc 15.0)
+     (print "POWER BUILDING"))
+    
+    ;; LATE GAME: Thermal preparation
+    (late_game
+     (set! heating_alloc 0.70)
+     (set! isru_alloc 0.25)
+     (set! greenhouse_alloc 0.05)
+     (set! repair_alloc 10.0)
+     (print "LATE GAME PREP"))
+    
+    ;; EARLY GAME: Power building
+    (true
+     (set! heating_alloc 0.60)
+     (set! isru_alloc 0.35)
+     (set! greenhouse_alloc 0.05)
+     (set! repair_alloc 5.0)
+     (print "EARLY POWER BUILD")))
+  
+  ;; Food ration doesn't matter for robots
+  (set! food_ration 0.1)
+  
+  ;; Output
+  (concat "ROBOT-SURVIVAL Sol" (string sol) " H:" (string (round (* heating_alloc 100))) "% I:" (string (round (* isru_alloc 100))) "% R:" (string repair_alloc)))

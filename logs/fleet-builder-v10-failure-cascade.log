@@ -1,0 +1,29 @@
+I'll implement the v10-failure-cascade physics upgrade to make the Mars colony sim more realistic. Let me start by reading the essential files to understand the system architecture and current state.
+
+● Read RULES.md
+  └ 335 lines read
+
+● Read fidelity-queue.json
+  │ data/fidelity-queue.json
+  └ 76 lines read
+
+● Read AUTONOMOUS-FIDELITY-PIPELINE.md
+  │ docs/AUTONOMOUS-FIDELITY-PIPELINE.md
+  └ 375 lines read
+
+● Read CONVERGENCE-ROADMAP.md
+  │ docs/CONVERGENCE-ROADMAP.md
+  └ 357 lines read
+
+Now let me examine the current gauntlet engine to understand the system architecture:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ 1 line read
+
+Let me examine specific sections of the gauntlet to understand the current physics implementation:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L1:50 (50 lines read)
+
