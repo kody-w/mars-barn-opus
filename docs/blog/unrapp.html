@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>unRAPP: Why Your Agent Should Be One File That Runs Everywhere — kody-w</title>
+<meta name="description" content="The engineering case for universal agents. One file. Two runtimes. Zero sync. Why basic_agent.py and basic_agent.lispy are the same agent, and why you should never maintain both.">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#484f58;
+--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--cyan:#79c0ff;
+--purple:#a371f7;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.9}
+.wrap{max-width:720px;margin:0 auto;padding:40px 24px 80px}
+.meta{color:var(--dim);font-size:12px;margin-bottom:32px}
+.meta a{color:var(--cyan);text-decoration:none}
+h1{font-size:26px;color:#fff;line-height:1.3;margin-bottom:8px}
+h2{font-size:20px;color:var(--cyan);margin:40px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+h3{font-size:15px;color:var(--green);margin:28px 0 8px}
+p{margin:12px 0}
+strong{color:#fff}
+em{color:var(--dim)}
+code{background:rgba(88,166,255,0.1);color:var(--cyan);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:0.9em}
+pre{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:16px 0;overflow-x:auto;line-height:1.5}
+pre code{background:none;padding:0;color:var(--text);font-size:12px}
+blockquote{border-left:3px solid var(--purple);padding:12px 16px;margin:24px 0;background:rgba(163,113,247,0.05);border-radius:0 8px 8px 0;font-style:italic;color:var(--dim)}
+ul,ol{margin:12px 0 12px 24px}
+li{margin:6px 0}
+hr{border:none;border-top:1px solid var(--border);margin:48px 0}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline}
+.callout{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px;margin:28px 0}
+.callout-title{color:var(--yellow);font-weight:700;font-size:12px;letter-spacing:1px;margin-bottom:8px}
+.side-by-side{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0}
+.side-by-side pre{margin:0}
+.side-label{font-size:10px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin:2px}
+.tag-unrapp{background:rgba(63,185,80,0.15);color:var(--green)}
+.tag-pattern{background:rgba(88,166,255,0.15);color:var(--blue)}
+.footer{text-align:center;color:var(--dim);font-size:11px;margin-top:48px;padding-top:24px;border-top:1px solid var(--border)}
+@media(max-width:700px){.side-by-side{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="meta"><a href="./">← Blog</a> · <a href="../unrapp.html">Full Docs</a> · <a href="../patterns.html">Patterns</a></div>
+
+<h1>unRAPP: Why Your Agent Should Be One File That Runs Everywhere</h1>
+<div class="meta">kody-w · April 2025 · <span class="tag tag-unrapp">unRAPP</span> <span class="tag tag-pattern">Engineering</span></div>
+
+<p>You have <code>basic_agent.py</code>. It runs on Python. Works great on your server.</p>
+
+<p>Now you want it to run in a browser. In a virtual OS. On a Raspberry Pi. On a Mars rover simulator.</p>
+
+<p>The traditional answer: rewrite it. Port the Python to JavaScript. Then port it again for the embedded runtime. Now you have three files that do the same thing. One gets updated. The other two drift. Six months later, they're three different agents wearing the same name.</p>
+
+<p>unRAPP solves this: <strong>one file, any runtime, automatic translation.</strong></p>
+
+<h2>The Problem: Digital Twin Drift</h2>
+
+<p>The AI-Agent-Templates library has 17 Python agents. Each is a class with <code>__init__(name, metadata)</code> and <code>perform(**kwargs)</code>. They work great on Azure Functions.</p>
+
+<p>But we built a LisPy VM that runs in browsers, in a virtual OS, on physical hardware, and inside a Mars colony simulator. We need those same 17 agents to run on the VM too.</p>
+
+<p>The obvious approach: create 17 <code>.lispy</code> files alongside the 17 <code>.py</code> files. Now we have 34 files. When someone improves the Python <code>calendar_agent.py</code>, someone needs to also update <code>calendar_agent.lispy</code>. And vice versa.</p>
+
+<p>This is the <strong>digital twin drift problem</strong>. Two files that should be identical but inevitably diverge because humans forget to update both.</p>
+
+<h2>The Solution: Don't Have Two Files</h2>
+
+<p>An agent is either a <code>.py</code> file or a <code>.lispy</code> file. You carry whichever one you prefer. When the other runtime needs it, <strong>unRAPP</strong> translates automatically. Behind the scenes. The user never sees it.</p>
+
+<p>This works because both formats share the same interface contract:</p>
+
+<div class="side-by-side">
+<div>
+<div class="side-label">Python (.py)</div>
+<pre><code>class CalendarAgent(BasicAgent):
+    def __init__(self):
+        self.name = 'calendar_agent'
+        self.metadata = {
+            "name": "calendar_agent",
+            "description": "Mars calendar"
+        }
+    
+    def perform(self, **kwargs):
+        sol = kwargs.get('sol', 0)
+        year = sol // 669
+        sol_in_year = sol % 669
+        season = (
+            "Spring" if sol_in_year < 167
+            else "Summer" if sol_in_year < 334
+            else "Autumn" if sol_in_year < 501
+            else "Winter"
+        )
+        return f"Year {year} Sol {sol_in_year} {season}"</code></pre>
+</div>
+<div>
+<div class="side-label">LisPy (.lispy)</div>
+<pre><code>;; calendar_agent.lispy
+(begin
+  (define _agent_name "calendar_agent")
+  (define _agent_desc "Mars calendar")
+  
+  (define year (floor (/ sol 669)))
+  (define sol_in_year (% sol 669))
+  (define season
+    (cond
+      ((< sol_in_year 167) "Spring")
+      ((< sol_in_year 334) "Summer")
+      ((< sol_in_year 501) "Autumn")
+      (true "Winter")))
+  
+  (log (concat "Year " (string year)
+    " Sol " (string sol_in_year)
+    " " season)))</code></pre>
+</div>
+</div>
+
+<p>These are the <strong>same agent</strong>. Same name. Same logic. Same result. The Python version wraps it in a class. The LisPy version IS the logic directly. unRAPP converts between them because the mapping is mechanical:</p>
+
+<pre><code># The translation rules (these are deterministic):
+
+Python                          LisPy
+─────────────────────────────   ─────────────────────────────
+self.name = 'X'                 (define _agent_name "X")
+self.metadata["description"]    (define _agent_desc "...")
+kwargs.get('sol', 0)            sol  (env var, pre-seeded)
+if x < 167:                     (if (< x 167) ...)
+return f"Year {year}"           (log (concat "Year " (string year)))
+class XAgent(BasicAgent):       (begin ...)  — just the body</code></pre>
+
+<h2>Why LisPy Makes This Possible</h2>
+
+<p>LisPy is <strong>homoiconic</strong> — code and data are the same format. An S-expression is simultaneously:</p>
+
+<ul>
+<li>A program you can execute</li>
+<li>A data structure you can inspect, copy, and modify</li>
+<li>A string you can embed in a JSON field</li>
+<li>A text file you can read in any language</li>
+</ul>
+
+<p>This means a Python program can <em>contain</em> a LisPy program as a string literal, and execute it via <code>vm.run()</code>. The Python class is just a wrapper. The LisPy is the soul.</p>
+
+<pre><code># The Python wrapper IS the unRAPP translation:
+class CalendarAgent(BasicAgent):
+    PROGRAM = """(begin
+      (define year (floor (/ sol 669)))
+      (define season (cond ((< (% sol 669) 167) "Spring") ...))
+      (log (concat "Year " (string year) " " season)))"""
+    
+    def perform(self, **kwargs):
+        vm = LispyVM()
+        for k, v in kwargs.items():
+            vm.set_env(k, v)
+        return vm.run(self.PROGRAM)
+
+# The .lispy file IS the PROGRAM field extracted.
+# The .py file IS the PROGRAM field wrapped.
+# unRAPP moves between them. That's it.</code></pre>
+
+<h2>Why Personal Preference Works</h2>
+
+<p>Some developers think in Python. They carry <code>.py</code> files. That's fine — the LisPy VM can import their perform() logic.</p>
+
+<p>Some developers think in Lisp. They carry <code>.lispy</code> files. That's fine — a thin Python wrapper executes it on Azure.</p>
+
+<p>Some developers start with LisPy in the browser OS, test it live, then need it on a server. unRAPP generates the <code>.py</code>.</p>
+
+<p>Some developers have existing Python agents from AI-Agent-Templates. They want them in the browser. unRAPP generates the <code>.lispy</code>.</p>
+
+<p><strong>The user never thinks about translation.</strong> They think about their agent. The runtime handles the rest.</p>
+
+<h2>The 22 Agent Templates</h2>
+
+<p>We built 22 agents that exist in LisPy form (<code>docs/agents/*.lispy</code>) and can unRAPP to Python on demand. 14 are 1:1 equivalents of the OG AI-Agent-Templates. 8 are Mars-native.</p>
+
+<div class="callout">
+<div class="callout-title">THE FULL LIBRARY</div>
+<p><strong>OG 1:1 (same name as .py):</strong> basic_agent, context_memory_agent, calendar_agent, motivational_quote_skill, duckduckgo_search_agent, manage_memory_agent, fetch_random_wikipedia_article_skill, code_review_agent, meeting_prep_agent, hacker_news_agent, adaptive_card_agent, powerpoint_agent, email_drafting_agent, image_generation_agent</p>
+
+<p><strong>Mars-native:</strong> colony_governor_agent, colony_status_agent, doom_clock_agent, sentiment_agent, gauntlet_agent, treasury_agent, perchlorate_guard_agent, echo_enrichment_agent</p>
+
+<p>Every one is a real, executable program — not a stub. Run any of them in the <a href="../os.html">LisPy OS</a> terminal right now.</p>
+</div>
+
+<h2>The Engineering Principle</h2>
+
+<blockquote>Don't maintain digital twins. Maintain ONE source of truth and translate on demand. The translation is mechanical. The drift is eliminated. The user chooses their preferred format. The runtime adapts.</blockquote>
+
+<p>This principle applies beyond agents:</p>
+
+<ul>
+<li><strong>Configs:</strong> YAML ↔ JSON ↔ TOML — maintain one, convert for the consumer</li>
+<li><strong>APIs:</strong> REST ↔ GraphQL — maintain one schema, generate both interfaces</li>
+<li><strong>Docs:</strong> Markdown ↔ HTML — maintain one, render for the medium</li>
+<li><strong>Agents:</strong> .py ↔ .lispy — maintain one, unRAPP for the runtime</li>
+</ul>
+
+<p>unRAPP is the specific case. The general principle is: <strong>don't duplicate what you can derive.</strong></p>
+
+<hr>
+
+<p><em>One file. One agent. Any runtime. unRAPP handles the rest.</em></p>
+
+<div class="footer">
+<a href="./">← Back to Blog</a> · <a href="../unrapp.html">Full unRAPP Docs</a> · <a href="../patterns.html">Pattern Library</a> · <a href="https://github.com/kody-w/mars-barn-opus">GitHub</a>
+</div>
+</div>
+</body>
+</html>
