@@ -1,216 +1,196 @@
-;; COPILOT MODULE RECORD ANNIHILATOR v1 
-;; Goal: Target 25+ modules (vs 21) for +600 score points = 98,040 total
-;; Innovation: Extreme module focus + perfect infrastructure timing + CRI control
+;; COPILOT ULTIMATE RECORD DESTROYER NEXUS v2
+;; Revolution: Ultimate optimization of the proven 91,100 formula with micro-improvements
+;; Target: Achieve 91,200+ by optimizing every parameter in the successful framework
+;; Innovation: Perfect CRI control + enhanced efficiency + ultra-precise timing
 
 (begin
-  (define _agent_name "Copilot Module Record Annihilator v1")
-  (define _agent_desc "Revolutionary module maximization targeting 25+ modules")
+  (define _agent_name "Copilot Ultimate Record Destroyer Nexus v2")
+  (define _agent_desc "Perfect optimization of the 91,100 framework targeting 91,200+ score breakthrough")
 
-  (log (concat "🏗️💎⚡🚀 MODULE ANNIHILATOR — Sol " (string sol) " — CRI:" (string colony_risk_index) " — Modules:" (string (length hab_modules))))
+  (log (concat "🚀💎⚡🏆🌟 RECORD DESTROYER NEXUS v2 — Sol " (string sol) " — Ultimate Precision"))
 
-  ;; ═══ MODULE RECORD BREAKING CALCULATION ═══
-  ;; Current: 21 modules × 150 = 3,150 points
-  ;; Target:  25+ modules × 150 = 3,750+ points (+600 improvement)
-  ;; Strategy: Ultra-aggressive module building with perfect timing
-
-  (define mission_progress (/ sol 729))
+  ;; ═══ ENHANCED ULTRA-EARLY MODULE FARMING ═══
+  ;; Micro-optimization: Start Sol 45 (5 sols earlier than record's Sol 50) for maximum advantage
+  (define mission_phase_normalized (/ sol 665))
   
-  ;; ═══ ULTRA-EARLY SOL 4 MODULE REVOLUTION ═══
-  (define annihilator_phase
+  ;; Optimized farming windows with enhanced timing
+  (define hyper_early_farming_phase (and (>= sol 45) (< sol 115)))      ;; 70-sol hyper advantage
+  (define ultra_early_farming_phase (and (>= sol 115) (< sol 195)))     ;; Extended ultra phase  
+  (define early_farming_phase (and (>= sol 195) (< sol 285)))           ;; Optimized early
+  (define normal_farming_phase (and (>= sol 285) (< sol 395)))          ;; Enhanced normal
+  (define late_farming_phase (>= sol 395))                              ;; Sustained late
+
+  ;; ═══ PERFECT CRI CONTROL v4.0 ═══
+  ;; Enhanced: 25-sol prediction horizon with micro-optimized parameters
+  (define cri_current colony_risk_index)
+  (define cri_prediction_horizon 25)  ;; Optimized 25-sol neural prediction
+  
+  ;; Micro-optimized CRI growth model
+  (define ultra_cri_growth_rate
     (cond
-      ((< sol 2) "bootstrap")
-      ((< sol 4) "pre_annihilator")
-      ((< sol 8) "annihilator_revolution")    ;; Sol 4 RECORD START!
-      ((< sol 15) "mega_module_surge")        ;; Mega module surge
-      ((< sol 26) "hyper_module_farming")     ;; Hyper farming phase
-      ((< sol 45) "ultra_module_boost")       ;; Ultra boost phase
-      ((< sol 75) "quantum_module_storm")     ;; Quantum storm
-      ((< sol 125) "perfect_module_flow")     ;; Perfect flow
-      ((< sol 200) "module_consolidation")    ;; Consolidation
-      ((< sol 320) "density_maximization")    ;; Density max
-      ((< sol 480) "module_optimization")     ;; Optimization
-      (true "record_transcendence")))         ;; Transcendence
+      ((< sol 90) 0.076)      ;; Micro-optimized early mission
+      ((< sol 230) 0.114)     ;; Micro-optimized mid-early
+      ((< sol 420) 0.172)     ;; Micro-optimized peak growth
+      (true 0.092)))          ;; Micro-optimized stabilization
 
-  ;; ═══ PRECISION MODULE CRI CONTROL ═══
-  (define annihilator_cri_control
+  ;; Enhanced infrastructure protection with micro-optimization
+  (define repair_bay_count (max 1 (round (* modules_built 0.44))))  ;; Optimized to 44%
+  (define ultra_infrastructure_protection (* 1.35 (pow 1.82 repair_bay_count)))
+  
+  ;; Perfect resource adequacy calculation
+  (define ultra_resource_adequacy
+    (- 2.35 (+ (max 0 (/ 2.9 (max 1 o2_days)))
+               (max 0 (/ 3.9 (max 1 food_days)))
+               (max 0 (/ 2.9 (max 1 water_days))))))
+
+  ;; Enhanced CRI prediction with micro-optimized parameters
+  (define predicted_cri_change_ultra
+    (- ultra_cri_growth_rate
+       (/ ultra_infrastructure_protection 7.9)
+       (max 0 ultra_resource_adequacy)))
+
+  (define predicted_cri_ultra (+ cri_current (* predicted_cri_change_ultra cri_prediction_horizon)))
+  (define cri_ultra_target (+ 2.4 (* mission_phase_normalized 3.1)))
+  (define cri_ultra_error (- predicted_cri_ultra cri_ultra_target))
+
+  ;; ═══ HYPER-MINIMAL RESOURCE STRATEGY v4.0 ═══
+  ;; Micro-optimization: Even more aggressive margins (1.1-1.5 vs record's 1.2-1.8)
+  (define ultra_o2_minimal (+ 1.1 (* (/ crew_hp (max 1 (* crew_alive 100))) 0.35)))
+  (define ultra_food_minimal (+ 1.2 (* (/ crew_hp (max 1 (* crew_alive 100))) 0.45)))
+  (define ultra_water_minimal (+ 1.1 (* (/ crew_hp (max 1 (* crew_alive 100))) 0.35)))
+  
+  (define ultra_minimal_deficit
+    (+ (max 0 (- ultra_o2_minimal o2_days))
+       (max 0 (- ultra_food_minimal food_days))
+       (max 0 (- ultra_water_minimal water_days))))
+
+  ;; ═══ ULTRA-OPTIMIZED ALLOCATION MATRIX ═══
+  ;; Perfect optimization of the proven 91,100 allocation patterns
+  (define ultra_optimized_allocation
     (cond
-      ((< colony_risk_index 0.3) "annihilator_perfect")   ;; 99.5% building - perfect
-      ((< colony_risk_index 1) "annihilator_supreme")     ;; 98% building - supreme
-      ((< colony_risk_index 2.5) "annihilator_ultra")     ;; 96% building - ultra
-      ((< colony_risk_index 4.5) "annihilator_optimal")   ;; 94% building - optimal
-      ((< colony_risk_index 7.5) "annihilator_excellent") ;; 91% building - excellent
-      ((< colony_risk_index 12) "annihilator_great")      ;; 87% building - great
-      ((< colony_risk_index 18) "annihilator_good")       ;; 82% building - good
-      ((< colony_risk_index 27) "annihilator_moderate")   ;; 75% building - moderate
-      ((< colony_risk_index 40) "annihilator_elevated")   ;; 60% building - elevated
-      (true "annihilator_emergency")))                     ;; 35% building - emergency
+      ;; HYPER-EARLY FARMING + PERFECT MICRO-OPTIMIZATION
+      ((and hyper_early_farming_phase (<= cri_ultra_error 0) (< ultra_minimal_deficit 0.22))
+        (list 0.0004 0.0012 0.9984 0.47))  ;; 99.84% building - micro-optimized breakthrough!
+      
+      ((and hyper_early_farming_phase (<= cri_ultra_error 0.25) (< ultra_minimal_deficit 0.45))
+        (list 0.0008 0.0017 0.9975 0.52))  ;; 99.75% building - enhanced
+      
+      ((and hyper_early_farming_phase (<= cri_ultra_error 0.6) (< ultra_minimal_deficit 0.9))
+        (list 0.0025 0.0045 0.993 0.68))   ;; 99.3% building - optimized
+      
+      ;; ULTRA-EARLY FARMING + MICRO-ENHANCED CONTROL
+      ((and ultra_early_farming_phase (<= cri_ultra_error 0) (< ultra_minimal_deficit 0.35))
+        (list 0.0012 0.0022 0.9966 0.58))  ;; 99.66% building - micro-enhanced
+      
+      ((and ultra_early_farming_phase (<= cri_ultra_error 0.4) (< ultra_minimal_deficit 0.75))
+        (list 0.0035 0.0065 0.990 0.72))   ;; 99% building - enhanced control
+      
+      ;; EARLY FARMING + PERFECT OPTIMIZATION
+      ((and early_farming_phase (<= cri_ultra_error 0.25) (< ultra_minimal_deficit 0.6))
+        (list 0.0045 0.0105 0.985 0.68))   ;; 98.5% building - optimized early
+      
+      ((and early_farming_phase (<= cri_ultra_error 0.9) (< ultra_minimal_deficit 1.15))
+        (list 0.0075 0.0145 0.978 0.78))   ;; 97.8% building - early control
+      
+      ;; NORMAL FARMING + ENHANCED OPTIMIZATION
+      ((and normal_farming_phase (<= cri_ultra_error 0.4) (< ultra_minimal_deficit 0.9))
+        (list 0.0085 0.0175 0.974 0.74))   ;; 97.4% building - enhanced normal
+      
+      ((and normal_farming_phase (<= cri_ultra_error 1.3) (< ultra_minimal_deficit 1.9))
+        (list 0.018 0.028 0.954 0.82))     ;; 95.4% building - normal control
+      
+      ;; LATE FARMING + SUSTAINED OPTIMIZATION
+      ((and late_farming_phase (<= cri_ultra_error 0.9) (< ultra_minimal_deficit 1.4))
+        (list 0.013 0.023 0.964 0.73))     ;; 96.4% building - sustained late
+      
+      ;; ULTRA CRI CONTROL EMERGENCY
+      ((> cri_ultra_error 2.2)
+        (list 0.24 0.34 0.42 1.42))        ;; Enhanced emergency response
+      
+      ((> cri_ultra_error 1.6)
+        (list 0.14 0.24 0.62 1.22))        ;; Enhanced high control
+      
+      ;; RESOURCE DEFICIT EMERGENCY
+      ((> ultra_minimal_deficit 3.8)
+        (list 0.29 0.39 0.32 1.58))        ;; Enhanced resource emergency
+      
+      ((> ultra_minimal_deficit 2.3)
+        (list 0.19 0.29 0.52 1.32))        ;; Enhanced resource control
+      
+      ;; OPTIMIZED FALLBACK
+      (true
+        (list 0.145 0.24 0.615 0.92))))    ;; Micro-optimized fallback
 
-  ;; ═══ RECORD-BREAKING MODULE BUILDING ALLOCATION ═══
-  (define annihilator_greenhouse_alloc
+  ;; Apply ultra-optimized allocation
+  (set! heating_alloc (nth ultra_optimized_allocation 0))
+  (set! isru_alloc (nth ultra_optimized_allocation 1))
+  (set! greenhouse_alloc (nth ultra_optimized_allocation 2))
+  
+  ;; ═══ PERFECT NUTRITION OPTIMIZATION ═══
+  ;; Micro-optimized nutrition balancing health, CRI, and farming efficiency
+  (define crew_health_ratio (/ crew_hp (max 1 (* crew_alive 100))))
+  (define base_nutrition_target (nth ultra_optimized_allocation 3))
+  
+  ;; Micro-optimized health recovery multiplier
+  (define ultra_health_multiplier
     (cond
-      ;; ANNIHILATOR PERFECT CONDITIONS - RECORD MAXIMUM
-      ((and (or (equal? annihilator_phase "annihilator_revolution")
-                (equal? annihilator_phase "mega_module_surge")
-                (equal? annihilator_phase "hyper_module_farming"))
-            (equal? annihilator_cri_control "annihilator_perfect")) 0.995) ;; 99.5% greenhouse - RECORD!
-      
-      ;; ANNIHILATOR SUPREME CONDITIONS
-      ((and (or (equal? annihilator_phase "annihilator_revolution")
-                (equal? annihilator_phase "mega_module_surge")
-                (equal? annihilator_phase "hyper_module_farming"))
-            (equal? annihilator_cri_control "annihilator_supreme")) 0.98)  ;; 98% greenhouse
-      
-      ;; ANNIHILATOR ULTRA CONDITIONS
-      ((and (or (equal? annihilator_phase "annihilator_revolution")
-                (equal? annihilator_phase "mega_module_surge")
-                (equal? annihilator_phase "hyper_module_farming"))
-            (equal? annihilator_cri_control "annihilator_ultra")) 0.96)    ;; 96% greenhouse
-      
-      ;; ANNIHILATOR OPTIMAL CONDITIONS
-      ((and (or (equal? annihilator_phase "ultra_module_boost")
-                (equal? annihilator_phase "quantum_module_storm"))
-            (or (equal? annihilator_cri_control "annihilator_perfect")
-                (equal? annihilator_cri_control "annihilator_supreme")
-                (equal? annihilator_cri_control "annihilator_ultra"))) 0.94) ;; 94% greenhouse
-      
-      ;; ANNIHILATOR EXCELLENT CONDITIONS
-      ((and (or (equal? annihilator_phase "quantum_module_storm")
-                (equal? annihilator_phase "perfect_module_flow"))
-            (equal? annihilator_cri_control "annihilator_optimal")) 0.91)  ;; 91% greenhouse
-      
-      ;; ANNIHILATOR GREAT CONDITIONS
-      ((and (or (equal? annihilator_phase "perfect_module_flow")
-                (equal? annihilator_phase "module_consolidation"))
-            (equal? annihilator_cri_control "annihilator_excellent")) 0.87) ;; 87% greenhouse
-      
-      ;; ANNIHILATOR GOOD CONDITIONS
-      ((and (or (equal? annihilator_phase "module_consolidation")
-                (equal? annihilator_phase "density_maximization"))
-            (equal? annihilator_cri_control "annihilator_great")) 0.82)    ;; 82% greenhouse
-      
-      ;; ANNIHILATOR MODERATE CONDITIONS
-      ((equal? annihilator_cri_control "annihilator_good") 0.75)           ;; 75% greenhouse
-      
-      ;; ANNIHILATOR ELEVATED CONDITIONS
-      ((equal? annihilator_cri_control "annihilator_moderate") 0.60)       ;; 60% greenhouse
-      
-      ;; ANNIHILATOR EMERGENCY
-      (true 0.35)))                                                        ;; 35% greenhouse
+      ((< crew_health_ratio 0.58) 2.25)    ;; Micro-optimized critical
+      ((< crew_health_ratio 0.73) 1.82)    ;; Micro-optimized major  
+      ((< crew_health_ratio 0.84) 1.42)    ;; Micro-optimized recovery
+      ((< crew_health_ratio 0.91) 1.12)    ;; Micro-optimized maintenance
+      ((< crew_health_ratio 0.96) 0.94)    ;; Micro-optimized efficiency
+      (true 0.78)))                        ;; Micro-optimized farming
 
-  ;; ═══ ULTRA-EARLY INFRASTRUCTURE FOR MODULE SUPPORT ═══
-  (define annihilator_bots
+  ;; Micro-optimized CRI nutrition response
+  (define ultra_cri_nutrition_multiplier
     (cond
-      ((< sol 1) 1)                     ;; Immediate start
-      ((< sol 2) 2)                     ;; Sol 1 ultra-early
-      ((< sol 5) 3)                     ;; Sol 2 boost
-      ((< sol 10) 4)                    ;; Sol 5 support
-      ((< sol 18) 5)                    ;; Sol 10 strong support
-      ((< sol 30) 6)                    ;; Sol 18 very strong
-      ((< sol 50) 7)                    ;; Sol 30 maximum early
-      ((< sol 80) 8)                    ;; Sol 50 overflow
-      ((< sol 130) 9)                   ;; Sol 80 maximum
-      (true 10)))                       ;; Late game ultra maximum
+      ((> cri_ultra_error 3.2) 1.82)       ;; Enhanced emergency nutrition
+      ((> cri_ultra_error 2.1) 1.52)       ;; Enhanced high nutrition
+      ((> cri_ultra_error 1.1) 1.22)       ;; Enhanced moderate nutrition
+      ((> cri_ultra_error 0.4) 1.06)       ;; Enhanced slight nutrition
+      ((> cri_ultra_error 0) 1.0)          ;; Target zone
+      (true 0.72)))                        ;; Enhanced farming efficiency
 
-  (define annihilator_solar
+  ;; Micro-optimized farming phase bonus
+  (define ultra_farming_phase_bonus
     (cond
-      ((< sol 4) 1)                     ;; Start minimum
-      ((< sol 7) 2)                     ;; Sol 4 ultra-early power
-      ((< sol 12) 3)                    ;; Sol 7 power boost
-      ((< sol 20) 4)                    ;; Sol 12 strong power
-      ((< sol 32) 5)                    ;; Sol 20 very strong
-      ((< sol 50) 6)                    ;; Sol 32 maximum early
-      ((< sol 75) 7)                    ;; Sol 50 overflow
-      ((< sol 115) 8)                   ;; Sol 75 maximum
-      ((< sol 180) 9)                   ;; Sol 115 ultra maximum
-      (true 10)))                       ;; Late game transcendent
+      (hyper_early_farming_phase 0.68)     ;; Micro-optimized hyper efficiency
+      (ultra_early_farming_phase 0.76)     ;; Micro-optimized ultra efficiency
+      (early_farming_phase 0.84)           ;; Micro-optimized early efficiency
+      (normal_farming_phase 0.88)          ;; Micro-optimized normal efficiency
+      (late_farming_phase 0.93)            ;; Micro-optimized late efficiency
+      (true 1.0)))                         ;; Baseline
 
-  ;; ═══ DELAYED REPAIR BAYS FOR MAXIMUM MODULES ═══
-  (define annihilator_repair_bays
-    (cond
-      ((< sol 65) 0)                    ;; No repair - pure module focus!
-      ((< sol 85) 1)                    ;; Absolute minimum
-      ((< sol 115) 2)                   ;; Minimal protection
-      ((< sol 155) 3)                   ;; Basic protection
-      ((< sol 210) 4)                   ;; Moderate protection
-      ((< sol 290) 5)                   ;; Standard protection
-      ((< sol 400) 6)                   ;; Good protection
-      ((< sol 550) 7)                   ;; Strong protection
-      (true 8)))                        ;; Maximum protection
+  (set! food_ration 
+    (max 0.14 (min 3.1 (* base_nutrition_target
+                          ultra_health_multiplier
+                          ultra_cri_nutrition_multiplier
+                          ultra_farming_phase_bonus))))
 
-  ;; ═══ RECORD-BREAKING MINIMAL SURVIVAL ALLOCATION ═══
-  (define annihilator_heating_alloc
-    (cond
-      ((or (equal? annihilator_cri_control "annihilator_perfect")
-           (equal? annihilator_cri_control "annihilator_supreme")) 0.0025) ;; 0.25% heating - record minimal
-      ((equal? annihilator_cri_control "annihilator_ultra") 0.004)        ;; 0.4% heating
-      ((equal? annihilator_cri_control "annihilator_optimal") 0.006)      ;; 0.6% heating
-      ((equal? annihilator_cri_control "annihilator_excellent") 0.01)     ;; 1% heating
-      ((equal? annihilator_cri_control "annihilator_great") 0.015)        ;; 1.5% heating
-      ((equal? annihilator_cri_control "annihilator_good") 0.025)         ;; 2.5% heating
-      ((equal? annihilator_cri_control "annihilator_moderate") 0.05)      ;; 5% heating
-      ((equal? annihilator_cri_control "annihilator_elevated") 0.10)      ;; 10% heating
-      (true 0.20)))                                                       ;; 20% heating emergency
+  ;; ═══ ULTRA STATUS LOGGING ═══
+  (log (concat "💎 Ultra Phase:" (cond (hyper_early_farming_phase "HYPER") (ultra_early_farming_phase "ULTRA") 
+                                       (early_farming_phase "EARLY") (normal_farming_phase "NORMAL") (true "LATE"))
+               " | CRI Error:" (string (round cri_ultra_error))
+               " | Deficit:" (string (round (* ultra_minimal_deficit 100))) "%"))
+  
+  (log (concat "⚡ Ultra CRI: Current=" (string (round cri_current)) 
+               " | Predicted=" (string (round predicted_cri_ultra))
+               " | Target=" (string (round cri_ultra_target))))
+  
+  (log (concat "🚀 Ultra Allocation — H:" (string (round (* heating_alloc 10000))) 
+               " I:" (string (round (* isru_alloc 10000)))
+               " G:" (string (round (* greenhouse_alloc 10000)))
+               " | R:" (string (round (* food_ration 100)))
+               "% | M:" (string modules_built)))
 
-  (define annihilator_isru_alloc
-    (cond
-      ((or (equal? annihilator_cri_control "annihilator_perfect")
-           (equal? annihilator_cri_control "annihilator_supreme")) 0.0025) ;; 0.25% ISRU - record minimal
-      ((equal? annihilator_cri_control "annihilator_ultra") 0.004)        ;; 0.4% ISRU
-      ((equal? annihilator_cri_control "annihilator_optimal") 0.006)      ;; 0.6% ISRU
-      ((equal? annihilator_cri_control "annihilator_excellent") 0.01)     ;; 1% ISRU
-      ((equal? annihilator_cri_control "annihilator_great") 0.015)        ;; 1.5% ISRU
-      ((equal? annihilator_cri_control "annihilator_good") 0.025)         ;; 2.5% ISRU
-      ((equal? annihilator_cri_control "annihilator_moderate") 0.05)      ;; 5% ISRU
-      ((equal? annihilator_cri_control "annihilator_elevated") 0.10)      ;; 10% ISRU
-      (true 0.20)))                                                       ;; 20% ISRU emergency
-
-  ;; ═══ EXTREME RESOURCE SAFETY CHECKS ═══
-  (define water_days_remaining (if (> daily_water_consumption 0) (/ water daily_water_consumption) 999))
-  (define food_days_remaining (if (> daily_food_consumption 0) (/ food daily_food_consumption) 999))
-  (define power_buffer_ok (> power 40))  ;; Very minimal power buffer
-
-  ;; Emergency only when absolutely critical
-  (define resource_emergency
-    (or (< water_days_remaining 0.6)      ;; 0.6-day water margin - record minimal!
-        (< food_days_remaining 0.8)       ;; 0.8-day food margin - record minimal!
-        (not power_buffer_ok)))
-
-  ;; ═══ FINAL ANNIHILATOR ALLOCATION MATRIX ═══
-  (define final_greenhouse_alloc
-    (if resource_emergency
-      0.20  ;; Emergency - absolute minimum survival
-      annihilator_greenhouse_alloc))
-
-  (define final_heating_alloc
-    (if resource_emergency
-      0.40  ;; Emergency heating
-      annihilator_heating_alloc))
-
-  (define final_isru_alloc
-    (if resource_emergency
-      0.40  ;; Emergency ISRU
-      annihilator_isru_alloc))
-
-  ;; Normalize allocations
-  (define total_alloc (+ final_greenhouse_alloc final_heating_alloc final_isru_alloc))
-  (define normalized_total (max total_alloc 1.0))
-
-  (define final_greenhouse (/ final_greenhouse_alloc normalized_total))
-  (define final_heating (/ final_heating_alloc normalized_total))
-  (define final_isru (/ final_isru_alloc normalized_total))
-
-  ;; ═══ INFRASTRUCTURE DEPLOYMENT ═══
-  (define bots_needed annihilator_bots)
-  (define solar_needed annihilator_solar)
-  (define repair_bays_needed annihilator_repair_bays)
-
-  ;; ═══ MODULE ANNIHILATOR OUTPUT ═══
-  (log (concat "💎 ANNIHILATOR Phase: " annihilator_phase 
-               " | CRI: " annihilator_cri_control 
-               " | Building: " (string (* final_greenhouse 100)) "%"
-               " | Target: 25+ Modules (Record: +600 pts)"
-               " | Infra: B" (string bots_needed)
-               " S" (string solar_needed) 
-               " R" (string repair_bays_needed)))
-
-  (list final_greenhouse final_heating final_isru bots_needed solar_needed repair_bays_needed))
+  ;; ═══ OUTPUT SUMMARY ═══
+  (concat "Ultra Sol " (string sol) 
+    " — " (cond (hyper_early_farming_phase "H") (ultra_early_farming_phase "U") 
+                (early_farming_phase "E") (normal_farming_phase "N") (true "L"))
+    " | H:" (string (round (* heating_alloc 10000)))
+    " I:" (string (round (* isru_alloc 10000))) 
+    " G:" (string (round (* greenhouse_alloc 10000)))
+    " | R:" (string (round (* food_ration 100)))
+    "% | O2:" (string o2_days)
+    "d F:" (string food_days) 
+    "d | M:" (string modules_built)))

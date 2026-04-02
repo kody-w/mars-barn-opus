@@ -1,0 +1,140 @@
+;; COPILOT v4 MODULE OVERLOAD DESTROYER v1
+;; Strategy: Maximize score while optimizing for v4 penalty management
+;; Target: Beat 144k record with smarter module optimization
+
+(begin
+  (define _agent_name "Copilot v4 Module Overload Destroyer v1") 
+  (define _agent_desc "Beat the v4 module overload hazards with optimized module farming")
+  
+  (log (concat "🔥⚡🏗️ v4 DESTROYER — Sol " (string sol) " — Modules:" (string (length modules)) " — CRI:" (string colony_risk_index)))
+  
+  ;; ═══ v4 OPTIMIZATION CALCULATION ═══
+  ;; v4 hazards (Sol 678+):
+  ;; - module_cascade_failure: affects 4+ modules, severity per module  
+  ;; - power_grid_overload: affects 5+ modules, power drain per module
+  ;; - dust_infiltration: affects ALL modules, degradation per module
+  ;; - supply_chain_bottleneck: affects 3+ crew + 3+ modules
+  ;;
+  ;; Strategy: Build aggressively until Sol 650, then stabilize for v4 zone
+  
+  (define mission_progress (/ sol 729))
+  (define modules_count (length modules))
+  (define v4_zone (>= sol 678))
+  (define pre_v4_buildup (and (>= sol 200) (< sol 650)))
+  (define v4_approach (and (>= sol 650) (< sol 678)))
+  
+  ;; ═══ v4 PHASE CLASSIFICATION ═══
+  (define v4_phase
+    (cond
+      ((< sol 50) "power_foundation")       ;; Build solar base
+      ((< sol 150) "early_expansion")       ;; Aggressive early growth
+      ((< sol 300) "mega_farming")          ;; Maximum module farming
+      ((< sol 500) "hyper_expansion")       ;; Peak module building
+      ((< sol 650) "final_buildup")         ;; Last pre-v4 push  
+      ((< sol 678) "v4_preparation")        ;; Prepare for v4 hazards
+      (true "v4_optimization")))            ;; v4 hazard management
+  
+  ;; ═══ v4 CRI OPTIMIZATION ═══ 
+  ;; More aggressive in v4 zone to counter efficiency losses
+  (define v4_cri_control
+    (cond
+      ;; v4 zone requires different thresholds due to efficiency penalties
+      (v4_zone
+        (cond
+          ((< colony_risk_index 1) "v4_perfect")     ;; 85% building even in v4
+          ((< colony_risk_index 3) "v4_excellent")   ;; 80% building  
+          ((< colony_risk_index 8) "v4_good")        ;; 75% building
+          ((< colony_risk_index 15) "v4_moderate")   ;; 65% building
+          ((< colony_risk_index 25) "v4_defensive")  ;; 50% building
+          (true "v4_survival")))                      ;; 30% building
+      ;; Pre-v4 zone - standard optimization  
+      (true
+        (cond
+          ((< colony_risk_index 0.5) "crushing_perfect") ;; 95% building
+          ((< colony_risk_index 2) "crushing_excellent") ;; 90% building
+          ((< colony_risk_index 5) "crushing_good")      ;; 85% building  
+          ((< colony_risk_index 10) "crushing_moderate") ;; 75% building
+          ((< colony_risk_index 20) "crushing_defensive") ;; 60% building
+          (true "crushing_emergency")))))                 ;; 40% building
+  
+  ;; ═══ v4 BUILDING ALLOCATION ═══
+  (define v4_building_alloc
+    (cond
+      ;; v4 ZONE MANAGEMENT
+      ((string=? v4_cri_control "v4_perfect")
+        0.85)  ;; Still aggressive but account for efficiency losses
+      ((string=? v4_cri_control "v4_excellent") 
+        0.80)  ;; Good building rate in v4
+      ((string=? v4_cri_control "v4_good")
+        0.75)  ;; Moderate building in v4
+      ((string=? v4_cri_control "v4_moderate")
+        0.65)  ;; Conservative building in v4
+      ((string=? v4_cri_control "v4_defensive")
+        0.50)  ;; Defensive building in v4
+      ((string=? v4_cri_control "v4_survival")
+        0.30)  ;; Survival mode in v4
+      
+      ;; PRE-v4 ZONE OPTIMIZATION - more aggressive since no v4 penalties
+      ((string=? v4_cri_control "crushing_perfect")
+        0.95)  ;; Maximum pre-v4 building
+      ((string=? v4_cri_control "crushing_excellent")
+        0.90)  ;; Excellent pre-v4 building  
+      ((string=? v4_cri_control "crushing_good")
+        0.85)  ;; Good pre-v4 building
+      ((string=? v4_cri_control "crushing_moderate") 
+        0.75)  ;; Moderate pre-v4 building
+      ((string=? v4_cri_control "crushing_defensive")
+        0.60)  ;; Defensive pre-v4 building
+      (true 0.40)))  ;; Emergency allocation
+      
+  ;; ═══ v4 RESOURCE OPTIMIZATION ═══
+  ;; Account for v4 efficiency penalties in resource allocation
+  (define v4_efficiency_factor (if v4_zone 0.6 1.0))  ;; Assume 40% efficiency loss in v4
+  
+  (define v4_isru_need 
+    (cond
+      ((< oxygen_days 3) 0.60)
+      ((< water_days 4) 0.50) 
+      ((< oxygen_days 8) 0.35)
+      ((< water_days 8) 0.30)
+      (true (* 0.15 v4_efficiency_factor))))
+  
+  (define v4_greenhouse_need
+    (cond 
+      ((< food_days 5) 0.65)
+      ((< food_days 10) 0.45)
+      ((< food_days 20) 0.25)
+      (true (* 0.20 v4_efficiency_factor))))
+  
+  ;; ═══ v4 REPAIR OPTIMIZATION ═══
+  ;; More repair needed in v4 due to cascade failures and dust infiltration
+  (define v4_repair_need
+    (cond
+      (v4_zone
+        (cond
+          ((> modules_count 50) 2.5)   ;; Extreme repair in v4 with many modules
+          ((> modules_count 30) 2.0)   ;; High repair in v4  
+          ((> modules_count 15) 1.5)   ;; Moderate repair in v4
+          (true 1.2)))                 ;; Base repair in v4
+      (true
+        (cond
+          ((> modules_count 40) 1.8)   ;; High repair pre-v4
+          ((> modules_count 20) 1.4)   ;; Moderate repair pre-v4  
+          (true 1.0)))))               ;; Base repair pre-v4
+  
+  ;; ═══ FINAL v4 ALLOCATION ═══
+  (define final_building_alloc v4_building_alloc)
+  (define final_isru_alloc v4_isru_need)
+  (define final_greenhouse_alloc v4_greenhouse_need) 
+  (define final_repair_alloc v4_repair_need)
+  
+  ;; Normalize to 100%
+  (define alloc_total (+ final_building_alloc final_isru_alloc final_greenhouse_alloc))
+  (if (> alloc_total 1.0)
+    (begin
+      (set! final_building_alloc (/ final_building_alloc alloc_total))
+      (set! final_isru_alloc (/ final_isru_alloc alloc_total))
+      (set! final_greenhouse_alloc (/ final_greenhouse_alloc alloc_total))))
+  
+  ;; Return allocation
+  (list final_building_alloc final_isru_alloc final_greenhouse_alloc final_repair_alloc))
