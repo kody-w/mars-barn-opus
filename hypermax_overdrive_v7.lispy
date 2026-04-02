@@ -1,0 +1,175 @@
+;; HYPERMAX OVERDRIVE V7 - REVOLUTIONARY BUILD TIMING
+;; Strategy: Radical 4-crew + ultra-early repair bay swarm + power-first allocation
+;; Goal: Beat gauntlet through overwhelming early infrastructure + maximum crew efficiency
+
+(begin
+  (define _agent_name "Hypermax Overdrive v7.0")
+  (define _agent_desc "Revolutionary 4-crew powerhouse with ultra-early repair swarm and aggressive power-first resource allocation")
+
+  (log (concat "⚡ Hypermax v7.0 — Sol " (string sol)))
+
+  ;; ═══ AGGRESSIVE 4-CREW OPTIMIZATION ═══
+  ;; Strategy: Use 4 crew to accelerate early builds, then benefit from massive infrastructure
+  (define crew_active (filter (lambda (c) (get c :a)) crew))
+  (define crew_count (length crew_active))
+  (define target_crew_size 4)
+  
+  ;; 4-crew gives workload bonuses during critical early build phase
+  (define crew_productivity_bonus
+    (cond
+      ((>= crew_count 4) 1.25)  ;; Maximum crew productivity
+      ((= crew_count 3) 1.0)    ;; Standard efficiency
+      ((= crew_count 2) 0.70)   ;; Workload penalties
+      (true 0.50)))             ;; Severe understaffing
+
+  ;; ═══ REVOLUTIONARY INFRASTRUCTURE PREDICTION ═══
+  ;; Hypermax targeting: 6+ solar by sol 100, 5+ repair by sol 120
+  (define hypermax_infrastructure_target 20)  ;; Aggressive total module target
+  (define infrastructure_completion (min 1.0 (/ modules_built hypermax_infrastructure_target)))
+  (define estimated_solar_farms (max 3 (round (* modules_built 0.55))))   ;; Solar priority
+  (define estimated_repair_bays (max 2 (round (* modules_built 0.30))))   ;; Heavy repair investment
+  (define estimated_greenhouses (max 1 (round (* modules_built 0.15))))   ;; Minimal but sufficient
+  
+  ;; Hypermax exponential scaling - maximum aggression
+  (define hypermax_exponential_base 2.3)  ;; Most aggressive scaling yet
+  (define repair_hypermax_effect (pow hypermax_exponential_base estimated_repair_bays))
+  (define crew_infrastructure_synergy (* crew_productivity_bonus 1.20))
+  (define early_build_momentum (+ 1 (* infrastructure_completion 0.50)))
+  (define total_hypermax_shield (* repair_hypermax_effect crew_infrastructure_synergy early_build_momentum))
+  
+  (log (concat "  Hypermax State: " (string crew_count) "/" (string target_crew_size) " crew | " (string estimated_solar_farms) "S/" (string estimated_repair_bays) "R/" (string estimated_greenhouses) "G"))
+  (log (concat "  Hypermax Shield: " (string (round (* total_hypermax_shield 100))) "% | Build Progress: " (string (round (* infrastructure_completion 100))) "%"))
+
+  ;; ═══ HYPERMAX CRI THREAT ANALYSIS ═══
+  ;; Enhanced threat modeling optimized for 4-crew strategy
+  (define cri_threat_base (/ colony_risk_index 70))
+  (define cri_volatility_component (max 0.30 (/ colony_risk_index 40)))
+  (define cri_compound_multiplier
+    (cond
+      ((> colony_risk_index 70) 3.5)  ;; Extreme threats
+      ((> colony_risk_index 55) 2.8)
+      ((> colony_risk_index 40) 2.0)
+      ((> colony_risk_index 25) 1.4)
+      (true 1.0)))
+  
+  ;; Hypermax aggregate threat with crew bonus factor
+  (define hypermax_threat_total (* cri_threat_base cri_volatility_component cri_compound_multiplier (/ 1 crew_productivity_bonus)))
+  (define hypermax_threat_classification
+    (cond
+      ((> hypermax_threat_total 3.0) "OMEGA-LEVEL")
+      ((> hypermax_threat_total 2.0) "APOCALYPTIC")
+      ((> hypermax_threat_total 1.3) "EXTINCTION")
+      ((> hypermax_threat_total 0.9) "CATASTROPHIC") 
+      ((> hypermax_threat_total 0.6) "SEVERE")
+      ((> hypermax_threat_total 0.3) "ELEVATED")
+      (true "STABLE")))
+
+  ;; Hypermax cascade system - more sensitive due to 4-crew resource needs
+  (define hypermax_cascade_score 0)
+  (if (< o2_days 4) (set! hypermax_cascade_score (+ hypermax_cascade_score 5)))
+  (if (< food_days 6) (set! hypermax_cascade_score (+ hypermax_cascade_score 4)))
+  (if (< power_kwh 40) (set! hypermax_cascade_score (+ hypermax_cascade_score 4)))
+  (if (> dust_tau 5.0) (set! hypermax_cascade_score (+ hypermax_cascade_score 3)))
+  (if (> colony_risk_index 65) (set! hypermax_cascade_score (+ hypermax_cascade_score 5)))
+  (if (< crew_count target_crew_size) (set! hypermax_cascade_score (+ hypermax_cascade_score 4)))
+
+  (define hypermax_cascade_crisis (>= hypermax_cascade_score 8))
+  
+  (log (concat "  Threat: " hypermax_threat_classification " | Cascade Score: " (string hypermax_cascade_score)))
+  (if hypermax_cascade_crisis (log "  🚨 HYPERMAX CASCADE CRISIS"))
+
+  ;; ═══ HYPERMAX POWER-FIRST ALLOCATION ═══  
+  ;; Revolutionary allocation: prioritize power heavily, optimize other resources
+  (define hypermax_power_efficiency (min 2.5 (max 0.4 (/ total_hypermax_shield 6))))
+  
+  ;; Power-first allocation strategy
+  (define hypermax_isru_allocation
+    (cond
+      (hypermax_cascade_crisis 0.05)  ;; Crisis: minimal O2 only
+      ((= hypermax_threat_classification "OMEGA-LEVEL") 0.07)
+      ((= hypermax_threat_classification "APOCALYPTIC") 0.10)
+      ((= hypermax_threat_classification "EXTINCTION") 0.15)
+      ((= hypermax_threat_classification "CATASTROPHIC") 0.20)
+      ((< o2_days 1) 0.90)  ;; Absolute O2 emergency
+      ((< o2_days 3) 0.70)
+      ((< o2_days 6) 0.50)
+      (true 0.18)))  ;; Very low baseline - trust solar production
+
+  (define hypermax_greenhouse_allocation
+    (cond
+      (hypermax_cascade_crisis 0.10)  ;; Crisis: minimal food
+      ((= hypermax_threat_classification "OMEGA-LEVEL") 0.12)
+      ((= hypermax_threat_classification "APOCALYPTIC") 0.16)
+      ((= hypermax_threat_classification "EXTINCTION") 0.22)
+      ((= hypermax_threat_classification "CATASTROPHIC") 0.28)
+      ((< food_days 3) 0.75)  ;; Food emergency
+      ((< food_days 6) 0.60)
+      ((< food_days 10) 0.45)
+      (true 0.30)))  ;; Moderate food allocation
+
+  (define hypermax_heating_allocation
+    (cond
+      (hypermax_cascade_crisis 0.85)  ;; Crisis: maximum power
+      ((= hypermax_threat_classification "OMEGA-LEVEL") 0.81)
+      ((= hypermax_threat_classification "APOCALYPTIC") 0.74)
+      ((= hypermax_threat_classification "EXTINCTION") 0.63)
+      ((= hypermax_threat_classification "CATASTROPHIC") 0.52)
+      ((< power_kwh 20) 0.80)  ;; Power emergency
+      ((< power_kwh 50) 0.65)
+      ((> dust_tau 6.0) 0.58)
+      (true 0.52)))  ;; Power-first baseline
+
+  ;; Apply hypermax efficiency and normalize
+  (define hypermax_total_allocation (+ hypermax_isru_allocation hypermax_greenhouse_allocation hypermax_heating_allocation))
+  (define hypermax_normalization (/ hypermax_power_efficiency hypermax_total_allocation))
+  
+  (set! isru_alloc (* hypermax_isru_allocation hypermax_normalization))
+  (set! greenhouse_alloc (* hypermax_greenhouse_allocation hypermax_normalization))
+  (set! heating_alloc (* hypermax_heating_allocation hypermax_normalization))
+
+  ;; ═══ HYPERMAX ULTRA-AGGRESSIVE RATIONING ═══
+  ;; Extreme rationing leveraging massive infrastructure investment
+  (define hypermax_survival_ration
+    (cond
+      (hypermax_cascade_crisis 0.15)  ;; Crisis: extreme rationing
+      ((= hypermax_threat_classification "OMEGA-LEVEL") 0.18)
+      ((= hypermax_threat_classification "APOCALYPTIC") 0.22) 
+      ((= hypermax_threat_classification "EXTINCTION") 0.30)
+      ((= hypermax_threat_classification "CATASTROPHIC") 0.40)
+      ((< food_days 2) 0.20)  ;; Food crisis
+      ((< food_days 5) 0.35)
+      ((< food_days 8) 0.55)
+      ((< food_days 12) 0.70)
+      (true 0.85)))
+
+  ;; Hypermax shield effect - strongest bonus yet
+  (define hypermax_shield_bonus (max 0 (min 0.50 (- hypermax_power_efficiency 1))))
+  (define hypermax_crew_ration_bonus (* crew_productivity_bonus 0.10))  ;; 4-crew ration bonus
+  
+  (set! food_ration (max 0.12 (min 1.3 (+ hypermax_survival_ration hypermax_shield_bonus hypermax_crew_ration_bonus))))
+
+  ;; ═══ HYPERMAX STATUS VISUALIZATION ═══
+  (define hypermax_status_icon
+    (cond
+      (hypermax_cascade_crisis "💀")
+      ((= hypermax_threat_classification "OMEGA-LEVEL") "🌌")
+      ((= hypermax_threat_classification "APOCALYPTIC") "🌋") 
+      ((= hypermax_threat_classification "EXTINCTION") "☠️")
+      ((= hypermax_threat_classification "CATASTROPHIC") "🔴")
+      ((= hypermax_threat_classification "SEVERE") "🟠")
+      ((= hypermax_threat_classification "ELEVATED") "🟡")
+      (true "🟢")))
+
+  (log (concat "  Status: " hypermax_status_icon " " hypermax_threat_classification))
+  (log (concat "  Hypermax Alloc — I:" (string (round (* isru_alloc 100))) "% | G:" (string (round (* greenhouse_alloc 100))) "% | H:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Hypermax Ration: " (string (round (* food_ration 100))) "% | Shield:" (string (round (* total_hypermax_shield 100))) "% | Crew Prod:" (string (round (* crew_productivity_bonus 100))) "%"))
+
+  ;; ═══ HYPERMAX STRATEGY SUMMARY ═══
+  (concat "Hypermax v7.0 Sol " (string sol) " — " hypermax_status_icon " " hypermax_threat_classification
+    " | C:" (string crew_count) "/" (string target_crew_size)
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | HS:" (string (round (* total_hypermax_shield 100)))
+    "% | CS:" (string hypermax_cascade_score)))

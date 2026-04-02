@@ -1,0 +1,167 @@
+;; CREW PRESERVATION MASTER V8 - HIGH-SCORE OPTIMIZATION
+;; Strategy: Focus on keeping 3+ crew alive consistently for higher min crew scores
+;; Goal: Beat the 85890 score by achieving min_crew = 3 (+500 points) and/or median_modules = 15+ (+150 points)
+
+(begin
+  (define _agent_name "Crew Preservation Master v8.0")
+  (define _agent_desc "Specialized high-score strategy optimized for crew survival and module construction bonuses")
+
+  (log (concat "🏆 Crew Master v8.0 — Sol " (string sol)))
+
+  ;; ═══ CREW SURVIVAL PRIORITY SYSTEM ═══
+  ;; Primary goal: maintain 3+ crew alive for scoring bonus
+  (define crew_active (filter (lambda (c) (get c :a)) crew))
+  (define crew_count (length crew_active))
+  (define optimal_survival_crew 3)  ;; Target for high score
+  
+  ;; Crew health monitoring and protection
+  (define avg_crew_health (if (> crew_count 0) 
+                           (/ (apply + (map (lambda (c) (get c :hp)) crew_active)) crew_count) 
+                           0))
+  (define crew_health_critical (< avg_crew_health 35))
+  (define crew_survival_bonus 
+    (cond
+      ((>= crew_count optimal_survival_crew) 1.3)  ;; Bonus for 3+ crew
+      ((= crew_count 2) 1.0)   ;; Standard 
+      (true 0.8)))             ;; Penalties for <2 crew
+
+  (log (concat "  Crew Status: " (string crew_count) " active | Avg HP: " (string (round avg_crew_health)) 
+               (if crew_health_critical " ⚠️" "") " | Survival Bonus: " (string (round (* crew_survival_bonus 100))) "%"))
+
+  ;; ═══ HIGH-MODULE-COUNT INFRASTRUCTURE ═══  
+  ;; Secondary goal: build 15+ modules for median module bonus
+  (define target_modules_for_bonus 16)  ;; Target for scoring
+  (define modules_bonus_progress (min 1.0 (/ modules_built target_modules_for_bonus)))
+  (define estimated_solar_farms (max 3 (round (* modules_built 0.50))))
+  (define estimated_repair_bays (max 3 (round (* modules_built 0.31))))  ;; More repair bays for crew protection
+  (define estimated_greenhouses (max 2 (round (* modules_built 0.19))))
+
+  ;; Enhanced repair scaling for crew protection
+  (define crew_protection_base 2.0)
+  (define repair_crew_protection_effect (pow crew_protection_base estimated_repair_bays))
+  (define module_quantity_bonus (+ 1 (* modules_bonus_progress 0.4)))
+  (define total_crew_shield (* repair_crew_protection_effect crew_survival_bonus module_quantity_bonus))
+
+  (log (concat "  Modules: " (string modules_built) "/" (string target_modules_for_bonus) 
+               " | Progress: " (string (round (* modules_bonus_progress 100))) 
+               "% | Shield: " (string (round (* total_crew_shield 100))) "%"))
+
+  ;; ═══ CRI OPTIMIZATION FOR BONUS POINTS ═══
+  ;; Minimize CRI for score optimization
+  (define cri_optimization_factor (max 0.5 (- 1.0 (/ colony_risk_index 100))))
+  (define cri_threat_level
+    (cond
+      ((< colony_risk_index 15) "OPTIMAL")     ;; Best possible CRI
+      ((< colony_risk_index 25) "EXCELLENT")   ;; Good CRI
+      ((< colony_risk_index 35) "GOOD")        ;; Acceptable CRI
+      ((< colony_risk_index 50) "MODERATE")    ;; Standard CRI
+      ((< colony_risk_index 65) "ELEVATED")    ;; High CRI
+      (true "CRITICAL")))                      ;; Dangerous CRI
+
+  ;; Crisis detection optimized for crew survival
+  (define crew_survival_crisis_score 0)
+  (if (< o2_days 6) (set! crew_survival_crisis_score (+ crew_survival_crisis_score 3)))
+  (if (< food_days 10) (set! crew_survival_crisis_score (+ crew_survival_crisis_score 2)))
+  (if (< power_kwh 60) (set! crew_survival_crisis_score (+ crew_survival_crisis_score 2)))
+  (if crew_health_critical (set! crew_survival_crisis_score (+ crew_survival_crisis_score 4)))
+  (if (< crew_count optimal_survival_crew) (set! crew_survival_crisis_score (+ crew_survival_crisis_score 5)))
+  (if (> colony_risk_index 45) (set! crew_survival_crisis_score (+ crew_survival_crisis_score 3)))
+
+  (define crew_survival_emergency (>= crew_survival_crisis_score 8))
+
+  (log (concat "  CRI: " (string colony_risk_index) " (" cri_threat_level ") | Crisis Score: " (string crew_survival_crisis_score)))
+
+  ;; ═══ CREW-OPTIMIZED ALLOCATION ═══
+  ;; Resource allocation prioritizing crew health and survival
+  (define crew_protection_efficiency (min 1.8 (max 0.6 (/ total_crew_shield 4))))
+  
+  ;; Allocation optimized for crew survival (higher food/O2, stable power)
+  (define crew_isru_target
+    (cond
+      (crew_survival_emergency 0.12)  ;; Emergency: stable O2
+      ((= cri_threat_level "CRITICAL") 0.15)
+      ((= cri_threat_level "ELEVATED") 0.20)
+      ((= cri_threat_level "MODERATE") 0.25)
+      ((< o2_days 4) 0.70)  ;; O2 crisis
+      ((< o2_days 8) 0.45)
+      ((< o2_days 12) 0.35)
+      (true 0.28)))  ;; Higher baseline for crew support
+
+  (define crew_greenhouse_target
+    (cond
+      (crew_survival_emergency 0.25)  ;; Emergency: prioritize crew nutrition
+      ((= cri_threat_level "CRITICAL") 0.28)
+      ((= cri_threat_level "ELEVATED") 0.32)
+      ((= cri_threat_level "MODERATE") 0.35)
+      ((< food_days 5) 0.65)  ;; Food crisis
+      ((< food_days 10) 0.50)
+      ((< food_days 15) 0.42)
+      (true 0.38)))  ;; Higher baseline for crew health
+
+  (define crew_heating_target
+    (cond
+      (crew_survival_emergency 0.63)  ;; Emergency: stable power
+      ((= cri_threat_level "CRITICAL") 0.57)
+      ((= cri_threat_level "ELEVATED") 0.48)
+      ((= cri_threat_level "MODERATE") 0.40)
+      ((< power_kwh 35) 0.65)  ;; Power crisis
+      ((< power_kwh 70) 0.50)
+      ((> dust_tau 4.5) 0.45)
+      (true 0.37)))  ;; Balanced power allocation
+
+  ;; Apply crew protection efficiency and normalize
+  (define crew_total_allocation (+ crew_isru_target crew_greenhouse_target crew_heating_target))
+  (define crew_normalization (/ crew_protection_efficiency crew_total_allocation))
+  
+  (set! isru_alloc (* crew_isru_target crew_normalization))
+  (set! greenhouse_alloc (* crew_greenhouse_target crew_normalization))
+  (set! heating_alloc (* crew_heating_target crew_normalization))
+
+  ;; ═══ CREW HEALTH OPTIMIZED RATIONING ═══
+  ;; Rationing strategy focused on maintaining crew health above critical levels
+  (define crew_health_ration
+    (cond
+      (crew_health_critical 0.60)      ;; Health crisis: improve rationing
+      (crew_survival_emergency 0.40)   ;; Emergency: moderate rationing
+      ((= cri_threat_level "CRITICAL") 0.45)
+      ((= cri_threat_level "ELEVATED") 0.55)
+      ((= cri_threat_level "MODERATE") 0.65)
+      ((< food_days 4) 0.35)  ;; Food emergency
+      ((< food_days 8) 0.55)
+      ((< food_days 15) 0.75)
+      ((< food_days 25) 0.85)
+      (true 0.95)))  ;; Higher baseline for crew health
+
+  ;; Crew protection bonus - shield strength improves rationing
+  (define crew_shield_ration_bonus (max 0 (min 0.35 (- crew_protection_efficiency 1))))
+  (define crew_count_bonus (if (>= crew_count optimal_survival_crew) 0.05 0))  ;; Bonus for maintaining target crew
+  
+  (set! food_ration (max 0.25 (min 1.15 (+ crew_health_ration crew_shield_ration_bonus crew_count_bonus))))
+
+  ;; ═══ HIGH-SCORE STATUS DISPLAY ═══
+  (define crew_status_icon
+    (cond
+      (crew_survival_emergency "💀")
+      ((= cri_threat_level "CRITICAL") "🔴")
+      ((= cri_threat_level "ELEVATED") "🟠")
+      ((= cri_threat_level "MODERATE") "🟡")
+      ((= cri_threat_level "GOOD") "🔵")
+      ((= cri_threat_level "EXCELLENT") "🟢")
+      ((= cri_threat_level "OPTIMAL") "⭐")
+      (true "🔵")))
+
+  (log (concat "  Status: " crew_status_icon " " cri_threat_level))
+  (log (concat "  Allocation — I:" (string (round (* isru_alloc 100))) "% | G:" (string (round (* greenhouse_alloc 100))) "% | H:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Crew Health Ration: " (string (round (* food_ration 100))) "% | Protection Shield: " (string (round (* total_crew_shield 100))) "%"))
+  (log (concat "  Score Optimization — Crew:" (string crew_count) "/" (string optimal_survival_crew) " | Modules:" (string modules_built) "/" (string target_modules_for_bonus) " | CRI:" (string colony_risk_index)))
+
+  ;; ═══ CREW PRESERVATION STRATEGY SUMMARY ═══
+  (concat "CrewMaster v8.0 Sol " (string sol) " — " crew_status_icon " " cri_threat_level
+    " | C:" (string crew_count) "/" (string optimal_survival_crew) 
+    " HP:" (string (round avg_crew_health))
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | CS:" (string (round (* total_crew_shield 100)))
+    "% | Mod:" (string modules_built)))

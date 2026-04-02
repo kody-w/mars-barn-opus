@@ -1,0 +1,88 @@
+;; SIMPLE SURVIVAL CHAMPION V9 - ROBUST BASIC STRATEGY
+;; Strategy: Focus on balanced resource allocation with robust O2/power/food management
+;; Goal: Survive all 629 sols with robust allocation and minimal complexity
+
+(begin
+  (define _agent_name "Simple Survival Champion v9.0")
+  (define _agent_desc "Robust balanced strategy focused on reliable survival fundamentals")
+
+  ;; ═══ BALANCED THREAT ASSESSMENT ═══
+  ;; Simple but effective CRI-based threat classification
+  (define threat_level
+    (cond
+      ((> colony_risk_index 70) "CRITICAL")
+      ((> colony_risk_index 50) "HIGH")
+      ((> colony_risk_index 30) "MODERATE") 
+      (true "STABLE")))
+
+  ;; Crisis detection based on resource shortages
+  (define crisis_score 0)
+  (if (< o2_days 5) (set! crisis_score (+ crisis_score 4)))
+  (if (< food_days 8) (set! crisis_score (+ crisis_score 3)))
+  (if (< power_kwh 50) (set! crisis_score (+ crisis_score 3)))
+  (if (> colony_risk_index 60) (set! crisis_score (+ crisis_score 2)))
+
+  (define emergency_state (>= crisis_score 6))
+
+  ;; ═══ SIMPLE ROBUST ALLOCATION ═══
+  ;; Conservative allocation prioritizing stability
+  (define base_isru_allocation
+    (cond
+      (emergency_state 0.15)         ;; Emergency: stable O2
+      ((= threat_level "CRITICAL") 0.20)
+      ((= threat_level "HIGH") 0.25)
+      ((< o2_days 3) 0.70)           ;; O2 emergency override
+      ((< o2_days 6) 0.50)
+      ((< o2_days 10) 0.35)
+      (true 0.30)))                  ;; Conservative O2 baseline
+
+  (define base_greenhouse_allocation
+    (cond
+      (emergency_state 0.20)         ;; Emergency: essential food
+      ((= threat_level "CRITICAL") 0.25)
+      ((= threat_level "HIGH") 0.30)
+      ((< food_days 4) 0.60)         ;; Food emergency override
+      ((< food_days 8) 0.45)
+      ((< food_days 15) 0.38)
+      (true 0.35)))                  ;; Conservative food baseline
+
+  (define base_heating_allocation
+    (cond
+      (emergency_state 0.65)         ;; Emergency: stable power
+      ((= threat_level "CRITICAL") 0.55)
+      ((= threat_level "HIGH") 0.45)
+      ((< power_kwh 30) 0.70)        ;; Power emergency override
+      ((< power_kwh 60) 0.50)
+      ((> dust_tau 4.0) 0.42)
+      (true 0.35)))                  ;; Balanced power baseline
+
+  ;; Normalize allocations to sum to 1.0
+  (define allocation_sum (+ base_isru_allocation base_greenhouse_allocation base_heating_allocation))
+  (define normalization_factor (/ 1.0 allocation_sum))
+  
+  (set! isru_alloc (* base_isru_allocation normalization_factor))
+  (set! greenhouse_alloc (* base_greenhouse_allocation normalization_factor))
+  (set! heating_alloc (* base_heating_allocation normalization_factor))
+
+  ;; ═══ CONSERVATIVE RATIONING ═══
+  ;; Rationing strategy focused on consistent crew health
+  (define base_ration
+    (cond
+      (emergency_state 0.35)         ;; Emergency: survival rationing
+      ((= threat_level "CRITICAL") 0.45)
+      ((= threat_level "HIGH") 0.55)
+      ((< food_days 3) 0.30)         ;; Food crisis override
+      ((< food_days 6) 0.50)
+      ((< food_days 12) 0.70)
+      ((< food_days 20) 0.85)
+      (true 0.95)))                  ;; Full rations when stable
+
+  (set! food_ration (max 0.25 (min 1.0 base_ration)))
+
+  ;; ═══ SIMPLE STRATEGY SUMMARY ═══
+  (concat "Simple v9.0 Sol " (string sol) " — " threat_level
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | Crisis:" (string crisis_score)))

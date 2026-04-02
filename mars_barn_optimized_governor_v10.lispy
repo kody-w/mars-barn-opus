@@ -1,0 +1,128 @@
+;; MARS BARN OPTIMIZED GOVERNOR V10 - PROPER VARIABLES
+;; Strategy: Advanced allocation using actual available LisPy variables
+;; Goal: Survive all 629 sols with optimal resource allocation
+
+(begin
+  ;; ═══ CRISIS DETECTION ═══
+  ;; Multi-factor crisis analysis using available variables
+  (define o2_critical (< o2_days 4))
+  (define h2o_critical (< h2o_days 4))
+  (define food_critical (< food_days 6))
+  (define power_critical (< power_kwh 50))
+  
+  (define o2_urgent (< o2_days 7))
+  (define h2o_urgent (< h2o_days 7))
+  (define food_urgent (< food_days 10))
+  (define power_low (< power_kwh 100))
+  
+  ;; Crisis score calculation
+  (define crisis_score 0)
+  (if o2_critical (set! crisis_score (+ crisis_score 5)))
+  (if h2o_critical (set! crisis_score (+ crisis_score 4)))
+  (if food_critical (set! crisis_score (+ crisis_score 3)))
+  (if power_critical (set! crisis_score (+ crisis_score 3)))
+  (if o2_urgent (set! crisis_score (+ crisis_score 2)))
+  (if h2o_urgent (set! crisis_score (+ crisis_score 2)))
+  (if food_urgent (set! crisis_score (+ crisis_score 1)))
+  (if power_low (set! crisis_score (+ crisis_score 1)))
+  
+  (define emergency_state (>= crisis_score 8))
+  (define high_risk (>= crisis_score 5))
+  (define moderate_risk (>= crisis_score 3))
+
+  ;; ═══ PHASE-BASED STRATEGY ═══
+  ;; Early game: focus on infrastructure building (power for construction)
+  ;; Mid game: balanced allocation
+  ;; Late game: defensive allocation
+  (define early_game (< sol 100))
+  (define mid_game (and (>= sol 100) (< sol 400)))
+  (define late_game (>= sol 400))
+
+  ;; ═══ SMART ALLOCATION STRATEGY ═══
+  ;; Priorities change based on crisis state and game phase
+  (cond
+    ;; CRITICAL EMERGENCIES - override everything
+    (o2_critical (begin
+      (set! isru_alloc 0.85)
+      (set! heating_alloc 0.08)
+      (set! greenhouse_alloc 0.07)
+      (set! food_ration 0.30)))
+    
+    (power_critical (begin
+      (set! heating_alloc 0.75)
+      (set! isru_alloc 0.20)
+      (set! greenhouse_alloc 0.05)
+      (set! food_ration 0.25)))
+      
+    (food_critical (begin
+      (set! greenhouse_alloc 0.65)
+      (set! heating_alloc 0.25)
+      (set! isru_alloc 0.10)
+      (set! food_ration 0.40)))
+
+    ;; EMERGENCY STATE - crisis management
+    (emergency_state (begin
+      (set! isru_alloc 0.45)
+      (set! heating_alloc 0.35)
+      (set! greenhouse_alloc 0.20)
+      (set! food_ration 0.45)))
+
+    ;; HIGH RISK STATE - defensive
+    (high_risk (begin
+      (set! isru_alloc 0.35)
+      (set! heating_alloc 0.40)
+      (set! greenhouse_alloc 0.25)
+      (set! food_ration 0.60)))
+
+    ;; EARLY GAME - power focus for infrastructure
+    (early_game (begin
+      (set! heating_alloc 0.50)
+      (set! isru_alloc 0.25)
+      (set! greenhouse_alloc 0.25)
+      (set! food_ration 0.90)))
+
+    ;; LATE GAME - defensive stance
+    (late_game (begin
+      (set! heating_alloc 0.45)
+      (set! isru_alloc 0.30)
+      (set! greenhouse_alloc 0.25)
+      (set! food_ration 0.80)))
+
+    ;; MID GAME - balanced allocation
+    (mid_game (begin
+      (set! heating_alloc 0.40)
+      (set! isru_alloc 0.30)
+      (set! greenhouse_alloc 0.30)
+      (set! food_ration 0.95)))
+
+    ;; DEFAULT - stable allocation
+    (true (begin
+      (set! heating_alloc 0.35)
+      (set! isru_alloc 0.35)
+      (set! greenhouse_alloc 0.30)
+      (set! food_ration 1.0))))
+
+  ;; ═══ FINE-TUNE RATIONING ═══
+  ;; Additional rationing adjustments based on specific shortages
+  (cond
+    ((< food_days 3) (set! food_ration 0.25))
+    ((< food_days 5) (set! food_ration 0.40))
+    ((< food_days 8) (set! food_ration 0.60))
+    ((< food_days 12) (set! food_ration 0.75))
+    ((< food_days 20) (set! food_ration 0.85)))
+
+  ;; Ensure minimum rationing in emergencies
+  (if emergency_state (set! food_ration (max 0.20 food_ration)))
+  (if high_risk (set! food_ration (max 0.35 food_ration)))
+
+  ;; ═══ STRATEGY OUTPUT ═══
+  (concat "OptimizedGov v10.0 Sol " (string sol)
+    " | O2:" (string (round o2_days)) "d"
+    " H2O:" (string (round h2o_days)) "d"
+    " Food:" (string (round food_days)) "d"
+    " Power:" (string (round power_kwh)) "kWh"
+    " | I:" (string (round (* isru_alloc 100))) "%"
+    " G:" (string (round (* greenhouse_alloc 100))) "%"
+    " H:" (string (round (* heating_alloc 100))) "%"
+    " | R:" (string (round (* food_ration 100))) "%"
+    " | Crisis:" (string crisis_score)))

@@ -1,0 +1,168 @@
+;; ULTRA ADAPTIVE EMPEROR V6 - BEYOND 629 SOLS
+;; Strategy: Ultra-aggressive early build + 3-crew efficiency + hyper-adaptive smart rationing
+;; Goal: Beat the gauntlet champion through superior resource optimization + crew size advantage
+
+(begin
+  (define _agent_name "Ultra Adaptive Emperor v6.0")
+  (define _agent_desc "Revolutionary 3-crew strategy with ultra-aggressive early infrastructure + hyper-adaptive crisis management + quantum efficiency optimization")
+
+  (log (concat "👑 Emperor v6.0 — Sol " (string sol)))
+
+  ;; ═══ CREW SIZE OPTIMIZATION ANALYSIS ═══ 
+  ;; 3-crew strategy: better than 2-crew (workload penalties) and 4-crew (resource drain)
+  ;; Sweet spot: enough crew to avoid workload_wear penalties while minimizing consumption
+  (define crew_count (length (filter (lambda (c) (get c :a)) crew)))
+  (define optimal_crew_size 3)
+  (define crew_efficiency_multiplier 
+    (cond
+      ((= crew_count optimal_crew_size) 1.0)  ;; Perfect efficiency
+      ((< crew_count optimal_crew_size) 0.75) ;; Workload penalties
+      (true 0.90)))  ;; Overcrew inefficiency
+
+  ;; ═══ REVOLUTIONARY INFRASTRUCTURE INTELLIGENCE ═══
+  ;; Enhanced build state detection with optimal timing prediction
+  (define infrastructure_progress (/ modules_built 18))  ;; Target 18 modules total
+  (define estimated_solar (max 3 (round (* modules_built 0.50))))   ;; More solar-focused
+  (define estimated_repair (max 2 (round (* modules_built 0.28))))  ;; Strong repair presence
+  (define estimated_greenhouse (max 1 (round (* modules_built 0.22))))
+  
+  ;; Emperor-level exponential repair scaling with 3-crew optimization
+  (define emperor_exponential_base 2.1)  ;; More aggressive than champion
+  (define repair_emperor_effect (pow emperor_exponential_base estimated_repair))
+  (define crew_repair_synergy (* crew_efficiency_multiplier 1.15))  ;; 3-crew bonus
+  (define total_emperor_shield (* repair_emperor_effect crew_repair_synergy infrastructure_progress))
+  
+  (log (concat "  Empire State: " (string crew_count) " crew | " (string estimated_solar) "S/" (string estimated_repair) "R/" (string estimated_greenhouse) "G | Shield:" (string (round (* total_emperor_shield 100))) "%"))
+
+  ;; ═══ HYPER-ADVANCED CRI THREAT MODELING ═══
+  ;; Multi-layer threat detection with predictive early warning
+  (define cri_base_threat (/ colony_risk_index 75))
+  (define cri_volatility_threat (max 0.25 (/ colony_risk_index 45)))
+  (define cri_compound_threat 
+    (cond
+      ((> colony_risk_index 65) 3.0)  ;; Extreme compound threat
+      ((> colony_risk_index 50) 2.2)
+      ((> colony_risk_index 35) 1.5)
+      (true 1.0)))
+  
+  ;; Emperor threat aggregation with crew efficiency factor
+  (define emperor_threat_aggregate (* cri_base_threat cri_volatility_threat cri_compound_threat (/ 1 crew_efficiency_multiplier)))
+  (define emperor_threat_level
+    (cond
+      ((> emperor_threat_aggregate 2.5) "APOCALYPTIC")
+      ((> emperor_threat_aggregate 1.8) "EXTINCTION") 
+      ((> emperor_threat_aggregate 1.2) "CATASTROPHIC")
+      ((> emperor_threat_aggregate 0.8) "SEVERE")
+      ((> emperor_threat_aggregate 0.5) "ELEVATED")
+      ((> emperor_threat_aggregate 0.25) "MODERATE")
+      (true "STABLE")))
+
+  ;; Emperor cascade detection system
+  (define emperor_cascade_indicators 0)
+  (if (< o2_days 5) (set! emperor_cascade_indicators (+ emperor_cascade_indicators 4)))
+  (if (< food_days 8) (set! emperor_cascade_indicators (+ emperor_cascade_indicators 3)))
+  (if (< power_kwh 50) (set! emperor_cascade_indicators (+ emperor_cascade_indicators 3))) 
+  (if (> dust_tau 4.5) (set! emperor_cascade_indicators (+ emperor_cascade_indicators 2)))
+  (if (> colony_risk_index 60) (set! emperor_cascade_indicators (+ emperor_cascade_indicators 4)))
+  (if (< crew_count optimal_crew_size) (set! emperor_cascade_indicators (+ emperor_cascade_indicators 3)))
+
+  (define emperor_cascade_emergency (>= emperor_cascade_indicators 7))
+  
+  (log (concat "  Threat: " emperor_threat_level " | Cascade Risk: " (string emperor_cascade_indicators)))
+  (if emperor_cascade_emergency (log "  ⚠️ EMPEROR CASCADE EMERGENCY"))
+
+  ;; ═══ EMPEROR-LEVEL RESOURCE ALLOCATION ═══
+  ;; Hyper-optimized allocation leveraging 3-crew efficiency + emperor shield
+  (define emperor_efficiency_modifier (min 2.0 (max 0.5 (/ total_emperor_shield 5))))
+  
+  ;; Emperor allocation targets - more aggressive than previous strategies
+  (define emperor_isru_target
+    (cond
+      (emperor_cascade_emergency 0.06)  ;; Absolute minimum O2 in crisis
+      ((= emperor_threat_level "APOCALYPTIC") 0.08)
+      ((= emperor_threat_level "EXTINCTION") 0.12)
+      ((= emperor_threat_level "CATASTROPHIC") 0.18)
+      ((= emperor_threat_level "SEVERE") 0.24)
+      ((< o2_days 2) 0.85)  ;; Emergency O2 override
+      ((< o2_days 5) 0.65)
+      ((< o2_days 8) 0.45)
+      (true 0.20)))  ;; Lower baseline - more power focus
+
+  (define emperor_greenhouse_target
+    (cond
+      (emperor_cascade_emergency 0.12)  ;; Minimal food in crisis
+      ((= emperor_threat_level "APOCALYPTIC") 0.15)
+      ((= emperor_threat_level "EXTINCTION") 0.20)
+      ((= emperor_threat_level "CATASTROPHIC") 0.26)
+      ((= emperor_threat_level "SEVERE") 0.32)
+      ((< food_days 4) 0.70)  ;; Emergency food override
+      ((< food_days 8) 0.55)
+      ((< food_days 12) 0.42)
+      (true 0.33)))  ;; Balanced food allocation
+
+  (define emperor_heating_target
+    (cond
+      (emperor_cascade_emergency 0.82)  ;; Maximum power in crisis
+      ((= emperor_threat_level "APOCALYPTIC") 0.77)
+      ((= emperor_threat_level "EXTINCTION") 0.68)
+      ((= emperor_threat_level "CATASTROPHIC") 0.56)
+      ((= emperor_threat_level "SEVERE") 0.44)
+      ((< power_kwh 25) 0.75)  ;; Emergency power override
+      ((< power_kwh 60) 0.55)
+      ((> dust_tau 5.5) 0.50)
+      (true 0.47)))  ;; Higher baseline - power priority
+
+  ;; Apply emperor efficiency and normalize
+  (define emperor_allocation_sum (+ emperor_isru_target emperor_greenhouse_target emperor_heating_target))
+  (define emperor_normalization_factor (/ emperor_efficiency_modifier emperor_allocation_sum))
+  
+  (set! isru_alloc (* emperor_isru_target emperor_normalization_factor))
+  (set! greenhouse_alloc (* emperor_greenhouse_target emperor_normalization_factor))
+  (set! heating_alloc (* emperor_heating_target emperor_normalization_factor))
+
+  ;; ═══ EMPEROR SURVIVAL RATIONING PROTOCOL ═══
+  ;; Ultra-aggressive rationing with shield-based recovery
+  (define emperor_base_ration
+    (cond
+      (emperor_cascade_emergency 0.18)  ;; Extreme survival rationing
+      ((= emperor_threat_level "APOCALYPTIC") 0.22)
+      ((= emperor_threat_level "EXTINCTION") 0.28)
+      ((= emperor_threat_level "CATASTROPHIC") 0.38)
+      ((= emperor_threat_level "SEVERE") 0.48)
+      ((< food_days 3) 0.25)  ;; Critical food emergency
+      ((< food_days 6) 0.40)
+      ((< food_days 10) 0.60)
+      ((< food_days 15) 0.75)
+      (true 0.88)))
+
+  ;; Emperor shield bonus - stronger effect than previous strategies
+  (define emperor_ration_bonus (max 0 (min 0.40 (- emperor_efficiency_modifier 1))))
+  (define emperor_crew_bonus (* crew_efficiency_multiplier 0.08))  ;; 3-crew bonus
+  
+  (set! food_ration (max 0.15 (min 1.25 (+ emperor_base_ration emperor_ration_bonus emperor_crew_bonus))))
+
+  ;; ═══ EMPEROR STATUS DISPLAY ═══
+  (define emperor_status_icon
+    (cond
+      (emperor_cascade_emergency "💀")
+      ((= emperor_threat_level "APOCALYPTIC") "🌋")
+      ((= emperor_threat_level "EXTINCTION") "☠️")
+      ((= emperor_threat_level "CATASTROPHIC") "🔴")
+      ((= emperor_threat_level "SEVERE") "🟠")
+      ((= emperor_threat_level "ELEVATED") "🟡")
+      ((= emperor_threat_level "MODERATE") "🔵")
+      (true "🟢")))
+
+  (log (concat "  Status: " emperor_status_icon " " emperor_threat_level))
+  (log (concat "  Emperor Allocation — I:" (string (round (* isru_alloc 100))) "% | G:" (string (round (* greenhouse_alloc 100))) "% | H:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Emperor Ration: " (string (round (* food_ration 100))) "% | Shield: " (string (round (* total_emperor_shield 100))) "% | Crew Eff: " (string (round (* crew_efficiency_multiplier 100))) "%"))
+
+  ;; ═══ EMPEROR STRATEGIC SUMMARY ═══
+  (concat "Emperor v6.0 Sol " (string sol) " — " emperor_status_icon " " emperor_threat_level
+    " | C:" (string crew_count)
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100))) 
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | ES:" (string (round (* total_emperor_shield 100)))
+    "% | CR:" (string emperor_cascade_indicators)))
