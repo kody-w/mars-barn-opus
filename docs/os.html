@@ -1276,19 +1276,118 @@ window.os = {
         }
       }
 
-      // All proxies failed — show friendly error with open-in-new-tab link
+      // All proxies failed — try API renderers for known sites
+      const apiResult = await this._tryAPIRenderer(url);
+      if (apiResult) {
+        this._html = apiResult;
+        const parser = new DOMParser();
+        this._doc = parser.parseFromString(this._html, 'text/html');
+        this._renderToGUI(url);
+        return 'Loaded: ' + url + ' (via API)';
+      }
+
+      // Everything failed — show friendly error
       this._html = `<html><head><title>Cannot Load</title></head>
         <body style="background:#0d1117;color:#c9d1d9;font-family:'Courier New',monospace;padding:60px;text-align:center">
           <div style="font-size:48px;margin-bottom:16px">🌐</div>
           <h1 style="color:#f0883e;font-size:20px">Page Unavailable</h1>
           <p style="color:#8b949e;margin:16px 0">${url}</p>
-          <p style="color:#484f58;font-size:12px;max-width:400px;margin:0 auto">This site blocks proxy access. Some sites (like Hacker News) actively reject requests from intermediary servers.</p>
+          <p style="color:#484f58;font-size:12px;max-width:400px;margin:0 auto">Proxy and API renderers couldn't load this page.</p>
           <a href="${url}" target="_blank" style="display:inline-block;margin-top:24px;padding:10px 24px;background:#238636;color:#fff;text-decoration:none;border-radius:6px;font-family:inherit;font-size:13px">Open in new tab ↗</a>
         </body></html>`;
       const parser = new DOMParser();
       this._doc = parser.parseFromString(this._html, 'text/html');
       this._renderToGUI(url);
-      return 'Unavailable: ' + url + ' (site blocks proxy access)';
+      return 'Unavailable: ' + url;
+    },
+
+    // ── API Renderers: known sites with public APIs ──
+    // When proxy fails, fetch from the site's own API and render our own frontend
+    async _tryAPIRenderer(url) {
+      const u = url.toLowerCase();
+
+      // Hacker News
+      if (u.includes('news.ycombinator.com') || u.includes('hackernews')) {
+        try {
+          const ids = await (await fetch('https://hacker-news.firebaseio.com/v0/topstories.json')).json();
+          const stories = await Promise.all(ids.slice(0, 30).map(async id => {
+            const s = await (await fetch('https://hacker-news.firebaseio.com/v0/item/' + id + '.json')).json();
+            return s;
+          }));
+          return `<html><head><title>Hacker News</title></head>
+          <body style="background:#f6f6ef;color:#000;font-family:Verdana,sans-serif;padding:0;margin:0">
+            <div style="background:#ff6600;padding:4px 8px;display:flex;align-items:center;gap:8px">
+              <b style="color:#000;font-size:14px">🟠 Hacker News</b>
+              <span style="color:#000;font-size:11px">via Firebase API</span>
+            </div>
+            <table style="width:100%;padding:8px" cellspacing="0">
+              ${stories.map((s, i) => `<tr>
+                <td style="color:#828282;font-size:12px;text-align:right;padding:2px 8px;vertical-align:top">${i + 1}.</td>
+                <td style="padding:4px 0">
+                  <a href="${s.url || ''}" target="_blank" style="color:#000;font-size:13px;text-decoration:none">${s.title || '?'}</a>
+                  <span style="font-size:10px;color:#828282">(${s.url ? new URL(s.url).hostname : 'self'})</span>
+                  <div style="font-size:10px;color:#828282">${s.score} points by ${s.by} | ${s.descendants || 0} comments</div>
+                </td>
+              </tr>`).join('')}
+            </table>
+          </body></html>`;
+        } catch (e) { return null; }
+      }
+
+      // Reddit (JSON API)
+      if (u.includes('reddit.com')) {
+        try {
+          const apiUrl = u.replace('www.reddit.com', 'www.reddit.com') + '.json';
+          const data = await (await fetch(apiUrl.replace('https://www.reddit.com', 'https://www.reddit.com'))).json();
+          const posts = data?.data?.children?.slice(0, 25) || [];
+          return `<html><head><title>Reddit</title></head>
+          <body style="background:#1a1a1b;color:#d7dadc;font-family:-apple-system,sans-serif;padding:0">
+            <div style="background:#ff4500;padding:8px 16px"><b style="color:#fff">reddit</b></div>
+            ${posts.map(p => {
+              const d = p.data;
+              return `<div style="padding:10px 16px;border-bottom:1px solid #343536">
+                <div style="font-size:12px;color:#818384">r/${d.subreddit} · u/${d.author} · ${d.score} pts</div>
+                <a href="https://reddit.com${d.permalink}" target="_blank" style="color:#d7dadc;text-decoration:none;font-size:15px;font-weight:500">${d.title}</a>
+                <div style="font-size:11px;color:#818384;margin-top:4px">${d.num_comments} comments</div>
+              </div>`;
+            }).join('')}
+          </body></html>`;
+        } catch (e) { return null; }
+      }
+
+      // GitHub repos (API)
+      if (u.includes('github.com') && u.split('/').length >= 5) {
+        try {
+          const parts = new URL(url).pathname.split('/').filter(Boolean);
+          const owner = parts[0], repo = parts[1];
+          const data = await (await fetch('https://api.github.com/repos/' + owner + '/' + repo)).json();
+          const readme = await (await fetch('https://api.github.com/repos/' + owner + '/' + repo + '/readme', {headers: {Accept: 'application/vnd.github.raw'}})).text().catch(() => '');
+          return `<html><head><title>${data.full_name} · GitHub</title></head>
+          <body style="background:#0d1117;color:#c9d1d9;font-family:-apple-system,sans-serif;padding:20px;max-width:900px;margin:0 auto">
+            <h1 style="color:#58a6ff;font-size:20px">${data.full_name}</h1>
+            <p style="color:#8b949e">${data.description || ''}</p>
+            <div style="display:flex;gap:16px;margin:12px 0;font-size:13px;color:#8b949e">
+              <span>⭐ ${data.stargazers_count}</span><span>🍴 ${data.forks_count}</span>
+              <span>📦 ${(data.size / 1024).toFixed(1)} MB</span><span>📄 ${data.language || '?'}</span>
+            </div>
+            <hr style="border-color:#30363d">
+            <div style="font-size:14px;line-height:1.6;white-space:pre-wrap">${readme.substring(0, 5000)}</div>
+          </body></html>`;
+        } catch (e) { return null; }
+      }
+
+      // Wikipedia (API)
+      if (u.includes('wikipedia.org/wiki/')) {
+        try {
+          const article = url.split('/wiki/')[1];
+          const data = await (await fetch('https://en.wikipedia.org/api/rest_v1/page/html/' + article)).text();
+          return `<html><head><title>${decodeURIComponent(article)} - Wikipedia</title>
+          <style>body{background:#fff;color:#222;font-family:sans-serif;padding:20px;max-width:800px;margin:0 auto;line-height:1.6}a{color:#0645ad}h1,h2,h3{border-bottom:1px solid #eee;padding-bottom:4px}</style>
+          </head><body>${data}</body></html>`;
+        } catch (e) { return null; }
+      }
+
+      return null; // No renderer for this site
     },
 
     _renderToGUI(url, directLoad) {
