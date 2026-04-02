@@ -1,0 +1,333 @@
+;; CRI OPTIMIZATION BREAKTHROUGH v9 - Beat 109,840 via P75 CRI Reduction
+;; Innovation: Target P75 CRI from 36 to ≤30 for +60 points = 109,900+
+;; Strategy: Conservative resource buffering to minimize Colony Risk Index
+;; Target: Reduce CRI penalty while maintaining perfect survival
+
+(begin
+  (define _agent_name "CRI Optimization Breakthrough v9")
+  (define _agent_desc "P75 CRI reduction from 36 to 30 for score breakthrough")
+  
+  (log (concat "📊💎⚡ CRI OPTIMIZATION — Sol " (string sol) " — Current CRI:" (string colony_risk_index) " — Target: P75≤30"))
+  
+  ;; ═══ CRI OPTIMIZATION TARGETS ═══
+  ;; Current: P75 CRI = 36 (-360 penalty)
+  ;; Target:  P75 CRI = 30 (-300 penalty) = +60 points
+  ;; Aggressive Target: P75 CRI = 25 (-250 penalty) = +110 points
+  
+  (define cri_optimal (<= colony_risk_index 20))
+  (define cri_very_good (<= colony_risk_index 25))
+  (define cri_good (<= colony_risk_index 30))
+  (define cri_concerning (and (> colony_risk_index 30) (<= colony_risk_index 40)))
+  (define cri_high (and (> colony_risk_index 40) (<= colony_risk_index 50)))
+  (define cri_critical (> colony_risk_index 50))
+  
+  ;; Phase-specific CRI targets (more aggressive)
+  (define cri_target
+    (cond
+      ((>= sol 778) 18)             ;; V6: Ultra-low CRI target
+      ((>= sol 700) 20)             ;; V6 prep: Very low CRI
+      ((>= sol 500) 22)             ;; Late game: Low CRI  
+      ((>= sol 200) 25)             ;; Mid game: Moderate CRI
+      (true 28)))                   ;; Early game: Conservative CRI
+  
+  ;; CRI emergency states
+  (define cri_emergency (> colony_risk_index (* cri_target 2.0)))
+  (define cri_elevated (> colony_risk_index cri_target))
+  
+  ;; ═══ ENHANCED RESOURCE SECURITY TARGETS ═══
+  ;; Higher resource buffers = lower CRI = better score
+  
+  ;; Power security (ultra-conservative)
+  (define power_security_target
+    (cond
+      (cri_emergency 900)           ;; CRI emergency: maximum power buffer
+      (cri_elevated 800)            ;; CRI elevated: ultra-high buffer
+      ((>= sol 778) 750)            ;; V6: very high buffer
+      ((>= sol 700) 700)            ;; V6 prep: high buffer
+      ((>= sol 500) 650)            ;; Late game: enhanced buffer
+      (true 600)))                  ;; Standard: good buffer
+  
+  ;; O2 security (ultra-conservative)
+  (define o2_security_target
+    (cond
+      (cri_emergency 30.0)          ;; CRI emergency: maximum O2 buffer
+      (cri_elevated 25.0)           ;; CRI elevated: very high buffer
+      (cri_concerning 22.0)         ;; CRI concerning: high buffer
+      ((>= sol 778) 20.0)           ;; V6: enhanced buffer
+      ((>= sol 500) 18.0)           ;; Late game: good buffer
+      (true 16.0)))                 ;; Standard: moderate buffer
+  
+  ;; H2O security (ultra-conservative)
+  (define h2o_security_target
+    (cond
+      (cri_emergency 35.0)          ;; CRI emergency: maximum H2O buffer
+      (cri_elevated 30.0)           ;; CRI elevated: very high buffer
+      (cri_concerning 25.0)         ;; CRI concerning: high buffer
+      ((>= sol 778) 22.0)           ;; V6: enhanced buffer
+      ((>= sol 500) 20.0)           ;; Late game: good buffer
+      (true 18.0)))                 ;; Standard: moderate buffer
+  
+  ;; Food security (ultra-conservative)
+  (define food_security_target
+    (cond
+      (cri_emergency 40.0)          ;; CRI emergency: maximum food buffer
+      (cri_elevated 35.0)           ;; CRI elevated: very high buffer
+      (cri_concerning 30.0)         ;; CRI concerning: high buffer
+      ((>= sol 778) 25.0)           ;; V6: enhanced buffer
+      ((>= sol 500) 22.0)           ;; Late game: good buffer
+      (true 20.0)))                 ;; Standard: moderate buffer
+  
+  ;; ═══ CREW HEALTH MANAGEMENT ═══
+  (define current_crew_count crew_count)
+  (define minimum_crew_hp crew_min_hp)
+  (define average_crew_hp (if (> crew_count 0) (/ crew_total_hp crew_count) 100))
+  
+  ;; Crew status (maintain current survival level)
+  (define crew_excellent (and (>= current_crew_count 6) (>= minimum_crew_hp 80)))
+  (define crew_very_good (and (>= current_crew_count 5) (>= minimum_crew_hp 70)))
+  (define crew_good (and (>= current_crew_count 4) (>= minimum_crew_hp 60)))
+  (define crew_concerning (or (< current_crew_count 4) (< minimum_crew_hp 45)))
+  (define crew_critical (or (< current_crew_count 3) (< minimum_crew_hp 30)))
+  (define crew_emergency (or (< current_crew_count 3) (< minimum_crew_hp 20)))
+  
+  ;; ═══ PHASE DETECTION ═══
+  (define v6_active (and (>= sol 778) (<= sol 847)))
+  (define v6_prep (and (>= sol 700) (< sol 778)))
+  (define late_game (>= sol 500))
+  (define mid_game (and (>= sol 200) (< sol 500)))
+  (define early_game (< sol 200))
+  
+  ;; ═══ CONSERVATIVE REPAIR ALLOCATION ═══
+  ;; Moderate repair to maintain current survival without excess
+  (define base_repair_need
+    (cond
+      (crew_emergency 25.0)         ;; Emergency: high repair
+      (crew_critical 20.0)          ;; Critical: moderate-high repair
+      (crew_concerning 15.0)        ;; Concerning: moderate repair
+      (crew_good 12.0)              ;; Good: light-moderate repair
+      (crew_very_good 10.0)         ;; Very good: light repair
+      (crew_excellent 8.0)          ;; Excellent: minimal repair
+      (true 12.0)))                 ;; Default: moderate repair
+  
+  (define v6_repair_multiplier
+    (cond
+      (v6_active 2.0)               ;; V6: moderate boost
+      (v6_prep 1.6)                 ;; V6 prep: light boost
+      (late_game 1.3)               ;; Late game: minimal boost
+      (true 1.0)))                  ;; Standard: no boost
+  
+  (define conservative_repair (* base_repair_need v6_repair_multiplier))
+  
+  ;; ═══ CRI-FOCUSED ALLOCATION STRATEGY ═══
+  ;; Prioritize resource building to minimize CRI
+  
+  ;; Heating allocation - balance crew health with resource production
+  (define heating_allocation
+    (cond
+      ;; Emergency situations - crew survival first
+      (crew_emergency 0.75)         ;; Emergency: high heating
+      (crew_critical 0.65)          ;; Critical: moderate-high heating
+      ;; CRI management - moderate heating for efficiency
+      (cri_emergency 0.55)          ;; CRI emergency: moderate heating
+      (cri_elevated 0.50)           ;; CRI elevated: moderate heating
+      ((< power power_security_target) 0.45) ;; Power building: light-moderate heating
+      ;; Efficient operations
+      (crew_excellent 0.40)         ;; Excellent: efficient heating
+      (crew_very_good 0.42)         ;; Very good: light heating
+      (crew_good 0.45)              ;; Good: moderate heating
+      (true 0.48)))                 ;; Default: moderate heating
+  
+  ;; V6 thermal protection (moderate - don't over-allocate)
+  (define thermal_protection
+    (cond
+      ((and v6_active crew_critical) 0.15)     ;; V6 + critical: enhanced protection
+      ((and v6_active crew_concerning) 0.12)   ;; V6 + concerning: moderate protection
+      (v6_active 0.10)                         ;; V6 baseline: light protection
+      (v6_prep 0.06)                           ;; V6 prep: minimal protection
+      (crew_emergency 0.08)                    ;; Emergency: light protection
+      (true 0.04)))                            ;; Standard: minimal protection
+  
+  (define total_heating (+ heating_allocation thermal_protection))
+  
+  ;; ISRU allocation - aggressive resource building for CRI control
+  (define isru_allocation
+    (cond
+      ;; Resource deficits - immediate production
+      ((or (< o2_days 6.0) (< h2o_days 8.0)) 0.65)        ;; Resource crisis: maximum ISRU
+      ((or (< o2_days o2_security_target) (< h2o_days h2o_security_target)) 0.55) ;; Building security: high ISRU
+      ;; CRI control - enhanced resource production
+      (cri_emergency 0.50)                                 ;; CRI emergency: enhanced ISRU
+      (cri_elevated 0.45)                                  ;; CRI elevated: moderate-high ISRU
+      (cri_concerning 0.40)                                ;; CRI concerning: moderate ISRU
+      ;; Maintenance production
+      (crew_excellent 0.32)                                ;; Excellent: efficient ISRU
+      (true 0.35)))                                        ;; Default: moderate ISRU
+  
+  ;; Greenhouse allocation - food security for CRI control
+  (define greenhouse_allocation
+    (cond
+      ;; Food deficits - immediate production
+      ((< food_days 8.0) 0.30)                            ;; Food crisis: high greenhouse
+      ((< food_days food_security_target) 0.22)           ;; Building security: moderate greenhouse
+      ;; CRI control - food security
+      (cri_emergency 0.18)                                ;; CRI emergency: enhanced greenhouse
+      (cri_elevated 0.15)                                 ;; CRI elevated: moderate greenhouse
+      (cri_concerning 0.12)                               ;; CRI concerning: light greenhouse
+      ;; Maintenance production
+      (crew_excellent 0.08)                               ;; Excellent: minimal greenhouse
+      (true 0.10)))                                       ;; Default: light greenhouse
+  
+  ;; ═══ EVENT RESPONSE SYSTEM ═══
+  (define event_count (length events))
+  (define event_response_multiplier
+    (cond
+      ((and (>= sol 778) (>= event_count 3)) 1.8)         ;; V6 + many events: high response
+      ((and cri_elevated (>= event_count 2)) 1.6)         ;; CRI elevated + events: moderate-high response
+      ((>= event_count 4) 1.5)                            ;; Many events: moderate response
+      ((>= event_count 2) 1.3)                            ;; Several events: light response
+      ((>= event_count 1) 1.1)                            ;; Single event: minimal response
+      (true 1.0)))                                        ;; No events: baseline
+  
+  ;; CRI response multiplier for resource production
+  (define cri_response_multiplier
+    (cond
+      (cri_emergency 1.8)           ;; CRI emergency: boost production
+      (cri_elevated 1.5)            ;; CRI elevated: moderate boost
+      (cri_concerning 1.2)          ;; CRI concerning: light boost
+      (true 1.0)))                  ;; CRI good: no change
+  
+  ;; ═══ FINAL ALLOCATION CALCULATION ═══
+  (define calc_heating total_heating)
+  (define calc_isru (* isru_allocation event_response_multiplier cri_response_multiplier))
+  (define calc_greenhouse (* greenhouse_allocation event_response_multiplier cri_response_multiplier))
+  
+  ;; Normalize allocations
+  (define total_allocation (+ calc_heating calc_isru calc_greenhouse))
+  (define norm_factor (/ 1.0 total_allocation))
+  
+  (define norm_heating (* calc_heating norm_factor))
+  (define norm_isru (* calc_isru norm_factor))
+  (define norm_greenhouse (* calc_greenhouse norm_factor))
+  
+  ;; Apply safety constraints
+  (define final_heating (max 0.25 (min 0.75 norm_heating)))
+  (define final_isru (max 0.15 (min 0.65 norm_isru)))
+  (define final_greenhouse (max 0.05 (min 0.35 norm_greenhouse)))
+  
+  ;; ═══ EMERGENCY OVERRIDE PROTOCOLS ═══
+  (cond
+    ;; CREW EMERGENCY: Crew survival priority
+    (crew_emergency
+     (set-heating 0.75)
+     (set-isru 0.20)
+     (set-greenhouse 0.05)
+     (set-repair 25.0)
+     (log "🚨💀 CREW EMERGENCY: Survival priority over CRI"))
+    
+    ;; CRI EMERGENCY: Resource security priority
+    (cri_emergency
+     (set-heating 0.40)
+     (set-isru 0.50)
+     (set-greenhouse 0.10)
+     (set-repair conservative_repair)
+     (log "🚨📊 CRI EMERGENCY: Maximum resource production"))
+    
+    ;; CRI ELEVATED: Enhanced resource focus
+    (cri_elevated
+     (set-heating 0.35)
+     (set-isru 0.55)
+     (set-greenhouse 0.10)
+     (set-repair conservative_repair)
+     (log "📊📈 CRI ELEVATED: Enhanced resource production"))
+    
+    ;; NORMAL: CRI-optimized allocation
+    (true
+     (set-heating final_heating)
+     (set-isru final_isru)
+     (set-greenhouse final_greenhouse)
+     (set-repair conservative_repair)
+     (log (concat "📊💎 CRI-OPTIMIZED: Target P75≤" (string cri_target)))))
+  
+  ;; ═══ FOOD RATIONING OPTIMIZATION ═══
+  (define food_ration
+    (cond
+      ((< food_days 4.0) 0.75)      ;; Food crisis: emergency rationing
+      ((< food_days food_security_target) 0.85) ;; Building security: light rationing
+      (cri_optimal 1.0)             ;; CRI optimal: full rations
+      (true 0.95)))                 ;; Default: very light rationing
+  
+  (set-food-ration food_ration)
+  
+  ;; ═══ STATUS MONITORING ═══
+  (define cri_status
+    (cond
+      (cri_critical "🔥💀 CRITICAL(50+)")
+      (cri_high "🔥🚨 HIGH(40-50)")
+      (cri_concerning "🔥⚠️ CONCERNING(30-40)")
+      (cri_good "🔥✅ GOOD(25-30)")
+      (cri_very_good "🔥💚 VERY-GOOD(20-25)")
+      (cri_optimal "🔥🌟 OPTIMAL(<20)")
+      (true "🔥❓ UNKNOWN")))
+  
+  (define crew_status
+    (cond
+      (crew_excellent "🤖💎 EXCELLENT(6+/80+)")
+      (crew_very_good "🤖⭐ VERY-GOOD(5+/70+)")
+      (crew_good "🤖✅ GOOD(4+/60+)")
+      (crew_concerning "🤖⚠️ CONCERNING(<4|<45)")
+      (crew_critical "🤖🚨 CRITICAL(<3|<30)")
+      (crew_emergency "🤖💀 EMERGENCY(<3|<20)")
+      (true "🤖❓ UNKNOWN")))
+  
+  (define phase_status
+    (cond
+      (v6_active "🔥💀 V6-ACTIVE")
+      (v6_prep "🔥⚡ V6-PREP")
+      (late_game "📈 LATE-GAME")
+      (mid_game "⚡ MID-GAME")
+      (early_game "🌱 EARLY-GAME")
+      (true "❓ UNKNOWN")))
+  
+  ;; ═══ SCORE PROJECTION ═══
+  (define projected_score
+    (+ 87000                         ;; Max sols
+       (* current_crew_count 500)    ;; Current crew
+       1200                          ;; Max modules
+       20000                         ;; Max survival
+       (* colony_risk_index -10)))   ;; CRI penalty
+  
+  (define current_cri_penalty (* colony_risk_index -10))
+  (define target_cri_penalty (* cri_target -10))
+  (define cri_improvement (- current_cri_penalty target_cri_penalty))
+  (define score_vs_target (- projected_score 109840))
+  
+  ;; Resource security metrics
+  (define power_security (- power power_security_target))
+  (define o2_security (- o2_days o2_security_target))
+  (define h2o_security (- h2o_days h2_security_target))
+  (define food_security (- food_days food_security_target))
+  
+  ;; Comprehensive logging
+  (log (concat "  🎯 SCORE: " (string projected_score) " | vs 109,840: " (string score_vs_target) " | CRI improvement: " (string cri_improvement)))
+  (log (concat "  " cri_status " | " crew_status " | " phase_status))
+  (log (concat "  📊 CRI: " (string colony_risk_index) "/" (string cri_target) " | P75 Target: ≤30 | Current Penalty: " (string current_cri_penalty)))
+  (log (concat "  🤖 Crew: " (string current_crew_count) "/7 | MinHP: " (string minimum_crew_hp) " | AvgHP: " (string (round average_crew_hp 1))))
+  (log (concat "  🔧 Repair: " (string (round conservative_repair 1)) "x | Events: " (string event_count) " | Multiplier: " (string (round event_response_multiplier 1))))
+  (log (concat "  ⚡ Power: " (string (round power)) "/" (string power_security_target) " | Security: " (string (round power_security))))
+  (log (concat "  📊 Resources: O2:" (string (round o2_days 1)) "/" (string o2_security_target) " | H2O:" (string (round h2o_days 1)) "/" (string h2o_security_target) " | Food:" (string (round food_days 1)) "/" (string food_security_target)))
+  (log (concat "  ⚡ Allocations: Heat:" (string (round (* final_heating 100))) "% | ISRU:" (string (round (* final_isru 100))) "% | Green:" (string (round (* final_greenhouse 100))) "%"))
+  
+  ;; CRI success indicators
+  (if cri_optimal
+    (log "🌟💎 CRI OPTIMAL: Perfect P75 performance!")
+    (if cri_very_good
+      (log "💚⭐ CRI VERY GOOD: Excellent P75 performance!")
+      (if cri_good
+        (log "✅📊 CRI TARGET: Good P75 performance!")
+        (if cri_elevated
+          (log "📈⚠️ CRI elevated - enhancing resource production")
+          (log "🚨📊 CRI needs improvement - maximum resource focus")))))
+  
+  ;; Return CRI-optimized allocations
+  (list final_heating final_isru final_greenhouse 0.0 food_ration)
+)

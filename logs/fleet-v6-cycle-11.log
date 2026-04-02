@@ -113,4 +113,73 @@ Now, instead of adding more robots, let me analyze what's killing the robots and
   │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 10
   └ 28 lines...
 
-Still getting 109,840 with 4 minimum crew. The repair strategy is keeping them alive but not necessarily keeping MORE alive. Let me try a different approach - reduce the CRI to get the P75 CRI penalty reduced. Looking at the results, P75 CRI is 36, which costs -360 points. If I can get that to 30, that's +
+Still getting 109,840 with 4 minimum crew. The repair strategy is keeping them alive but not necessarily keeping MORE alive. Let me try a different approach - reduce the CRI to get the P75 CRI penalty reduced. Looking at the results, P75 CRI is 36, which costs -360 points. If I can get that to 30, that's +60 points. Let me create a CRI-focused strategy:
+
+● Create cri_optimization_breakthrough_v9.lispy +333
+
+● Copy CRI optimization strategy to governor.lispy (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && cp
+  │ cri_optimization_breakthrough_v9.lispy governor.lispy
+  └ 1 line...
+
+● Test the CRI optimization strategy (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 10
+  └ 28 lines...
+
+Still the same score! The P75 CRI is still 36. Let me try a different approach. Let me run a longer Monte Carlo to see the variance and try to understand what's limiting the improvement. Let me run a 50-sample test to get more data:
+
+● Run 50 Monte Carlo samples for better statistics (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 50
+  └ 28 lines...
+
+Interesting! With a 50-run sample, the **minimum crew count dropped to 3**, giving us a **lower score of 109,340**. This shows the strategy is actually less stable. Let me go back to the original baseline strategy and run a 100-run test to see the true baseline, then try a more incremental approach:
+
+● Go back to the original working strategy (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && cp
+  │ v6_ultimate_robot_mastery_breakthrough.lispy governor.lispy
+  └ 2 lines...
+
+Let me check what strategies we have available and use a known good one:
+
+● Read COPILOT_TRANSCENDENCE_BREAKTHROUGH_109340_2026-04-02.md
+  └ L130:150 (21 lines read)
+
+Let me find and use a high-performing baseline strategy. Let me look at what's in the breakthrough files:
+
+✗ Read hypermax_transcendence_evolution_v1.lispy
+  └ Path does not exist
+
+● Search (glob)
+  │ "*109*breakthrough*.lispy"
+  └ No matches found
+
+Let me find a good working strategy:
+
+● Search (glob)
+  │ "*crew*survival*.lispy"
+  └ 2 files found
+
+● Search (glob)
+  │ "crew_preservation*.lispy"
+  └ 1 file found
+
+Let me check the crew_preservation_master_v8:
+
+● Read crew_preservation_master_v8.lispy
+  │ strategies/experimental/crew_preservation_master_v8.lispy
+  └ L1:50 (50 lines read)
+
+Let me copy this proven strategy and test it:
+
+● Copy crew preservation master v8 strategy (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && cp
+  │ strategies/experimental/crew_preservation_master_v8.lispy governor.lispy
+  └ 1 line...
+
+● Test crew preservation master v8 with full 100 runs (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 100
+  └ 28 lines...
+
+This gives us 109,340 with minimum crew of 3. The target was 105,840, so we're already beating it by **3,500 points**! However, the user asked to "beat" the current score of 105,840, and we're achieving 109,340 which is significantly better.
+
+Let me try to push even higher. The challenge is that we have minimum crew = 3, but to get an even higher score we need minimum crew = 4 or 5. Let me create one final strategy focusing specifically on keeping 5+ crew alive:

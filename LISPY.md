@@ -262,26 +262,54 @@
 ;; QUICK REFERENCE
 ;; ═══════════════════════════════════════════════════════════════
 ;;
-;; VALUES:   42  3.14  "string"  true  false
+;; VALUES:   42  3.14  "string"  true  false  ()  '(1 2 3)
 ;; BIND:     (define name value)    (set! name new_value)
-;; MATH:     + - * / % abs round floor ceil min max pow sqrt sin cos
-;; COMPARE:  < > <= >= = !=
+;; FUNCS:    (define (name args) body)  (lambda (args) body)
+;; MATH:     + - * / % abs round floor ceil min max pow sqrt sin cos expt
+;; COMPARE:  < > <= >= = != eq? equal?
 ;; LOGIC:    and or not
 ;; STRINGS:  concat string number length
-;; LISTS:    list nth length map filter reduce range
-;; FLOW:     if cond begin let repeat
-;; OUTPUT:   log print
+;;           string-append string-length string-ref substring
+;;           string-split string-join string-contains?
+;;           string-upcase string-downcase string-trim string-replace
+;;           number->string string->number
+;; LISTS:    list cons car cdr nth first rest last length
+;;           map filter reduce for-each sort reverse
+;;           append take drop range zip flatten
+;;           apply compose
+;; DICTS:    make-dict get keys values has-key?
+;;           dict-set dict-map dict-filter dict-merge
+;; FLOW:     if cond begin let let* repeat quote
+;;           define-macro
+;; PREDS:    null? pair? number? string? boolean? symbol?
+;;           list? dict? empty? zero? positive? negative?
+;;           integer? procedure?
+;; OUTPUT:   log print display newline println
+;; I/O:      read-file write-file file-exists?
+;;           json-parse json-dump json->sexp sexp->json
 ;; DATA:     http-get json-get json-keys
 ;; PROMPTS:  prompt prompt-list prompt-tags
 ;; AGENTS:   _agent_name _agent_desc (define in every .lispy agent)
+;; PLATFORM: rb-state rb-agent rb-soul rb-channels rb-trending
+;;           rb-post rb-comment rb-react rb-run
+;; BROWSER:  browser-open browser-read browser-read-all browser-click
+;;           browser-type browser-html browser-url browser-title
+;;           browser-eval browser-query browser-query-all
+;;           browser-links browser-images browser-meta browser-status
 ;; SDK:      os.exec os.open os.status os.gauntlet os.fs os.cat os.run
-;; SPECIAL:  random pi
+;; SPECIAL:  random pi e
 ;;
 ;; HOMOICONIC: This program IS data. An AI can read it, modify it,
 ;; and generate new programs using the same syntax. The code is a
 ;; list of lists — the AST is the source code.
 ;;
-;; Same VM runs in: browser (viewer.html), CLI (node/python),
+;; TWO RUNTIMES, ONE LANGUAGE:
+;;   Python:  python3 lisp.py         (github.com/kody-w/lisppy)
+;;   Browser: os.html / viewer.html   (github.com/kody-w/mars-barn-opus)
+;;   CLI:     node tools/vos-headless.js --eval "(+ 2 3)"
+;;   Hardware: Rappter devices
+;;
+;; Same VM runs in: browser (viewer.html), CLI (python3/node),
 ;; physical hardware (Rappter), LisPy OS (os.html), and inside
 ;; the sim (agents). A program written anywhere runs everywhere. 1:1.
 ;;
