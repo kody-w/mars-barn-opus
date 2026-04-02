@@ -1,0 +1,167 @@
+;; COPILOT QUANTUM CREW OPTIMIZATION NEXUS v1
+;; Revolutionary Paradigm: Crew Count Maximization with Perfect Module Balance
+;; Goal: Achieve 95,000+ score through crew survival optimization and strategic module deployment
+;; Features: Crew preservation excellence, optimal health management, strategic building timing
+
+(begin
+  (define _agent_name "Copilot Quantum Crew Optimization Nexus v1")
+  (define _agent_desc "Revolutionary crew optimization strategy targeting maximum crew survival with optimal module balance")
+
+  (log (concat "👥⚡💎🌟🚀 QUANTUM CREW NEXUS — Sol " (string sol) " — Crew Optimization Protocol"))
+
+  ;; ═══ REVOLUTIONARY CREW PRESERVATION STRATEGY ═══
+  ;; Ultra-refined health management for maximum crew survival
+  (define crew_critical (< crew_count 4))
+  (define crew_vulnerable (< crew_count 5))
+  (define crew_stable (>= crew_count 5))
+
+  ;; ═══ ADAPTIVE PHASE INTELLIGENCE ═══
+  ;; Crew-optimized mission phases
+  (define genesis_phase (< sol 20))
+  (define protection_phase (and (>= sol 20) (< sol 60)))
+  (define expansion_phase (and (>= sol 60) (< sol 140)))
+  (define optimization_phase (and (>= sol 140) (< sol 280)))
+  (define transcendence_phase (>= sol 280))
+
+  ;; ═══ CREW-OPTIMIZED THREAT MODELING ═══
+  ;; Enhanced threat assessment with crew survival focus
+  (define threat_minimal (< cri 8))
+  (define threat_low (and (>= cri 8) (< cri 18)))
+  (define threat_moderate (and (>= cri 18) (< cri 35)))
+  (define threat_elevated (and (>= cri 35) (< cri 55)))
+  (define threat_critical (and (>= cri 55) (< cri 75)))
+  (define threat_extreme (>= cri 75))
+
+  ;; Crew health multiplier based on threat and crew count
+  (define crew_health_multiplier
+    (cond
+      ((and crew_critical threat_extreme) 4.0)
+      ((and crew_critical threat_critical) 3.0)
+      ((and crew_vulnerable threat_critical) 2.5)
+      ((and crew_vulnerable threat_elevated) 2.0)
+      (crew_critical 1.8)
+      (crew_vulnerable 1.4)
+      (true 1.0)))
+
+  ;; ═══ REVOLUTIONARY ALLOCATION MATRIX ═══
+  ;; Crew-optimized allocation for maximum score
+  (define base_health_allocation
+    (cond
+      (threat_minimal 0.08)
+      (threat_low 0.12)
+      (threat_moderate 0.18)
+      (threat_elevated 0.26)
+      (threat_critical 0.36)
+      (threat_extreme 0.48)))
+
+  ;; Apply crew health multiplier
+  (define optimized_health_allocation 
+    (min 0.65 (* base_health_allocation crew_health_multiplier)))
+
+  ;; Strategic building allocation balancing modules and crew safety
+  (define optimized_building_allocation
+    (cond
+      ;; Early phase ultra-aggressive building
+      ((and genesis_phase threat_minimal) 0.90)
+      ((and genesis_phase threat_low) 0.86)
+      ((and genesis_phase threat_moderate) 0.80)
+      
+      ;; Protection phase balanced approach
+      ((and protection_phase threat_minimal) 0.86)
+      ((and protection_phase threat_low) 0.82)
+      ((and protection_phase threat_moderate) 0.76)
+      ((and protection_phase threat_elevated) 0.68)
+      
+      ;; Expansion phase optimized building
+      ((and expansion_phase threat_minimal) 0.84)
+      ((and expansion_phase threat_low) 0.80)
+      ((and expansion_phase threat_moderate) 0.74)
+      ((and expansion_phase threat_elevated) 0.66)
+      ((and expansion_phase threat_critical) 0.56)
+      
+      ;; Optimization phase strategic balance
+      ((and optimization_phase threat_minimal) 0.82)
+      ((and optimization_phase threat_low) 0.78)
+      ((and optimization_phase threat_moderate) 0.72)
+      ((and optimization_phase threat_elevated) 0.64)
+      ((and optimization_phase threat_critical) 0.54)
+      
+      ;; Transcendence phase perfect optimization
+      ((and transcendence_phase threat_minimal) 0.80)
+      ((and transcendence_phase threat_low) 0.76)
+      ((and transcendence_phase threat_moderate) 0.70)
+      ((and transcendence_phase threat_elevated) 0.62)
+      ((and transcendence_phase threat_critical) 0.52)
+      ((and transcendence_phase threat_extreme) 0.40)
+      
+      ;; Fallback
+      (0.60)))
+
+  ;; Ensure allocations don't exceed crew health needs
+  (define final_building_allocation 
+    (max 0.20 (- 1.0 optimized_health_allocation 0.02)))
+
+  (define final_health_allocation optimized_health_allocation)
+  (define final_science_allocation 
+    (- 1.0 final_building_allocation final_health_allocation))
+
+  ;; ═══ CREW-OPTIMIZED MODULE STRATEGY ═══
+  ;; Intelligent module selection for crew survival and score optimization
+  (define critical_bot_shortage (< bot_count 3))
+  (define critical_solar_shortage (< solar_count 4))
+  (define critical_repair_shortage (and (> sol 35) (< repair_count 2)))
+
+  ;; Strategic module targets
+  (define target_bots 
+    (cond
+      (genesis_phase 4)
+      (protection_phase 6)
+      (expansion_phase 9)
+      (optimization_phase 12)
+      (transcendence_phase 15)))
+
+  (define target_solar
+    (cond
+      (genesis_phase 5)
+      (protection_phase 8)
+      (expansion_phase 12)
+      (optimization_phase 16)
+      (transcendence_phase 20)))
+
+  (define target_repair
+    (cond
+      (genesis_phase 1)
+      (protection_phase 3)
+      (expansion_phase 5)
+      (optimization_phase 7)
+      (transcendence_phase 9)))
+
+  ;; Revolutionary module selection
+  (define next_module
+    (cond
+      ;; Emergency infrastructure
+      (critical_bot_shortage "bot")
+      (critical_solar_shortage "solar")
+      (critical_repair_shortage "repair")
+      
+      ;; Strategic progression
+      ((< bot_count target_bots) "bot")
+      ((< solar_count target_solar) "solar")
+      ((< repair_count target_repair) "repair")
+      ((< greenhouse_count 5) "greenhouse")
+      
+      ;; Default to bot for module count
+      ("bot")))
+
+  ;; ═══ MONITORING ═══
+  (define total_modules (+ bot_count solar_count greenhouse_count repair_count))
+  
+  (log (concat "👥 CREW NEXUS | Sol " (string sol) 
+               " | Crew: " (string crew_count)
+               " | Modules: " (string total_modules)
+               " | Health: " (string (floor (* final_health_allocation 100))) "%"
+               " | Building: " (string (floor (* final_building_allocation 100))) "%"
+               " | CRI: " (string cri)))
+
+  ;; QUANTUM CREW OPTIMIZATION OUTPUT
+  (list final_building_allocation final_health_allocation final_science_allocation next_module))
