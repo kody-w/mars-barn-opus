@@ -540,13 +540,13 @@
     { name: 'BOT-MNT', color: 0x44ff88, hp: 0.78, status: 'healthy' },
   ];
 
-  // Waypoints for patrol routes
+  // Waypoints for patrol routes (avoid building centers)
   const waypointSets = [
-    [[0, 0], [20, 5], [15, -15], [5, -25], [0, 0]],
-    [[0, 0], [-15, -10], [-22, 8], [-8, -16], [0, 0]],
-    [[-40, -5], [-22, 8], [0, 0], [20, 5], [-40, -5]],
-    [[5, -25], [15, -15], [20, 5], [0, 0], [-15, -10], [5, -25]],
-    [[0, 0], [-22, 8], [-40, -5], [-15, -10], [0, 0]],
+    [[12, 12], [20, 5], [15, -15], [5, -25], [12, 12]],
+    [[-10, 10], [-15, -10], [-22, 8], [-8, -16], [-10, 10]],
+    [[-40, -5], [-22, 8], [-10, 10], [20, 5], [-40, -5]],
+    [[5, -25], [15, -15], [20, 5], [12, 12], [-15, -10], [5, -25]],
+    [[-10, 10], [-22, 8], [-40, -5], [-15, -10], [-10, 10]],
   ];
 
   const labelContainer = document.getElementById('label-container');
@@ -620,6 +620,28 @@
       direction: new THREE.Vector3(0, 0, 1)
     });
   });
+
+  // ─── COLLISION OBSTACLES (buildings + radii) ────────────────
+  const obstacles = [
+    { x: 0,   z: 0,   r: 10 },  // HAB-CENTRAL (sphere r=8 + buffer)
+    { x: -12, z: 18,  r: 4 },   // SOLAR-ARRAY row 1
+    { x: -6,  z: 18,  r: 4 },
+    { x: 0,   z: 18,  r: 4 },
+    { x: -12, z: 23,  r: 4 },   // SOLAR-ARRAY row 2
+    { x: -6,  z: 23,  r: 4 },
+    { x: 0,   z: 23,  r: 4 },
+    { x: -8,  z: -16, r: 5 },   // ISRU-PLANT
+    { x: 20,  z: 5,   r: 5 },   // GREENHOUSE (approx positions)
+    { x: 25,  z: 10,  r: 5 },
+    { x: 5,   z: -25, r: 5 },   // WATER-EXTRACT
+    { x: -22, z: 8,   r: 6 },   // REPAIR-BAY
+    { x: -40, z: -5,  r: 13 },  // LANDING-PAD
+    { x: 15,  z: -15, r: 3 },   // COMMS-ARRAY
+  ];
+
+  const UNIT_RADIUS = 1.2;
+  const BUILDING_PUSH = 3.0;  // repulsion strength from buildings
+  const UNIT_PUSH = 2.0;      // repulsion strength between units
 
   // ─── DUST PARTICLES ──────────────────────────────────────────
   const dustCount = 1500;
@@ -852,7 +874,7 @@
     const elapsed = clock.elapsedTime;
 
     // ── Update units ──
-    units.forEach(u => {
+    units.forEach((u, ui) => {
       const wp = u.waypoints;
       u.progress += dt * u.speed * 0.15;
       if (u.progress >= 1) {
@@ -865,14 +887,51 @@
       const cx = wp[ci][0], cz = wp[ci][1];
       const nx = wp[ni][0], nz = wp[ni][1];
 
-      // Smooth interpolation
+      // Smooth interpolation (desired position)
       const t = u.progress;
       const st = t * t * (3 - 2 * t); // smoothstep
-      const px = cx + (nx - cx) * st;
-      const pz = cz + (nz - cz) * st;
+      let px = cx + (nx - cx) * st;
+      let pz = cz + (nz - cz) * st;
+
+      // ── Collision avoidance ──
+      let pushX = 0, pushZ = 0;
+
+      // Repel from buildings
+      for (const ob of obstacles) {
+        const dx = px - ob.x;
+        const dz = pz - ob.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        const minDist = ob.r + UNIT_RADIUS;
+        if (dist < minDist && dist > 0.01) {
+          const overlap = minDist - dist;
+          const nx2 = dx / dist, nz2 = dz / dist;
+          pushX += nx2 * overlap * BUILDING_PUSH;
+          pushZ += nz2 * overlap * BUILDING_PUSH;
+        }
+      }
+
+      // Repel from other units
+      for (let j = 0; j < units.length; j++) {
+        if (j === ui) continue;
+        const other = units[j];
+        const dx = px - other.group.position.x;
+        const dz = pz - other.group.position.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        const minDist = UNIT_RADIUS * 2;
+        if (dist < minDist && dist > 0.01) {
+          const overlap = minDist - dist;
+          const nx2 = dx / dist, nz2 = dz / dist;
+          pushX += nx2 * overlap * UNIT_PUSH;
+          pushZ += nz2 * overlap * UNIT_PUSH;
+        }
+      }
+
+      px += pushX;
+      pz += pushZ;
+
       const ty = getTerrainY(px, pz);
 
-      u.direction.set(nx - cx, 0, nz - cz).normalize();
+      u.direction.set(nx - cx + pushX * 0.5, 0, nz - cz + pushZ * 0.5).normalize();
       u.group.position.set(px, ty, pz);
 
       // Face direction
