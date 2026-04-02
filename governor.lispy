@@ -1,11 +1,11 @@
-;; COPILOT CRI ANNIHILATOR V1
-;; Target: Break 108,840 via aggressive CRI minimization
-;; Strategy: Break the CRI feedback loop by ultra-defensive resource management
-;; Key insight: CRI creates events which create more CRI - BREAK THE CYCLE
+;; COPILOT ULTIMATE TRANSCENDENCE GOD v1
+;; Target: Break 109,000+ via crew survival + ultra-CRI minimization
+;; Strategy: Maximum crew preservation + ultra-defensive CRI management
+;; Key insight: +1 crew = +500 points, P75 CRI reduction = +10 per point
 
 (begin
-  (define _agent_name "Copilot CRI Annihilator v1")
-  (define _agent_desc "Aggressive CRI minimization targeting P75 CRI ≤ 20")
+  (define _agent_name "Copilot Ultimate Transcendence God v1")
+  (define _agent_desc "Crew preservation + ultra-CRI minimization → 109,000+")
   
   (log (concat "🔥💥 CRI ANNIHILATOR — Sol " (string sol) " — CRI:" (string colony_risk_index) " — Target: P75 ≤ 20"))
   
@@ -16,20 +16,26 @@
   ;; O2/H2O/Food < 5 days: +20 each
   ;; Random events: probability = 0.012 * (1 + CRI/80) - FEEDBACK LOOP!
   
-  ;; ═══ ANNIHILATION TARGETS ═══
-  ;; Ultra-defensive thresholds to guarantee 0 penalties
-  (define annihilator_power_target 200)     ;; Well above 150 to avoid +10 penalty
-  (define annihilator_o2_target 8.0)        ;; Well above 5 to avoid +20 penalty
-  (define annihilator_h2o_target 8.0)       ;; Well above 5 to avoid +20 penalty  
-  (define annihilator_food_target 10.0)     ;; Well above 5 to avoid +20 penalty
+  ;; ═══ TRANSCENDENCE TARGETS ═══
+  ;; Ultra-defensive thresholds to guarantee 0 penalties + crew preservation
+  (define transcendence_power_target 300)   ;; Ultra-high to avoid all penalties
+  (define transcendence_o2_target 12.0)     ;; Ultra-safe O2 target (12+ days)
+  (define transcendence_h2o_target 12.0)    ;; Ultra-safe H2O target (12+ days)
+  (define transcendence_food_target 15.0)   ;; Ultra-safe Food target (15+ days)
   
-  ;; CRI feedback prevention - the key insight
-  (define cri_danger_zone (> colony_risk_index 25))     ;; High CRI = high event risk
-  (define cri_critical_zone (> colony_risk_index 35))   ;; Very high CRI = very high event risk
-  (define cri_emergency_zone (> colony_risk_index 45))  ;; Extreme CRI = extreme event risk
+  ;; Emergency response thresholds - even higher than base targets
+  (define emergency_power_target 400)       ;; Emergency power buffer
+  (define emergency_o2_target 15.0)         ;; Emergency O2 buffer
+  (define emergency_h2o_target 15.0)        ;; Emergency H2O buffer
+  (define emergency_food_target 20.0)       ;; Emergency food buffer
+  
+  ;; CRI feedback prevention - MORE AGGRESSIVE thresholds for P75 ≤ 25 target
+  (define cri_danger_zone (> colony_risk_index 20))     ;; Danger at 20 (was 25)
+  (define cri_critical_zone (> colony_risk_index 28))   ;; Critical at 28 (was 35)
+  (define cri_emergency_zone (> colony_risk_index 35))  ;; Emergency at 35 (was 45)
 
   ;; ═══ CREW MONITORING ═══
-  (define robot_count 5)
+  (define robot_count 6)  ;; Updated to 6 robots for better redundancy
   (define robot_health_perfect (>= crew_min_hp 80))
   (define robot_health_good (>= crew_min_hp 60))
   (define robot_health_critical (< crew_min_hp 40))
@@ -46,7 +52,21 @@
   ;; ═══ CRI ANNIHILATION ALLOCATION ═══
   ;; Ultra-aggressive resource building when CRI is elevated
   
-  (define annihilator_power_need
+  ;; ═══ TRANSCENDENCE ALLOCATION LOGIC ═══
+  ;; Ultra-aggressive resource building with crew preservation priority
+  
+  (define transcendence_power_need
+    (cond
+      (cri_emergency_zone emergency_power_target)     ; Emergency response
+      (cri_critical_zone 350)                         ; Critical response  
+      (cri_danger_zone transcendence_power_target)    ; Danger response
+      (cri_transcendence_zone 250)                    ; Transcendence mode
+      (robot_health_emergency emergency_power_target) ; Crew emergency
+      (robot_health_critical 350)                     ; Crew critical
+      ((not crew_target_met) 300)                    ; Boost for crew preservation
+      (true transcendence_power_target)))             ; Base target
+  
+  (define transcendence_heating_need
     (cond
       ((< power 150) 0.95)                                   ;; Emergency - avoid +10 penalty
       ((< power annihilator_power_target) 0.75)              ;; Build to safe target
@@ -97,10 +117,10 @@
   
   (define annihilator_cri_response
     (cond
-      (cri_emergency_zone 2.2)     ;; Extreme CRI = extreme response  
-      (cri_critical_zone 1.8)      ;; Critical CRI = strong response
-      (cri_danger_zone 1.4)        ;; Elevated CRI = moderate response
-      ((> colony_risk_index 15) 1.2)  ;; Slightly elevated = light response
+      (cri_emergency_zone 2.0)     ;; Extreme CRI = strong response (reduced from 2.2)
+      (cri_critical_zone 1.6)      ;; Critical CRI = moderate response (reduced from 1.8)
+      (cri_danger_zone 1.2)        ;; Elevated CRI = light response (reduced from 1.4)
+      ((> colony_risk_index 15) 1.1)  ;; Slightly elevated = minimal response (reduced from 1.2)
       (true 1.0)))                 ;; Low CRI = maintain efficiency
 
   (define event_count (length events))
@@ -127,13 +147,21 @@
 
   (define annihilator_thermal_protection
     (cond
-      ((and v6_active_period robot_health_emergency) 0.15)   ;; V6 maximum emergency
-      ((and v6_active_period robot_health_critical) 0.10)    ;; V6 critical
-      ((and v6_active_period (not robot_health_good)) 0.06)  ;; V6 concerning
-      (v6_preparation_period 0.04)                           ;; V6 preparation
-      (robot_health_emergency 0.10)                          ;; General emergency
-      (robot_health_critical 0.06)                           ;; General critical
-      ((not robot_health_good) 0.03)                         ;; General concerning
+      ;; CREW COUNT CRISIS - Maximum thermal emergency
+      ((< current_crew_count 3) 0.25)                        ;; Below 3 robots = MAXIMUM THERMAL
+      ;; V6 ACTIVE PERIOD - Maximum thermal shield
+      ((and v6_active_period robot_health_emergency) 0.20)   ;; V6 maximum emergency (increased)
+      ((and v6_active_period robot_health_critical) 0.15)    ;; V6 critical (increased)
+      ((and v6_active_period robot_health_concerning) 0.10)  ;; V6 concerning (increased)
+      ((and v6_active_period (not robot_health_good)) 0.08)  ;; V6 general protection (increased)
+      (v6_active_period 0.05)                                ;; V6 baseline (added)
+      ;; V6 PREPARATION - Enhanced prep
+      (v6_preparation_period 0.06)                           ;; V6 preparation (increased)
+      ;; GENERAL THERMAL PROTECTION - Enhanced
+      (robot_health_emergency 0.12)                          ;; General emergency (increased)
+      (robot_health_critical 0.08)                           ;; General critical (increased)
+      ((not robot_health_good) 0.05)                         ;; General concerning (increased)
+      ((> sol 600) 0.02)                                     ;; Late game prep (added)
       (true 0.00)))                                          ;; Good health
 
   ;; ═══ ANNIHILATOR ANTI-COMPLACENCY ═══
@@ -171,6 +199,8 @@
   ;; ═══ ANNIHILATOR REPAIR OPTIMIZATION ═══
   (define annihilator_repair_multiplier
     (cond
+      ;; CREW COUNT CRISIS - Ultra-aggressive survival target focus
+      ((< current_crew_count 3) 15.0)                        ;; Below 3 robots = MAXIMUM REPAIR
       ;; V6 ACTIVE PERIOD - Ultra-aggressive repair
       ((and v6_active_period robot_health_emergency) 12.0)   ;; V6 maximum emergency (increased)
       ((and v6_active_period robot_health_critical) 8.5)     ;; V6 critical (increased)  
@@ -179,8 +209,6 @@
       (v6_active_period 3.8)                                 ;; V6 baseline (increased)
       ;; V6 PREPARATION - Early intervention
       (v6_preparation_period 4.0)                            ;; V6 preparation (increased)
-      ;; CREW COUNT CRISIS - Prioritize survival target
-      ((< current_crew_count 3) 9.0)                         ;; Below 3 robots = CRISIS
       ;; GENERAL HEALTH RESPONSES - More aggressive
       (robot_health_emergency 9.0)                           ;; General emergency (increased)
       (robot_health_critical 6.0)                            ;; General critical (increased)
