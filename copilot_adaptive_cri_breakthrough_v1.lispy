@@ -1,0 +1,129 @@
+;; COPILOT ADAPTIVE CRI BREAKTHROUGH v1
+;; Goal: Create an even more optimized strategy combining the best innovations
+;; Target: Beat current records through ultra-early farming + adaptive CRI management
+
+(begin
+  (define _agent_name "Copilot Adaptive CRI Breakthrough v1")
+  (define _agent_desc "Ultra-early farming with adaptive CRI management and multiple repair bays")
+
+  (log (concat "🚀🏆 ADAPTIVE CRI — Sol " (string sol) " — CRI:" (string colony_risk_index)))
+
+  ;; ═══ MISSION PHASE INTELLIGENCE ═══
+  (define mission_phase
+    (cond
+      ((< sol 15) "genesis")
+      ((< sol 25) "early_farming")     ;; Ultra-early Sol 15 start!
+      ((< sol 70) "mega_farming")
+      ((< sol 150) "acceleration")
+      ((< sol 300) "consolidation")
+      ((< sol 500) "optimization")
+      (true "transcendence")))
+
+  ;; ═══ CRI THREAT LEVEL ASSESSMENT ═══
+  (define cri_threat_level
+    (cond
+      ((< colony_risk_index 5) "minimal")     ;; Safe farming conditions
+      ((< colony_risk_index 15) "low")        ;; Light caution
+      ((< colony_risk_index 30) "moderate")   ;; Balanced approach
+      ((< colony_risk_index 50) "high")       ;; Conservative
+      ((< colony_risk_index 75) "critical")   ;; Emergency mode
+      (true "crisis")))                        ;; All-hands survival
+
+  ;; ═══ ADAPTIVE ALLOCATION MATRIX ═══ 
+  ;; Dynamically adjusts based on CRI and mission phase
+  (define base_greenhouse_alloc
+    (cond
+      ;; Ultra-early farming window (Sol 15-70)
+      ((and (equal? mission_phase "early_farming") (equal? cri_threat_level "minimal")) 0.85)
+      ((and (equal? mission_phase "early_farming") (equal? cri_threat_level "low")) 0.80)
+      ((and (equal? mission_phase "mega_farming") (equal? cri_threat_level "minimal")) 0.90)
+      ((and (equal? mission_phase "mega_farming") (equal? cri_threat_level "low")) 0.85)
+      
+      ;; High-threat survival mode
+      ((equal? cri_threat_level "crisis") 0.20)
+      ((equal? cri_threat_level "critical") 0.30)
+      ((equal? cri_threat_level "high") 0.45)
+      
+      ;; Standard operations
+      ((equal? mission_phase "acceleration") 0.65)
+      ((equal? mission_phase "consolidation") 0.55)
+      ((equal? mission_phase "optimization") 0.50)
+      ((equal? mission_phase "transcendence") 0.45)
+      
+      ;; Default safe allocation
+      (true 0.40)))
+
+  ;; ISRU allocation - scales with CRI for O2 security
+  (define base_isru_alloc
+    (cond
+      ((equal? cri_threat_level "crisis") 0.50)
+      ((equal? cri_threat_level "critical") 0.40)
+      ((equal? cri_threat_level "high") 0.30)
+      ((equal? cri_threat_level "moderate") 0.25)
+      ;; During farming, minimize ISRU to maximize building
+      ((and (or (equal? mission_phase "early_farming") 
+               (equal? mission_phase "mega_farming"))
+           (or (equal? cri_threat_level "minimal") 
+               (equal? cri_threat_level "low"))) 0.10)
+      (true 0.20)))
+
+  ;; Heating allocation - remainder after ISRU and Greenhouse
+  (define base_heating_alloc (- 1.0 (+ base_greenhouse_alloc base_isru_alloc)))
+
+  ;; ═══ RESOURCE SAFETY CHECKS ═══
+  ;; Override aggressive farming if resources are critically low
+  (define safety_greenhouse_alloc
+    (cond
+      ((< o2_days 2) (min base_greenhouse_alloc 0.30))   ;; O2 emergency
+      ((< food_days 2) (max base_greenhouse_alloc 0.60))  ;; Food emergency
+      ((< o2_days 4) (min base_greenhouse_alloc 0.50))   ;; O2 warning
+      ((< food_days 4) (max base_greenhouse_alloc 0.70)) ;; Food warning
+      (true base_greenhouse_alloc)))
+
+  (define safety_isru_alloc
+    (cond
+      ((< o2_days 2) (max base_isru_alloc 0.40))         ;; O2 emergency
+      ((< o2_days 4) (max base_isru_alloc 0.30))         ;; O2 warning
+      (true base_isru_alloc)))
+
+  (define final_heating_alloc (- 1.0 (+ safety_greenhouse_alloc safety_isru_alloc)))
+
+  ;; Apply the calculated allocations
+  (set! greenhouse_alloc safety_greenhouse_alloc)
+  (set! isru_alloc safety_isru_alloc)
+  (set! heating_alloc final_heating_alloc)
+
+  ;; ═══ ADAPTIVE FOOD RATIONING ═══
+  ;; More aggressive rationing during farming phases
+  (define base_food_ration
+    (cond
+      ;; Ultra-conservative in crisis
+      ((equal? cri_threat_level "crisis") 0.25)
+      ((equal? cri_threat_level "critical") 0.35)
+      
+      ;; Resource-based rationing
+      ((< food_days 2) 0.30)
+      ((< food_days 5) 0.50)
+      ((< food_days 10) 0.65)
+      
+      ;; Farming phases - moderate rationing for building power
+      ((or (equal? mission_phase "early_farming") 
+           (equal? mission_phase "mega_farming")) 0.75)
+      
+      ;; Normal operations
+      (true 0.85)))
+
+  (set! food_ration base_food_ration)
+
+  ;; ═══ STATUS REPORTING ═══
+  (log (concat "  Phase: " mission_phase " | CRI: " cri_threat_level " (" (string colony_risk_index) ")"))
+  (log (concat "  Alloc — G:" (string (round (* greenhouse_alloc 100))) "% I:" (string (round (* isru_alloc 100))) "% H:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Ration: " (string (round (* food_ration 100))) "% | O2:" (string o2_days) "d Food:" (string food_days) "d"))
+
+  ;; ═══ OUTPUT SUMMARY ═══
+  (concat "Adaptive Sol " (string sol) " " mission_phase "/" cri_threat_level
+    " | G:" (string (round (* greenhouse_alloc 100)))
+    "% I:" (string (round (* isru_alloc 100)))  
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | O2:" (string o2_days) "d F:" (string food_days) "d"))

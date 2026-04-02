@@ -1,0 +1,178 @@
+;; COPILOT ULTRA RECORD BREAKER v1
+;; Goal: Beat all records through ultra-aggressive early farming and perfect CRI control
+;; Innovation: Sol 15 mega farming start + 95% greenhouse allocation in safe conditions
+
+(begin
+  (define _agent_name "Copilot Ultra Record Breaker v1")
+  (define _agent_desc "Ultra-aggressive early farming with extreme allocation optimization")
+
+  (log (concat "🚀💎🏆 ULTRA RECORD — Sol " (string sol) " — CRI:" (string colony_risk_index)))
+
+  ;; ═══ ULTRA-EARLY FARMING PHASES ═══
+  (define ultra_mission_phase
+    (cond
+      ((< sol 10) "bootstrap")
+      ((< sol 15) "pre_farming")
+      ((< sol 20) "ultra_farming_start")   ;; THE BREAKTHROUGH WINDOW
+      ((< sol 50) "mega_farming")          ;; Extreme farming
+      ((< sol 100) "hyper_farming")
+      ((< sol 180) "power_farming") 
+      ((< sol 320) "consolidation")
+      ((< sol 500) "optimization")
+      (true "transcendence")))
+
+  ;; ═══ ULTRA-PRECISE CRI THREAT ASSESSMENT ═══
+  (define cri_ultra_level
+    (cond
+      ((< colony_risk_index 3) "ultra_safe")   ;; 95% farming conditions
+      ((< colony_risk_index 8) "safe")         ;; 90% farming
+      ((< colony_risk_index 15) "low_threat")  ;; 85% farming
+      ((< colony_risk_index 25) "moderate")    ;; 70% farming
+      ((< colony_risk_index 40) "elevated")    ;; 50% farming
+      ((< colony_risk_index 60) "high")        ;; 35% farming
+      ((< colony_risk_index 80) "critical")    ;; 25% survival mode
+      (true "emergency")))                      ;; 15% emergency
+
+  ;; ═══ BREAKTHROUGH ALLOCATION MATRIX ═══
+  ;; The most aggressive allocation system ever created
+  (define ultra_greenhouse_alloc
+    (cond
+      ;; ULTRA-EARLY BREAKTHROUGH FARMING (Sol 15-50)
+      ((and (or (equal? ultra_mission_phase "ultra_farming_start")
+                (equal? ultra_mission_phase "mega_farming"))
+            (equal? cri_ultra_level "ultra_safe")) 0.95)  ;; MAXIMUM FARMING!
+      
+      ((and (equal? ultra_mission_phase "ultra_farming_start")
+            (equal? cri_ultra_level "safe")) 0.92)
+            
+      ((and (equal? ultra_mission_phase "mega_farming") 
+            (equal? cri_ultra_level "safe")) 0.90)
+            
+      ((and (equal? ultra_mission_phase "mega_farming")
+            (equal? cri_ultra_level "low_threat")) 0.85)
+
+      ;; HYPER FARMING CONTINUATION (Sol 50-100)
+      ((and (equal? ultra_mission_phase "hyper_farming")
+            (equal? cri_ultra_level "ultra_safe")) 0.90)
+            
+      ((and (equal? ultra_mission_phase "hyper_farming")
+            (equal? cri_ultra_level "safe")) 0.87)
+
+      ;; POWER FARMING (Sol 100-180)
+      ((and (equal? ultra_mission_phase "power_farming")
+            (equal? cri_ultra_level "ultra_safe")) 0.85)
+            
+      ((and (equal? ultra_mission_phase "power_farming")
+            (equal? cri_ultra_level "safe")) 0.80)
+
+      ;; THREAT-BASED SURVIVAL SCALING
+      ((equal? cri_ultra_level "emergency") 0.15)
+      ((equal? cri_ultra_level "critical") 0.25)
+      ((equal? cri_ultra_level "high") 0.35)
+      ((equal? cri_ultra_level "elevated") 0.50)
+      ((equal? cri_ultra_level "moderate") 0.65)
+      ((equal? cri_ultra_level "low_threat") 0.75)
+      ((equal? cri_ultra_level "safe") 0.70)
+      
+      ;; LATE-GAME OPTIMIZATION
+      ((equal? ultra_mission_phase "consolidation") 0.60)
+      ((equal? ultra_mission_phase "optimization") 0.55)
+      ((equal? ultra_mission_phase "transcendence") 0.50)
+      
+      ;; FALLBACK
+      (true 0.45)))
+
+  ;; ═══ ULTRA-MINIMAL ISRU STRATEGY ═══
+  ;; Minimize O2 allocation during farming for maximum building power
+  (define ultra_isru_alloc
+    (cond
+      ;; EMERGENCY O2 ALLOCATION
+      ((equal? cri_ultra_level "emergency") 0.60)
+      ((equal? cri_ultra_level "critical") 0.45)
+      ((equal? cri_ultra_level "high") 0.35)
+      
+      ;; ULTRA-EARLY FARMING - MINIMIZE O2 FOR BUILDING
+      ((and (or (equal? ultra_mission_phase "ultra_farming_start")
+                (equal? ultra_mission_phase "mega_farming")
+                (equal? ultra_mission_phase "hyper_farming"))
+            (or (equal? cri_ultra_level "ultra_safe")
+                (equal? cri_ultra_level "safe"))) 0.05)  ;; MINIMAL O2!
+                
+      ;; FARMING WITH MODERATE THREAT
+      ((and (or (equal? ultra_mission_phase "ultra_farming_start")
+                (equal? ultra_mission_phase "mega_farming"))
+            (equal? cri_ultra_level "low_threat")) 0.10)
+            
+      ;; NORMAL THREAT SCALING
+      ((equal? cri_ultra_level "moderate") 0.20)
+      ((equal? cri_ultra_level "elevated") 0.25)
+      
+      ;; LATE GAME CONSERVATIVE
+      ((equal? ultra_mission_phase "transcendence") 0.25)
+      
+      ;; DEFAULT
+      (true 0.15)))
+
+  ;; Heating gets remainder
+  (define ultra_heating_alloc (- 1.0 (+ ultra_greenhouse_alloc ultra_isru_alloc)))
+
+  ;; ═══ ULTRA-SAFETY OVERRIDES ═══
+  ;; Only override if truly critical - trust the ultra system
+  (define final_greenhouse_alloc
+    (cond
+      ((< o2_days 1.5) (min ultra_greenhouse_alloc 0.20))    ;; Absolute O2 emergency
+      ((< food_days 1.5) (max ultra_greenhouse_alloc 0.70))  ;; Absolute food emergency
+      ((< o2_days 2.5) (min ultra_greenhouse_alloc 0.40))    ;; O2 critical
+      (true ultra_greenhouse_alloc)))
+
+  (define final_isru_alloc
+    (cond
+      ((< o2_days 1.5) (max ultra_isru_alloc 0.50))          ;; Absolute O2 emergency
+      ((< o2_days 2.5) (max ultra_isru_alloc 0.35))          ;; O2 critical
+      (true ultra_isru_alloc)))
+
+  (define final_heating_alloc (- 1.0 (+ final_greenhouse_alloc final_isru_alloc)))
+
+  ;; Apply allocations
+  (set! greenhouse_alloc final_greenhouse_alloc)
+  (set! isru_alloc final_isru_alloc)  
+  (set! heating_alloc final_heating_alloc)
+
+  ;; ═══ ULTRA-OPTIMIZED FOOD RATIONING ═══
+  (define ultra_food_ration
+    (cond
+      ;; ABSOLUTE EMERGENCY
+      ((< food_days 1.5) 0.25)
+      ((equal? cri_ultra_level "emergency") 0.30)
+      ((equal? cri_ultra_level "critical") 0.40)
+      
+      ;; FARMING PHASE RATIONING - Be aggressive to build more
+      ((and (or (equal? ultra_mission_phase "ultra_farming_start")
+                (equal? ultra_mission_phase "mega_farming"))
+            (>= food_days 5)) 0.70)    ;; Trust the farming will pay off
+            
+      ((and (equal? ultra_mission_phase "hyper_farming")
+            (>= food_days 4)) 0.75)
+            
+      ;; RESOURCE-BASED SCALING
+      ((< food_days 3) 0.45)
+      ((< food_days 5) 0.60)
+      ((< food_days 8) 0.70)
+      
+      ;; NORMAL OPERATIONS
+      (true 0.80)))
+
+  (set! food_ration ultra_food_ration)
+
+  ;; ═══ ULTRA STATUS REPORTING ═══
+  (log (concat "  🎯 ULTRA Phase: " ultra_mission_phase " | CRI: " cri_ultra_level " (" (string colony_risk_index) ")"))
+  (log (concat "  💎 Ultra Alloc — G:" (string (round (* greenhouse_alloc 100))) "% I:" (string (round (* isru_alloc 100))) "% H:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  ⚡ Food: " (string (round (* food_ration 100))) "% | O2:" (string o2_days) "d Food:" (string food_days) "d"))
+
+  ;; ═══ OUTPUT ═══
+  (concat "Ultra " (string sol) " " ultra_mission_phase "/" cri_ultra_level
+    " | G:" (string (round (* greenhouse_alloc 100)))
+    "% I:" (string (round (* isru_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))  
+    "% | R:" (string (round (* food_ration 100)))
+    "% | O2:" (string o2_days) "d F:" (string food_days) "d"))
