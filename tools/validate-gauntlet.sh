@@ -44,8 +44,8 @@ if [ -z "$SCORE" ]; then
     exit 1
 fi
 
-# 3. Score must be positive and reasonable (> 1000)
-if [ "$SCORE" -lt 1000 ] 2>/dev/null; then
+# 3. Score must be positive and reasonable (> 50000 for a real run)
+if [ "$SCORE" -lt 50000 ] 2>/dev/null; then
     echo "⚠️  SCORE SUSPICIOUSLY LOW ($SCORE) — rolling back"
     cp "$KNOWN_GOOD" "$GAUNTLET"
     echo "✅ Restored from known-good"

@@ -6,3 +6,31 @@ playwright-report/
 # Deployment secrets
 .env.testnet
 .env
+
+# Fleet output spam — Amendment VII
+# Fleets must NOT create files in root or copy the gauntlet
+*ACHIEVEMENT*.md
+*BREAKTHROUGH*.md
+*RECORD*.md
+*VICTORY*.md
+*TRANSCENDENCE*.md
+*OBLITERATED*.md
+*DEMOLISHED*.md
+*SUPREME*.md
+*OPTIMIZATION*.md
+*OMNIPOTENCE*.md
+*CONSCIOUSNESS*.md
+*HYPERMAX*.md
+*MASTERY*.md
+
+# No gauntlet copies
+tools/gauntlet-*.js
+tools/gauntlet_*.js
+tools/gauntlet_backup.js
+!tools/gauntlet.js
+!tools/gauntlet.known-good.js
+
+# No stray generators/tests in root
+generate_v*.py
+test_*.js
+test_*.py
