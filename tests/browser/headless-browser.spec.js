@@ -89,8 +89,8 @@ test.describe('LisPy Headless Browser', () => {
     const result = await page.evaluate(() => window.os.browser.type('#pasteArea', '(+ 1 2)'));
     expect(result).toContain('Typed');
     const val = await page.evaluate(() => {
-      const doc = document.getElementById('vos-browser-frame')?.contentDocument;
-      return doc?.querySelector('#pasteArea')?.value;
+      const iframe = document.querySelector('#win-iframe-vbrowser iframe');
+      return iframe?.contentDocument?.querySelector('#pasteArea')?.value;
     });
     expect(val).toBe('(+ 1 2)');
   });
