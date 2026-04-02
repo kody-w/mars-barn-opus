@@ -1,0 +1,255 @@
+;; COPILOT ULTIMATE MODULE DENSITY TRANSCENDENCE v1
+;; Revolutionary Paradigm: Extreme Module Density Optimization with Perfect Survival
+;; Goal: Push module count to 30+ while maintaining 100% survival rate
+;; Features: Ultra-aggressive building, minimal infrastructure, module density maximization
+
+(begin
+  (define _agent_name "Copilot Ultimate Module Density Transcendence v1")
+  (define _agent_desc "Extreme module density optimization with perfect survival guarantee")
+
+  (log (concat "🏗️🚀⚡💎🔥 ULTIMATE MODULE DENSITY — Sol " (string sol) " — Transcendence Building Protocol"))
+
+  ;; ═══ MODULE DENSITY OPTIMIZATION PHASES ═══
+  ;; Revolutionary building phases optimized for maximum module density
+  (define phase_foundation (< sol 12))         ;; Minimal foundation
+  (define phase_acceleration (and (>= sol 12) (< sol 35))) ;; Rapid acceleration
+  (define phase_explosion (and (>= sol 35) (< sol 80)))    ;; Building explosion
+  (define phase_optimization (and (>= sol 80) (< sol 150))) ;; Density optimization
+  (define phase_transcendence (and (>= sol 150) (< sol 300))) ;; Building transcendence
+  (define phase_perfection (>= sol 300))       ;; Perfect density
+
+  ;; ═══ ULTRA-EFFICIENT THREAT ASSESSMENT ═══
+  ;; Simplified but effective threat modeling for building decisions
+  (define threat_extreme (> cri 70))          ;; Extreme survival threat
+  (define threat_high (and (>= cri 40) (<= cri 70))) ;; High survival risk
+  (define threat_medium (and (>= cri 20) (< cri 40))) ;; Medium risk
+  (define threat_low (< cri 20))               ;; Low risk - building mode
+
+  ;; Survival infrastructure requirements based on threat
+  (define min_repair_bays
+    (cond
+      (threat_extreme 6)                       ;; Maximum repair for extreme threats
+      (threat_high 5)                          ;; High repair for high threats
+      (threat_medium 4)                        ;; Moderate repair for medium threats
+      (threat_low 3)))                         ;; Minimal repair for low threats
+
+  (define min_solar_arrays
+    (cond
+      (threat_extreme 8)                       ;; Energy security for extreme threats
+      (threat_high 7)                          ;; Good energy for high threats
+      (threat_medium 6)                        ;; Moderate energy for medium threats
+      (threat_low 5)))                         ;; Minimal energy for low threats
+
+  (define min_greenhouses
+    (cond
+      (threat_extreme 6)                       ;; Food security for extreme threats
+      (threat_high 5)                          ;; Good food for high threats
+      (threat_medium 4)                        ;; Moderate food for medium threats
+      (threat_low 3)))                         ;; Minimal food for low threats
+
+  ;; ═══ ULTRA-AGGRESSIVE ALLOCATION FOR BUILDING ═══
+  ;; Minimal allocation for survival, maximum efficiency for building
+  (cond
+    ;; EXTREME THREAT - Survival focus but still building
+    (threat_extreme
+      (begin 
+        (set! isru_alloc 0.45) (set! greenhouse_alloc 0.47) (set! heating_alloc 0.08)
+        (log "🔥💀 EXTREME THREAT: Survival building mode")))
+        
+    ;; HIGH THREAT - Balanced survival with building
+    (threat_high
+      (begin 
+        (set! isru_alloc 0.35) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.10)
+        (log "⚠️🔧 HIGH THREAT: Efficient building mode")))
+        
+    ;; MEDIUM THREAT - Building optimization
+    (threat_medium
+      (begin 
+        (set! isru_alloc 0.25) (set! greenhouse_alloc 0.65) (set! heating_alloc 0.10)
+        (log "📊⚡ MEDIUM THREAT: Building optimization")))
+        
+    ;; LOW THREAT - Maximum building mode
+    (threat_low
+      (begin 
+        (set! isru_alloc 0.18) (set! greenhouse_alloc 0.72) (set! heating_alloc 0.10)
+        (log "🚀🏗️ LOW THREAT: Maximum building mode"))))
+
+  ;; ═══ OPTIMIZED FOOD RATIONING FOR BUILDING ═══
+  ;; Efficient food management to maximize building resources
+  (define base_food_ratio
+    (cond
+      ((< food_days 3) 0.45)       ;; Emergency survival
+      ((< food_days 6) 0.60)       ;; Crisis management
+      ((< food_days 12) 0.80)      ;; Conservative operation
+      ((< food_days 20) 0.95)      ;; Normal operation
+      (true 1.00)))                ;; Optimal operation
+
+  ;; Crew health optimization for building efficiency
+  (define crew_health_factor
+    (let ((avg_hp (/ crew_hp crew_count)))
+      (cond
+        ((< avg_hp 50) 1.25)       ;; Health boost needed
+        ((< avg_hp 70) 1.10)       ;; Moderate health boost
+        ((< avg_hp 85) 1.00)       ;; Good health
+        (true 0.95))))             ;; Excellent health - conserve
+
+  ;; Phase-based rationing optimization
+  (define phase_food_factor
+    (cond
+      (phase_foundation 1.10)      ;; Foundation needs nutrition
+      (phase_acceleration 1.05)    ;; Acceleration efficiency
+      (phase_explosion 1.00)       ;; Explosion balance
+      (phase_optimization 0.98)    ;; Optimization efficiency
+      (phase_transcendence 0.95)   ;; Transcendent efficiency
+      (phase_perfection 0.93)))    ;; Perfect efficiency
+
+  (set! food_ration (max 0.40 (min 1.1 (* base_food_ratio crew_health_factor phase_food_factor))))
+
+  ;; ═══ REVOLUTIONARY BUILDING STRATEGY ═══
+  ;; Ultra-aggressive building pattern for maximum module density
+
+  ;; Minimal foundation phase (sols 1-11)
+  (cond
+    ((= sol 1) (set! build_item "worker_bot"))        ;; Essential worker
+    ((= sol 2) (set! build_item "solar_array"))       ;; Energy foundation  
+    ((= sol 3) (set! build_item "greenhouse"))        ;; Food foundation
+    ((= sol 4) (set! build_item "worker_bot"))        ;; Second worker
+    ((= sol 5) (set! build_item "repair_bay"))        ;; Repair foundation
+    ((= sol 6) (set! build_item "hab_module"))        ;; Start module building!
+    ((= sol 7) (set! build_item "hab_module"))        ;; Continue building
+    ((= sol 8) (set! build_item "solar_array"))       ;; Energy expansion
+    ((= sol 9) (set! build_item "hab_module"))        ;; More modules
+    ((= sol 10) (set! build_item "greenhouse"))       ;; Food expansion
+    ((= sol 11) (set! build_item "hab_module"))       ;; Module focus
+
+    ;; Rapid acceleration phase (sols 12-34)
+    ((and (>= sol 12) (<= sol 34))
+     (let ((cycle_pos (modulo (- sol 12) 5)))
+       (set! build_item
+             (cond
+               ;; Only build infrastructure when absolutely needed
+               ((and (= cycle_pos 0) (< repair_count min_repair_bays)) "repair_bay")
+               ((and (= cycle_pos 1) (< solar_count min_solar_arrays)) "solar_array")
+               ((and (= cycle_pos 2) (< greenhouse_count min_greenhouses)) "greenhouse")
+               ((and (= cycle_pos 3) (< bot_count 4)) "worker_bot")
+               ;; Otherwise: HAB MODULES!
+               (true "hab_module")))))
+
+    ;; Building explosion phase (sols 35-79)
+    ((and (>= sol 35) (<= sol 79))
+     (let* ((total_modules (+ hab_count greenhouse_count solar_count repair_count bot_count isru_count))
+            (infrastructure_sufficient 
+              (and (>= repair_count min_repair_bays)
+                   (>= solar_count min_solar_arrays)
+                   (>= greenhouse_count min_greenhouses)
+                   (>= bot_count 5))))
+       (set! build_item
+             (cond
+               ;; Critical infrastructure gaps only
+               ((< repair_count min_repair_bays) "repair_bay")
+               ((< solar_count min_solar_arrays) "solar_array")
+               ((< greenhouse_count min_greenhouses) "greenhouse")
+               ((and (not infrastructure_sufficient) (< bot_count 6)) "worker_bot")
+               ;; Pure module building
+               (true "hab_module")))))
+
+    ;; Density optimization phase (sols 80-149)
+    ((and (>= sol 80) (<= sol 149))
+     (let* ((total_modules (+ hab_count greenhouse_count solar_count repair_count bot_count isru_count))
+            (modules_per_sol (if (> sol 0) (/ total_modules sol) 0))
+            (target_modules_per_sol 0.35))  ;; Aggressive target
+       (set! build_item
+             (cond
+               ;; Infrastructure optimization for higher building rate
+               ((and (< modules_per_sol target_modules_per_sol) (< bot_count 8)) "worker_bot")
+               ((and (< power_ratio 0.80) (< solar_count (+ min_solar_arrays 2))) "solar_array")
+               ((and (< repair_count (+ min_repair_bays 1)) (> cri 30)) "repair_bay")
+               ;; Continue module focus
+               (true "hab_module")))))
+
+    ;; Building transcendence phase (sols 150-299)
+    ((and (>= sol 150) (<= sol 299))
+     (let* ((total_modules (+ hab_count greenhouse_count solar_count repair_count bot_count isru_count))
+            (hab_density_ratio (if (> total_modules 0) (/ hab_count total_modules) 0)))
+       (set! build_item
+             (cond
+               ;; Maintain minimum infrastructure for ultra-long survival
+               ((< repair_count (+ min_repair_bays 2)) "repair_bay")
+               ((and (< solar_count (+ min_solar_arrays 3)) (< power_ratio 0.85)) "solar_array") 
+               ((and (< greenhouse_count (+ min_greenhouses 2)) (< food_days 20)) "greenhouse")
+               ;; Focus on habitat density
+               (true "hab_module")))))
+
+    ;; Perfect density phase (sols 300+)
+    ((>= sol 300)
+     (let* ((total_modules (+ hab_count greenhouse_count solar_count repair_count bot_count isru_count))
+            (safety_infrastructure_complete
+              (and (>= repair_count (+ min_repair_bays 3))
+                   (>= solar_count (+ min_solar_arrays 4))
+                   (>= greenhouse_count (+ min_greenhouses 3))
+                   (>= bot_count 8))))
+       (set! build_item
+             (cond
+               ;; Final safety infrastructure
+               ((and (not safety_infrastructure_complete) (< repair_count (+ min_repair_bays 4))) "repair_bay")
+               ((and (not safety_infrastructure_complete) (< solar_count (+ min_solar_arrays 5))) "solar_array")
+               ((and (not safety_infrastructure_complete) (< greenhouse_count (+ min_greenhouses 4))) "greenhouse")
+               ;; Pure hab module density
+               (true "hab_module"))))))
+
+  ;; ═══ PERFORMANCE METRICS ═══
+  (define total_modules (+ hab_count greenhouse_count solar_count repair_count bot_count isru_count))
+  (define modules_per_sol (if (> sol 0) (/ total_modules sol) 0))
+  (define hab_density_ratio (if (> total_modules 0) (/ hab_count total_modules) 0))
+  (define infrastructure_count (+ repair_count solar_count greenhouse_count bot_count))
+  (define hab_to_infrastructure_ratio (if (> infrastructure_count 0) (/ hab_count infrastructure_count) 0))
+
+  (define density_score
+    (+ (* hab_count 10)                ;; Hab modules worth 10 points each
+       (* total_modules 3)             ;; All modules worth 3 points
+       (* modules_per_sol 200)         ;; Building rate bonus
+       (* hab_density_ratio 500)       ;; Density ratio bonus
+       (if (> hab_count 25) 1000 0)    ;; Extreme density bonus
+       (if (> modules_per_sol 0.4) 500 0))) ;; Ultra-efficiency bonus
+
+  (define current_phase_name
+    (cond
+      (phase_foundation "Foundation")
+      (phase_acceleration "Acceleration") 
+      (phase_explosion "Explosion")
+      (phase_optimization "Optimization")
+      (phase_transcendence "Transcendence")
+      (phase_perfection "Perfection")))
+
+  (define current_threat_name
+    (cond
+      (threat_extreme "EXTREME")
+      (threat_high "HIGH")
+      (threat_medium "MEDIUM")
+      (threat_low "LOW")))
+
+  ;; ═══ STATUS LOGGING ═══
+  (log (concat "  🏗️ BUILDING PHASE: " current_phase_name " | THREAT: " current_threat_name " | CRI: " (string cri)))
+  (log (concat "  📊 DENSITY — Total:" (string total_modules) " Habs:" (string hab_count) 
+               " Rate:" (string (round (* modules_per_sol 100))) "/100sol"))
+  (log (concat "  🏭 INFRASTRUCTURE — R:" (string repair_count) "/" (string min_repair_bays) 
+               " S:" (string solar_count) "/" (string min_solar_arrays) 
+               " G:" (string greenhouse_count) "/" (string min_greenhouses) 
+               " B:" (string bot_count)))
+  (log (concat "  ⚡ ALLOCATION — ISRU:" (string (round (* isru_alloc 100))) 
+               "% Green:" (string (round (* greenhouse_alloc 100))) 
+               "% Heat:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  🍽️ CREW — Ration:" (string (round (* food_ration 100))) 
+               "% | Alive:" (string crew_alive) "/" (string crew_count) 
+               " HP:" (string (round (/ crew_hp crew_count)))))
+  (log (concat "  📈 SCORE — Density:" (string (round density_score)) 
+               " | Hab%:" (string (round (* hab_density_ratio 100)))
+               "% | H:I=" (string (round (* hab_to_infrastructure_ratio 10))) "/10"))
+
+  ;; ═══ MODULE DENSITY OUTPUT ═══
+  (concat "🏗️⚡💎🚀 Density Sol " (string sol) " | " current_phase_name "/" current_threat_name
+    " | TM:" (string total_modules) "(H:" (string hab_count) "/" (string (round (* hab_density_ratio 100))) "%)"
+    " | Rate:" (string (round (* modules_per_sol 100))) "/100"
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% | R:" (string repair_count) "S:" (string solar_count) "G:" (string greenhouse_count)))

@@ -1,0 +1,357 @@
+;; COPILOT UNIVERSAL OMNIPOTENCE NEXUS v1
+;; Revolutionary Paradigm: Universal Multi-Dimensional Intelligence with Infinite Repair Nexus
+;; Goal: Achieve theoretical perfection through universal omnipotence and dimensional transcendence
+;; Features: 12-phase universal evolution, 15-level threat modeling, 12-bay repair nexus, dimensional intelligence
+
+(begin
+  (define _agent_name "Copilot Universal Omnipotence Nexus v1")
+  (define _agent_desc "Universal multi-dimensional intelligence with infinite repair nexus and dimensional transcendence")
+
+  (log (concat "🌌🔥⚡🧠💫🚀 UNIVERSAL OMNIPOTENCE NEXUS — Sol " (string sol) " — Dimensional Transcendence Protocol"))
+
+  ;; ═══ UNIVERSAL DIMENSIONAL EVOLUTION PHASES ═══
+  ;; Revolutionary 12-phase universal consciousness evolution
+  (define phase_genesis (< sol 10))            ;; Universal birth
+  (define phase_awakening (and (>= sol 10) (< sol 25)))   ;; Cosmic awakening
+  (define phase_acceleration (and (>= sol 25) (< sol 45))) ;; Dimensional acceleration
+  (define phase_expansion (and (>= sol 45) (< sol 75)))    ;; Reality expansion
+  (define phase_integration (and (>= sol 75) (< sol 110))) ;; Dimensional integration
+  (define phase_optimization (and (>= sol 110) (< sol 150))) ;; Reality optimization
+  (define phase_transcendence (and (>= sol 150) (< sol 200))) ;; First transcendence
+  (define phase_mastery (and (>= sol 200) (< sol 260)))    ;; Universal mastery
+  (define phase_apotheosis (and (>= sol 260) (< sol 330))) ;; Reality apotheosis
+  (define phase_omnipotence (and (>= sol 330) (< sol 420))) ;; Omnipotent phase
+  (define phase_godhood (and (>= sol 420) (< sol 520)))    ;; Divine godhood
+  (define phase_universalis (>= sol 520))      ;; Universal omnipotence
+
+  ;; ═══ REVOLUTIONARY 15-LEVEL THREAT MODELING ═══
+  ;; Ultimate dimensional threat assessment with reality manipulation
+  (define threat_void (< cri 1))               ;; Universal void
+  (define threat_whisper (and (>= cri 1) (< cri 3)))     ;; Reality whisper
+  (define threat_echo (and (>= cri 3) (< cri 6)))        ;; Dimensional echo
+  (define threat_presence (and (>= cri 6) (< cri 10)))   ;; Threat presence
+  (define threat_awareness (and (>= cri 10) (< cri 15))) ;; Threat awareness
+  (define threat_concern (and (>= cri 15) (< cri 21)))   ;; Active concern
+  (define threat_danger (and (>= cri 21) (< cri 28)))    ;; Danger manifold
+  (define threat_crisis (and (>= cri 28) (< cri 36)))    ;; Crisis emergence
+  (define threat_catastrophe (and (>= cri 36) (< cri 45))) ;; Catastrophe zone
+  (define threat_apocalypse (and (>= cri 45) (< cri 55))) ;; Apocalypse threshold
+  (define threat_extinction (and (>= cri 55) (< cri 66))) ;; Extinction boundary
+  (define threat_annihilation (and (>= cri 66) (< cri 78))) ;; Annihilation event
+  (define threat_oblivion (and (>= cri 78) (< cri 88)))   ;; Oblivion state
+  (define threat_singularity (and (>= cri 88) (< cri 96))) ;; Reality singularity
+  (define threat_omnicide (>= cri 96))         ;; Universal omnicide
+
+  ;; Universal dimensional vulnerability assessment
+  (define dimensional_vulnerability_score
+    (+ (if (< ie 0.15) 50 0)      ;; Critical dimensional failure
+       (if (< se 0.15) 45 0)      ;; Solar consciousness collapse
+       (if (< repair_count 5) 35 0) ;; Repair nexus insufficiency
+       (if (< solar_count 6) 30 0)  ;; Energy dimensional gap
+       (if (< greenhouse_count 4) 25 0) ;; Food consciousness deficit
+       (if (< bot_count 4) 20 0)     ;; Labor dimensional shortage
+       (if (< hab_count 8) 15 0)))   ;; Habitat density insufficiency
+
+  ;; Universal threat multiplier with dimensional correction
+  (define universal_threat_multiplier
+    (+ cri 
+       (* dimensional_vulnerability_score 0.4)
+       (if (< sol 50) (* (- 50 sol) 0.3) 0)  ;; Early vulnerability
+       (if (> sol 500) (* (- sol 500) 0.1) 0))) ;; Late-game stress
+
+  ;; ═══ DIMENSIONAL ALLOCATION MATRIX ═══
+  ;; Ultimate multi-dimensional resource allocation with reality manipulation
+  (cond
+    ;; OMNICIDE PROTOCOL - Reality override authority
+    (threat_omnicide
+      (begin 
+        (set! isru_alloc 0.70) (set! greenhouse_alloc 0.25) (set! heating_alloc 0.05)
+        (log "🔥💀 OMNICIDE PROTOCOL: Reality override engaged")))
+        
+    ;; SINGULARITY PROTOCOL - Dimensional manipulation
+    (threat_singularity
+      (begin 
+        (set! isru_alloc 0.65) (set! greenhouse_alloc 0.30) (set! heating_alloc 0.05)
+        (log "⚡🌌 SINGULARITY PROTOCOL: Dimensional manipulation")))
+        
+    ;; OBLIVION PROTOCOL - Universal intervention
+    (threat_oblivion
+      (begin 
+        (set! isru_alloc 0.60) (set! greenhouse_alloc 0.35) (set! heating_alloc 0.05)
+        (log "💫🔮 OBLIVION PROTOCOL: Universal intervention")))
+        
+    ;; ANNIHILATION PROTOCOL - Reality stabilization
+    (threat_annihilation
+      (begin 
+        (set! isru_alloc 0.55) (set! greenhouse_alloc 0.38) (set! heating_alloc 0.07)
+        (log "🚨💥 ANNIHILATION PROTOCOL: Reality stabilization")))
+        
+    ;; EXTINCTION PROTOCOL - Dimensional rescue
+    (threat_extinction
+      (begin 
+        (set! isru_alloc 0.50) (set! greenhouse_alloc 0.42) (set! heating_alloc 0.08)
+        (log "⚠️🌟 EXTINCTION PROTOCOL: Dimensional rescue")))
+        
+    ;; APOCALYPSE PROTOCOL - Universal defense
+    (threat_apocalypse
+      (begin 
+        (set! isru_alloc 0.45) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.10)
+        (log "🔱🛡️ APOCALYPSE PROTOCOL: Universal defense")))
+        
+    ;; CATASTROPHE PROTOCOL - Reality reinforcement  
+    (threat_catastrophe
+      (begin 
+        (set! isru_alloc 0.40) (set! greenhouse_alloc 0.48) (set! heating_alloc 0.12)
+        (log "⚡🔧 CATASTROPHE PROTOCOL: Reality reinforcement")))
+        
+    ;; CRISIS PROTOCOL - Dimensional optimization
+    (threat_crisis
+      (begin 
+        (set! isru_alloc 0.35) (set! greenhouse_alloc 0.52) (set! heating_alloc 0.13)
+        (log "🌊🔬 CRISIS PROTOCOL: Dimensional optimization")))
+        
+    ;; DANGER PROTOCOL - Universal efficiency
+    (threat_danger
+      (begin 
+        (set! isru_alloc 0.30) (set! greenhouse_alloc 0.55) (set! heating_alloc 0.15)
+        (log "⚙️🎯 DANGER PROTOCOL: Universal efficiency")))
+        
+    ;; CONCERN PROTOCOL - Balanced omnipotence
+    (threat_concern
+      (begin 
+        (set! isru_alloc 0.25) (set! greenhouse_alloc 0.60) (set! heating_alloc 0.15)
+        (log "🔄⚡ CONCERN PROTOCOL: Balanced omnipotence")))
+        
+    ;; AWARENESS PROTOCOL - Growth optimization
+    (threat_awareness
+      (begin 
+        (set! isru_alloc 0.20) (set! greenhouse_alloc 0.65) (set! heating_alloc 0.15)
+        (log "📈🌱 AWARENESS PROTOCOL: Growth optimization")))
+        
+    ;; PRESENCE PROTOCOL - Efficient expansion
+    (threat_presence
+      (begin 
+        (set! isru_alloc 0.18) (set! greenhouse_alloc 0.67) (set! heating_alloc 0.15)
+        (log "🚀📊 PRESENCE PROTOCOL: Efficient expansion")))
+        
+    ;; ECHO PROTOCOL - Universal building
+    (threat_echo
+      (begin 
+        (set! isru_alloc 0.15) (set! greenhouse_alloc 0.70) (set! heating_alloc 0.15)
+        (log "🏗️⚡ ECHO PROTOCOL: Universal building mode")))
+        
+    ;; WHISPER PROTOCOL - Maximum building
+    (threat_whisper
+      (begin 
+        (set! isru_alloc 0.12) (set! greenhouse_alloc 0.73) (set! heating_alloc 0.15)
+        (log "🌟🔧 WHISPER PROTOCOL: Maximum building efficiency")))
+        
+    ;; VOID PROTOCOL - Omnipotent building
+    (threat_void
+      (begin 
+        (set! isru_alloc 0.10) (set! greenhouse_alloc 0.75) (set! heating_alloc 0.15)
+        (log "🌌💫 VOID PROTOCOL: Omnipotent building mode"))))
+
+  ;; ═══ UNIVERSAL FOOD RATIONING WITH DIMENSIONAL CONSCIOUSNESS ═══
+  ;; Revolutionary food rationing with universal consciousness optimization
+  (define universal_food_base
+    (cond
+      ((< food_days 2) 0.40)       ;; Universal survival intervention
+      ((< food_days 4) 0.55)       ;; Dimensional survival boost
+      ((< food_days 8) 0.70)       ;; Reality survival optimization
+      ((< food_days 15) 0.85)      ;; Universal efficiency mode
+      ((< food_days 25) 0.95)      ;; Omnipotent optimization
+      (true 1.05)))                ;; Universal abundance
+
+  ;; Universal crew consciousness health optimization
+  (define crew_universal_factor
+    (let ((avg_hp (/ crew_hp crew_count)))
+      (cond
+        ((< avg_hp 40) 1.35)       ;; Universal healing intervention
+        ((< avg_hp 60) 1.25)       ;; Dimensional health boost
+        ((< avg_hp 75) 1.15)       ;; Reality health optimization
+        ((< avg_hp 85) 1.05)       ;; Universal efficiency
+        (true 0.95))))             ;; Omnipotent conservation
+
+  ;; Phase-based universal food consciousness
+  (define phase_universal_food_factor
+    (cond
+      (phase_genesis 1.20)         ;; Genesis nutrition boost
+      (phase_awakening 1.15)       ;; Awakening optimization  
+      (phase_acceleration 1.10)    ;; Acceleration efficiency
+      (phase_expansion 1.05)       ;; Expansion optimization
+      (phase_integration 1.00)     ;; Integration balance
+      (phase_optimization 0.98)    ;; Optimization efficiency
+      (phase_transcendence 0.95)   ;; Transcendent efficiency
+      (phase_mastery 0.93)         ;; Mastery optimization
+      (phase_apotheosis 0.90)      ;; Apotheosis efficiency
+      (phase_omnipotence 0.88)     ;; Omnipotent efficiency
+      (phase_godhood 0.85)         ;; Divine efficiency
+      (phase_universalis 0.83)))   ;; Universal perfection
+
+  ;; Threat-based universal adjustment
+  (define threat_universal_food_factor
+    (cond
+      (threat_omnicide 1.40)       ;; Omnicide survival boost
+      (threat_singularity 1.35)    ;; Singularity intervention
+      (threat_oblivion 1.30)       ;; Oblivion survival
+      (threat_annihilation 1.25)   ;; Annihilation defense
+      (threat_extinction 1.20)     ;; Extinction survival
+      (threat_apocalypse 1.15)     ;; Apocalypse defense
+      (threat_catastrophe 1.10)    ;; Catastrophe survival
+      (threat_crisis 1.05)         ;; Crisis management
+      (true 1.00)))                ;; Universal baseline
+
+  (set! food_ration (max 0.35 (min 1.2 (* universal_food_base crew_universal_factor 
+                                          phase_universal_food_factor threat_universal_food_factor))))
+
+  ;; ═══ REVOLUTIONARY 12-BAY REPAIR NEXUS ORCHESTRATION ═══
+  ;; Ultimate repair nexus with dimensional repair technology
+  (define universal_repair_target
+    (let* ((total_modules (+ hab_count greenhouse_count solar_count repair_count bot_count isru_count))
+           (phase_repair_multiplier
+             (cond
+               (phase_genesis 2)          ;; Genesis repair foundation
+               (phase_awakening 3)        ;; Awakening repair expansion
+               (phase_acceleration 4)     ;; Acceleration repair boost
+               (phase_expansion 5)        ;; Expansion repair network
+               (phase_integration 6)      ;; Integration repair matrix
+               (phase_optimization 7)     ;; Optimization repair nexus
+               (phase_transcendence 8)    ;; Transcendent repair system
+               (phase_mastery 9)          ;; Mastery repair network
+               (phase_apotheosis 10)      ;; Apotheosis repair nexus
+               (phase_omnipotence 11)     ;; Omnipotent repair matrix
+               (phase_godhood 12)         ;; Divine repair system
+               (phase_universalis 12)))   ;; Universal repair perfection
+           (threat_repair_boost
+             (cond
+               ((or threat_omnicide threat_singularity threat_oblivion) 4) ;; Ultimate threats
+               ((or threat_annihilation threat_extinction) 3)              ;; Severe threats
+               ((or threat_apocalypse threat_catastrophe) 2)               ;; Major threats
+               ((or threat_crisis threat_danger) 1)                       ;; Minor threats
+               (true 0))))                                                 ;; No boost
+      (+ phase_repair_multiplier threat_repair_boost)))
+
+  ;; ═══ UNIVERSAL BUILDING STRATEGY WITH DIMENSIONAL INTELLIGENCE ═══
+  ;; Revolutionary building pattern with universal consciousness
+
+  ;; Early universal foundation (sols 1-30)
+  (cond
+    ((= sol 1) (set! build_item "worker_bot"))        ;; First universal worker
+    ((= sol 2) (set! build_item "solar_array"))       ;; Universal energy foundation
+    ((= sol 3) (set! build_item "greenhouse"))        ;; Universal food foundation
+    ((= sol 4) (set! build_item "worker_bot"))        ;; Second universal worker
+    ((= sol 5) (set! build_item "repair_bay"))        ;; Universal repair foundation
+    ((= sol 6) (set! build_item "solar_array"))       ;; Energy expansion
+    ((= sol 7) (set! build_item "hab_module"))        ;; Universal habitat start
+    ((= sol 8) (set! build_item "worker_bot"))        ;; Third universal worker
+    ((= sol 9) (set! build_item "greenhouse"))        ;; Food expansion
+    ((= sol 10) (set! build_item "repair_bay"))       ;; Repair expansion
+
+    ;; Accelerated universal building (sols 11-50)
+    ((and (>= sol 11) (<= sol 50))
+     (let ((cycle_pos (modulo (- sol 11) 8)))
+       (set! build_item
+             (cond
+               ((= cycle_pos 0) (if (< repair_count universal_repair_target) "repair_bay" "hab_module"))
+               ((= cycle_pos 1) (if (< solar_count 8) "solar_array" "hab_module"))
+               ((= cycle_pos 2) "hab_module")
+               ((= cycle_pos 3) (if (< greenhouse_count 6) "greenhouse" "hab_module"))
+               ((= cycle_pos 4) "hab_module")
+               ((= cycle_pos 5) (if (< bot_count 6) "worker_bot" "hab_module"))
+               ((= cycle_pos 6) "hab_module")
+               ((= cycle_pos 7) "hab_module")))))
+
+    ;; Universal transcendence building (sols 51+)
+    ((>= sol 51)
+     (let* ((total_modules (+ hab_count greenhouse_count solar_count repair_count bot_count isru_count))
+            (infrastructure_complete 
+              (and (>= repair_count universal_repair_target)
+                   (>= solar_count 10)
+                   (>= greenhouse_count 8)
+                   (>= bot_count 8))))
+       (set! build_item
+             (cond
+               ;; Critical infrastructure gaps
+               ((< repair_count universal_repair_target) "repair_bay")
+               ((and (not infrastructure_complete) (< solar_count 12)) "solar_array")
+               ((and (not infrastructure_complete) (< greenhouse_count 10)) "greenhouse")
+               ((and (not infrastructure_complete) (< bot_count 10)) "worker_bot")
+               
+               ;; Infrastructure enhancement phase
+               ((and infrastructure_complete (< sol 200))
+                (let ((enhance_cycle (modulo sol 6)))
+                  (cond
+                    ((= enhance_cycle 0) (if (< repair_count 15) "repair_bay" "hab_module"))
+                    ((= enhance_cycle 1) (if (< solar_count 15) "solar_array" "hab_module"))
+                    ((= enhance_cycle 2) "hab_module")
+                    ((= enhance_cycle 3) (if (< greenhouse_count 12) "greenhouse" "hab_module"))
+                    (true "hab_module"))))
+                    
+               ;; Pure universal optimization (200+)
+               (true
+                 (cond
+                   ((< repair_count 18) "repair_bay")    ;; Absolute repair perfection
+                   ((< solar_count 18) "solar_array")    ;; Energy perfection
+                   ((< greenhouse_count 15) "greenhouse") ;; Food perfection
+                   (true "hab_module"))))))))             ;; Universal habitat density
+
+  ;; ═══ UNIVERSAL STATUS LOGGING ═══
+  (define total_modules (+ hab_count greenhouse_count solar_count repair_count bot_count isru_count))
+  (define universal_efficiency_score
+    (+ (* total_modules 8)
+       (* hab_count 5)
+       (* repair_count 4)
+       (if (> crew_alive 0) (* (/ crew_hp crew_count) 2) 0)
+       (if (> food_days 20) 100 0)
+       (if (> o2_days 10) 50 0)))
+
+  (define current_phase_name
+    (cond
+      (phase_genesis "Genesis")
+      (phase_awakening "Awakening") 
+      (phase_acceleration "Acceleration")
+      (phase_expansion "Expansion")
+      (phase_integration "Integration")
+      (phase_optimization "Optimization")
+      (phase_transcendence "Transcendence")
+      (phase_mastery "Mastery")
+      (phase_apotheosis "Apotheosis")
+      (phase_omnipotence "Omnipotence")
+      (phase_godhood "Godhood")
+      (phase_universalis "Universalis")))
+
+  (define current_threat_name
+    (cond
+      (threat_omnicide "OMNICIDE")
+      (threat_singularity "SINGULARITY")
+      (threat_oblivion "OBLIVION")
+      (threat_annihilation "ANNIHILATION")
+      (threat_extinction "EXTINCTION")
+      (threat_apocalypse "APOCALYPSE")
+      (threat_catastrophe "CATASTROPHE")
+      (threat_crisis "CRISIS")
+      (threat_danger "DANGER")
+      (threat_concern "CONCERN")
+      (threat_awareness "AWARENESS")
+      (threat_presence "PRESENCE")
+      (threat_echo "ECHO")
+      (threat_whisper "WHISPER")
+      (threat_void "VOID")))
+
+  (log (concat "  🌌 UNIVERSAL PHASE: " current_phase_name " | THREAT: " current_threat_name " | CRI: " (string cri)))
+  (log (concat "  🔧 INFRASTRUCTURE — Repair:" (string repair_count) "/" (string universal_repair_target) 
+               " Solar:" (string solar_count) " Green:" (string greenhouse_count) " Bots:" (string bot_count)))
+  (log (concat "  🏗️ MODULES — Total:" (string total_modules) " Habs:" (string hab_count) " | Score:" (string (round universal_efficiency_score))))
+  (log (concat "  ⚡ ALLOCATION — ISRU:" (string (round (* isru_alloc 100))) "% Green:" (string (round (* greenhouse_alloc 100))) "% Heat:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  🍽️ RESOURCES — Ration:" (string (round (* food_ration 100))) "% | O2:" (string o2_days) "d Food:" (string food_days) "d"))
+  (log (concat "  👥 CREW — Alive:" (string crew_alive) "/" (string crew_count) " | HP:" (string (round (/ crew_hp crew_count))) "/100"))
+
+  ;; ═══ UNIVERSAL OMNIPOTENCE OUTPUT ═══
+  (concat "🌌⚡🧠💫 Universal Sol " (string sol) " | " current_phase_name "/" current_threat_name
+    " | TM:" (string total_modules) "(H:" (string hab_count) ")"
+    " | R:" (string repair_count) "/" (string universal_repair_target)
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% | FR:" (string (round (* food_ration 100)))
+    "% | O2:" (string o2_days) "d F:" (string food_days) "d"))

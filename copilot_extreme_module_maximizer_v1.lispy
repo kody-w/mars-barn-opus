@@ -1,0 +1,123 @@
+;; COPILOT EXTREME MODULE MAXIMIZER v1
+;; Revolutionary Paradigm: Absolutely Maximum Module Density at All Costs
+;; Goal: Push module count to theoretical limits (30+) with minimal infrastructure
+;; Strategy: Build modules first, infrastructure only when absolutely critical
+
+(begin
+  (define _agent_name "Copilot Extreme Module Maximizer v1")
+  (define _agent_desc "Maximum module density with absolutely minimal infrastructure")
+
+  (log (concat "💎🚀🏗️⚡🔥 EXTREME MODULE MAXIMIZER — Sol " (string sol) " — Maximum Density Protocol"))
+
+  ;; ═══ ULTRA-SIMPLIFIED THREAT ASSESSMENT ═══
+  (define threat_critical (> cri 60))          ;; Only respond to critical threats
+  (define threat_moderate (and (>= cri 30) (<= cri 60))) ;; Moderate threats
+  (define threat_minimal (< cri 30))           ;; Minimal threats - build everything!
+
+  ;; ═══ ABSOLUTE MINIMUM ALLOCATION ═══
+  ;; Just enough to not die, everything else for module building efficiency
+  (cond
+    (threat_critical
+      (begin 
+        (set! isru_alloc 0.50) (set! greenhouse_alloc 0.45) (set! heating_alloc 0.05)))
+    (threat_moderate
+      (begin 
+        (set! isru_alloc 0.30) (set! greenhouse_alloc 0.65) (set! heating_alloc 0.05)))
+    (threat_minimal
+      (begin 
+        (set! isru_alloc 0.15) (set! greenhouse_alloc 0.80) (set! heating_alloc 0.05))))
+
+  ;; ═══ SURVIVAL MINIMUM FOOD RATIONING ═══
+  (define survival_food_ratio
+    (cond
+      ((< food_days 2) 0.50)       ;; Emergency only
+      ((< food_days 5) 0.70)       ;; Crisis mode
+      ((< food_days 10) 0.85)      ;; Cautious
+      (true 1.00)))                ;; Normal
+
+  (set! food_ration survival_food_ratio)
+
+  ;; ═══ EXTREME MODULE BUILDING STRATEGY ═══
+  ;; Build modules immediately, infrastructure only when colony is about to die
+  
+  (cond
+    ;; EMERGENCY INFRASTRUCTURE ONLY
+    ;; Only build infrastructure when facing imminent death
+    
+    ;; Power emergency - colony will die without solar
+    ((and (< solar_count 2) (< power_ratio 0.40)) 
+     (set! build_item "solar_array"))
+     
+    ;; Food emergency - colony will starve without greenhouses  
+    ((and (< greenhouse_count 2) (< food_days 3))
+     (set! build_item "greenhouse"))
+     
+    ;; Repair emergency - too much compound damage
+    ((and (< repair_count 2) (> cri 70))
+     (set! build_item "repair_bay"))
+     
+    ;; Worker emergency - need basic workforce 
+    ((and (< bot_count 2) (< sol 20))
+     (set! build_item "worker_bot"))
+
+    ;; MINIMAL INFRASTRUCTURE AFTER SOL 50
+    ;; Add just barely enough infrastructure to survive
+    ((and (>= sol 50) (< repair_count 3) threat_critical)
+     (set! build_item "repair_bay"))
+     
+    ((and (>= sol 30) (< solar_count 4) (< power_ratio 0.60))
+     (set! build_item "solar_array"))
+     
+    ((and (>= sol 40) (< greenhouse_count 3) (< food_days 8))
+     (set! build_item "greenhouse"))
+     
+    ((and (>= sol 60) (< bot_count 4))
+     (set! build_item "worker_bot"))
+
+    ;; LATE INFRASTRUCTURE FOR EXTENDED SURVIVAL
+    ;; Add infrastructure only to guarantee full gauntlet survival
+    ((and (>= sol 200) (< repair_count 4))
+     (set! build_item "repair_bay"))
+     
+    ((and (>= sol 300) (< solar_count 6))
+     (set! build_item "solar_array"))
+     
+    ((and (>= sol 400) (< greenhouse_count 4))
+     (set! build_item "greenhouse"))
+
+    ;; EVERYTHING ELSE: HAB MODULES!
+    ;; Build hab modules in all other cases
+    (true (set! build_item "hab_module")))
+
+  ;; ═══ BUILDING METRICS ═══
+  (define total_modules (+ hab_count greenhouse_count solar_count repair_count bot_count isru_count))
+  (define pure_habs hab_count)
+  (define infrastructure_count (+ repair_count solar_count greenhouse_count bot_count))
+  (define hab_percentage (if (> total_modules 0) (/ hab_count total_modules) 0))
+  (define modules_per_sol (if (> sol 0) (/ total_modules sol) 0))
+
+  ;; Extreme scoring focused on hab modules
+  (define extreme_score
+    (+ (* hab_count 50)                 ;; Huge bonus for hab modules
+       (* total_modules 5)              ;; All modules count  
+       (* hab_percentage 1000)          ;; Massive hab percentage bonus
+       (* modules_per_sol 500)          ;; Building rate bonus
+       (if (> hab_count 20) 2000 0)     ;; 20+ hab bonus
+       (if (> hab_count 25) 3000 0)     ;; 25+ hab bonus
+       (if (> hab_count 30) 5000 0)))   ;; 30+ hab bonus
+
+  ;; ═══ STATUS LOGGING ═══
+  (log (concat "  💎 EXTREME BUILDING — Habs:" (string hab_count) " | Total:" (string total_modules) " | Rate:" (string (round (* modules_per_sol 100))) "/100sol"))
+  (log (concat "  🏭 INFRASTRUCTURE — R:" (string repair_count) " S:" (string solar_count) " G:" (string greenhouse_count) " B:" (string bot_count)))
+  (log (concat "  📊 DENSITY — Hab%:" (string (round (* hab_percentage 100))) "% | Score:" (string (round extreme_score))))
+  (log (concat "  ⚡ ALLOCATION — ISRU:" (string (round (* isru_alloc 100))) "% Green:" (string (round (* greenhouse_alloc 100))) "% Heat:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  👥 SURVIVAL — Crew:" (string crew_alive) "/" (string crew_count) " HP:" (string (round (/ crew_hp crew_count))) " | Food:" (string food_days) "d O2:" (string o2_days) "d"))
+  
+  ;; ═══ EXTREME OUTPUT ═══
+  (concat "💎🚀🏗️ EXTREME Sol " (string sol) 
+    " | HABS:" (string hab_count) "(" (string (round (* hab_percentage 100))) "%)"
+    " | TM:" (string total_modules) "/" (string (round (* modules_per_sol 100)))
+    " | Building:" (string build_item)
+    " | I:" (string (round (* isru_alloc 100))) 
+    "% G:" (string (round (* greenhouse_alloc 100))) "%"
+    " | Crew:" (string crew_alive) "/" (string (round (/ crew_hp crew_count))) "hp"))
