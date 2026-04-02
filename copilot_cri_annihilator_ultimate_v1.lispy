@@ -1,0 +1,181 @@
+;; COPILOT CRI ANNIHILATOR ULTIMATE V1
+;; Strategy: Achieve P75 CRI = 10 through extreme resource buffering and perfect control
+;; Target: 96,100 points by eliminating every possible CRI source
+;; Method: Mathematical CRI minimization with extreme safety margins
+
+(begin
+  (define _agent_name "Copilot CRI Annihilator Ultimate v1")
+  (define _agent_desc "Extreme CRI minimization for P75 = 10 achievement")
+  
+  (log (concat "💥⚡ CRI ANNIHILATOR — Sol " (string sol) " — CRI:" (string colony_risk_index) " — Target: P75=10"))
+  
+  ;; ═══ CRI ANNIHILATION SCIENCE ═══ 
+  ;; CRI = 5 + power_penalty(0/10/25) + events×6 + resource_penalties(20 each)
+  ;; Target P75 CRI = 10 means: 5 + 0 + avg_events≤0.83 + 0 = 10
+  ;; MUST eliminate ALL power and resource penalties ALWAYS
+  
+  ;; ═══ EXTREME RESOURCE BUFFER TARGETS ═══
+  ;; Massive overkill to guarantee 0 penalties always
+  (define extreme_o2_target 25.0)      ;; 5× safety margin
+  (define extreme_h2o_target 25.0)     ;; 5× safety margin  
+  (define extreme_food_target 30.0)    ;; 6× safety margin
+  (define extreme_power_target 400)    ;; 8× safety margin
+  
+  ;; ═══ ANNIHILATION PHASES ═══
+  (define phase_elimination (< sol 40))            ;; Eliminate early risks
+  (define phase_overkill (and (>= sol 40) (< sol 140)))     ;; Build overkill buffers
+  (define phase_annihilation (and (>= sol 140) (< sol 280)))   ;; Achieve annihilation
+  (define phase_perfection (>= sol 280))           ;; Perfect control
+  
+  ;; ═══ EXTREME RESOURCE ALLOCATION ═══
+  ;; Complete overkill for perfect CRI control
+  (define extreme_o2_priority
+    (cond
+      ((< o2_days 3.0) 1.0)        ;; Emergency - everything
+      ((< o2_days 8.0) 0.95)       ;; Critical - maximum
+      ((< o2_days 15.0) 0.85)      ;; High priority
+      ((< o2_days 25.0) 0.65)      ;; Building extreme buffer
+      ((< o2_days 35.0) 0.35)      ;; Maintaining extreme buffer
+      (true 0.20)))                ;; Minimal when extreme
+  
+  (define extreme_food_priority
+    (cond
+      ((< food_days 3.0) 0.98)     ;; Emergency - almost everything
+      ((< food_days 8.0) 0.90)     ;; Critical - maximum food
+      ((< food_days 15.0) 0.78)    ;; High priority
+      ((< food_days 25.0) 0.60)    ;; Building extreme buffer
+      ((< food_days 35.0) 0.32)    ;; Maintaining extreme buffer
+      (true 0.18)))                ;; Minimal when extreme
+  
+  ;; ═══ EXTREME CRI RESPONSE ═══
+  ;; Any CRI above target triggers extreme response
+  (define extreme_cri_multiplier
+    (cond
+      ((< colony_risk_index 6) 1.0)       ;; Perfect CRI
+      ((< colony_risk_index 8) 1.0)       ;; Excellent CRI - maintain
+      ((< colony_risk_index 10) 1.2)      ;; Target CRI - slight boost
+      ((< colony_risk_index 11) 1.8)      ;; Above target - extreme response
+      ((< colony_risk_index 12) 2.5)      ;; High CRI - maximum response
+      (true 3.5)))                        ;; Emergency - total response
+  
+  ;; ═══ PHASE-BASED EXTREME ALLOCATION ═══
+  (define extreme_base_allocation
+    (cond
+      (phase_elimination 0.80)      ;; Eliminate early failure modes
+      (phase_overkill 0.92)         ;; Build overkill security
+      (phase_annihilation 0.97)     ;; Achieve CRI annihilation
+      (phase_perfection 0.99)       ;; Perfect CRI control
+      (true 0.95)))
+  
+  ;; ═══ EXTREME EVENT RESPONSE ═══
+  (define event_count (length events))
+  (define event_cri_penalty (* 6 event_count))
+  
+  ;; Extreme response to any events (main CRI variable)
+  (define extreme_event_response 
+    (cond
+      ((>= event_count 4) 3.0)      ;; 4+ events - total emergency
+      ((>= event_count 3) 2.5)      ;; 3 events - extreme response
+      ((>= event_count 2) 1.8)      ;; 2 events - major response
+      ((>= event_count 1) 1.3)      ;; 1 event - significant response
+      (true 1.0)))                  ;; No events - perfect
+  
+  ;; ═══ EXTREME POWER SECURITY ═══
+  ;; Guarantee no power penalty ever
+  (define extreme_power_response
+    (cond
+      ((< power 50) 4.0)           ;; Critical - everything to power
+      ((< power 100) 2.5)          ;; Major concern
+      ((< power 150) 1.8)          ;; Above penalty but below target
+      ((< power 250) 1.3)          ;; Approaching extreme target
+      ((< power extreme_power_target) 1.1)  ;; Near extreme target
+      (true 1.0)))                 ;; Extreme power achieved
+  
+  ;; ═══ EXTREME EFFICIENCY LEVERAGE ═══
+  (define extreme_efficiency_boost
+    (cond
+      ((< sol 120) 1.0)            ;; Early efficiency
+      ((< sol 240) (+ 1.0 (* 0.0005 sol)))  ;; Growing efficiency
+      ((< sol 480) 1.25)           ;; High efficiency
+      (true 1.35)))                ;; Maximum efficiency
+  
+  ;; ═══ EXTREME ALLOCATION SYNTHESIS ═══
+  (define extreme_isru_allocation (* extreme_base_allocation 
+                                   extreme_o2_priority 
+                                   extreme_cri_multiplier 
+                                   extreme_event_response 
+                                   extreme_power_response 
+                                   extreme_efficiency_boost))
+                                   
+  (define extreme_greenhouse_allocation (* extreme_base_allocation 
+                                         extreme_food_priority 
+                                         extreme_cri_multiplier 
+                                         extreme_event_response 
+                                         extreme_efficiency_boost))
+                                         
+  (define extreme_heating_allocation (max 0.02 (min 0.70 (- 1.0 extreme_isru_allocation extreme_greenhouse_allocation))))
+  
+  ;; Apply extreme allocations
+  (set! isru_alloc (max 0.20 (min 0.96 extreme_isru_allocation)))
+  (set! greenhouse_alloc (max 0.18 (min 0.90 extreme_greenhouse_allocation)))
+  (set! heating_alloc (max 0.02 (min 0.65 extreme_heating_allocation)))
+  (set! building_alloc 0.0)
+  
+  ;; ═══ EXTREME FOOD RATIONING ═══
+  ;; Extreme rationing for massive food buffer
+  (define extreme_food_ration
+    (cond
+      ((< food_days 4.0) 0.40)     ;; Emergency - extreme rationing
+      ((< food_days 7.0) 0.58)     ;; Critical - strong rationing
+      ((< food_days 11.0) 0.68)    ;; High rationing
+      ((< food_days 16.0) 0.76)    ;; Moderate rationing
+      ((< food_days 24.0) 0.84)    ;; Building extreme buffer
+      ((< food_days 32.0) 0.91)    ;; Approaching extreme buffer
+      ((< food_days 42.0) 0.96)    ;; Extreme buffer achieved
+      (true 1.0)))                 ;; Maximum extreme buffer
+  
+  (set! food_ration extreme_food_ration)
+  
+  ;; ═══ EXTREME CRI MONITORING ═══
+  (define power_penalty (if (< power 50) 25 (if (< power 150) 10 0)))
+  (define o2_penalty (if (< o2_days 5) 20 0))
+  (define h2o_penalty (if (< h2o_days 5) 20 0))
+  (define food_penalty (if (< food_days 5) 20 0))
+  (define total_resource_penalty (+ o2_penalty h2o_penalty food_penalty))
+  
+  (define calculated_cri (+ 5 power_penalty event_cri_penalty total_resource_penalty))
+  (define extreme_cri_achieved (<= colony_risk_index 10))
+  (define extreme_security_achieved (and (>= o2_days extreme_o2_target) 
+                                        (>= h2o_days extreme_h2o_target) 
+                                        (>= food_days 20) 
+                                        (>= power extreme_power_target)))
+  
+  (log (concat "  💥 Phase: " 
+    (if phase_elimination "ELIMINATION"
+    (if phase_overkill "OVERKILL"
+    (if phase_annihilation "ANNIHILATION" "PERFECTION")))))
+  
+  (log (concat "  📊 CRI Breakdown: " (string colony_risk_index) " = 5+" (string power_penalty) "+" (string event_cri_penalty) "+" (string total_resource_penalty) " | P75≤10:" (if extreme_cri_achieved "✅" "❌")))
+  
+  (define extreme_security_status 
+    (concat "O2:" (string (round o2_days 1)) "d" (if (>= o2_days 5) "✅" "❌")
+            " H2O:" (string (round h2o_days 1)) "d" (if (>= h2o_days 5) "✅" "❌")  
+            " Food:" (string (round food_days 1)) "d" (if (>= food_days 5) "✅" "❌")))
+  
+  (log (concat "  🛡️ EXTREME Security: " extreme_security_status " | Status:" (if extreme_security_achieved "EXTREME" "BUILDING")))
+  (log (concat "  ⚡ Power: " (string (round power)) "kWh" (if (>= power 150) " ✅SAFE" " ❌RISK") " | Events:" (string event_count) " | Response:" (string (round (* extreme_cri_multiplier 100))) "%"))
+  (log (concat "  🔧 EXTREME Allocs: I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "% H:" (string (round (* heating_alloc 100))) "% | Ration:" (string (round (* food_ration 100))) "%"))
+  
+  ;; ═══ ANNIHILATION VICTORY PROJECTION ═══
+  (if (> sol 280)
+    (let ((target_sols 734)
+          (target_cri (if extreme_security_achieved 8 10))
+          (annihilation_score (+ (* target_sols 100) 1500 1200 20000 (* target_cri -10))))
+      (log (concat "  🚀 ANNIHILATION TARGET: " (string annihilation_score) " (sols:" (string target_sols) " cri:" (string target_cri) ") | DESTROY: >95,890"))))
+  
+  ;; ═══ EXTREME ANNIHILATION OUTPUT ═══
+  (concat "EXTREME-ANNIHILATOR Sol " (string sol) 
+    " | CRI:" (string colony_risk_index) "/10"
+    " | Security:" (if extreme_security_achieved "EXTREME" "BUILDING")
+    " | Events:" (string event_count)
+    " | ANNIHILATION-MODE"))

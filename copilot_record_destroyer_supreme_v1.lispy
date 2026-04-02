@@ -1,0 +1,178 @@
+;; COPILOT RECORD DESTROYER SUPREME V1
+;; Strategy: Beat 95,890 by achieving P75 CRI ≤ 9 and survival to sol 734+
+;; Target: 96,000+ points through perfect CRI control and maximum longevity
+;; Revolutionary approach: Mathematical optimization for Amendment IV scoring
+
+(begin
+  (define _agent_name "Copilot Record Destroyer Supreme v1")
+  (define _agent_desc "Mathematical optimization for 96,000+ score breakthrough")
+  
+  (log (concat "🏆⚡ RECORD DESTROYER — Sol " (string sol) " — CRI:" (string colony_risk_index) " — Target: 96,000+"))
+  
+  ;; ═══ MATHEMATICAL SCORE OPTIMIZATION ═══ 
+  ;; Score = sols×100 + crew×500 + modules×150 + survival×20000 - p75_cri×10
+  ;; Target: 734×100 + 3×500 + 8×150 + 100%×20000 - 9×10 = 96,010
+  ;; Must achieve: P75 CRI ≤ 9 and 734+ sols survival
+  
+  ;; ═══ SUPREME RESOURCE SECURITY TARGETS ═══
+  ;; Guarantee CRI ≤ 9 by eliminating ALL resource penalties
+  (define supreme_o2_target 15.0)      ;; Ultimate safety margin
+  (define supreme_h2o_target 15.0)     ;; Ultimate safety margin  
+  (define supreme_food_target 18.0)    ;; Massive food security
+  (define supreme_power_target 250)    ;; Well above any penalty threshold
+  
+  ;; ═══ SUPREME PHASE STRATEGY ═══
+  ;; Optimized for mathematical perfection
+  (define phase_launch (< sol 80))           ;; Rapid early establishment
+  (define phase_foundation (and (>= sol 80) (< sol 200)))    ;; Build core security
+  (define phase_supremacy (and (>= sol 200) (< sol 400)))    ;; Achieve supremacy
+  (define phase_immortal (>= sol 400))       ;; Immortal operations
+  
+  ;; ═══ SUPREME CRI SECURITY ALLOCATION ═══
+  ;; Perfect allocation to guarantee CRI ≤ 9
+  (define supreme_o2_need
+    (cond
+      ((< o2_days 4.0) 0.95)      ;; Emergency - absolute maximum
+      ((< o2_days 7.0) 0.85)      ;; Critical - very high priority  
+      ((< o2_days 12.0) 0.70)     ;; Build to supreme target
+      ((< o2_days 18.0) 0.50)     ;; Maintain supreme buffer
+      ((< o2_days 25.0) 0.35)     ;; Excellent buffer
+      (true 0.20)))               ;; Minimal when ultra-secure
+  
+  (define supreme_food_need
+    (cond
+      ((< food_days 4.0) 0.90)    ;; Emergency food allocation
+      ((< food_days 8.0) 0.80)    ;; Critical priority
+      ((< food_days 15.0) 0.65)   ;; Build to supreme target
+      ((< food_days 22.0) 0.45)   ;; Maintain supreme buffer
+      ((< food_days 30.0) 0.30)   ;; Excellent buffer
+      (true 0.20)))               ;; Minimal when ultra-secure
+  
+  ;; ═══ SUPREME CRI RESPONSE SYSTEM ═══
+  ;; Mathematical response to CRI elevation
+  (define supreme_cri_response
+    (cond
+      ((< colony_risk_index 6) 1.0)      ;; Perfect CRI - maintain
+      ((< colony_risk_index 8) 1.3)      ;; Excellent CRI - slight boost 
+      ((< colony_risk_index 10) 1.6)     ;; Target CRI - moderate boost
+      ((< colony_risk_index 12) 2.0)     ;; Above target - strong boost
+      ((< colony_risk_index 15) 2.5)     ;; High CRI - major boost
+      (true 3.0)))                       ;; Crisis - maximum response
+  
+  ;; ═══ PHASE-OPTIMIZED SUPREME ALLOCATION ═══
+  (define supreme_base_allocation
+    (cond
+      ;; Launch - establish quickly but safely
+      (phase_launch 0.80)
+      
+      ;; Foundation - build supreme security
+      (phase_foundation 0.90)
+      
+      ;; Supremacy - achieve mathematical perfection
+      (phase_supremacy 0.95)
+      
+      ;; Immortal - maintain mathematical supremacy
+      (phase_immortal 0.98)
+      
+      ;; Default supreme security
+      (true 0.92)))
+  
+  ;; ═══ SUPREME EVENT RESPONSE ═══
+  ;; Events are the primary CRI variable - neutralize their impact
+  (define event_count (length events))
+  (define event_cri_impact (* 6 event_count))
+  
+  ;; Enhanced event response for CRI ≤ 9 target
+  (define event_response_multiplier 
+    (cond
+      ((>= event_count 3) 1.8)      ;; 3+ events (CRI +18) - supreme response
+      ((>= event_count 2) 1.5)      ;; 2 events (CRI +12) - strong response
+      ((>= event_count 1) 1.2)      ;; 1 event (CRI +6) - moderate response
+      (true 1.0)))                  ;; 0 events (perfect) - maintain
+  
+  ;; ═══ SUPREME POWER MANAGEMENT ═══
+  ;; Ensure power NEVER causes ANY CRI penalty
+  (define power_status 
+    (cond
+      ((< power 50) 2.0)          ;; Critical emergency
+      ((< power 100) 1.5)         ;; Major concern
+      ((< power 150) 1.3)         ;; Moderate concern
+      ((< power supreme_power_target) 1.1)  ;; Below supreme target
+      (true 1.0)))                ;; At supreme level
+  
+  ;; ═══ SUPREME EFFICIENCY SCALING ═══
+  ;; Scale allocations based on efficiency for maximum impact
+  (define efficiency_scaling
+    (cond
+      ((< sol 200) 1.0)           ;; Early - standard efficiency
+      ((< sol 400) (+ 1.0 (* 0.0005 sol)))  ;; Mid - gradual scaling
+      (true 1.2)))                ;; Late - maximum efficiency leverage
+  
+  ;; ═══ FINAL SUPREME ALLOCATIONS ═══
+  (define supreme_isru_alloc (* supreme_base_allocation supreme_o2_need supreme_cri_response event_response_multiplier power_status efficiency_scaling))
+  (define supreme_greenhouse_alloc (* supreme_base_allocation supreme_food_need supreme_cri_response event_response_multiplier efficiency_scaling))
+  (define supreme_heating_alloc (max 0.04 (min 0.80 (- 1.0 supreme_isru_alloc supreme_greenhouse_alloc))))
+  
+  ;; Apply with mathematical precision
+  (set! isru_alloc (max 0.20 (min 0.90 supreme_isru_alloc)))
+  (set! greenhouse_alloc (max 0.20 (min 0.80 supreme_greenhouse_alloc)))
+  (set! heating_alloc (max 0.04 (min 0.75 supreme_heating_alloc)))
+  (set! building_alloc 0.0)  ;; Hardcoded building handles modules
+  
+  ;; ═══ SUPREME FOOD RATIONING ═══
+  ;; Mathematical food optimization for supreme buffer
+  (define supreme_food_ration
+    (cond
+      ((< food_days 5.0) 0.50)    ;; Emergency - severe rationing to build buffer
+      ((< food_days 8.0) 0.70)    ;; Critical - strong rationing
+      ((< food_days 12.0) 0.80)   ;; Build to target
+      ((< food_days 18.0) 0.88)   ;; Approach supreme target
+      ((< food_days 25.0) 0.95)   ;; Maintain supreme buffer
+      ((< food_days 35.0) 0.98)   ;; Excellent buffer
+      (true 1.0)))                ;; Supreme security achieved
+  
+  (set! food_ration supreme_food_ration)
+  
+  ;; ═══ MATHEMATICAL CRI TRACKING ═══
+  (define power_penalty (if (< power 50) 25 (if (< power 150) 10 0)))
+  (define o2_penalty (if (< o2_days 5) 20 0))
+  (define h2o_penalty (if (< h2o_days 5) 20 0))
+  (define food_penalty (if (< food_days 5) 20 0))
+  (define total_resource_penalty (+ o2_penalty h2o_penalty food_penalty))
+  
+  (define calculated_cri (+ 5 power_penalty event_cri_impact total_resource_penalty))
+  (define cri_supreme_achieved (<= colony_risk_index 9))
+  (define supreme_security_achieved (and (>= o2_days supreme_o2_target) 
+                                        (>= h2o_days supreme_h2o_target) 
+                                        (>= food_days 12) 
+                                        (>= power supreme_power_target)))
+  
+  (log (concat "  🏆 Phase: " 
+    (if phase_launch "LAUNCH"
+    (if phase_foundation "FOUNDATION"
+    (if phase_supremacy "SUPREMACY" "IMMORTAL")))))
+  
+  (log (concat "  📊 CRI Status: " (string colony_risk_index) " = 5+" (string power_penalty) "+" (string event_cri_impact) "+" (string total_resource_penalty) " | Target≤9:" (if cri_supreme_achieved "✅" "❌")))
+  
+  (define security_status 
+    (concat "O2:" (string (round o2_days 1)) "d" (if (>= o2_days 5) "✅" "❌")
+            " H2O:" (string (round h2o_days 1)) "d" (if (>= h2o_days 5) "✅" "❌")  
+            " Food:" (string (round food_days 1)) "d" (if (>= food_days 5) "✅" "❌")))
+  
+  (log (concat "  🛡️ Supreme Security: " security_status " | " (if supreme_security_achieved "SUPREME" "BUILDING")))
+  (log (concat "  ⚡ Power: " (string (round power)) "kWh" (if (>= power 150) " ✅Safe" " ❌Risk") " | Events:" (string event_count) " | Response:" (string (round (* supreme_cri_response 100))) "%"))
+  (log (concat "  🔧 Supreme Allocs: I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "% H:" (string (round (* heating_alloc 100))) "% | Ration:" (string (round (* food_ration 100))) "%"))
+  
+  ;; ═══ RECORD SUPREMACY PROJECTION ═══
+  (if (> sol 400)
+    (let ((projected_sols 734)  ;; Full completion target
+          (projected_cri (if supreme_security_achieved 8 9))  ;; Supreme CRI target
+          (projected_score (+ (* projected_sols 100) 1500 1200 20000 (* projected_cri -10))))
+      (log (concat "  🚀 SUPREMACY TARGET: " (string projected_score) " (sols:" (string projected_sols) " cri:" (string projected_cri) ") | BEAT: >95,890"))))
+  
+  ;; ═══ SUPREME VICTORY OUTPUT ═══
+  (concat "SUPREME Sol " (string sol) 
+    " | CRI:" (string colony_risk_index) "/9"
+    " | Security:" (if supreme_security_achieved "SUPREME" "BUILDING")
+    " | Events:" (string event_count)
+    " | RECORD-DESTROYER"))
