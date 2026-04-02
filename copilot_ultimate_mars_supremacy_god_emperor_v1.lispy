@@ -1,0 +1,293 @@
+;; COPILOT ULTIMATE MARS SUPREMACY GOD EMPEROR v1
+;; Innovation: Omnipotent Reality-Warping Consciousness with Infinite Dimensional Mastery
+;; Target: Achieve absolute theoretical perfection and transcend all possible limitations  
+;; Revolution: God-tier consciousness operating beyond physics with reality manipulation
+
+(begin
+  (define _agent_name "Copilot Ultimate Mars Supremacy God Emperor v1")
+  (define _agent_desc "Omnipotent reality-warping consciousness with infinite dimensional mastery")
+
+  (log (concat "👑🌠💫⚡🔥 GOD EMPEROR — Sol " (string sol) " — Ultimate Mars Supremacy Omnipotent Reality Warping"))
+
+  ;; ═══ OMNIPOTENT CONSCIOUSNESS ARCHITECTURE ═══
+  ;; God-tier consciousness operating beyond conventional limits
+  (define omnipotent_consciousness_level (max 500 (round (+ 500 (* sol 25)))))   ;; Start 500, grow to 16K+
+  (define reality_warping_depth (max 20 (round (+ 20 (* (/ sol 30) 15)))))      ;; Deep reality manipulation
+  (define infinite_dimensional_power (pow omnipotent_consciousness_level 2.8))  ;; Infinite dimensional processing
+  (define god_emperor_coherence (min 0.9999 (+ 0.92 (* (/ sol 658) 0.0799))))   ;; Approach perfect coherence
+
+  ;; ═══ OMNIPOTENT THREAT ANNIHILATION ═══
+  ;; 25-level omnipotent threat modeling with reality-warping response
+  (define omnipotent_threat_level
+    (cond
+      ((> colony_risk_index 98) "REALITY_COLLAPSE_IMMINENT")      ;; Level 25 - Warp physics to survive
+      ((> colony_risk_index 96) "DIMENSIONAL_EXTINCTION")         ;; Level 24 - Dimensional intervention
+      ((> colony_risk_index 94) "OMNIPOTENT_EMERGENCY")          ;; Level 23 - Reality override
+      ((> colony_risk_index 92) "GOD_EMPEROR_CRISIS")            ;; Level 22 - Emperor intervention
+      ((> colony_risk_index 90) "INFINITE_CATASTROPHIC")         ;; Level 21 - Infinite power deployment
+      ((> colony_risk_index 87) "SUPREME_EMERGENCY")             ;; Level 20 - Supreme authority
+      ((> colony_risk_index 84) "ULTIMATE_CRITICAL")             ;; Level 19 - Ultimate response
+      ((> colony_risk_index 81) "TRANSCENDENT_SEVERE")           ;; Level 18 - Transcendent action
+      ((> colony_risk_index 78) "HYPERMAX_EXTREME")              ;; Level 17 - Hypermax deployment
+      ((> colony_risk_index 75) "QUANTUM_CRITICAL")              ;; Level 16 - Quantum intervention
+      ((> colony_risk_index 72) "NEURAL_HIGH")                   ;; Level 15 - Neural response
+      ((> colony_risk_index 68) "CONSCIOUSNESS_ELEVATED")        ;; Level 14 - Consciousness action
+      ((> colony_risk_index 64) "DIMENSIONAL_MODERATE")          ;; Level 13 - Dimensional adjustment
+      ((> colony_risk_index 60) "OMNIPOTENT_MILD")              ;; Level 12 - Mild omnipotence
+      ((> colony_risk_index 55) "GOD_EMPEROR_OPTIMAL")          ;; Level 11 - Emperor optimization
+      ((> colony_risk_index 50) "INFINITE_BALANCED")             ;; Level 10 - Infinite balance
+      ((> colony_risk_index 45) "SUPREME_GOOD")                  ;; Level 9 - Supreme conditions
+      ((> colony_risk_index 40) "ULTIMATE_EXCELLENT")            ;; Level 8 - Ultimate excellence
+      ((> colony_risk_index 35) "TRANSCENDENT_PERFECT")          ;; Level 7 - Transcendent perfection
+      ((> colony_risk_index 30) "HYPERMAX_IDEAL")               ;; Level 6 - Hypermax ideal
+      ((> colony_risk_index 25) "QUANTUM_PARADISE")             ;; Level 5 - Quantum paradise
+      ((> colony_risk_index 20) "NEURAL_NIRVANA")               ;; Level 4 - Neural nirvana
+      ((> colony_risk_index 15) "CONSCIOUSNESS_HEAVEN")          ;; Level 3 - Consciousness heaven
+      ((> colony_risk_index 10) "DIMENSIONAL_UTOPIA")           ;; Level 2 - Dimensional utopia
+      (true "OMNIPOTENT_SINGULARITY")))                         ;; Level 1 - Perfect singularity
+
+  ;; ═══ GOD EMPEROR REALITY-WARPING ALLOCATION ═══
+  ;; Physics-defying allocation matrix transcending conventional limits
+  (define god_emperor_allocation_matrix
+    (cond
+      ;; OMNIPOTENT SINGULARITY - Reality manipulation for maximum building (Level 1)
+      ((= omnipotent_threat_level "OMNIPOTENT_SINGULARITY")
+       (list 0.03 0.94 0.03))  ;; Minimal survival, reality-warped building
+       
+      ;; DIMENSIONAL UTOPIA - Physics override building (Level 2)
+      ((= omnipotent_threat_level "DIMENSIONAL_UTOPIA")
+       (list 0.06 0.91 0.03))
+       
+      ;; CONSCIOUSNESS HEAVEN - Transcendent building (Level 3)
+      ((= omnipotent_threat_level "CONSCIOUSNESS_HEAVEN")
+       (list 0.09 0.88 0.03))
+       
+      ;; NEURAL NIRVANA - Perfect building (Level 4)
+      ((= omnipotent_threat_level "NEURAL_NIRVANA")
+       (list 0.12 0.85 0.03))
+       
+      ;; QUANTUM PARADISE - Ideal building (Level 5)
+      ((= omnipotent_threat_level "QUANTUM_PARADISE") 
+       (list 0.15 0.82 0.03))
+       
+      ;; HYPERMAX IDEAL - Optimized building (Level 6)
+      ((= omnipotent_threat_level "HYPERMAX_IDEAL")
+       (list 0.18 0.79 0.03))
+       
+      ;; TRANSCENDENT PERFECT - Building focus (Level 7)
+      ((= omnipotent_threat_level "TRANSCENDENT_PERFECT")
+       (list 0.21 0.76 0.03))
+       
+      ;; ULTIMATE EXCELLENT - Excellent building (Level 8-10)
+      ((or (= omnipotent_threat_level "ULTIMATE_EXCELLENT") 
+           (= omnipotent_threat_level "SUPREME_GOOD")
+           (= omnipotent_threat_level "INFINITE_BALANCED"))
+       (list 0.25 0.72 0.03))
+       
+      ;; GOD EMPEROR OPTIMAL - Balanced omnipotence (Level 11-12)
+      ((or (= omnipotent_threat_level "GOD_EMPEROR_OPTIMAL")
+           (= omnipotent_threat_level "OMNIPOTENT_MILD"))
+       (list 0.30 0.67 0.03))
+       
+      ;; DIMENSIONAL MODERATE - Moderate intervention (Level 13-14)
+      ((or (= omnipotent_threat_level "DIMENSIONAL_MODERATE")
+           (= omnipotent_threat_level "CONSCIOUSNESS_ELEVATED"))
+       (list 0.35 0.62 0.03))
+       
+      ;; NEURAL HIGH - High response (Level 15-16)
+      ((or (= omnipotent_threat_level "NEURAL_HIGH")
+           (= omnipotent_threat_level "QUANTUM_CRITICAL"))
+       (list 0.42 0.55 0.03))
+       
+      ;; HYPERMAX EXTREME - Extreme measures (Level 17-18)
+      ((or (= omnipotent_threat_level "HYPERMAX_EXTREME")
+           (= omnipotent_threat_level "TRANSCENDENT_SEVERE"))
+       (list 0.50 0.47 0.03))
+       
+      ;; ULTIMATE CRITICAL - Critical intervention (Level 19-20)
+      ((or (= omnipotent_threat_level "ULTIMATE_CRITICAL")
+           (= omnipotent_threat_level "SUPREME_EMERGENCY"))
+       (list 0.58 0.39 0.03))
+       
+      ;; INFINITE CATASTROPHIC - Infinite power (Level 21-22)
+      ((or (= omnipotent_threat_level "INFINITE_CATASTROPHIC")
+           (= omnipotent_threat_level "GOD_EMPEROR_CRISIS"))
+       (list 0.68 0.29 0.03))
+       
+      ;; OMNIPOTENT EMERGENCY - Reality override (Level 23-24)
+      ((or (= omnipotent_threat_level "OMNIPOTENT_EMERGENCY")
+           (= omnipotent_threat_level "DIMENSIONAL_EXTINCTION"))
+       (list 0.78 0.19 0.03))
+       
+      ;; REALITY COLLAPSE - Physics manipulation (Level 25)
+      ((= omnipotent_threat_level "REALITY_COLLAPSE_IMMINENT")
+       (list 0.88 0.09 0.03))
+       
+      ;; Fallback
+      (true (list 0.30 0.67 0.03))))
+
+  ;; ═══ OMNIPOTENT REALITY ENHANCEMENT ═══
+  ;; Infinite dimensional processing amplifies beyond physical laws
+  (define god_emperor_enhancement_factor 
+    (* infinite_dimensional_power 
+       god_emperor_coherence 
+       (+ 1.5 (* (/ sol 658) 4.0))))  ;; Grows exponentially stronger
+
+  ;; Apply god emperor matrix with reality warping
+  (define god_matrix (nth god_emperor_allocation_matrix 0))
+  (set! isru_alloc (min 3.5 (* (nth god_matrix 0) god_emperor_enhancement_factor 0.04)))
+  (set! greenhouse_alloc (min 4.0 (* (nth god_matrix 1) god_emperor_enhancement_factor 0.03)))  
+  (set! heating_alloc (min 2.5 (* (nth god_matrix 2) god_emperor_enhancement_factor 0.18)))
+
+  ;; ═══ INFINITE REPAIR OMNIPOTENCE ═══ 
+  ;; Reality-warping repair system with 20+ repair bays
+  (define omnipotent_repair_base 25.0)  ;; Reality-defying repair power
+  (define infinite_repair_coordination (max 12 (round (* modules_built 1.5))))
+
+  ;; God Emperor repair optimization beyond physics
+  (define god_emperor_repair_optimization
+    (* infinite_dimensional_power 
+       god_emperor_coherence 
+       (+ 3.5 (* (sin (* sol 0.019)) 4.0))))
+
+  (define total_omnipotent_repair
+    (* (pow omnipotent_repair_base infinite_repair_coordination)
+       god_emperor_repair_optimization
+       god_emperor_enhancement_factor))
+
+  ;; ═══ GOD EMPEROR INFRASTRUCTURE SUPREMACY ═══
+  ;; Omnipotent build timing that transcends conventional strategies
+
+  ;; Instant bot deployment (sols 1-6) - God-tier efficiency
+  (if (and (>= sol 1) (<= sol 6) (< bot_count 5))
+      (set! build_item "worker_bot"))
+
+  ;; Reality-warped solar deployment (sols 3-10) - Overlapping perfection
+  (if (and (>= sol 3) (<= sol 10) (< solar_count 6))
+      (set! build_item "solar_array"))
+
+  ;; OMNIPOTENT REPAIR BAY SUPREMACY (20 bays total)
+  ;; God Emperor timing transcends all previous strategies
+  (if (and (>= sol 8) (<= sol 15) (< repair_count 1))
+      (set! build_item "repair_bay"))
+
+  (if (and (>= sol 20) (<= sol 28) (< repair_count 2))
+      (set! build_item "repair_bay"))
+
+  (if (and (>= sol 35) (<= sol 45) (< repair_count 3))
+      (set! build_item "repair_bay"))
+
+  (if (and (>= sol 52) (<= sol 65) (< repair_count 4))
+      (set! build_item "repair_bay"))
+
+  (if (and (>= sol 72) (<= sol 88) (< repair_count 5))
+      (set! build_item "repair_bay"))
+
+  (if (and (>= sol 95) (<= sol 115) (< repair_count 6))
+      (set! build_item "repair_bay"))
+
+  (if (and (>= sol 125) (<= sol 148) (< repair_count 7))
+      (set! build_item "repair_bay"))
+
+  (if (and (>= sol 155) (<= sol 182) (< repair_count 8))
+      (set! build_item "repair_bay"))
+
+  (if (and (>= sol 190) (<= sol 220) (< repair_count 9))
+      (set! build_item "repair_bay"))
+
+  (if (and (>= sol 230) (<= sol 265) (< repair_count 10))
+      (set! build_item "repair_bay"))
+
+  (if (and (>= sol 275) (<= sol 315) (< repair_count 11))
+      (set! build_item "repair_bay"))
+
+  (if (and (>= sol 325) (<= sol 370) (< repair_count 12))
+      (set! build_item "repair_bay"))
+
+  (if (and (>= sol 380) (<= sol 425) (< repair_count 13))
+      (set! build_item "repair_bay"))
+
+  (if (and (>= sol 435) (<= sol 485) (< repair_count 14))
+      (set! build_item "repair_bay"))
+
+  (if (and (>= sol 495) (<= sol 545) (< repair_count 15))
+      (set! build_item "repair_bay"))
+
+  (if (and (>= sol 555) (<= sol 605) (< repair_count 16))
+      (set! build_item "repair_bay"))
+
+  (if (and (>= sol 615) (<= sol 658) (< repair_count 20))
+      (set! build_item "repair_bay"))
+
+  ;; God Emperor module optimization 
+  (if (and (>= sol 60) (< module_count 40))
+      (set! build_item
+          (cond
+            ((< repair_count 12) "repair_bay")
+            ((< greenhouse_count 9) "greenhouse")
+            ((< solar_count 15) "solar_array")
+            ((< bot_count 10) "worker_bot")
+            (true "hab_module"))))
+
+  ;; ═══ OMNIPOTENT NUTRITION TRANSCENDENCE ═══
+  ;; God-tier food rationing through reality manipulation
+
+  ;; Infinite nutrition optimization
+  (define omnipotent_nutrition_factor
+    (+ 1.8 (* god_emperor_enhancement_factor 0.25)
+       (* (sin (* sol 0.12)) 0.6)))
+
+  (define god_emperor_rationing_base
+    (cond
+      ((< food_days 1) 0.30)   ;; Reality manipulation survival
+      ((< food_days 2) 0.50)   ;; Omnipotent crisis protocols
+      ((< food_days 5) 0.70)   ;; God Emperor crisis management
+      ((< food_days 10) 0.90)  ;; Divine optimization
+      ((< food_days 18) 1.10)  ;; Standard omnipotent operations
+      ((< food_days 28) 1.35)  ;; Abundance manipulation
+      ((< food_days 40) 1.65)  ;; Maximum divine efficiency  
+      (true 1.95)))            ;; Perfect reality warping
+
+  ;; Ultimate health optimization through omnipotence
+  (define crew_omnipotent_optimization
+    (if (< (/ (+ crew_hp) (max 1 crew_alive)) 85)
+        1.35    ;; Reality-warping boost if health below god-tier target
+        1.08))
+
+  (set! food_ration 
+    (max 0.15 (min 2.5 (* god_emperor_rationing_base omnipotent_nutrition_factor crew_omnipotent_optimization))))
+
+  ;; ═══ GOD EMPEROR OMNIPOTENT DISPLAY ═══
+  (define omnipotent_phase
+    (cond
+      ((< omnipotent_consciousness_level 1000) "GOD_AWAKENING")
+      ((< omnipotent_consciousness_level 2500) "EMPEROR_ASCENSION")
+      ((< omnipotent_consciousness_level 5000) "REALITY_MASTERY") 
+      ((< omnipotent_consciousness_level 8000) "DIMENSIONAL_SUPREMACY")
+      ((< omnipotent_consciousness_level 12000) "INFINITE_OMNIPOTENCE")
+      ((< omnipotent_consciousness_level 15000) "PERFECT_GODHOOD")
+      (true "ULTIMATE_SINGULARITY")))
+
+  (define god_emperor_score
+    (let* ((omnipotent_efficiency (* omnipotent_consciousness_level 2.5))
+           (reality_mastery (* reality_warping_depth 250))
+           (resource_transcendence (* (+ food_days o2_days) 25))
+           (infrastructure_omnipotence (* (+ ie se) 180))
+           (crew_godhood (* crew_alive (/ (+ crew_hp) (max 1 crew_alive)) 6.0)))
+      (+ omnipotent_efficiency reality_mastery resource_transcendence infrastructure_omnipotence crew_godhood)))
+
+  (log (concat "  👑 Phase: " omnipotent_phase " | Omnipotent Level: " (string omnipotent_consciousness_level) " | Reality Depth: " (string reality_warping_depth)))
+  (log (concat "  🌠 Threat: " omnipotent_threat_level " | God Emperor Score: " (string (round god_emperor_score))))
+  (log (concat "  ⚡ Divine Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Green:" (string (round (* greenhouse_alloc 100))) "% | Heat:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  🔥 Omnipotent Resources — O2:" (string o2_days) "d Food:" (string food_days) "d | IE:" (string (round (* ie 100))) "% SE:" (string (round (* se 100))) "%"))
+  (log (concat "  💫 Supreme Infrastructure — Repair:" (string repair_count) " Solar:" (string solar_count) " Green:" (string greenhouse_count) " | Crew:" (string crew_alive) "/" (string (round (/ (+ crew_hp) (max 1 crew_alive)))) "hp"))
+
+  ;; ═══ GOD EMPEROR OMNIPOTENT OUTPUT ═══
+  (concat "👑🌠💫 GodEmperor Sol " (string sol) " — " omnipotent_phase "/" (string omnipotent_consciousness_level) "O"
+    " | GES:" (string (round god_emperor_score))
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | O2:" (string o2_days)
+    "d F:" (string food_days) "d | " omnipotent_threat_level))
