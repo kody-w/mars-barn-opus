@@ -166,7 +166,7 @@
       "hazards_added": [
         "catalyst_poisoning",
         "sabatier_reactor_fouling",
-        "electrolysis_membrane_degradation", 
+        "electrolysis_membrane_degradation",
         "co2_compressor_failure",
         "water_separator_malfunction"
       ],
@@ -179,19 +179,19 @@
         "sabatier_reactor_startup",
         "electrolysis_voltage_regulation"
       ],
-      "notes": "REAL CHEMISTRY: Replaces magic numbers with actual Sabatier reaction (CO₂ + 4H₂ → CH₄ + 2H₂O) and electrolysis (2H₂O → 2H₂ + O₂). O₂ production now depends on power input, catalyst temperature, CO₂ pressure, and catalyst age. Catalysts degrade over time (2000 hour life), requiring replacement. Based on NASA MOXIE (6g O₂/hr at 300W), Sabatier reactor studies (0.34 kg CH₄/hr baseline), ISS OGS (9kg O₂/day at 3kW). Power requirements are realistic: 1.5kW minimum for Sabatier, 5kWh per kg O₂ for electrolysis.",
-      "backtest_target": "Run v6 best strategy against v7 frames. Expected: Governors assuming constant O₂ production (2.8 kg/sol) will fail when real chemistry limits output and catalysts degrade. ISRU timing becomes critical.",
+      "notes": "REAL CHEMISTRY: Replaces magic numbers with actual Sabatier reaction (CO\u2082 + 4H\u2082 \u2192 CH\u2084 + 2H\u2082O) and electrolysis (2H\u2082O \u2192 2H\u2082 + O\u2082). O\u2082 production now depends on power input, catalyst temperature, CO\u2082 pressure, and catalyst age. Catalysts degrade over time (2000 hour life), requiring replacement. Based on NASA MOXIE (6g O\u2082/hr at 300W), Sabatier reactor studies (0.34 kg CH\u2084/hr baseline), ISS OGS (9kg O\u2082/day at 3kW). Power requirements are realistic: 1.5kW minimum for Sabatier, 5kWh per kg O\u2082 for electrolysis.",
+      "backtest_target": "Run v6 best strategy against v7 frames. Expected: Governors assuming constant O\u2082 production (2.8 kg/sol) will fail when real chemistry limits output and catalysts degrade. ISRU timing becomes critical.",
       "data_sources": [
         "NASA MOXIE (Mars 2020 Perseverance rover)",
-        "NASA Sabatier reactor specifications", 
+        "NASA Sabatier reactor specifications",
         "ISS Oxygen Generation System (OGS) performance data",
-        "Mars atmospheric composition: 95.3% CO₂ at 606 Pa",
+        "Mars atmospheric composition: 95.3% CO\u2082 at 606 Pa",
         "Catalyst degradation studies: Ni catalyst 2000 hour life",
         "Electrolysis efficiency curves: 70% practical efficiency"
       ],
       "chemistry": {
-        "sabatier_reaction": "CO₂ + 4H₂ → CH₄ + 2H₂O",
-        "electrolysis_reaction": "2H₂O → 2H₂ + O₂", 
+        "sabatier_reaction": "CO\u2082 + 4H\u2082 \u2192 CH\u2084 + 2H\u2082O",
+        "electrolysis_reaction": "2H\u2082O \u2192 2H\u2082 + O\u2082",
         "catalyst_life_hours": 2000,
         "electrode_life_hours": 70000,
         "power_minimum_kw": 1.5,
@@ -208,7 +208,7 @@
       ],
       "hazards_added": [
         "insulation_degradation",
-        "thermal_bridge_failure", 
+        "thermal_bridge_failure",
         "heating_system_failure",
         "thermal_shock_damage",
         "condensation_damage"
@@ -222,21 +222,21 @@
         "thermal_management",
         "insulation_maintenance"
       ],
-      "notes": "REAL HEAT TRANSFER: Replaces magic temperature adjustments (±0.5K) with actual heat transfer equations: Q = U×A×ΔT (conduction) + ε×σ×A×(T⁴) (radiation). Interior temperature now depends on exterior temperature, insulation efficiency, crew metabolic heat, equipment waste heat, and heating power allocation. Heat loss scales with ΔT and surface area. Insulation degrades over time from thermal cycling, micrometeorites, and UV. Based on NASA aerogel studies (R-10.3/inch), ISS thermal data, and Mars habitat thermal modeling.",
+      "notes": "REAL HEAT TRANSFER: Replaces magic temperature adjustments (\u00b10.5K) with actual heat transfer equations: Q = U\u00d7A\u00d7\u0394T (conduction) + \u03b5\u00d7\u03c3\u00d7A\u00d7(T\u2074) (radiation). Interior temperature now depends on exterior temperature, insulation efficiency, crew metabolic heat, equipment waste heat, and heating power allocation. Heat loss scales with \u0394T and surface area. Insulation degrades over time from thermal cycling, micrometeorites, and UV. Based on NASA aerogel studies (R-10.3/inch), ISS thermal data, and Mars habitat thermal modeling.",
       "backtest_target": "Run v7 best strategy against v8 frames. Expected: Governors assuming constant heating costs (simple allocation ratios) will fail when real thermodynamics require adaptive power management. Heating becomes the dominant power consumer in late-mission phases.",
       "data_sources": [
         "Mars habitat thermal analysis (NASA JSC-CN-33799)",
         "ISS Environmental Control and Life Support System (ECLSS) specifications",
-        "Aerogel insulation thermal properties (R-10.3 per inch, k=0.015 W/m·K)",
+        "Aerogel insulation thermal properties (R-10.3 per inch, k=0.015 W/m\u00b7K)",
         "Mars surface temperature cycles (Curiosity REMS, InSight temperature data)",
         "Human metabolic heat production (~100W/person, NASA studies)",
-        "Stefan-Boltzmann radiation law (σ=5.67×10⁻⁸ W/m²K⁴)"
+        "Stefan-Boltzmann radiation law (\u03c3=5.67\u00d710\u207b\u2078 W/m\u00b2K\u2074)"
       ],
       "physics": {
-        "conductive_loss": "Q = U × A × ΔT where U=0.11 W/m²K (aerogel), A=150 m², ΔT varies 50-130K",
-        "radiative_loss": "Q = ε × σ × A × (T_in⁴ - T_out⁴) where ε=0.95, σ=Stefan-Boltzmann constant",
+        "conductive_loss": "Q = U \u00d7 A \u00d7 \u0394T where U=0.11 W/m\u00b2K (aerogel), A=150 m\u00b2, \u0394T varies 50-130K",
+        "radiative_loss": "Q = \u03b5 \u00d7 \u03c3 \u00d7 A \u00d7 (T_in\u2074 - T_out\u2074) where \u03b5=0.95, \u03c3=Stefan-Boltzmann constant",
         "internal_gains": "100W per human + 5W per kW equipment power",
-        "thermal_mass": "8000 kg habitat × 1000 J/kg·K specific heat",
+        "thermal_mass": "8000 kg habitat \u00d7 1000 J/kg\u00b7K specific heat",
         "degradation": "Insulation efficiency decreases 0.01% per sol from cumulative damage"
       }
     },
@@ -257,7 +257,7 @@
       ],
       "events_added": [
         "site_survey_required",
-        "cable_routing_optimization", 
+        "cable_routing_optimization",
         "foundation_reinforcement"
       ],
       "challenges_added": [
@@ -265,21 +265,21 @@
         "thermal_management",
         "construction_scheduling"
       ],
-      "notes": "SPATIAL INFRASTRUCTURE: Modules now exist on 16×16 grid (160m × 160m footprint). Distance matters: power loss = I²R × cable length, thermal bridges between adjacent modules, construction requires adjacency to existing infrastructure within 2 tiles, foundation preparation takes 3 sols. Based on NASA JSC Mars habitat architecture studies, power distribution specifications (copper cable resistance 1.68×10⁻⁸ Ω·m), EVA operational limits (~500m radius), and regolith bearing capacity (300-1000 kPa). Construction is no longer instantaneous - site preparation, adjacency constraints, and distance costs force strategic layout planning.",
+      "notes": "SPATIAL INFRASTRUCTURE: Modules now exist on 16\u00d716 grid (160m \u00d7 160m footprint). Distance matters: power loss = I\u00b2R \u00d7 cable length, thermal bridges between adjacent modules, construction requires adjacency to existing infrastructure within 2 tiles, foundation preparation takes 3 sols. Based on NASA JSC Mars habitat architecture studies, power distribution specifications (copper cable resistance 1.68\u00d710\u207b\u2078 \u03a9\u00b7m), EVA operational limits (~500m radius), and regolith bearing capacity (300-1000 kPa). Construction is no longer instantaneous - site preparation, adjacency constraints, and distance costs force strategic layout planning.",
       "backtest_target": "Run v8 best strategy against v9 frames. Expected: Governors assuming instantaneous module construction will fail when spatial constraints require foundation prep time, adjacency planning, and infrastructure overhead costs.",
       "data_sources": [
         "NASA JSC Mars habitat thermal modeling (JSC-CN-33799)",
         "Mars regolith bearing capacity studies (300-1000 kPa)",
-        "Copper cable resistivity at Mars temperature (1.68×10⁻⁸ Ω·m at 230K)",
+        "Copper cable resistivity at Mars temperature (1.68\u00d710\u207b\u2078 \u03a9\u00b7m at 230K)",
         "NASA EVA operational limits (~500m effective radius)",
         "Mars habitat architecture studies (modular grid layouts)",
-        "Power distribution losses (I²R) for Mars surface power grids",
+        "Power distribution losses (I\u00b2R) for Mars surface power grids",
         "Regolith excavation and foundation preparation time estimates"
       ],
       "physics": {
-        "grid_layout": "16×16 tiles, each 10m×10m (160m × 160m colony footprint)",
-        "cable_resistance": "R = ρL/A where ρ=1.68×10⁻⁸ Ω·m, typical 50mm² cable cross-section",
-        "power_loss": "P_loss = I²R where I = P/V, typical 400V distribution voltage",
+        "grid_layout": "16\u00d716 tiles, each 10m\u00d710m (160m \u00d7 160m colony footprint)",
+        "cable_resistance": "R = \u03c1L/A where \u03c1=1.68\u00d710\u207b\u2078 \u03a9\u00b7m, typical 50mm\u00b2 cable cross-section",
+        "power_loss": "P_loss = I\u00b2R where I = P/V, typical 400V distribution voltage",
         "thermal_bridges": "Adjacent modules (1 tile apart) create 1-2 kW additional heating cost",
         "foundation_prep": "3 sols site preparation per module (excavation, leveling, compaction)",
         "adjacency_constraint": "New modules must connect within 2 tiles of existing infrastructure",
@@ -297,7 +297,7 @@
       "hazards_added": [
         "system_dependency_cascade",
         "water_recycler_cascade_failure",
-        "power_grid_cascade_failure", 
+        "power_grid_cascade_failure",
         "isru_system_cascade_failure",
         "thermal_control_cascade_failure",
         "oxygen_system_cascade_failure",
@@ -313,7 +313,7 @@
         "resource_prioritization",
         "cascade_failure_management"
       ],
-      "notes": "REAL SYSTEM DEPENDENCIES: Resources are no longer independent buckets. Implements ISS ECLSS-style dependency graph where water recycler failure → humidity drops → greenhouse irrigation fails → O₂ production drops → crew shifts to emergency O₂ → power draw spikes → heating budget cut → temperature drops → more equipment failures. Based on Apollo 13 cascade analysis: oxygen tank explosion → fuel cell failure → power crisis → water production stops → thermal control fails → crew survival threat. Every system connects to every other system through realistic dependency chains.",
+      "notes": "REAL SYSTEM DEPENDENCIES: Resources are no longer independent buckets. Implements ISS ECLSS-style dependency graph where water recycler failure \u2192 humidity drops \u2192 greenhouse irrigation fails \u2192 O\u2082 production drops \u2192 crew shifts to emergency O\u2082 \u2192 power draw spikes \u2192 heating budget cut \u2192 temperature drops \u2192 more equipment failures. Based on Apollo 13 cascade analysis: oxygen tank explosion \u2192 fuel cell failure \u2192 power crisis \u2192 water production stops \u2192 thermal control fails \u2192 crew survival threat. Every system connects to every other system through realistic dependency chains.",
       "backtest_target": "Run v9 best strategy against v10 frames. Expected: Governors assuming independent resource management will fail when water recycler failure cascades through greenhouse, life support, and power systems. Must learn dependency-aware resource allocation and failure isolation.",
       "data_sources": [
         "ISS Environmental Control and Life Support System (ECLSS) specifications",
@@ -324,17 +324,34 @@
         "NASA Marshall ECLSS system integration studies"
       ],
       "dependency_graph": {
-        "water_recycler": ["humidity_control", "greenhouse_irrigation"],
-        "humidity_control": ["greenhouse_transpiration", "crew_comfort"],
-        "greenhouse": ["o2_production_biological", "food_production"],
-        "power_grid": ["all_systems"],
-        "isru": ["o2_production_chemical", "h2o_production"],
-        "thermal": ["crew_life_support", "equipment_efficiency"]
+        "water_recycler": [
+          "humidity_control",
+          "greenhouse_irrigation"
+        ],
+        "humidity_control": [
+          "greenhouse_transpiration",
+          "crew_comfort"
+        ],
+        "greenhouse": [
+          "o2_production_biological",
+          "food_production"
+        ],
+        "power_grid": [
+          "all_systems"
+        ],
+        "isru": [
+          "o2_production_chemical",
+          "h2o_production"
+        ],
+        "thermal": [
+          "crew_life_support",
+          "equipment_efficiency"
+        ]
       },
       "physics": {
         "cascade_propagation": "Failures propagate through dependency graph with 1-3 sol delays",
         "micro_failure_accumulation": "Small failures build stress over time until major cascade occurs",
-        "apollo_13_scenario": "Oxygen failure → power failure → thermal failure → crew emergency",
+        "apollo_13_scenario": "Oxygen failure \u2192 power failure \u2192 thermal failure \u2192 crew emergency",
         "repair_complexity": "Fixing cascades requires addressing root cause, not just symptoms"
       }
     },
@@ -364,7 +381,7 @@
         "landing_site_preparation",
         "emergency_supply_rationing"
       ],
-      "notes": "EARTH-MARS SUPPLY CHAIN: Colony is no longer self-contained. Real Hohmann transfer windows every 779.9 days (26 months). Cargo takes 180-270 days transit time. Landing accuracy ±10km requires rover retrieval. EDL failure rate ~50% for heavy payloads. Colony must plan cargo manifests 2-3 years ahead. Missing a window means 26 more months without resupply. Self-sufficiency metric: % of needs met locally vs imported. Based on SpaceX Starship cargo capacity (100 metric tons to Mars surface), NASA Mars Design Reference Architecture 5.0, historical Mars EDL success rates.",
+      "notes": "EARTH-MARS SUPPLY CHAIN: Colony is no longer self-contained. Real Hohmann transfer windows every 779.9 days (26 months). Cargo takes 180-270 days transit time. Landing accuracy \u00b110km requires rover retrieval. EDL failure rate ~50% for heavy payloads. Colony must plan cargo manifests 2-3 years ahead. Missing a window means 26 more months without resupply. Self-sufficiency metric: % of needs met locally vs imported. Based on SpaceX Starship cargo capacity (100 metric tons to Mars surface), NASA Mars Design Reference Architecture 5.0, historical Mars EDL success rates.",
       "backtest_target": "Run v10 best strategy against v11 frames. Expected: Governors assuming unlimited local resources will fail when supply windows create multi-year planning requirements and EDL failures cause critical shortages. Must balance Earth dependency vs ISRU self-sufficiency.",
       "data_sources": [
         "NASA Mars Design Reference Architecture 5.0",
@@ -373,13 +390,13 @@
         "Historical Mars EDL success/failure rates (~50% for heavy cargo)",
         "Hohmann transfer orbit calculations (779.9 day synodic period)",
         "NASA ISRU technology readiness levels (TRL 1-9)",
-        "Mars landing accuracy specifications (±10km from target)"
+        "Mars landing accuracy specifications (\u00b110km from target)"
       ],
       "supply_chain_physics": {
         "synodic_period": "779.9 days between Earth-Mars launch windows",
         "transit_time": "180-270 days depending on trajectory",
         "cargo_capacity": "100 metric tons to Mars surface (Starship class)",
-        "landing_accuracy": "±10km from target (requires retrieval)",
+        "landing_accuracy": "\u00b110km from target (requires retrieval)",
         "edl_success_rate": "50% historical average for heavy payloads",
         "planning_horizon": "2-3 years ahead for cargo manifest"
       },
@@ -402,7 +419,7 @@
       "hazards_added": [
         "radiation_storm",
         "bone_fracture_risk",
-        "muscle_weakness_incident", 
+        "muscle_weakness_incident",
         "circadian_disruption_crisis",
         "exercise_equipment_failure",
         "caloric_deficiency_crisis"
@@ -424,7 +441,7 @@
         "NASA Curiosity Rover Radiation Assessment Detector (RAD) - 0.67 mSv/day",
         "NASA STD-3001 Space Radiation Exposure Standards",
         "NASA OCHMO Technical Brief: Bone Loss (NASA/TB-2022-030)",
-        "ISS crew health and countermeasures database", 
+        "ISS crew health and countermeasures database",
         "Mars-500 isolation study physiological and psychological data",
         "HI-SEAS analog mission crew health monitoring",
         "NASA Fatigue Countermeasures Laboratory circadian research",
@@ -432,7 +449,7 @@
       ],
       "physiology_physics": {
         "radiation_daily_dose": "0.67 mSv/day Mars surface (Curiosity RAD)",
-        "career_radiation_limit": "1 Sv (1000 mSv) NASA career limit", 
+        "career_radiation_limit": "1 Sv (1000 mSv) NASA career limit",
         "bone_loss_rate": "1.5% per month in 0.38g Mars gravity",
         "muscle_loss_rate": "2% per month without exercise countermeasures",
         "circadian_drift": "37 minutes daily drift from Mars sol length",
@@ -442,10 +459,56 @@
         "mars_radiation": "Daily 0.67 mSv accumulation, solar particle events 10-200 mSv",
         "bone_muscle_loss": "Monthly 1.5-2% degradation in Mars 0.38g gravity",
         "circadian_misalignment": "37-minute daily drift disrupts Earth-evolved sleep cycles",
-        "exercise_countermeasures": "Equipment provides 60-70% protection from deconditioning", 
+        "exercise_countermeasures": "Equipment provides 60-70% protection from deconditioning",
         "health_performance": "Physiological degradation reduces work capacity and increases errors"
       },
       "enrichment": "echo-enrichments-v12.json - Retroactive radiation dose accumulation from Sol 1"
+    },
+    {
+      "version": "v13",
+      "name": "Crew Psychology Model",
+      "release_date": "2026-04-02",
+      "physics_added": {
+        "third_quarter_syndrome": "Peak psychological stress at 75% mission duration (Mars-500/HI-SEAS data)",
+        "circadian_disruption": "Mars sol drift (24h 37m) causes cumulative sleep/cognitive degradation",
+        "crew_conflicts": "Small group dynamics in confined space lead to mission-threatening conflicts",
+        "communication_isolation": "4-24 minute Mars-Earth delays increase autonomy pressure and isolation",
+        "psychological_breakdown": "Individual stress cascade affects entire crew productivity",
+        "mars_adaptation": "Long-term environmental psychological adaptation to alien environment"
+      },
+      "new_hazards": [
+        "third_quarter_syndrome",
+        "circadian_misalignment_cascade",
+        "crew_conflict_escalation",
+        "communication_delay_isolation",
+        "psychological_breakdown_cascade",
+        "mars_adaptation_syndrome"
+      ],
+      "data_sources": [
+        "NASA HRP (Human Research Program) behavioral health reports",
+        "Mars-500 520-day isolation study (Moscow, 2010-2011)",
+        "HI-SEAS missions I-VI psychological data (Hawaii)",
+        "Antarctic winter-over crew psychology studies (50+ years)",
+        "ISS crew behavioral health reports",
+        "US Navy/Royal Navy submarine crew psychology research"
+      ],
+      "fidelity_improvements": {
+        "crew_individual_psychology": "Each crew member has stress, morale, circadian alignment, isolation tolerance",
+        "mission_phase_psychology": "Third-quarter phenomenon modeled with Gaussian stress peak at 75% duration",
+        "communication_delay_stress": "Mars-Earth orbital mechanics drive communication delays and isolation",
+        "productivity_degradation": "Psychological state affects colony efficiency and decision-making",
+        "psychological_breakdown": "Severe stress can take crew members offline, cascading to team"
+      },
+      "validation": {
+        "monte_carlo_required": true,
+        "baseline_score_drop": "\u226510% (validates physics significance)",
+        "new_strategic_considerations": [
+          "Crew composition (humans vs robots) becomes strategic choice",
+          "Mission phases require different psychological management",
+          "Communication delay timing affects crew stress management",
+          "Long missions need psychological sustainability planning"
+        ]
+      }
     }
   ],
   "backtest_protocol": {

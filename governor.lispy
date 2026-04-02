@@ -116,8 +116,8 @@
   (define isru_target (nth allocation_strategy 1))  
   (define greenhouse_target (nth allocation_strategy 2))
   
-  ;; ═══ ENHANCED REPAIR STRATEGY ═══
-  (define repair_multiplier
+  ;; ═══ ENHANCED REPAIR STRATEGY WITH CRI AWARENESS ═══
+  (define base_repair_multiplier
     (cond
       ((and v11_active_period crew_health_critical) 25.0)
       ((and v11_active_period efficiency_critical) 18.0)
@@ -130,6 +130,15 @@
       ((and hybrid_aggressive_phase efficiency_critical) 8.0)
       (hybrid_aggressive_phase 6.0)
       (true 4.0)))
+  
+  ;; Minor CRI-based repair boost for potential score improvement
+  (define cri_repair_adjustment
+    (cond
+      ((>= colony_risk_index 30) 1.4)    ;; High CRI: modest repair boost
+      ((>= colony_risk_index 25) 1.2)    ;; Medium-high CRI: slight boost
+      (true 1.0)))                       ;; Low CRI: normal repairs
+  
+  (define repair_multiplier (* base_repair_multiplier cri_repair_adjustment))
 
   ;; ═══ ENHANCED FOOD RATIONING STRATEGY ═══
   (define food_ration_target
@@ -173,10 +182,10 @@
       (crew_health_critical "👥🔴 HEALTH-CRISIS")
       (true "🚧🏭 BUILDING")))
   
-  ;; Enhanced status logging
-  (log (concat "  🎯 " phase_text " | " status_text))
+  ;; Enhanced status logging with CRI awareness
+  (log (concat "  🎯 " phase_text " | " status_text " | CRI: " (string colony_risk_index)))
   (log (concat "  📊 O2:" (string (round o2_days 1)) "/" (string v11_o2_independence_target) " H2O:" (string (round h2o_days 1)) "/" (string v11_h2o_independence_target) " Food:" (string (round food_days 1)) "/" (string v11_food_independence_target)))
-  (log (concat "  ⚡ Allocs: H:" (string (round (* heating_target 100))) "% I:" (string (round (* isru_target 100))) "% G:" (string (round (* greenhouse_target 100))) "% R:" (string repair_multiplier) "x"))
-  (log (concat "  🍽️ Ration: " (string (round (* food_ration_target 100))) "% | Power: " (string (round power)) " | Crew: " (string crew_count) "/" (string crew_min_hp) "hp"))
+  (log (concat "  ⚡ Allocs: H:" (string (round (* heating_target 100))) "% I:" (string (round (* isru_target 100))) "% G:" (string (round (* greenhouse_target 100))) "% R:" (string (round repair_multiplier 1)) "x"))
+  (log (concat "  🍽️ Ration: " (string (round (* food_ration_target 100))) "% | Power: " (string (round power)) " | Crew: " (string crew_count) "/" (string crew_min_hp) "hp | Modules: " (string (length modules))))
   
-  (concat "V11-HYBRID-149K Sol" (string sol) " " phase_text " " status_text " O2:" (string (round o2_days 1)) "d Mods:" (string (length modules))))
+  (concat "V11-HYBRID-OPTIMIZED Sol" (string sol) " " phase_text " " status_text " CRI:" (string colony_risk_index) " Score-Target:135k+ O2:" (string (round o2_days 1)) "d"))

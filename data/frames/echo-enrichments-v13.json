@@ -1,0 +1,73 @@
+{
+  "_format": "mars-barn-echo-enrichment",
+  "_version": "v13",
+  "_description": "Crew Psychology Model retroactive enrichment - adds psychology hazards to existing frames",
+  "_physics_added": {
+    "third_quarter_syndrome": "Peak psychological stress at 75% mission duration",
+    "circadian_disruption": "Mars sol drift causes cumulative sleep/cognitive degradation", 
+    "crew_conflicts": "Small group dynamics create mission-threatening interpersonal conflicts",
+    "communication_isolation": "Mars-Earth delay variations increase psychological isolation",
+    "psychological_breakdown": "Individual stress cascades affect entire crew productivity",
+    "mars_adaptation": "Long-term environmental psychological adaptation stresses"
+  },
+  "enrichments": {
+    "sol_450": {
+      "hazards": [
+        {
+          "type": "third_quarter_syndrome",
+          "stress_intensity": 10,
+          "productivity_impact": 0.15,
+          "description": "Peak psychological stress at 67% mission progress (approaching third quarter)"
+        }
+      ]
+    },
+    "sol_500": {
+      "hazards": [
+        {
+          "type": "third_quarter_syndrome", 
+          "stress_intensity": 12,
+          "productivity_impact": 0.18,
+          "description": "Peak third-quarter psychological stress at 75% mission progress"
+        }
+      ]
+    },
+    "sol_250": {
+      "hazards": [
+        {
+          "type": "mars_adaptation_syndrome",
+          "adaptation_rate": 0.6,
+          "description": "Long-term psychological adaptation to Mars environment begins"
+        }
+      ]
+    },
+    "sol_300": {
+      "hazards": [
+        {
+          "type": "communication_delay_isolation",
+          "isolation_factor": 3.2,
+          "description": "Mars-Earth communication delay reaches 20+ minutes, increasing isolation"
+        }
+      ]
+    },
+    "sol_400": {
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation", 
+          "conflict_probability": 0.04,
+          "conflict_severity": 15,
+          "description": "Small group dynamics stress leads to interpersonal conflicts"
+        }
+      ]
+    },
+    "sol_600": {
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.025,
+          "description": "Cumulative Mars sol drift causes severe circadian disruption"
+        }
+      ]
+    }
+  },
+  "_enrichment_strategy": "Retroactive psychology hazards added to existing frames to create cumulative psychological pressure throughout mission timeline. Third-quarter effects peak around sol 500 (75% of 669-sol mission)."
+}

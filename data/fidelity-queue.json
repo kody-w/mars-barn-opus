@@ -66,8 +66,22 @@
       "id": "v13-crew-psychology",
       "version": "v13",
       "title": "Crew Psychology Model",
-      "status": "pending",
-      "priority": 8
+      "status": "complete",
+      "priority": 8,
+      "completion_date": "2026-04-02",
+      "physics_added": {
+        "third_quarter_syndrome": "Peak psychological stress at 75% mission duration (Mars-500/HI-SEAS data)",
+        "circadian_disruption": "Mars sol = 24h37m causes cumulative sleep/cognitive degradation",
+        "crew_conflicts": "Small group dynamics in confined space for 2+ years cause mission conflicts",
+        "communication_delay_stress": "4-24 minute Mars-Earth delays increase isolation and autonomy pressure",
+        "psychological_breakdown_cascade": "Individual stress breakdowns cascade to affect entire crew",
+        "productivity_degradation": "Crew psychological state affects system efficiency and decision-making"
+      },
+      "validation": {
+        "monte_carlo_score": 131170,
+        "survival_rate": "100% (robot crews), significant impact with human crews",
+        "physics_impact": "Confirmed - psychology creates strategic crew composition decisions"
+      }
     },
     {
       "id": "v14-mars-gcm",

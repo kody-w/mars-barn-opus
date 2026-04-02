@@ -402,6 +402,97 @@ Data Sources:
 - NASA OCHMO Medical Briefs: space medicine countermeasures
 ```
 
+### v13 Crew Psychology Model (NEW):
+```
+# Real NASA/Mars-500/HI-SEAS crew psychology physics (Sol 1068+)
+
+Individual Crew Psychology State:
+  stress_level = 0-100 (accumulated psychological stress)
+  morale = 0-100 (current motivation and mental state) 
+  circadian_misalignment = 0-100 (Mars sol drift disruption)
+  isolation_tolerance = 50-80 (individual variation in stress resilience)
+  social_compatibility = 60-90 (ability to work with others)
+
+Psychological Stress Sources:
+  Mars Sol Circadian Drift:
+    mars_sol_hours = 24.617 hours (24h 37m)
+    earth_day_hours = 24.0 hours
+    drift_rate_per_sol = 0.37 hours / 24 = 1.54% per sol
+    cumulative_disruption → sleep quality degradation → stress accumulation
+  
+  Communication Delay Isolation:
+    mars_earth_delay = 4-24 minutes (orbital position dependent)
+    synodic_period = 780 sols (26-month communication cycle)
+    delay_stress = f(distance_from_earth, autonomy_pressure)
+    
+  Third-Quarter Phenomenon:
+    mission_progress = sol / total_mission_sols
+    peak_stress_time = 75% mission duration (0.75 progress)
+    stress_factor = Gaussian peak centered at 0.75 progress
+    documented: Mars-500, HI-SEAS, Antarctic winter-over studies
+    
+  Small Group Dynamics (4-6 crew, 2+ years, no exit):
+    crew_conflict_probability = f(social_compatibility, stress_level)
+    conflict_cascades = individual conflicts affect entire crew
+    breakdown_threshold = 85 stress points → crew member offline
+    
+  Environmental Adaptation:
+    mars_adaptation_stress = 0.3-0.8 stress/sol after sol 200
+    alien_environment_factor = cumulative psychological pressure
+    isolation_from_earth = no real-time communication/support
+
+Productivity Impact:
+  crew_productivity_factor = f(morale, stress_level)
+  robots = immune to psychological effects (maintain 100% productivity)
+  humans:
+    morale_factor = 0.7 + (morale/100) * 0.3  # 70-100% efficiency
+    stress_factor = max(0.6, 1.0 - stress_level/100 * 0.8)  # min 60% efficiency
+  
+  system_efficiency *= crew_productivity_factor
+  productivity_impact = up to 20% system efficiency reduction
+
+Psychological Hazards (Frame-Driven):
+  third_quarter_syndrome:
+    triggers: 65-85% mission progress, high stress periods
+    effect: +6-12 stress points, -10-20% productivity
+    
+  circadian_misalignment_cascade:
+    triggers: cumulative throughout mission
+    effect: +1.5-3% circadian disruption per sol, chronic fatigue
+    
+  crew_conflict_escalation:
+    triggers: high stress + low compatibility
+    effect: reduced compatibility, stress contagion, productivity loss
+    
+  communication_delay_isolation:
+    triggers: >18 minute communication delays
+    effect: isolation stress, reduced earth connection
+    
+  psychological_breakdown_cascade:
+    triggers: stress >85, individual crew breakdown
+    effect: crew member offline, stress contagion to others
+    
+  mars_adaptation_syndrome:
+    triggers: after sol 200, long-term exposure
+    effect: gradual stress + gradual adaptation tolerance
+
+Data Sources:
+- Mars-500: 520-day isolation study (Moscow, 2010-2011) 
+- HI-SEAS missions I-VI: 8-12 month Mars analog psychology data
+- Antarctic winter-over studies: 50+ years psychological isolation data  
+- NASA HRP: Human Research Program behavioral health reports
+- ISS crew behavioral health: real space psychology data
+- US Navy submarine psychology: small group confined space research
+
+Real Physics Impact:
+Crew composition (humans vs robots) becomes strategic choice.
+Mission phases require different psychological management approaches. 
+Communication delay timing affects crew stress and autonomy needs.
+Long missions need psychological sustainability, not just resource management.
+Human crews enable governance but create psychological vulnerability.
+Robots provide stability but limit colony growth and innovation.
+```
+
 ### Consumption per sol:
 ```
 O₂:    0.84 kg per HUMAN (robots don't breathe)

@@ -1,0 +1,292 @@
+;; ENHANCED MODULE DENSITY SUPER-OPTIMIZER v1.3
+;; Strategy: Aggressive module building while maintaining ultra-low CRI
+;; Target: 135,000+ via maximum module efficiency + P75 CRI ≤ 15
+;; Innovation: Earlier module building with enhanced CRI management
+
+(begin
+  (log (concat "🏭💎🚀 MODULE DENSITY SUPER-OPT — Sol " (string sol) " — Target: 135,000+ | Modules: " (string (length modules)) " | CRI: " (string colony_risk_index)))
+  
+  ;; ═══ AGGRESSIVE MODULE TIMING STRATEGY ═══
+  ;; Build modules much earlier than standard approach
+  (define ultra_early_phase (< sol 100))
+  (define early_expansion_phase (and (>= sol 100) (< sol 250)))
+  (define mega_build_phase (and (>= sol 250) (< sol 500)))
+  (define infrastructure_completion_phase (and (>= sol 500) (< sol 678)))
+  (define cri_stabilization_phase (and (>= sol 678) (< sol 950)))
+  (define v11_prep_phase (and (>= sol 950) (< sol 1008)))
+  (define v11_active_phase (>= sol 1008))
+  
+  ;; ═══ ENHANCED CRI CONTROL SYSTEM ═══
+  ;; More aggressive CRI targets with better management
+  (define target_cri
+    (cond
+      (v11_active_phase 12)
+      (v11_prep_phase 14)
+      (cri_stabilization_phase 16)
+      (infrastructure_completion_phase 18)
+      (mega_build_phase 20)
+      (early_expansion_phase 22)
+      (ultra_early_phase 25)
+      (true 20)))
+  
+  ;; CRI-based emergency states
+  (define cri_emergency (> colony_risk_index 35))
+  (define cri_very_high (> colony_risk_index 28))
+  (define cri_high (> colony_risk_index (+ target_cri 5)))
+  (define cri_elevated (> colony_risk_index target_cri))
+  
+  ;; ═══ MODULE-DENSITY OPTIMIZED RESOURCE TARGETS ═══
+  ;; Lower resource targets early to enable more module building
+  (define power_threshold_for_building
+    (cond
+      (ultra_early_phase 50)        ;; Very aggressive early building
+      (early_expansion_phase 100)   ;; Moderate threshold
+      (mega_build_phase 150)        ;; Standard threshold
+      (true 200)))                  ;; Conservative threshold
+  
+  (define o2_maintenance_target
+    (cond
+      (cri_emergency 35.0)          ;; Emergency: high buffer
+      (cri_very_high 28.0)          ;; Very high CRI: increased buffer
+      (cri_high 22.0)               ;; High CRI: moderate buffer
+      (v11_active_phase 30.0)       ;; V11 active: high buffer
+      (v11_prep_phase 25.0)         ;; V11 prep: good buffer
+      (cri_stabilization_phase 20.0) ;; CRI stabilization: moderate
+      (infrastructure_completion_phase 18.0) ;; Infrastructure: balanced
+      (mega_build_phase 15.0)       ;; Mega build: lower buffer
+      (early_expansion_phase 12.0)  ;; Early expansion: minimal
+      (ultra_early_phase 10.0)      ;; Ultra early: very minimal
+      (true 15.0)))
+  
+  (define h2o_maintenance_target
+    (cond
+      (cri_emergency 40.0)
+      (cri_very_high 32.0)
+      (cri_high 25.0)
+      (v11_active_phase 35.0)
+      (v11_prep_phase 30.0)
+      (cri_stabilization_phase 25.0)
+      (infrastructure_completion_phase 22.0)
+      (mega_build_phase 18.0)
+      (early_expansion_phase 15.0)
+      (ultra_early_phase 12.0)
+      (true 18.0)))
+  
+  (define food_maintenance_target
+    (cond
+      (cri_emergency 45.0)
+      (cri_very_high 38.0)
+      (cri_high 30.0)
+      (v11_active_phase 40.0)
+      (v11_prep_phase 35.0)
+      (cri_stabilization_phase 30.0)
+      (infrastructure_completion_phase 25.0)
+      (mega_build_phase 20.0)
+      (early_expansion_phase 18.0)
+      (ultra_early_phase 15.0)
+      (true 22.0)))
+  
+  ;; ═══ RESOURCE STATUS ASSESSMENT ═══
+  (define o2_critical (< o2_days 3.0))
+  (define h2o_critical (< h2o_days 4.0))
+  (define food_critical (< food_days 6.0))
+  (define any_critical (or o2_critical h2o_critical food_critical))
+  
+  (define o2_low (< o2_days o2_maintenance_target))
+  (define h2o_low (< h2o_days h2o_maintenance_target))
+  (define food_low (< food_days food_maintenance_target))
+  
+  (define efficiency_critical (or (< isru_eff 0.60) (< greenhouse_eff 0.60) (< solar_eff 0.60)))
+  (define efficiency_low (or (< isru_eff 0.75) (< greenhouse_eff 0.75) (< solar_eff 0.75)))
+  (define crew_health_critical (< crew_min_hp 25))
+  (define crew_health_low (< crew_min_hp 50))
+  
+  (define power_sufficient_for_building (> power power_threshold_for_building))
+  
+  ;; ═══ MODULE-DENSITY OPTIMIZED ALLOCATION STRATEGY ═══
+  (define allocation_strategy
+    (cond
+      ;; CRITICAL EMERGENCIES - Top priority
+      (any_critical
+       (cond
+         (o2_critical (list 0.05 0.85 0.10))
+         (h2o_critical (list 0.05 0.80 0.15))
+         (food_critical (list 0.10 0.50 0.40))
+         (true (list 0.08 0.72 0.20))))
+      
+      ;; CRI EMERGENCY - Immediate stabilization
+      (cri_emergency
+       (cond
+         (efficiency_critical (list 0.25 0.60 0.15))
+         (crew_health_critical (list 0.30 0.50 0.20))
+         ((or o2_low h2o_low) (list 0.20 0.65 0.15))
+         (food_low (list 0.20 0.50 0.30))
+         (true (list 0.25 0.55 0.20))))
+      
+      ;; V11 ACTIVE - Stabilization with module support
+      (v11_active_phase
+       (cond
+         (efficiency_critical (list 0.15 0.65 0.20))
+         ((or o2_low h2o_low) (list 0.18 0.62 0.20))
+         (food_low (list 0.20 0.50 0.30))
+         (cri_elevated (list 0.22 0.58 0.20))
+         (true (list 0.24 0.56 0.20))))
+      
+      ;; V11 PREP - Final preparation
+      (v11_prep_phase
+       (cond
+         (efficiency_critical (list 0.18 0.62 0.20))
+         ((or o2_low h2o_low) (list 0.20 0.60 0.20))
+         (food_low (list 0.22 0.48 0.30))
+         (cri_elevated (list 0.24 0.56 0.20))
+         (true (list 0.26 0.54 0.20))))
+      
+      ;; CRI STABILIZATION - Balance CRI with module support
+      (cri_stabilization_phase
+       (cond
+         (efficiency_critical (list 0.20 0.60 0.20))
+         ((or o2_low h2o_low) (list 0.22 0.58 0.20))
+         (food_low (list 0.24 0.46 0.30))
+         (cri_very_high (list 0.26 0.54 0.20))
+         (cri_elevated (list 0.28 0.52 0.20))
+         (true (list 0.30 0.50 0.20))))
+      
+      ;; INFRASTRUCTURE COMPLETION - Moderate building focus
+      (infrastructure_completion_phase
+       (cond
+         ((not power_sufficient_for_building) (list 0.15 0.55 0.30))
+         (efficiency_critical (list 0.22 0.58 0.20))
+         ((or o2_low h2o_low) (list 0.24 0.56 0.20))
+         (food_low (list 0.26 0.44 0.30))
+         (cri_very_high (list 0.28 0.52 0.20))
+         (cri_elevated (list 0.30 0.50 0.20))
+         (true (list 0.32 0.48 0.20))))
+      
+      ;; MEGA BUILD PHASE - High module building focus
+      (mega_build_phase
+       (cond
+         ((not power_sufficient_for_building) (list 0.12 0.53 0.35))
+         (efficiency_critical (list 0.18 0.52 0.30))
+         ((or o2_low h2o_low) (list 0.20 0.50 0.30))
+         (food_low (list 0.22 0.38 0.40))
+         (cri_very_high (list 0.24 0.46 0.30))
+         (cri_elevated (list 0.26 0.44 0.30))
+         (crew_health_critical (list 0.28 0.42 0.30))
+         (true (list 0.25 0.40 0.35))))
+      
+      ;; EARLY EXPANSION - Aggressive building
+      (early_expansion_phase
+       (cond
+         ((not power_sufficient_for_building) (list 0.10 0.50 0.40))
+         (efficiency_critical (list 0.16 0.49 0.35))
+         ((or o2_low h2o_low) (list 0.18 0.47 0.35))
+         (food_low (list 0.20 0.35 0.45))
+         (cri_very_high (list 0.22 0.43 0.35))
+         (cri_elevated (list 0.24 0.41 0.35))
+         (crew_health_critical (list 0.26 0.39 0.35))
+         (true (list 0.22 0.38 0.40))))
+      
+      ;; ULTRA EARLY - Maximum building focus
+      (ultra_early_phase
+       (cond
+         ((< power 80) (list 0.08 0.47 0.45))
+         (efficiency_critical (list 0.14 0.46 0.40))
+         ((or o2_low h2o_low) (list 0.16 0.44 0.40))
+         (food_low (list 0.18 0.32 0.50))
+         (cri_very_high (list 0.20 0.40 0.40))
+         (cri_elevated (list 0.22 0.38 0.40))
+         (crew_health_critical (list 0.24 0.36 0.40))
+         (true (list 0.20 0.35 0.45))))
+      
+      ;; Fallback
+      (true (list 0.25 0.50 0.25))))
+  
+  (define heating_target (nth allocation_strategy 0))
+  (define isru_target (nth allocation_strategy 1))
+  (define greenhouse_target (nth allocation_strategy 2))
+  
+  ;; ═══ ENHANCED REPAIR STRATEGY ═══
+  (define repair_multiplier
+    (cond
+      (cri_emergency 40.0)              ;; Emergency: maximum repairs
+      (cri_very_high 30.0)              ;; Very high CRI: heavy repairs
+      (cri_high 22.0)                   ;; High CRI: increased repairs
+      ((and v11_active_phase efficiency_critical) 25.0)
+      (v11_active_phase 18.0)
+      ((and v11_prep_phase efficiency_critical) 20.0)
+      (v11_prep_phase 15.0)
+      ((and cri_stabilization_phase efficiency_critical) 18.0)
+      (cri_stabilization_phase 12.0)
+      ((and efficiency_critical (or mega_build_phase infrastructure_completion_phase)) 15.0)
+      ((or mega_build_phase infrastructure_completion_phase) 10.0)
+      ((and efficiency_critical (or early_expansion_phase ultra_early_phase)) 12.0)
+      ((or early_expansion_phase ultra_early_phase) 8.0)
+      (true 6.0)))
+  
+  ;; ═══ FOOD RATIONING STRATEGY ═══
+  (define food_ration_target
+    (cond
+      (food_critical 0.15)              ;; Critical: severe rationing
+      (cri_emergency 0.30)              ;; CRI emergency: heavy rationing
+      (cri_very_high 0.40)              ;; Very high CRI: significant rationing
+      (cri_high 0.50)                   ;; High CRI: moderate rationing
+      ((and v11_active_phase food_low) 0.55)
+      (v11_active_phase 0.75)
+      ((and v11_prep_phase food_low) 0.60)
+      (v11_prep_phase 0.80)
+      ((and cri_stabilization_phase food_low) 0.65)
+      (cri_stabilization_phase 0.80)
+      ((and infrastructure_completion_phase food_low) 0.70)
+      (infrastructure_completion_phase 0.85)
+      ((and mega_build_phase food_low) 0.75)
+      (mega_build_phase 0.90)
+      ((and early_expansion_phase food_low) 0.80)
+      (early_expansion_phase 0.90)
+      ((and ultra_early_phase food_low) 0.85)
+      (ultra_early_phase 0.95)
+      ((< food_days 12) 0.65)
+      (true 0.90)))
+  
+  ;; ═══ APPLY ALLOCATIONS ═══
+  (set! heating_alloc heating_target)
+  (set! isru_alloc isru_target)
+  (set! greenhouse_alloc greenhouse_target)
+  (set! repair_alloc repair_multiplier)
+  (set! food_ration food_ration_target)
+  
+  ;; ═══ STATUS MONITORING ═══
+  (define phase_text
+    (cond
+      (v11_active_phase "🌍🏭 V11-ACTIVE")
+      (v11_prep_phase "🚨🏭 V11-PREP")
+      (cri_stabilization_phase "🎯⚖️ CRI-STAB")
+      (infrastructure_completion_phase "🏗️✅ INFRA-COMPLETE")
+      (mega_build_phase "🏭⚡ MEGA-BUILD")
+      (early_expansion_phase "🚀🏗️ EARLY-EXPAND")
+      (ultra_early_phase "⚡🎯 ULTRA-EARLY")
+      (true "🛠️ STANDARD")))
+  
+  (define cri_status_text
+    (cond
+      (cri_emergency "🔴💀 CRI-EMERGENCY")
+      (cri_very_high "🟠🚨 CRI-VERY-HIGH")
+      (cri_high "🟡⚠️ CRI-HIGH")
+      (cri_elevated "🟡📈 CRI-ELEVATED")
+      (true "🟢✅ CRI-GOOD")))
+  
+  (define status_text
+    (cond
+      (any_critical "💀🚨 CRITICAL")
+      (efficiency_critical "⚙️🔴 EFF-CRISIS")
+      (crew_health_critical "👥🔴 HEALTH-CRISIS")
+      ((not power_sufficient_for_building) "⚡🔴 LOW-POWER")
+      (true "🏭🚀 BUILDING")))
+  
+  ;; Enhanced logging
+  (log (concat "  🏭 " phase_text " | " cri_status_text " | " status_text))
+  (log (concat "  📊 CRI:" (string colony_risk_index) "/" (string target_cri) " | Power:" (string (round power)) "/" (string power_threshold_for_building) " | Modules:" (string (length modules))))
+  (log (concat "  📊 O2:" (string (round o2_days 1)) "/" (string o2_maintenance_target) " H2O:" (string (round h2o_days 1)) "/" (string h2o_maintenance_target) " Food:" (string (round food_days 1)) "/" (string food_maintenance_target)))
+  (log (concat "  ⚡ Allocs: H:" (string (round (* heating_target 100))) "% I:" (string (round (* isru_target 100))) "% G:" (string (round (* greenhouse_target 100))) "% R:" (string repair_multiplier) "x FR:" (string (round (* food_ration_target 100))) "%"))
+  (log (concat "  👥 Crew: " (string crew_count) "/" (string crew_min_hp) "hp | Eff: I:" (string (round (* isru_eff 100))) "% G:" (string (round (* greenhouse_eff 100))) "% S:" (string (round (* solar_eff 100))) "%"))
+  
+  (concat "MODULE-DENSITY-OPT Sol" (string sol) " " phase_text " " cri_status_text " CRI:" (string colony_risk_index) " Mods:" (string (length modules)) " Pwr:" (string (round power))))

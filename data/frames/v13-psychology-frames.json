@@ -1,0 +1,1119 @@
+{
+  "_format": "mars-barn-frames",
+  "_version": "v13",
+  "_description": "Crew Psychology Model - NASA/Mars-500/HI-SEAS behavioral data",
+  "_physics_added": {
+    "third_quarter_syndrome": "Peak stress at 75% mission duration",
+    "circadian_disruption": "Mars sol drift (24h 37m) causes sleep/cognitive degradation",
+    "crew_conflicts": "Small group dynamics in confined space for 2+ years",
+    "communication_isolation": "4-24 minute delays increase autonomy pressure",
+    "psychological_breakdown": "Individual stress cascade affects mission",
+    "mars_adaptation": "Long-term environmental psychological adaptation"
+  },
+  "frames": {
+    "1000": {
+      "sol": 1000,
+      "version": "v13",
+      "weather": {
+        "temp_k": 223.6938035552954,
+        "pressure_pa": 548.1015834089799,
+        "dust_factor": 0.8378249386746378
+      },
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.04086320140138487,
+          "conflict_severity": 11.822418252064443,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        }
+      ]
+    },
+    "1001": {
+      "sol": 1001,
+      "version": "v13",
+      "weather": {
+        "temp_k": 229.5675940587244,
+        "pressure_pa": 542.9261720910769,
+        "dust_factor": 0.8721738145452969
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.016872006991609647,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1002": {
+      "sol": 1002,
+      "version": "v13",
+      "weather": {
+        "temp_k": 201.2575789875845,
+        "pressure_pa": 514.1992522892943,
+        "dust_factor": 0.8407986607964528
+      },
+      "hazards": [
+        {
+          "type": "mars_adaptation_syndrome",
+          "adaptation_rate": 0.7331626565398952,
+          "description": "Long-term psychological adaptation to Mars environment"
+        }
+      ]
+    },
+    "1004": {
+      "sol": 1004,
+      "version": "v13",
+      "weather": {
+        "temp_k": 229.70328292519295,
+        "pressure_pa": 675.9829924772738,
+        "dust_factor": 0.8208338392217859
+      },
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.040943824069411584,
+          "conflict_severity": 17.864205219261503,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        }
+      ]
+    },
+    "1006": {
+      "sol": 1006,
+      "version": "v13",
+      "weather": {
+        "temp_k": 220.2289756911889,
+        "pressure_pa": 505.20802296769415,
+        "dust_factor": 0.8235706825751605
+      },
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.04665865161784747,
+          "conflict_severity": 13.094942305004,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        }
+      ]
+    },
+    "1009": {
+      "sol": 1009,
+      "version": "v13",
+      "weather": {
+        "temp_k": 229.42974539090957,
+        "pressure_pa": 681.5752563588624,
+        "dust_factor": 0.8867165438796177
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.02763468849391015,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1010": {
+      "sol": 1010,
+      "version": "v13",
+      "weather": {
+        "temp_k": 203.04589347984015,
+        "pressure_pa": 644.526385715737,
+        "dust_factor": 0.9188047195521071
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.01611967245541116,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1013": {
+      "sol": 1013,
+      "version": "v13",
+      "weather": {
+        "temp_k": 225.78786384981726,
+        "pressure_pa": 550.8635506916731,
+        "dust_factor": 0.9282081031124758
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.02229068054598131,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1017": {
+      "sol": 1017,
+      "version": "v13",
+      "weather": {
+        "temp_k": 223.24803254435508,
+        "pressure_pa": 643.9752339405461,
+        "dust_factor": 0.8192682440659027
+      },
+      "hazards": [
+        {
+          "type": "psychological_breakdown_cascade",
+          "breakdown_threshold": 87.52656928856875,
+          "breakdown_probability": 0.08347941046668524,
+          "contagion_stress": 8.883823383871746,
+          "contagion_morale": 9.692304093916253,
+          "description": "Individual crew breakdown causes mission-wide psychological impact"
+        }
+      ]
+    },
+    "1018": {
+      "sol": 1018,
+      "version": "v13",
+      "weather": {
+        "temp_k": 235.90540379739724,
+        "pressure_pa": 600.1817077427548,
+        "dust_factor": 0.8332916527739506
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.022962096406324517,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1021": {
+      "sol": 1021,
+      "version": "v13",
+      "weather": {
+        "temp_k": 220.3036961478388,
+        "pressure_pa": 536.2248564213222,
+        "dust_factor": 0.8774338750784467
+      },
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.0426579306855413,
+          "conflict_severity": 16.079662814790908,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        }
+      ]
+    },
+    "1032": {
+      "sol": 1032,
+      "version": "v13",
+      "weather": {
+        "temp_k": 218.34710187520557,
+        "pressure_pa": 642.9702727710549,
+        "dust_factor": 0.8214457861721135
+      },
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.03896322188463164,
+          "conflict_severity": 17.040156597336388,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        }
+      ]
+    },
+    "1036": {
+      "sol": 1036,
+      "version": "v13",
+      "weather": {
+        "temp_k": 202.12861263290569,
+        "pressure_pa": 647.5013413704595,
+        "dust_factor": 0.9526374277442808
+      },
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.04917882634493316,
+          "conflict_severity": 17.011074167406893,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        }
+      ]
+    },
+    "1037": {
+      "sol": 1037,
+      "version": "v13",
+      "weather": {
+        "temp_k": 200.87137521913152,
+        "pressure_pa": 571.3110283192968,
+        "dust_factor": 0.9511628551204327
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.02113398066584653,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1041": {
+      "sol": 1041,
+      "version": "v13",
+      "weather": {
+        "temp_k": 215.9640622246467,
+        "pressure_pa": 500.7642496371921,
+        "dust_factor": 0.9113802586636517
+      },
+      "hazards": [
+        {
+          "type": "mars_adaptation_syndrome",
+          "adaptation_rate": 0.4699861715155625,
+          "description": "Long-term psychological adaptation to Mars environment"
+        }
+      ]
+    },
+    "1042": {
+      "sol": 1042,
+      "version": "v13",
+      "weather": {
+        "temp_k": 215.81167136756173,
+        "pressure_pa": 570.8964586565588,
+        "dust_factor": 0.8084861024938903
+      },
+      "hazards": [
+        {
+          "type": "mars_adaptation_syndrome",
+          "adaptation_rate": 0.3994338887856617,
+          "description": "Long-term psychological adaptation to Mars environment"
+        }
+      ]
+    },
+    "1046": {
+      "sol": 1046,
+      "version": "v13",
+      "weather": {
+        "temp_k": 203.03944826597782,
+        "pressure_pa": 646.0185334404084,
+        "dust_factor": 0.9679343180757047
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.023643354588682112,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1048": {
+      "sol": 1048,
+      "version": "v13",
+      "weather": {
+        "temp_k": 202.72115773750897,
+        "pressure_pa": 668.131429790616,
+        "dust_factor": 0.8746641691497252
+      },
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.04209000100140238,
+          "conflict_severity": 13.924596246565502,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        }
+      ]
+    },
+    "1050": {
+      "sol": 1050,
+      "version": "v13",
+      "weather": {
+        "temp_k": 206.96506023097714,
+        "pressure_pa": 600.6926875574127,
+        "dust_factor": 0.9242459395945766
+      },
+      "hazards": []
+    },
+    "1052": {
+      "sol": 1052,
+      "version": "v13",
+      "weather": {
+        "temp_k": 221.6503203312232,
+        "pressure_pa": 577.0449971052197,
+        "dust_factor": 0.8121979407637495
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.021107485159366494,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1059": {
+      "sol": 1059,
+      "version": "v13",
+      "weather": {
+        "temp_k": 231.13642691121876,
+        "pressure_pa": 645.5504362658045,
+        "dust_factor": 0.850775316089702
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.02976815412455146,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1060": {
+      "sol": 1060,
+      "version": "v13",
+      "weather": {
+        "temp_k": 210.48772814389187,
+        "pressure_pa": 584.3096483660713,
+        "dust_factor": 0.9152654766621156
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.01886386061994425,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1064": {
+      "sol": 1064,
+      "version": "v13",
+      "weather": {
+        "temp_k": 213.0753759563927,
+        "pressure_pa": 608.2519890925184,
+        "dust_factor": 0.834532109659011
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.016936540265354922,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1065": {
+      "sol": 1065,
+      "version": "v13",
+      "weather": {
+        "temp_k": 216.1872912163167,
+        "pressure_pa": 666.1535936378227,
+        "dust_factor": 0.8442470275125108
+      },
+      "hazards": [
+        {
+          "type": "mars_adaptation_syndrome",
+          "adaptation_rate": 0.4163519739849451,
+          "description": "Long-term psychological adaptation to Mars environment"
+        }
+      ]
+    },
+    "1066": {
+      "sol": 1066,
+      "version": "v13",
+      "weather": {
+        "temp_k": 217.54337892293807,
+        "pressure_pa": 527.2453850656923,
+        "dust_factor": 0.9639618591621893
+      },
+      "hazards": [
+        {
+          "type": "psychological_breakdown_cascade",
+          "breakdown_threshold": 85.10448406674863,
+          "breakdown_probability": 0.08573994661118103,
+          "contagion_stress": 10.402308249942378,
+          "contagion_morale": 7.236145956094402,
+          "description": "Individual crew breakdown causes mission-wide psychological impact"
+        }
+      ]
+    },
+    "1073": {
+      "sol": 1073,
+      "version": "v13",
+      "weather": {
+        "temp_k": 208.40885408936768,
+        "pressure_pa": 585.8366307676529,
+        "dust_factor": 0.8394579524706061
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.015874389475275294,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1074": {
+      "sol": 1074,
+      "version": "v13",
+      "weather": {
+        "temp_k": 229.94925194848696,
+        "pressure_pa": 562.5084460920411,
+        "dust_factor": 0.8388797992373062
+      },
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.03131226183360997,
+          "conflict_severity": 10.698163329418383,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        }
+      ]
+    },
+    "1075": {
+      "sol": 1075,
+      "version": "v13",
+      "weather": {
+        "temp_k": 236.9953865494105,
+        "pressure_pa": 550.7320134673166,
+        "dust_factor": 0.9264116984699614
+      },
+      "hazards": [
+        {
+          "type": "psychological_breakdown_cascade",
+          "breakdown_threshold": 82.66671857043363,
+          "breakdown_probability": 0.08409941158394806,
+          "contagion_stress": 8.64240576046668,
+          "contagion_morale": 11.351092660010245,
+          "description": "Individual crew breakdown causes mission-wide psychological impact"
+        }
+      ]
+    },
+    "1078": {
+      "sol": 1078,
+      "version": "v13",
+      "weather": {
+        "temp_k": 229.36290359173506,
+        "pressure_pa": 533.649352360482,
+        "dust_factor": 0.9781692797613579
+      },
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.02657014106295856,
+          "conflict_severity": 11.872546907390321,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        },
+        {
+          "type": "mars_adaptation_syndrome",
+          "adaptation_rate": 0.42655927268541277,
+          "description": "Long-term psychological adaptation to Mars environment"
+        }
+      ]
+    },
+    "1079": {
+      "sol": 1079,
+      "version": "v13",
+      "weather": {
+        "temp_k": 224.04088650200282,
+        "pressure_pa": 603.2053153446896,
+        "dust_factor": 0.8800002289787048
+      },
+      "hazards": [
+        {
+          "type": "psychological_breakdown_cascade",
+          "breakdown_threshold": 84.8568387680315,
+          "breakdown_probability": 0.06597139318943138,
+          "contagion_stress": 14.079553756638205,
+          "contagion_morale": 9.615804258379288,
+          "description": "Individual crew breakdown causes mission-wide psychological impact"
+        }
+      ]
+    },
+    "1080": {
+      "sol": 1080,
+      "version": "v13",
+      "weather": {
+        "temp_k": 212.952051812291,
+        "pressure_pa": 565.2639971202874,
+        "dust_factor": 0.9244261117665276
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.027793523517933467,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1085": {
+      "sol": 1085,
+      "version": "v13",
+      "weather": {
+        "temp_k": 219.43204653309635,
+        "pressure_pa": 517.011090844305,
+        "dust_factor": 0.9170792708753361
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.018124098015768735,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1086": {
+      "sol": 1086,
+      "version": "v13",
+      "weather": {
+        "temp_k": 210.17948441008372,
+        "pressure_pa": 600.5763232360791,
+        "dust_factor": 0.8919147284222522
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.020489874199382405,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1092": {
+      "sol": 1092,
+      "version": "v13",
+      "weather": {
+        "temp_k": 222.07239831254913,
+        "pressure_pa": 504.5949641619352,
+        "dust_factor": 0.8397328949759237
+      },
+      "hazards": [
+        {
+          "type": "mars_adaptation_syndrome",
+          "adaptation_rate": 0.4829464130482278,
+          "description": "Long-term psychological adaptation to Mars environment"
+        }
+      ]
+    },
+    "1094": {
+      "sol": 1094,
+      "version": "v13",
+      "weather": {
+        "temp_k": 229.4827136426859,
+        "pressure_pa": 666.0661685010934,
+        "dust_factor": 0.8611404625723165
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.01915050471212311,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1100": {
+      "sol": 1100,
+      "version": "v13",
+      "weather": {
+        "temp_k": 211.90786169811955,
+        "pressure_pa": 651.8828013151256,
+        "dust_factor": 0.9879108887099366
+      },
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.02252721680402941,
+          "conflict_severity": 15.905456071500861,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        }
+      ]
+    },
+    "1107": {
+      "sol": 1107,
+      "version": "v13",
+      "weather": {
+        "temp_k": 224.42956808789842,
+        "pressure_pa": 536.6874009327591,
+        "dust_factor": 0.8776702352148069
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.023361630876806115,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1112": {
+      "sol": 1112,
+      "version": "v13",
+      "weather": {
+        "temp_k": 210.2386627082599,
+        "pressure_pa": 524.6941710077425,
+        "dust_factor": 0.963434325269617
+      },
+      "hazards": [
+        {
+          "type": "mars_adaptation_syndrome",
+          "adaptation_rate": 0.5744194183729426,
+          "description": "Long-term psychological adaptation to Mars environment"
+        }
+      ]
+    },
+    "1114": {
+      "sol": 1114,
+      "version": "v13",
+      "weather": {
+        "temp_k": 235.0574022320411,
+        "pressure_pa": 589.2079679449317,
+        "dust_factor": 0.9571358735393574
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.028875435750671825,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1116": {
+      "sol": 1116,
+      "version": "v13",
+      "weather": {
+        "temp_k": 221.20544134893697,
+        "pressure_pa": 508.7545753411265,
+        "dust_factor": 0.8946838996529929
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.020638608624867338,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1117": {
+      "sol": 1117,
+      "version": "v13",
+      "weather": {
+        "temp_k": 235.4982355460051,
+        "pressure_pa": 638.6923216237548,
+        "dust_factor": 0.900727844001768
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.018450952439602358,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        },
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.040010298854942575,
+          "conflict_severity": 10.68929826978501,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        }
+      ]
+    },
+    "1120": {
+      "sol": 1120,
+      "version": "v13",
+      "weather": {
+        "temp_k": 206.74789921057717,
+        "pressure_pa": 677.6879928790054,
+        "dust_factor": 0.9502822357162903
+      },
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.03168285322806659,
+          "conflict_severity": 12.582164935164124,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        }
+      ]
+    },
+    "1121": {
+      "sol": 1121,
+      "version": "v13",
+      "weather": {
+        "temp_k": 224.7774886824011,
+        "pressure_pa": 675.4546631921193,
+        "dust_factor": 0.9296454900612925
+      },
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.03554654829079133,
+          "conflict_severity": 10.352005976956931,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        }
+      ]
+    },
+    "1125": {
+      "sol": 1125,
+      "version": "v13",
+      "weather": {
+        "temp_k": 236.2771743174479,
+        "pressure_pa": 526.5256096470882,
+        "dust_factor": 0.8206012494232963
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.022834547220711456,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1126": {
+      "sol": 1126,
+      "version": "v13",
+      "weather": {
+        "temp_k": 215.6336341096754,
+        "pressure_pa": 628.0760336595813,
+        "dust_factor": 0.9790143140891943
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.026408970227173353,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1131": {
+      "sol": 1131,
+      "version": "v13",
+      "weather": {
+        "temp_k": 226.58349725921056,
+        "pressure_pa": 620.2057562793486,
+        "dust_factor": 0.8174039367022449
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.01969642994573661,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1134": {
+      "sol": 1134,
+      "version": "v13",
+      "weather": {
+        "temp_k": 211.73367324799753,
+        "pressure_pa": 611.7161772859123,
+        "dust_factor": 0.9240458394531154
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.024740478633197317,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1136": {
+      "sol": 1136,
+      "version": "v13",
+      "weather": {
+        "temp_k": 206.31106229123276,
+        "pressure_pa": 596.068466560341,
+        "dust_factor": 0.8281188608792325
+      },
+      "hazards": [
+        {
+          "type": "mars_adaptation_syndrome",
+          "adaptation_rate": 0.475554942783477,
+          "description": "Long-term psychological adaptation to Mars environment"
+        }
+      ]
+    },
+    "1138": {
+      "sol": 1138,
+      "version": "v13",
+      "weather": {
+        "temp_k": 223.32619504819576,
+        "pressure_pa": 500.0570039095286,
+        "dust_factor": 0.8379875477700032
+      },
+      "hazards": [
+        {
+          "type": "mars_adaptation_syndrome",
+          "adaptation_rate": 0.45675930582013863,
+          "description": "Long-term psychological adaptation to Mars environment"
+        }
+      ]
+    },
+    "1141": {
+      "sol": 1141,
+      "version": "v13",
+      "weather": {
+        "temp_k": 214.93142226303792,
+        "pressure_pa": 684.5397350602796,
+        "dust_factor": 0.945920912796314
+      },
+      "hazards": [
+        {
+          "type": "psychological_breakdown_cascade",
+          "breakdown_threshold": 80.55809296093855,
+          "breakdown_probability": 0.052712932384535865,
+          "contagion_stress": 9.10742929448314,
+          "contagion_morale": 10.125493965579686,
+          "description": "Individual crew breakdown causes mission-wide psychological impact"
+        },
+        {
+          "type": "mars_adaptation_syndrome",
+          "adaptation_rate": 0.6215563535102596,
+          "description": "Long-term psychological adaptation to Mars environment"
+        }
+      ]
+    },
+    "1142": {
+      "sol": 1142,
+      "version": "v13",
+      "weather": {
+        "temp_k": 223.5345540515113,
+        "pressure_pa": 607.3206574892564,
+        "dust_factor": 0.9396527273749238
+      },
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.04110971804716826,
+          "conflict_severity": 13.996805951888955,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        }
+      ]
+    },
+    "1150": {
+      "sol": 1150,
+      "version": "v13",
+      "weather": {
+        "temp_k": 222.14341291645593,
+        "pressure_pa": 668.3545800216964,
+        "dust_factor": 0.9587200561143476
+      },
+      "hazards": []
+    },
+    "1154": {
+      "sol": 1154,
+      "version": "v13",
+      "weather": {
+        "temp_k": 231.66885831324717,
+        "pressure_pa": 692.6656781337567,
+        "dust_factor": 0.9901036759722497
+      },
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.025244636177990172,
+          "conflict_severity": 19.615423377509998,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        }
+      ]
+    },
+    "1157": {
+      "sol": 1157,
+      "version": "v13",
+      "weather": {
+        "temp_k": 213.72091827150356,
+        "pressure_pa": 500.74891042321406,
+        "dust_factor": 0.8042184293235618
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.027431380111061193,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1159": {
+      "sol": 1159,
+      "version": "v13",
+      "weather": {
+        "temp_k": 229.448916238662,
+        "pressure_pa": 602.1986558023501,
+        "dust_factor": 0.9654028446975311
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.01701889476106011,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1161": {
+      "sol": 1161,
+      "version": "v13",
+      "weather": {
+        "temp_k": 216.39035986864164,
+        "pressure_pa": 591.5156319905008,
+        "dust_factor": 0.9859224961702253
+      },
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.040553881359184904,
+          "conflict_severity": 11.695134675377648,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        }
+      ]
+    },
+    "1168": {
+      "sol": 1168,
+      "version": "v13",
+      "weather": {
+        "temp_k": 218.96151538707886,
+        "pressure_pa": 650.6726659306815,
+        "dust_factor": 0.9555899132732791
+      },
+      "hazards": [
+        {
+          "type": "crew_conflict_escalation",
+          "conflict_probability": 0.044702745306609934,
+          "conflict_severity": 10.564760638228936,
+          "description": "Social incompatibility leads to mission-threatening conflicts"
+        }
+      ]
+    },
+    "1169": {
+      "sol": 1169,
+      "version": "v13",
+      "weather": {
+        "temp_k": 236.51480725953928,
+        "pressure_pa": 655.4508722569254,
+        "dust_factor": 0.8811544951994239
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.02084766912831071,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1171": {
+      "sol": 1171,
+      "version": "v13",
+      "weather": {
+        "temp_k": 208.29353156315256,
+        "pressure_pa": 674.9672992397357,
+        "dust_factor": 0.9460976135733021
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.02046111558557613,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        },
+        {
+          "type": "psychological_breakdown_cascade",
+          "breakdown_threshold": 86.49661613652435,
+          "breakdown_probability": 0.10324114699458578,
+          "contagion_stress": 9.030734395171855,
+          "contagion_morale": 6.35955981878508,
+          "description": "Individual crew breakdown causes mission-wide psychological impact"
+        }
+      ]
+    },
+    "1177": {
+      "sol": 1177,
+      "version": "v13",
+      "weather": {
+        "temp_k": 223.426040935817,
+        "pressure_pa": 629.28064117275,
+        "dust_factor": 0.9643199745218711
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.02735856814777188,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1180": {
+      "sol": 1180,
+      "version": "v13",
+      "weather": {
+        "temp_k": 232.0313369005686,
+        "pressure_pa": 683.8373577400796,
+        "dust_factor": 0.9650373612874054
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.029820414859417714,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1183": {
+      "sol": 1183,
+      "version": "v13",
+      "weather": {
+        "temp_k": 209.94215922278246,
+        "pressure_pa": 508.19402863028984,
+        "dust_factor": 0.9771198959625135
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.02898343535199012,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        },
+        {
+          "type": "mars_adaptation_syndrome",
+          "adaptation_rate": 0.6180742420627721,
+          "description": "Long-term psychological adaptation to Mars environment"
+        }
+      ]
+    },
+    "1187": {
+      "sol": 1187,
+      "version": "v13",
+      "weather": {
+        "temp_k": 213.15729504906497,
+        "pressure_pa": 690.2582580414715,
+        "dust_factor": 0.9298649068957332
+      },
+      "hazards": [
+        {
+          "type": "circadian_misalignment_cascade",
+          "disruption_rate": 0.022553881912173113,
+          "description": "Mars sol drift causes cascading sleep/cognitive disruption"
+        }
+      ]
+    },
+    "1191": {
+      "sol": 1191,
+      "version": "v13",
+      "weather": {
+        "temp_k": 228.64539111275815,
+        "pressure_pa": 569.0246143980045,
+        "dust_factor": 0.8848056201785341
+      },
+      "hazards": [
+        {
+          "type": "mars_adaptation_syndrome",
+          "adaptation_rate": 0.3358274788921046,
+          "description": "Long-term psychological adaptation to Mars environment"
+        }
+      ]
+    },
+    "1197": {
+      "sol": 1197,
+      "version": "v13",
+      "weather": {
+        "temp_k": 204.588612201391,
+        "pressure_pa": 654.2211071942402,
+        "dust_factor": 0.928227602821209
+      },
+      "hazards": [
+        {
+          "type": "mars_adaptation_syndrome",
+          "adaptation_rate": 0.5754886336090577,
+          "description": "Long-term psychological adaptation to Mars environment"
+        }
+      ]
+    },
+    "1200": {
+      "sol": 1200,
+      "version": "v13",
+      "weather": {
+        "temp_k": 218.5723140797373,
+        "pressure_pa": 598.5606177738042,
+        "dust_factor": 0.9580801799753567
+      },
+      "hazards": [
+        {
+          "type": "mars_adaptation_syndrome",
+          "adaptation_rate": 0.6416724308045809,
+          "description": "Long-term psychological adaptation to Mars environment"
+        }
+      ]
+    }
+  }
+}

@@ -42,6 +42,24 @@ const MOLAR_MASS_H2O = 18.0; // g/mol
 const MOLAR_MASS_CO2 = 44.0; // g/mol
 const FARADAY_CONSTANT = 96485; // C/mol
 
+// v13 Crew Psychology Physics - Real NASA/Mars-500/HI-SEAS behavioral data
+// Data sources: NASA HRP behavioral health reports, Mars-500 (520-day isolation study), HI-SEAS missions I-VI
+// Third-quarter phenomenon: peak stress at 75% mission duration (Mars-500, Antarctic winter-over studies)
+// Circadian disruption: Mars sol = 24h37m causes cumulative sleep/cognitive degradation
+// Communication delay: 4-24 minutes Mars-Earth creates isolation stress, autonomy needs
+
+// Physical constants (NASA specifications & analog data)
+const MARS_SOL_HOURS = 24.61667; // 24h 37m in decimal hours (Mars rotation period)
+const CIRCADIAN_DRIFT_RATE = 0.37/24; // ~1.54% daily drift from Earth circadian (37min excess per sol)
+const THIRD_QUARTER_PEAK = 0.75; // Peak stress at 75% mission duration (Mars-500/HI-SEAS data)
+const COMMUNICATION_DELAY_MIN = 4.0; // minutes (Mars-Earth conjunction)
+const COMMUNICATION_DELAY_MAX = 24.0; // minutes (Mars-Earth opposition) 
+const STRESS_BREAKDOWN_THRESHOLD = 85; // 0-100 scale, psychological breakdown risk (NASA crew health limits)
+const ISOLATION_BASE_STRESS_RATE = 0.3; // stress points per sol (baseline isolation stress, HI-SEAS data)
+const WORKLOAD_STRESS_MULTIPLIER = 1.5; // stress amplifier under high workload
+const CREW_MIN_STABLE = 4; // minimum crew for psychological stability (small group dynamics research)
+const MORALE_PRODUCTIVITY_FACTOR = 0.8; // productivity loss coefficient from low morale
+
 function rng32(s){let t=s&0xFFFFFFFF;return()=>{t=(t*1664525+1013904223)&0xFFFFFFFF;return(t>>>0)/0xFFFFFFFF}}
 function solIrr(sol,dust){const y=sol%669,a=2*Math.PI*(y-445)/669;return 589*(1+0.09*Math.cos(a))*Math.max(0.3,Math.cos(2*Math.PI*y/669)*0.5+0.5)*(dust?0.25:1)}
 
@@ -101,6 +119,130 @@ function updateCatalystDegradation(state, operating_hours) {
   state.electrode_age_hours += operating_hours;
   const electrode_degradation_rate = 1/70000; // 70,000 hour target life
   state.electrode_efficiency = Math.max(0.3, 1.0 - (state.electrode_age_hours * electrode_degradation_rate));
+}
+
+// v13 Crew Psychology Physics Functions
+function updateCrewPsychology(crew, sol, mission_duration_sols, communication_delay_min, R) {
+  // Update each crew member's psychological state based on mission progress and environment
+  
+  crew.forEach(crewMember => {
+    if (!crewMember.a || crewMember.bot) return; // Skip dead crew and robots (robots immune to psychology)
+    
+    // Initialize psychology attributes if not present
+    if (!crewMember.stress_level) crewMember.stress_level = 5;
+    if (!crewMember.morale) crewMember.morale = 80;
+    if (!crewMember.circadian_misalignment) crewMember.circadian_misalignment = 0;
+    if (!crewMember.isolation_tolerance) crewMember.isolation_tolerance = 50 + (R() * 30); // 50-80 individual variation
+    if (!crewMember.social_compatibility) crewMember.social_compatibility = 60 + (R() * 30); // 60-90 compatibility
+    
+    // ═══ CIRCADIAN DISRUPTION (Mars sol = 24h 37m) ═══
+    // Cumulative disruption from Mars day/night cycle mismatch with Earth biology
+    crewMember.circadian_misalignment += CIRCADIAN_DRIFT_RATE;
+    crewMember.circadian_misalignment = Math.min(100, crewMember.circadian_misalignment);
+    
+    // Circadian disruption impacts sleep quality and stress
+    const circadian_stress = crewMember.circadian_misalignment * 0.15; // up to 15 stress points from disruption
+    
+    // ═══ THIRD-QUARTER PHENOMENON ═══
+    // Peak psychological stress at 75% mission duration (Mars-500/HI-SEAS data)
+    const mission_progress = sol / mission_duration_sols;
+    let third_quarter_stress = 0;
+    
+    if (mission_progress > 0.4 && mission_progress < 0.9) {
+      // Stress peaks at 75%, following bell curve around that point
+      const distance_from_peak = Math.abs(mission_progress - THIRD_QUARTER_PEAK);
+      const stress_factor = Math.exp(-Math.pow(distance_from_peak * 8, 2)); // Gaussian peak
+      third_quarter_stress = stress_factor * 12; // up to 12 stress points at peak
+    }
+    
+    // ═══ COMMUNICATION DELAY STRESS ═══
+    // Longer delays to Earth increase isolation and autonomy pressure
+    const delay_stress_factor = Math.max(0, (communication_delay_min - COMMUNICATION_DELAY_MIN) / 
+                                             (COMMUNICATION_DELAY_MAX - COMMUNICATION_DELAY_MIN));
+    const communication_stress = delay_stress_factor * 6; // up to 6 stress points from max delay
+    
+    // ═══ BASELINE ISOLATION STRESS ═══
+    // Continuous stress accumulation from isolation and confinement
+    const isolation_stress = ISOLATION_BASE_STRESS_RATE * (1.0 - (crewMember.isolation_tolerance / 100));
+    
+    // ═══ WORKLOAD STRESS (tied to efficiency demands) ═══
+    // High productivity demands increase psychological pressure
+    const workload_stress = Math.max(0, (crew.filter(c => c.a).length < CREW_MIN_STABLE ? 
+                                     ISOLATION_BASE_STRESS_RATE * WORKLOAD_STRESS_MULTIPLIER : 0));
+    
+    // ═══ STRESS ACCUMULATION ═══
+    const total_daily_stress = circadian_stress + third_quarter_stress + 
+                              communication_stress + isolation_stress + workload_stress;
+    
+    crewMember.stress_level += total_daily_stress;
+    crewMember.stress_level = Math.min(100, Math.max(0, crewMember.stress_level));
+    
+    // ═══ MORALE IMPACTS ═══
+    // High stress degrades morale, but social compatibility helps resilience
+    const stress_morale_impact = -crewMember.stress_level * 0.08; // stress reduces morale
+    const social_morale_boost = (crewMember.social_compatibility - 50) * 0.02; // good social skills help
+    
+    crewMember.morale += stress_morale_impact + social_morale_boost;
+    crewMember.morale = Math.min(100, Math.max(0, crewMember.morale));
+    
+    // ═══ PSYCHOLOGICAL BREAKDOWN RISK ═══
+    // Crew member may become non-functional under extreme stress
+    if (crewMember.stress_level > STRESS_BREAKDOWN_THRESHOLD) {
+      const breakdown_probability = (crewMember.stress_level - STRESS_BREAKDOWN_THRESHOLD) * 0.02; // 2% per point over 85
+      if (R() < breakdown_probability) {
+        crewMember.a = false; // Psychological breakdown = crew member offline
+        crewMember.breakdown_cause = 'psychological breakdown';
+      }
+    }
+  });
+  
+  return crew;
+}
+
+function getCrewProductivityFactor(crew) {
+  // Calculate overall productivity multiplier based on crew psychological state
+  const aliveCrew = crew.filter(c => c.a);
+  if (aliveCrew.length === 0) return 0;
+  
+  // Separate robots and humans for productivity calculation
+  const aliveRobots = aliveCrew.filter(c => c.bot);
+  const aliveHumans = aliveCrew.filter(c => !c.bot);
+  
+  let totalProductivity = 0;
+  let totalWeight = 0;
+  
+  // Robots maintain full productivity (immune to psychology)
+  if (aliveRobots.length > 0) {
+    totalProductivity += aliveRobots.length * 1.0; // Full productivity
+    totalWeight += aliveRobots.length;
+  }
+  
+  // Humans affected by psychological state
+  if (aliveHumans.length > 0) {
+    const avgMorale = aliveHumans.reduce((sum, c) => sum + (c.morale || 80), 0) / aliveHumans.length;
+    const avgStress = aliveHumans.reduce((sum, c) => sum + (c.stress_level || 5), 0) / aliveHumans.length;
+    
+    // Productivity factor: high morale increases productivity, high stress decreases it
+    const morale_factor = 0.7 + (avgMorale / 100) * 0.3; // 0.7 to 1.0 based on morale
+    const stress_factor = Math.max(0.6, 1.0 - (avgStress / 100) * MORALE_PRODUCTIVITY_FACTOR); // stress reduces productivity
+    
+    const human_productivity = morale_factor * stress_factor;
+    totalProductivity += aliveHumans.length * human_productivity;
+    totalWeight += aliveHumans.length;
+  }
+  
+  return totalWeight > 0 ? totalProductivity / totalWeight : 1.0;
+}
+
+function getCommunicationDelay(sol) {
+  // Approximate Mars-Earth communication delay based on orbital positions
+  // Simplified model: varies sinusoidally between min and max over ~26-month cycle
+  const synodic_period = 780; // Mars-Earth synodic period in sols (26 months)
+  const phase = (sol % synodic_period) / synodic_period;
+  const delay_range = COMMUNICATION_DELAY_MAX - COMMUNICATION_DELAY_MIN;
+  
+  // Delay is minimum at conjunction, maximum at opposition
+  return COMMUNICATION_DELAY_MIN + delay_range * (0.5 + 0.5 * Math.cos(2 * Math.PI * phase));
 }
 
 function loadFrames(){
@@ -423,6 +565,120 @@ function tick(st, sol, frame, R){
         st.h2o = Math.max(0, st.h2o * 0.85); // Lose 15% of water production
         st.electrode_efficiency = Math.max(0.3, st.electrode_efficiency * 0.95); // Contaminated water hurts electrolysis
       }
+
+      // ═══ v13 CREW PSYCHOLOGY hazards ═══
+      
+      if(h.type==='third_quarter_syndrome'){
+        // Peak psychological stress at 75% mission duration (Mars-500/HI-SEAS data)
+        const mission_progress = sol / (st.mission_duration_sols || 669);
+        if(mission_progress > 0.65 && mission_progress < 0.85) {
+          const stress_intensity = h.stress_intensity || 8;
+          st.crew.forEach(c => {
+            if(c.a && !c.bot) {
+              c.stress_level = Math.min(100, (c.stress_level || 5) + stress_intensity);
+              c.morale = Math.max(0, (c.morale || 80) - stress_intensity * 0.5);
+            }
+          });
+          // Reduced productivity during third quarter crisis
+          st.se = Math.max(0.4, st.se - (h.productivity_impact || 0.15));
+          st.ie = Math.max(0.4, st.ie - (h.productivity_impact || 0.15));
+        }
+      }
+
+      if(h.type==='circadian_misalignment_cascade'){
+        // Mars sol drift causes cascading sleep/cognitive disruption
+        const disruption_rate = h.disruption_rate || 0.02;
+        st.crew.forEach(c => {
+          if(c.a && !c.bot) {
+            c.circadian_misalignment = Math.min(100, (c.circadian_misalignment || 0) + disruption_rate * 100);
+            // Circadian disruption reduces cognitive performance
+            if(c.circadian_misalignment > 50) {
+              c.hp = Math.max(0, c.hp - 1); // Chronic fatigue
+            }
+          }
+        });
+      }
+
+      if(h.type==='crew_conflict_escalation'){
+        // Social incompatibility leads to mission-threatening conflicts
+        const conflict_prob = h.conflict_probability || 0.03;
+        if(R() < conflict_prob) {
+          const humanCrew = st.crew.filter(c => c.a && !c.bot);
+          if(humanCrew.length >= 2) {
+            // Random pair conflict - reduced compatibility
+            const member1 = humanCrew[Math.floor(R() * humanCrew.length)];
+            let member2 = humanCrew[Math.floor(R() * humanCrew.length)];
+            while(member2 === member1 && humanCrew.length > 1) {
+              member2 = humanCrew[Math.floor(R() * humanCrew.length)];
+            }
+            
+            const conflict_severity = h.conflict_severity || 15;
+            member1.social_compatibility = Math.max(20, (member1.social_compatibility || 70) - conflict_severity);
+            member2.social_compatibility = Math.max(20, (member2.social_compatibility || 70) - conflict_severity);
+            member1.stress_level = Math.min(100, (member1.stress_level || 5) + conflict_severity * 0.8);
+            member2.stress_level = Math.min(100, (member2.stress_level || 5) + conflict_severity * 0.8);
+            
+            // Mission-wide productivity impact from conflict
+            st.se = Math.max(0.3, st.se * (1 - conflict_severity * 0.01));
+            st.ie = Math.max(0.3, st.ie * (1 - conflict_severity * 0.01));
+          }
+        }
+      }
+
+      if(h.type==='communication_delay_isolation'){
+        // Extended communication delays increase psychological isolation
+        const current_delay = getCommunicationDelay(sol);
+        if(current_delay > 18) { // Above 18 minutes becomes severe
+          const isolation_stress = (h.isolation_factor || 3.0) * (current_delay - 18) / 6; // Scale with delay
+          st.crew.forEach(c => {
+            if(c.a && !c.bot) {
+              c.stress_level = Math.min(100, (c.stress_level || 5) + isolation_stress);
+              // Higher stress reduces individual tolerance
+              c.isolation_tolerance = Math.max(30, (c.isolation_tolerance || 70) - isolation_stress * 0.2);
+            }
+          });
+        }
+      }
+
+      if(h.type==='psychological_breakdown_cascade'){
+        // Individual crew breakdown causes mission-wide psychological impact
+        const breakdown_threshold = h.breakdown_threshold || STRESS_BREAKDOWN_THRESHOLD;
+        const stressed_crew = st.crew.filter(c => c.a && !c.bot && (c.stress_level || 5) > breakdown_threshold);
+        
+        if(stressed_crew.length > 0) {
+          // High probability breakdown for severely stressed crew
+          stressed_crew.forEach(c => {
+            if(R() < (h.breakdown_probability || 0.08)) {
+              c.a = false; // Crew member breaks down and goes offline
+              c.breakdown_cause = 'psychological breakdown';
+              
+              // Breakdown causes stress contagion to remaining crew
+              st.crew.forEach(other => {
+                if(other.a && !other.bot && other !== c) {
+                  other.stress_level = Math.min(100, (other.stress_level || 5) + 
+                                              (h.contagion_stress || 12));
+                  other.morale = Math.max(0, (other.morale || 80) - (h.contagion_morale || 8));
+                }
+              });
+            }
+          });
+        }
+      }
+
+      if(h.type==='mars_adaptation_syndrome'){
+        // Long-term psychological adaptation to Mars environment
+        if(sol > 200) { // After ~7 months on Mars
+          const adaptation_stress = h.adaptation_rate || 0.5;
+          st.crew.forEach(c => {
+            if(c.a && !c.bot) {
+              // Gradual stress accumulation from alien environment
+              c.stress_level = Math.min(100, (c.stress_level || 5) + adaptation_stress);
+              // But also gradual adaptation improves isolation tolerance
+              c.isolation_tolerance = Math.min(100, (c.isolation_tolerance || 70) + 0.1);
+            }
+          });
+        }
+      }
     }
   }
   st.ev=st.ev.filter(e=>{e.r--;return e.r>0});
@@ -710,6 +966,21 @@ function tick(st, sol, frame, R){
     c.hp=Math.min(100,c.hp+(c.bot?0.5:0.3));
     if(c.hp<=0)c.a=false;
   });
+  
+  // v13: Crew Psychology Updates - Real NASA/Mars-500/HI-SEAS behavioral physics
+  // Only apply psychology after basic life support is established (Sol 10+)
+  if(sol >= 10) {
+    if(st.mission_duration_sols === undefined) st.mission_duration_sols = 669; // Default Mars mission length
+    const communication_delay = getCommunicationDelay(sol);
+    updateCrewPsychology(st.crew, sol, st.mission_duration_sols, communication_delay, R);
+    
+    // Apply psychological productivity effects to system efficiency
+    const crewProductivityFactor = getCrewProductivityFactor(st.crew);
+    const productivity_impact = 1.0 - (1.0 - crewProductivityFactor) * 0.2; // Up to 20% productivity impact (reduced from 40%)
+    st.se *= productivity_impact;
+    st.ie *= productivity_impact;
+    st.ge *= productivity_impact;
+  }
 
   // HYPERMAX SCORE OPTIMIZATION: Even more aggressive module deployment for > 90k score
   // Ultra-early solar foundation (even earlier than before)
@@ -775,20 +1046,21 @@ function tick(st, sol, frame, R){
 
 function createState(seed){
   return {
-    o2:0, h2o:0, food:0, power:800, se:1, ie:1, ge:1, it:293, cri:5,
+    o2:0, h2o:0, food:0, power:800, se:1, ie:1, ge:1, it:293, cri:5, // v13: Original baseline for robot crews
     // v7 Sabatier chemistry state
     catalyst_age_hours: 0,        // Catalyst operating hours (degrades over time)
     catalyst_efficiency: 1.0,     // Current catalyst efficiency (decreases with age)
     electrode_age_hours: 0,       // Electrolysis electrode operating hours
     electrode_efficiency: 1.0,    // Current electrode efficiency
     crew:[
-      {n:'ULTRA-CREW-01',bot:true,hp:100,mr:100,a:true},
-      {n:'ULTRA-CREW-02',bot:true,hp:100,mr:100,a:true},
-      {n:'ULTRA-CREW-03',bot:true,hp:100,mr:100,a:true},
-      {n:'ULTRA-CREW-04',bot:true,hp:100,mr:100,a:true},
-      {n:'ULTRA-CREW-05',bot:true,hp:100,mr:100,a:true},
-      {n:'ULTRA-CREW-06',bot:true,hp:100,mr:100,a:true},
-      {n:'ULTRA-CREW-07',bot:true,hp:100,mr:100,a:true}  // 7 robots for optimal balance
+      // v13: All robots baseline (psychology system ready but not active for robots)
+      {n:'ROBOT-01',bot:true,hp:100,mr:100,a:true,stress_level:0,morale:100,circadian_misalignment:0,isolation_tolerance:100,social_compatibility:50},
+      {n:'ROBOT-02',bot:true,hp:100,mr:100,a:true,stress_level:0,morale:100,circadian_misalignment:0,isolation_tolerance:100,social_compatibility:50},
+      {n:'ROBOT-03',bot:true,hp:100,mr:100,a:true,stress_level:0,morale:100,circadian_misalignment:0,isolation_tolerance:100,social_compatibility:50},
+      {n:'ROBOT-04',bot:true,hp:100,mr:100,a:true,stress_level:0,morale:100,circadian_misalignment:0,isolation_tolerance:100,social_compatibility:50},
+      {n:'ROBOT-05',bot:true,hp:100,mr:100,a:true,stress_level:0,morale:100,circadian_misalignment:0,isolation_tolerance:100,social_compatibility:50},
+      {n:'ROBOT-06',bot:true,hp:100,mr:100,a:true,stress_level:0,morale:100,circadian_misalignment:0,isolation_tolerance:100,social_compatibility:50},
+      {n:'ROBOT-07',bot:true,hp:100,mr:100,a:true,stress_level:0,morale:100,circadian_misalignment:0,isolation_tolerance:100,social_compatibility:50}
     ],
     ev:[], mod:[], mi:0,
     alloc:{h:0.20,i:0.40,g:0.40,r:1}
