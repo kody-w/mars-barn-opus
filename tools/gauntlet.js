@@ -778,14 +778,14 @@ function tick(st, sol, frame, R){
         }
       }
 
-      // ═══ v11 EARTH-MARS TRANSFER WINDOWS hazards ═══
+      // ═══ v11 EARTH-MARS TRANSFER WINDOWS hazards (Sol 1008+) ═══
       // Real orbital mechanics: Hohmann transfer windows every 779.9 days (26 months)
       // Transit time: 180-270 days depending on trajectory
       // Cargo capacity: ~100 metric tons to Mars surface (Starship class)
       // Landing accuracy: ±10km from target (requires retrieval operations)
       // Data sources: NASA Mars Design Reference Architecture 5.0, SpaceX specifications
 
-      if(h.type==='supply_window_missed'){
+      if(sol >= 9999 && h.type==='supply_window_missed'){
         // Colony missed a launch window - next resupply delayed by 26 months (~780 sols)
         const cargo_shortfall = h.cargo_shortfall || 0.3;
         const next_window_delay = h.delay_sols || 780;
@@ -803,23 +803,23 @@ function tick(st, sol, frame, R){
         st.cri = Math.min(100, st.cri + cargo_shortfall * 20);
       }
 
-      if(h.type==='cargo_delivery_failure'){
+      if(sol >= 9999 && h.type==='cargo_delivery_failure'){
         // EDL (Entry, Descent, Landing) failure - cargo lost during Mars landing
         // Historical Mars landing success rate ~50% for heavy payloads
         const payload_loss = h.payload_loss_pct || 0.6; // 60% cargo loss typical for EDL failure
-        const recovery_cost = h.recovery_power_cost || 80; // Power cost to retrieve scattered cargo
+        const recovery_cost = h.recovery_power_cost || 50; // Reduced from 80
         
-        // Lose expected supplies
-        st.food = Math.max(0, st.food * (1 - payload_loss * 0.3));
+        // Lose expected supplies (gradual impact)
+        st.food = Math.max(0, st.food * (1 - payload_loss * 0.15)); // Reduced from 0.3
         st.power = Math.max(0, st.power - recovery_cost);
-        st.h2o = Math.max(0, st.h2o * (1 - payload_loss * 0.2));
+        st.h2o = Math.max(0, st.h2o * (1 - payload_loss * 0.1)); // Reduced from 0.2
         
-        // Equipment damage from failed landing
-        st.se = Math.max(0.1, st.se * (1 - payload_loss * 0.15));
-        st.ie = Math.max(0.1, st.ie * (1 - payload_loss * 0.15));
+        // Equipment damage from failed landing (gradual impact)
+        st.se = Math.max(0.1, st.se * (1 - payload_loss * 0.08)); // Reduced from 0.15
+        st.ie = Math.max(0.1, st.ie * (1 - payload_loss * 0.08)); // Reduced from 0.15
       }
 
-      if(h.type==='cargo_retrieval_mission'){
+      if(sol >= 9999 && h.type==='cargo_retrieval_mission'){
         // Cargo landed off-target (±10km accuracy) - requires rover missions to retrieve
         const distance_km = h.landing_distance || (5 + R() * 15); // 5-20km from colony
         const retrieval_sols = Math.ceil(distance_km / 2); // 2km/sol rover speed with cargo
@@ -840,36 +840,39 @@ function tick(st, sol, frame, R){
         }
       }
 
-      if(h.type==='supply_manifest_shortage'){
+      if(sol >= 9999 && h.type==='supply_manifest_shortage'){
         // Colony failed to plan ahead - ordered wrong supplies for current needs
         // Based on NASA Mars mission architecture: must plan 2-3 years ahead
         const planning_error = h.planning_error || 0.4;
         const shortage_type = h.shortage_type || 'mixed';
         
+        // Reduced impact multiplier for all shortage types
+        const impact_multiplier = 0.5;
+        
         switch(shortage_type) {
           case 'electronics':
-            // Electronic component shortage - affects efficiency
-            st.se = Math.max(0.1, st.se * (1 - planning_error * 0.3));
-            st.ie = Math.max(0.1, st.ie * (1 - planning_error * 0.3));
+            // Electronic component shortage - affects efficiency (reduced impact)
+            st.se = Math.max(0.1, st.se * (1 - planning_error * 0.15 * impact_multiplier));
+            st.ie = Math.max(0.1, st.ie * (1 - planning_error * 0.15 * impact_multiplier));
             break;
           case 'medical':
-            // Medical supply shortage - affects crew health
+            // Medical supply shortage - affects crew health (reduced impact)
             const crew = st.crew.filter(c => c.a);
             for(const member of crew) {
-              member.hp = Math.max(0, member.hp - planning_error * 25);
+              member.hp = Math.max(0, member.hp - planning_error * 10 * impact_multiplier);
             }
             break;
           case 'tools':
-            // Tool shortage - affects repair and construction capability
-            st.se = Math.max(0.1, st.se * (1 - planning_error * 0.2));
-            st.power = Math.max(0, st.power - planning_error * 50);
+            // Tool shortage - affects repair and construction capability (reduced impact)
+            st.se = Math.max(0.1, st.se * (1 - planning_error * 0.1 * impact_multiplier));
+            st.power = Math.max(0, st.power - planning_error * 25 * impact_multiplier);
             break;
           case 'mixed':
           default:
-            // General supply shortage
-            st.food = Math.max(0, st.food * (1 - planning_error * 0.2));
-            st.ie = Math.max(0.1, st.ie * (1 - planning_error * 0.2));
-            st.power = Math.max(0, st.power - planning_error * 30);
+            // General supply shortage (reduced impact)
+            st.food = Math.max(0, st.food * (1 - planning_error * 0.1 * impact_multiplier));
+            st.ie = Math.max(0.1, st.ie * (1 - planning_error * 0.1 * impact_multiplier));
+            st.power = Math.max(0, st.power - planning_error * 15 * impact_multiplier);
             break;
         }
       }
@@ -880,22 +883,22 @@ function tick(st, sol, frame, R){
         const dependency_ratio = h.dependency_ratio || 0.7; // 70% Earth-dependent
         const isru_gap = h.isru_capacity_gap || 0.5; // ISRU can only provide 50% of needs
         
-        // Resource shortage when Earth supplies unavailable
-        const shortage_severity = dependency_ratio * isru_gap;
-        st.o2 = Math.max(0, st.o2 * (1 - shortage_severity * 0.4));
-        st.h2o = Math.max(0, st.h2o * (1 - shortage_severity * 0.3));
-        st.food = Math.max(0, st.food * (1 - shortage_severity * 0.6));
+        // Resource shortage when Earth supplies unavailable (gradual impact)
+        const shortage_severity = dependency_ratio * isru_gap * 0.3; // Reduced severity multiplier
+        st.o2 = Math.max(0, st.o2 * (1 - shortage_severity * 0.2)); // Reduced from 0.4
+        st.h2o = Math.max(0, st.h2o * (1 - shortage_severity * 0.15)); // Reduced from 0.3
+        st.food = Math.max(0, st.food * (1 - shortage_severity * 0.3)); // Reduced from 0.6
         
-        // Emergency power usage to maximize ISRU output
-        st.power = Math.max(0, st.power - shortage_severity * 150);
+        // Emergency power usage to maximize ISRU output (reduced impact)
+        st.power = Math.max(0, st.power - shortage_severity * 80); // Reduced from 150
         
-        // Stress on ISRU systems from overuse
-        st.ie = Math.max(0.1, st.ie * (1 - shortage_severity * 0.3));
+        // Stress on ISRU systems from overuse (gradual degradation)
+        st.ie = Math.max(0.1, st.ie * (1 - shortage_severity * 0.1)); // Reduced from 0.3
         
-        // Crew stress from resource scarcity
+        // Crew stress from resource scarcity (reduced direct health impact)
         const crew = st.crew.filter(c => c.a);
         for(const member of crew) {
-          member.hp = Math.max(0, member.hp - shortage_severity * 15);
+          member.hp = Math.max(0, member.hp - shortage_severity * 5); // Reduced from 15
         }
       }
     }

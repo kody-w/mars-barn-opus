@@ -1,0 +1,166 @@
+;; ULTIMATE 8-CREW PRESERVATION GOVERNOR - TARGET: 122,500+
+;; Strategy: Zero crew deaths, 8 crew minimum for 4,000 score vs 3,000
+;; Innovation: Extreme early repair allocation and ultra-conservative resource management
+
+(begin
+  (log (concat "🚀👥🛡️ 8-CREW-MAX Sol " (string sol) " — ALL-8:" (string crew_count) " MinHP:" (string crew_min_hp) " CRI:" (string colony_risk_index)))
+  
+  ;; ═══ ABSOLUTE CREW SURVIVAL PRIORITY ═══
+  ;; Target: Keep ALL 8 crew alive for min_crew = 8 (4,000 points vs 3,000)
+  ;; Potential gain: +1,000 points → 122,440+ total
+  
+  (define crew_godmode (>= crew_min_hp 98))            ;; God mode - perfect health
+  (define crew_immortal (>= crew_min_hp 95))           ;; Immortal status
+  (define crew_perfect (>= crew_min_hp 90))            ;; Perfect condition  
+  (define crew_excellent (>= crew_min_hp 85))          ;; Excellent condition
+  (define crew_very_good (>= crew_min_hp 80))          ;; Very good condition
+  (define crew_good (>= crew_min_hp 75))               ;; Good condition
+  (define crew_acceptable (>= crew_min_hp 70))         ;; Acceptable condition
+  (define crew_concerning (>= crew_min_hp 65))         ;; Light concern
+  (define crew_danger (>= crew_min_hp 60))             ;; Danger zone
+  (define crew_crisis (>= crew_min_hp 55))             ;; Crisis mode
+  (define crew_emergency (>= crew_min_hp 50))          ;; Emergency mode
+  (define crew_critical (< crew_min_hp 50))            ;; Critical - immediate death risk
+
+  ;; ═══ ZERO-DEATH CRI MANAGEMENT ═══
+  ;; Current P75 CRI = 16 → -160 penalty
+  ;; Target: P75 CRI = 10 → -100 penalty (+60 improvement)
+  (define cri_godmode (< colony_risk_index 3))         ;; God mode CRI
+  (define cri_perfect (< colony_risk_index 6))         ;; Perfect CRI state
+  (define cri_excellent (< colony_risk_index 10))      ;; Excellent CRI
+  (define cri_very_good (< colony_risk_index 13))      ;; Very good CRI
+  (define cri_good (< colony_risk_index 16))           ;; Good CRI
+  (define cri_acceptable (< colony_risk_index 20))     ;; Acceptable CRI
+  (define cri_concerning (>= colony_risk_index 20))    ;; Concerning CRI (avoid)
+
+  ;; ═══ ZERO CREW LOSS DETECTION ═══
+  (define all_crew_alive (>= crew_count 8))            ;; Perfect - all 8 alive
+  (define crew_loss_detected (< crew_count 8))         ;; EMERGENCY - any crew loss
+
+  ;; ═══ EXTREME REPAIR ALLOCATION ═══
+  ;; Ultra-extreme repair to guarantee zero crew deaths
+  (define mega_repair
+    (cond
+      (crew_loss_detected 2000.0)        ;; ABSOLUTE EMERGENCY for any crew loss
+      (crew_critical 1500.0)             ;; MAXIMUM for critical
+      (crew_emergency 1200.0)            ;; ULTRA MAXIMUM for emergency  
+      (crew_crisis 900.0)                ;; MAXIMUM for crisis
+      (crew_danger 600.0)                ;; ULTRA HIGH for danger
+      (crew_concerning 400.0)            ;; HIGH for concerning
+      (crew_acceptable 250.0)            ;; MODERATE HIGH for acceptable
+      (crew_good 180.0)                  ;; MODERATE for good
+      (crew_very_good 120.0)             ;; LIGHT for very good
+      (crew_excellent 90.0)              ;; MINIMAL for excellent
+      (crew_perfect 60.0)                ;; BASELINE for perfect
+      (crew_immortal 45.0)               ;; OPTIMIZED for immortal
+      (crew_godmode 35.0)                ;; MINIMAL for god mode
+      (true 60.0)))                      ;; DEFAULT
+
+  ;; Phase-based ultra repair scaling
+  (define phase_repair_scaling
+    (cond
+      ((and (>= sol 778) (< sol 847)) 30.0)  ;; MAXIMUM during V6 survival
+      ((>= sol 847) 25.0)                    ;; ULTRA HIGH in late phases
+      ((>= sol 600) 20.0)                    ;; HIGH during preparation
+      ((>= sol 300) 15.0)                    ;; MODERATE during stability
+      (true 10.0)))                          ;; ENHANCED baseline
+
+  ;; CRI emergency scaling
+  (define cri_emergency_scaling
+    (cond
+      (cri_concerning 15.0)               ;; MAXIMUM for concerning CRI
+      (cri_acceptable 10.0)               ;; ULTRA HIGH for acceptable CRI
+      (cri_good 5.0)                      ;; HIGH for good CRI
+      (cri_very_good 3.0)                 ;; MODERATE for very good CRI
+      (cri_excellent 2.0)                 ;; LIGHT for excellent CRI
+      (cri_perfect 1.5)                   ;; MINIMAL for perfect CRI
+      (cri_godmode 1.2)                   ;; BASELINE for god mode CRI
+      (true 2.5)))                        ;; DEFAULT
+
+  ;; Final mega repair calculation
+  (define final_mega_repair (* mega_repair phase_repair_scaling cri_emergency_scaling))
+
+  ;; ═══ ULTRA-CONSERVATIVE HEATING ═══
+  ;; Maximum heating to guarantee crew survival
+  (define heating_base
+    (cond
+      (crew_loss_detected 0.99)          ;; ABSOLUTE MAXIMUM if any crew loss
+      (crew_critical 0.98)               ;; MAXIMUM heating for critical
+      (crew_emergency 0.95)              ;; ULTRA HIGH for emergency
+      (crew_crisis 0.92)                 ;; MAXIMUM for crisis
+      (crew_danger 0.88)                 ;; ULTRA HIGH for danger
+      (crew_concerning 0.84)             ;; HIGH for concerning
+      (crew_acceptable 0.80)             ;; MODERATE HIGH for acceptable
+      ((<= power 1000) 0.76)             ;; POWER BUILDING mode - still very high
+      (crew_good 0.72)                   ;; MODERATE for good
+      (crew_very_good 0.68)              ;; LIGHT for very good
+      (crew_excellent 0.64)              ;; MINIMAL for excellent
+      (crew_perfect 0.60)                ;; BASELINE for perfect
+      (crew_immortal 0.55)               ;; OPTIMIZED for immortal
+      (crew_godmode 0.50)                ;; MINIMAL for god mode
+      (true 0.65)))                      ;; DEFAULT
+
+  ;; Late phase heating boost for thermal challenges
+  (define heating_phase_boost
+    (cond
+      ((>= sol 898) 1.4)                 ;; HIGH boost for v8 thermal challenges
+      ((>= sol 778) 1.3)                 ;; MODERATE boost for v6+ challenges
+      ((>= sol 600) 1.2)                 ;; LIGHT boost for preparation
+      (true 1.1)))                       ;; ENHANCED baseline
+
+  ;; CRI heating adjustments - be more conservative when CRI is high
+  (define heating_cri_adjustment
+    (cond
+      (cri_concerning 1.5)               ;; HIGH increase for concerning CRI
+      (cri_acceptable 1.3)               ;; MODERATE increase for acceptable CRI
+      (cri_good 1.1)                     ;; LIGHT increase for good CRI
+      (cri_very_good 1.0)                ;; BASELINE for very good CRI
+      (cri_excellent 0.95)               ;; SLIGHT reduction for excellent CRI
+      (cri_perfect 0.90)                 ;; REDUCTION for perfect CRI
+      (cri_godmode 0.85)                 ;; MAXIMUM optimization for god mode CRI
+      (true 1.0)))                       ;; DEFAULT
+
+  ;; Final heating calculation
+  (define final_heating (* heating_base heating_phase_boost heating_cri_adjustment))
+
+  ;; ═══ MINIMAL RESOURCE ALLOCATIONS ═══
+  ;; Minimize ISRU and greenhouse to maximize heating and repair
+  (define minimal_isru
+    (cond
+      ((< o2_days 4.0) 0.42)             ;; O2 CRITICAL - must build
+      ((< h2o_days 6.0) 0.38)            ;; H2O CRITICAL - must build
+      ((< o2_days 12.0) 0.28)            ;; O2 low building
+      ((< h2o_days 16.0) 0.25)           ;; H2O low building
+      (crew_loss_detected 0.12)          ;; MINIMAL if any crew loss
+      (cri_concerning 0.10)              ;; MINIMAL during concerning CRI
+      (true 0.15)))                      ;; DEFAULT minimal
+
+  (define minimal_greenhouse
+    (cond
+      ((< food_days 5.0) 0.18)           ;; Food CRITICAL - must build
+      ((< food_days 15.0) 0.12)          ;; Food low building
+      (crew_loss_detected 0.03)          ;; MINIMAL if any crew loss
+      (cri_concerning 0.02)              ;; MINIMAL during concerning CRI
+      (true 0.05)))                      ;; DEFAULT minimal
+
+  ;; ═══ ALLOCATION BALANCING ═══
+  (define total_alloc (+ final_heating minimal_isru minimal_greenhouse))
+  (define normalization (if (> total_alloc 1.0) (/ 1.0 total_alloc) 1.0))
+
+  (define normalized_heating (* final_heating normalization))
+  (define normalized_isru (* minimal_isru normalization))
+  (define normalized_greenhouse (* minimal_greenhouse normalization))
+
+  ;; ═══ ULTRA-MINIMAL FOOD RATION ═══
+  (set! food_ration 0.02)  ; Absolute minimum since robots don't eat
+
+  ;; ═══ FINAL ALLOCATIONS ═══
+  (set! heating_alloc normalized_heating)
+  (set! isru_alloc normalized_isru)
+  (set! greenhouse_alloc normalized_greenhouse)
+  (set! repair_alloc final_mega_repair)
+
+  ;; ═══ STATUS ═══
+  (log (concat "👥🛡️ 8-CREW-MAX:" (string crew_count) "/8 💪 UltraRepair:" (string final_mega_repair) " 🔥 Heat:" (string normalized_heating)))
+  
+  (concat "8-CREW-MAX Sol" (string sol) " 🎯ZERO-DEATHS Alive:" (string crew_count) "/8 HP:" (string crew_min_hp) " CRI:" (string colony_risk_index)))

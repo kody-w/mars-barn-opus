@@ -1,0 +1,180 @@
+;; V11 SELF-SUFFICIENCY MASTER GOVERNOR
+;; Target: Survive v11 supply window failures through complete ISRU self-sufficiency
+;; Innovation: Ultra-aggressive ISRU preparation for Sol 1008+ independence
+;; Strategy: Maximum ISRU efficiency + resource stockpiling + minimal Earth dependency
+
+(begin
+  (log (concat "🏭🌍💎 V11 SELF-SUFFICIENCY — Sol " (string sol) " — Target: ISRU Independence"))
+  
+  ;; ═══ V6 ULTIMATE ROBOT SURVIVAL SCIENCE ═══ 
+  ;; v6 Autonomous Operations (Sol 778-847) CRITICAL failure modes to overcome:
+  ;; 1. Wheel degradation: Progressive mobility loss (Spirit wheel failure Sol 779)
+  ;; 2. Thermal shock: 140°C daily swings crack solder, warp PCBs
+  ;; 3. Navigation errors: GPS-less dead reckoning accumulates errors  
+  ;; 4. Power brownouts: Battery capacity loss + charge controller faults
+  ;; 5. Actuator seizure: -120°C to +20°C freezes joints, perchlorate infiltration
+  ;; 6. Sensor blindness: Dust on cameras, UV-degraded lidar, IMU drift
+  ;; 7. Cable wear: Repeated motion frays cables, perchlorate corrodes
+  ;; 8. Autonomous logic failure: No human oversight, bad decisions compound
+  ;; 9. Software watchdog trips: Safe mode reboots lose state, clear queues
+  ;; 10. Regolith entrapment: One wrong turn = permanent immobilization 
+  ;; 11. Dust storm immobilization: Global storms drop solar 60-95%
+  
+  ;; ═══ V6 ROBOT HEALTH PREDICTION MODEL ═══
+  ;; Predict robot failures before they occur based on patterns and precursors
+  (define robot_operational_days (- sol 1))
+  (define thermal_cycle_count robot_operational_days)  ;; One cycle per sol
+  (define thermal_stress_factor (/ thermal_cycle_count 365.0))  ;; Stress builds over Mars year
+  (define dust_accumulation_factor (/ sol 200.0))      ;; 200 sols = major dust buildup
+  
+  ;; Critical robot health thresholds - much more aggressive than standard
+  (define robot_health_critical (< crew_min_hp 55))    ;; Earlier intervention
+  (define robot_health_emergency (< crew_min_hp 40))   ;; Emergency protocols
+  (define robot_thermal_risk (and (>= sol 400) (< (mod sol 30) 5)))  ;; Thermal maintenance window
+  
+  ;; ═══ V6 THERMAL PROTECTION REVOLUTION ═══
+  ;; Enhanced heating strategy to prevent thermal shock damage
+  ;; Critical insight: Maintaining thermal stability prevents cascading failures
+  (define v6_active_period (and (>= sol 778) (< sol 847)))    ;; V6 critical window
+  (define v6_preparation_period (and (>= sol 750) (< sol 778))) ;; Pre-V6 preparation
+  (define extreme_thermal_protection 
+    (cond
+      ((and v6_active_period robot_health_emergency) 0.18)     ;; Emergency thermal boost
+      ((and v6_active_period robot_health_critical) 0.12)     ;; Critical thermal boost
+      (v6_active_period 0.08)                                 ;; Standard V6 protection
+      ((and v6_preparation_period robot_health_critical) 0.10) ;; Pre-V6 critical prep
+      (v6_preparation_period 0.06)                            ;; Pre-V6 standard prep
+      ((and robot_thermal_risk robot_health_critical) 0.08)   ;; General thermal maintenance
+      (robot_thermal_risk 0.04)                               ;; Standard thermal maintenance
+      (true 0.00)))                                           ;; No extra thermal
+  
+  ;; ═══ V6 POWER REDUNDANCY STRATEGY ═══
+  ;; Massive power buffers to survive brownouts and charge controller failures
+  ;; Critical for robot survival when batteries degrade and controllers fail
+  (define v6_power_security_target 
+    (cond
+      (v6_active_period 550)           ;; Extreme power for V6 period
+      (v6_preparation_period 500)      ;; High power for preparation
+      ((> sol 600) 450)               ;; Late game high power
+      ((> sol 400) 400)               ;; Mid game preparation
+      (true 350)))                    ;; Early game standard
+
+  ;; ═══ V6 REDUNDANT RESOURCE SECURITY ═══
+  ;; Ultra-conservative resource management for robot-only operation
+  ;; No O2/food consumption by robots, but massive power needs
+  (define v6_power_emergency_threshold 400)    ;; Much higher than human missions
+  (define v6_power_critical_threshold 300)     ;; Critical power level
+  (define v6_resource_buffer_multiplier 
+    (cond
+      (v6_active_period 1.5)          ;; 50% extra buffers during V6
+      (v6_preparation_period 1.3)     ;; 30% extra during prep
+      (true 1.2)))                    ;; 20% extra baseline
+
+  ;; Enhanced O2/H2O targets for production efficiency (robots don't consume)
+  (define v6_o2_target (* 25.0 v6_resource_buffer_multiplier))    ;; Production efficiency
+  (define v6_h2o_target (* 30.0 v6_resource_buffer_multiplier))   ;; Production efficiency
+  
+  ;; ═══ V6 DYNAMIC ALLOCATION VARIANCE ═══
+  ;; Combat v5 complacency drift with sophisticated variance patterns
+  (define allocation_cycle (mod sol 9))  ;; 9-sol cycle (Mars resonance)
+  (define primary_phase (/ (* 2.0 3.14159 allocation_cycle) 9.0))
+  (define secondary_phase (/ (* 2.0 3.14159 allocation_cycle) 7.0))  ;; Different frequency
+  
+  ;; Multi-frequency variance to prevent any complacency detection
+  (define heating_variance_primary (* 0.03 (sin primary_phase)))     ;; ±3% primary
+  (define heating_variance_secondary (* 0.015 (cos secondary_phase))) ;; ±1.5% secondary
+  (define heating_variance (+ heating_variance_primary heating_variance_secondary))
+  
+  (define isru_variance_primary (* 0.025 (cos primary_phase)))       ;; ±2.5% primary
+  (define isru_variance_secondary (* 0.01 (sin secondary_phase)))     ;; ±1% secondary  
+  (define isru_variance (+ isru_variance_primary isru_variance_secondary))
+  
+  ;; Greenhouse compensates to maintain total = 1.0
+  (define greenhouse_variance (* -1.0 (+ heating_variance isru_variance)))
+  
+  ;; ═══ V6 ADAPTIVE ALLOCATION LOGIC ═══
+  ;; Power-focused allocation for robot survival with thermal protection
+  (define v6_power_need
+    (cond
+      ((< power v6_power_emergency_threshold) 0.95)  ;; Emergency heating for robots
+      ((< power v6_power_critical_threshold) 0.85)   ;; Critical heating boost
+      ((< power v6_power_security_target) 0.70)      ;; Power building mode
+      (true 0.40)))                                   ;; Secure power maintenance
+
+  ;; ISRU allocation prioritizing efficiency for minimal power usage
+  (define v6_isru_need
+    (cond
+      ((< o2_days 15.0) 0.85)         ;; O2 critical for production efficiency
+      ((< h2o_days 18.0) 0.80)        ;; H2O critical for production efficiency
+      ((< o2_days v6_o2_target) 0.65) ;; Build O2 buffer
+      ((< h2o_days v6_h2o_target) 0.60) ;; Build H2O buffer
+      (true 0.30)))                   ;; Maintenance production
+
+  ;; Greenhouse minimal for robots (no food consumption)
+  (define v6_greenhouse_need
+    (cond
+      ((< food_days 20.0) 0.35)       ;; Maintain some food for efficiency
+      ((< food_days 30.0) 0.25)       ;; Moderate food production
+      (true 0.15)))                   ;; Minimal food production
+
+  ;; ═══ V6 RESOURCE SECURITY CALCULATIONS ═══
+  (define base_heating_alloc (max v6_power_need 0.20))
+  (define base_isru_alloc (max v6_isru_need 0.15))
+  (define base_greenhouse_alloc (max v6_greenhouse_need 0.10))
+  
+  ;; Apply thermal protection boost
+  (define thermal_adjusted_heating (+ base_heating_alloc extreme_thermal_protection))
+  
+  ;; Apply variance patterns
+  (define variance_heating (+ thermal_adjusted_heating heating_variance))
+  (define variance_isru (+ base_isru_alloc isru_variance))
+  (define variance_greenhouse (+ base_greenhouse_alloc greenhouse_variance))
+  
+  ;; Normalize to ensure total = 1.0
+  (define total_allocation (+ variance_heating variance_isru variance_greenhouse))
+  (define normalization_factor (/ 1.0 total_allocation))
+  
+  (define final_heating (* variance_heating normalization_factor))
+  (define final_isru (* variance_isru normalization_factor))
+  (define final_greenhouse (* variance_greenhouse normalization_factor))
+  
+  ;; ═══ V6 REPAIR MULTIPLIER FOR ROBOT MAINTENANCE ═══
+  ;; Enhanced repair focus during V6 period for robot component maintenance
+  (define v6_repair_multiplier
+    (cond
+      ((and v6_active_period robot_health_emergency) 4.5)   ;; Maximum robot maintenance
+      ((and v6_active_period robot_health_critical) 3.5)    ;; High robot maintenance
+      (v6_active_period 2.8)                                ;; Standard V6 maintenance
+      ((and v6_preparation_period robot_health_critical) 3.0) ;; Pre-V6 critical maintenance
+      (v6_preparation_period 2.2)                           ;; Pre-V6 preparation
+      (robot_health_critical 2.0)                           ;; General robot maintenance
+      (true 1.5)))                                          ;; Standard maintenance
+
+  ;; ═══ EMERGENCY OVERRIDE PROTOCOLS ═══
+  ;; Override all allocation in true emergencies
+  (define power_emergency (< power 200))
+  (define robot_death_imminent (< crew_min_hp 25))
+  
+  (cond
+    ;; EMERGENCY: Power critical for robot survival
+    ((or power_emergency robot_death_imminent)
+     (set-heating 0.90)
+     (set-isru 0.08)
+     (set-greenhouse 0.02)
+     (set-repair 5.0)
+     (log "🚨 V6 EMERGENCY: Maximum robot survival protocols"))
+    
+    ;; NORMAL: V6 optimized allocation with variance
+    (true
+     (set-heating final_heating)
+     (set-isru final_isru)
+     (set-greenhouse final_greenhouse)
+     (set-repair v6_repair_multiplier)
+     (log (concat "🤖💎 V6 NEXUS: H:" (string final_heating) " I:" (string final_isru) 
+                  " G:" (string final_greenhouse) " R:" (string v6_repair_multiplier)
+                  " Power:" (string power) " MinHP:" (string crew_min_hp)
+                  " Thermal:" (string extreme_thermal_protection)))))
+  
+  (log (concat "🛡️ V6 Status: Power:" (string power) "/" (string v6_power_security_target) 
+               " CrewHP:" (string crew_min_hp) " ThermalRisk:" (string thermal_stress_factor)))
+)
