@@ -1,0 +1,76 @@
+{
+  "_format": "mars-barn-fidelity-queue",
+  "doctrine": "Each item closes one gap between game and reality. Ship it when the gauntlet score drops.",
+  "queue": [
+    {
+      "id": "v7-sabatier",
+      "version": "v7",
+      "title": "Sabatier Reaction Chemistry",
+      "status": "pending",
+      "priority": 1
+    },
+    {
+      "id": "v7-electrolysis",
+      "version": "v7",
+      "title": "Water Electrolysis Efficiency",
+      "status": "pending",
+      "priority": 2
+    },
+    {
+      "id": "v8-heat-transfer",
+      "version": "v8",
+      "title": "Habitat Heat Transfer Model",
+      "status": "pending",
+      "priority": 3
+    },
+    {
+      "id": "v9-spatial-layout",
+      "version": "v9",
+      "title": "Module Position Grid",
+      "status": "pending",
+      "priority": 4
+    },
+    {
+      "id": "v10-failure-cascade",
+      "version": "v10",
+      "title": "System Dependency Graph",
+      "status": "pending",
+      "priority": 5
+    },
+    {
+      "id": "v11-supply-windows",
+      "version": "v11",
+      "title": "Earth-Mars Transfer Windows",
+      "status": "pending",
+      "priority": 6
+    },
+    {
+      "id": "v12-crew-physiology",
+      "version": "v12",
+      "title": "Individual Crew Physiology",
+      "status": "pending",
+      "priority": 7
+    },
+    {
+      "id": "v13-crew-psychology",
+      "version": "v13",
+      "title": "Crew Psychology Model",
+      "status": "pending",
+      "priority": 8
+    },
+    {
+      "id": "v14-mars-gcm",
+      "version": "v14",
+      "title": "Mars GCM Weather",
+      "status": "pending",
+      "priority": 9
+    },
+    {
+      "id": "v15-site-geology",
+      "version": "v15",
+      "title": "Site-Specific Geology",
+      "status": "pending",
+      "priority": 10
+    }
+  ]
+}
