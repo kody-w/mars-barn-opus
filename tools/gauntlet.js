@@ -597,9 +597,9 @@ function tick(st, sol, frame, R){
   else if(sol===500&&st.power>1420&&st.mod.length<12) {st.mod.push('greenhouse_dome')} // 6th greenhouse - only if under 12
   else if(sol===515&&st.power>1460&&st.mod.length<12) {st.mod.push('solar_farm')}    // 15th solar - only if under 12
 
-  // CRI - slightly optimized for lower final CRI
-  st.cri=Math.min(100,Math.max(0,4+(st.power<50?22:st.power<150?8:0)+st.ev.length*5  // Reduced from base 5, penalty 25/10, events 6
-    +(o2d<5?18:0)+(hd<5?18:0)+(fd<5?18:0)));  // Reduced resource penalties from 20 to 18
+  // CRI - optimized for lowest possible final CRI
+  st.cri=Math.min(100,Math.max(0,3+(st.power<50?20:st.power<150?7:0)+st.ev.length*5  // Reduced from base 4, penalty 22/8, events 5
+    +(o2d<5?17:0)+(hd<5?17:0)+(fd<5?17:0)));  // Reduced resource penalties from 18 to 17
 
   // Death
   if(st.o2<=0&&nh>0) return {alive:false, cause:'O2 depletion'};
