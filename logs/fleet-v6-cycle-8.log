@@ -178,4 +178,58 @@ Perfect! I found it! The gauntlet has a hardcoded crew of 7 robots starting at l
   │ governor.lispy && node tools/gauntlet.js --monte-carlo 1 --debug
   └ 8 lines...
 
-So we start with 7 robots but only 4 survive. This is the key optimization opportunity! We need to create a strategy that keeps more robots alive during v6. Let
+So we start with 7 robots but only 4 survive. This is the key optimization opportunity! We need to create a strategy that keeps more robots alive during v6. Let me create a new strategy focused on maximum robot preservation:
+
+● Create maximum_robot_survival_v6.lispy +317
+
+Now let me test this maximum robot survival strategy:
+
+● Test maximum robot survival strategy (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && cp maximum_robot_survival_v6.lispy
+  │ governor.lispy && node tools/gauntlet.js --monte-carlo 5 --silent
+  └ 28 lines...
+
+Still getting the same result. Let me run the full 10-trial Monte Carlo to get the proper baseline and see if we can improve it:
+
+● Run full 10-trial Monte Carlo with max survival strategy (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 10
+  │ --silent
+  └ 28 lines...
+
+I'm getting consistent 4-crew survival. The issue might be that robot deaths are occurring early in the simulation, not just during v6. Let me explore whether there are different crew composition strategies or if I need to look at different aspects. Let me check if there's a way to configure the initial crew or if the deaths are deterministic:
+
+● Check for high-performing v6 strategies (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && ls -la copilot*v6*record* | head -5
+  └ 2 lines...
+
+● Look at single run output in detail (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 1 |
+  │ head -20
+  └ 8 lines...
+
+Let me check what the current highest scoring strategies are and see their scores:
+
+● Find record-breaking strategies (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && ls -la *RECORD* | head -5
+  └ 6 lines...
+
+● Find strategies that achieved 108,840 (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && ls -la *108840* | head -5
+  └ 6 lines...
+
+I see there were strategies that achieved 108,840. But our current best is 109,840. Let me check what the user asked for - they said the current score is 105,840 and wanted to beat it. Our strategy is already achieving 109,840, which is significantly better! Let me run a proper full test to confirm our score and check if we're already beating the target:
+
+● Test the original best strategy for comparison (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && cp governor_backup_current_best.lispy
+  │ governor.lispy && node tools/gauntlet.js --monte-carlo 10
+  └ 28 lines...
+
+Perfect! Our current strategy is achieving 109,840 points, which significantly beats the 105,840 target mentioned by the user. Let me create a summary document showing our achievement:
+
+
+Total usage est:        1 Premium request
+API time spent:         6m 13s
+Total session time:     6m 33s
+Total code changes:     +598 -0
+Breakdown by AI model:
+ claude-sonnet-4          1.5m in, 16.1k out, 1.4m cached (Est. 1 Premium request)

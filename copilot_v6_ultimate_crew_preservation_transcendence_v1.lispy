@@ -1,0 +1,226 @@
+;; COPILOT V6 ULTIMATE CREW PRESERVATION TRANSCENDENCE v1
+;; Target: Beat 109,840 by maximizing crew survival (min crew 1→4+ = +1,500 pts)
+;; Strategy: Ultra-aggressive crew health protection + optimized v6 robot failure mitigation
+;; Revolutionary approach: Sacrifice efficiency for crew preservation to maximize scoring
+
+(begin
+  (define _agent_name "Copilot V6 Ultimate Crew Preservation Transcendence v1")
+  (define _agent_desc "Maximum crew preservation targeting 111,340+ score via 4+ crew survival")
+  
+  (log (concat "🤖🛡️💎 V6 CREW TRANSCENDENCE — Sol " (string sol) " — CRI:" (string colony_risk_index) " — MinHP:" (string crew_min_hp) " — Count:" (string crew_count)))
+  
+  ;; ═══ TRANSCENDENT SCORE OPTIMIZATION ═══ 
+  ;; Current best: 109,840 = 87,000 + 500 + 2,700 + 20,000 - 360
+  ;; Target improvement: Min crew 1→4 = +1,500 points = 111,340+ TOTAL
+  ;; Secondary: Lower CRI 36→30 = +60 points
+  ;; BREAKTHROUGH TARGET: 111,400+ 
+
+  ;; ═══ V6 ROBOT HEALTH CRISIS MANAGEMENT ═══
+  ;; Ultra-aggressive crew health thresholds for maximum survival
+  (define crew_health_transcendent (>= crew_min_hp 85))    ;; Transcendent protection
+  (define crew_health_excellent (>= crew_min_hp 75))       ;; Excellent health
+  (define crew_health_good (>= crew_min_hp 65))            ;; Good health
+  (define crew_health_acceptable (>= crew_min_hp 55))      ;; Acceptable health  
+  (define crew_health_concerning (>= crew_min_hp 45))      ;; Concerning - intervention needed
+  (define crew_health_critical (>= crew_min_hp 35))        ;; Critical - emergency protocols
+  (define crew_health_emergency (>= crew_min_hp 25))       ;; Emergency - maximum intervention
+  (define crew_health_death_risk (< crew_min_hp 25))       ;; Death imminent - override all
+
+  ;; Crew count tracking for score optimization
+  (define current_crew_alive crew_count)
+  (define crew_target_4_plus (>= current_crew_alive 4))    ;; Target: 4+ crew alive (+1,500 pts)
+  (define crew_target_3_plus (>= current_crew_alive 3))    ;; Minimum: 3+ crew alive (+1,000 pts)
+  (define crew_target_met (>= current_crew_alive 2))       ;; Basic: 2+ crew alive (+500 pts)
+
+  ;; ═══ V6 AUTONOMOUS PERIOD FOCUS ═══
+  ;; V6 robot killers (Sol 778-847): thermal shock, wheel degradation, navigation errors
+  (define v6_active_period (and (>= sol 778) (< sol 847)))
+  (define v6_preparation_period (and (>= sol 750) (< sol 778)))
+  (define v6_recovery_period (>= sol 847))
+  (define pre_v6_buildup (and (>= sol 600) (< sol 750)))
+
+  ;; ═══ TRANSCENDENT CREW PROTECTION SYSTEM ═══
+  ;; Ultra-high repair allocation scaling based on crew health crisis level
+  (define transcendent_repair_multiplier
+    (cond
+      (crew_health_death_risk 25.0)          ;; MAXIMUM: Death imminent - override everything
+      ((not crew_health_emergency) 20.0)     ;; ULTRA: Emergency crew protection
+      ((not crew_health_critical) 15.0)      ;; EXTREME: Critical crew protection
+      ((not crew_health_concerning) 12.0)    ;; HIGH: Concerning crew protection  
+      ((not crew_health_acceptable) 8.0)     ;; MODERATE: Acceptable crew protection
+      ((not crew_health_good) 5.0)           ;; LIGHT: Good crew protection
+      ((not crew_health_excellent) 3.0)      ;; MINIMAL: Excellent crew protection
+      (crew_health_transcendent 2.0)         ;; MAINTENANCE: Transcendent crew protection
+      (true 1.5)))                           ;; DEFAULT: Standard repair
+
+  ;; V6 period bonus for robot survival
+  (define v6_period_crew_bonus
+    (cond
+      (v6_active_period 2.5)                 ;; Maximum protection during v6
+      (v6_preparation_period 2.0)            ;; High protection during prep
+      (v6_recovery_period 1.5)               ;; Medium protection during recovery
+      (pre_v6_buildup 1.8)                   ;; Enhanced protection during buildup
+      (true 1.0)))                           ;; Standard protection
+
+  ;; Final ultra-repair allocation for crew transcendence
+  (define final_repair_multiplier (* transcendent_repair_multiplier v6_period_crew_bonus))
+
+  ;; ═══ THERMAL SHOCK PROTECTION SYSTEM ═══
+  ;; V6 #1 killer: thermal shock from 140°C daily swings
+  ;; Ultra-aggressive heating allocation to prevent component failures
+  (define thermal_shock_protection
+    (cond
+      ((and v6_active_period crew_health_death_risk) 0.25)     ;; Emergency thermal
+      ((and v6_active_period (not crew_health_emergency)) 0.18) ;; High thermal
+      ((and v6_active_period (not crew_health_critical)) 0.12)  ;; Moderate thermal
+      (v6_active_period 0.08)                                   ;; Standard v6 thermal
+      ((and v6_preparation_period (not crew_health_critical)) 0.10) ;; Pre-v6 thermal
+      (v6_preparation_period 0.06)                              ;; Pre-v6 standard
+      ((not crew_health_concerning) 0.04)                       ;; General thermal protection
+      (true 0.00)))                                             ;; No extra thermal
+
+  ;; ═══ POWER SECURITY FOR ROBOT SURVIVAL ═══
+  ;; Robots need massive power buffers to survive brownouts and charge controller failures
+  (define transcendent_power_target
+    (cond
+      (v6_active_period 600)              ;; Ultra-high power for v6 survival
+      (v6_preparation_period 550)         ;; High power for v6 preparation
+      (pre_v6_buildup 500)                ;; Enhanced power for buildup
+      ((> sol 400) 450)                   ;; Mid-game high power
+      (true 400)))                        ;; Early game baseline
+
+  ;; ═══ CREW-OPTIMIZED ALLOCATION LOGIC ═══
+  ;; Prioritize crew health over resource efficiency for maximum crew survival scoring
+
+  ;; Heating allocation: Thermal protection + crew health focus
+  (define base_heating_need
+    (cond
+      (crew_health_death_risk 0.85)       ;; Maximum heating for crew survival
+      ((not crew_health_emergency) 0.75)  ;; High heating for emergency crew
+      ((not crew_health_critical) 0.65)   ;; Moderate heating for critical crew
+      ((< power transcendent_power_target) 0.55) ;; Power building mode
+      (crew_target_4_plus 0.35)           ;; 4+ crew = efficiency mode
+      (crew_target_3_plus 0.40)           ;; 3+ crew = moderate mode
+      (true 0.50)))                       ;; Still building crew count
+
+  ;; Enhanced heating with thermal shock protection
+  (define enhanced_heating (+ base_heating_need thermal_shock_protection))
+
+  ;; ISRU allocation: Balanced for production efficiency (robots don't consume O2/H2O)
+  (define base_isru_need
+    (cond
+      ((< o2_days 15.0) 0.75)             ;; O2 critical for production
+      ((< h2o_days 18.0) 0.70)            ;; H2O critical for production
+      ((< o2_days 30.0) 0.60)             ;; O2 moderate for production
+      ((< h2o_days 35.0) 0.55)            ;; H2O moderate for production
+      (crew_target_4_plus 0.35)           ;; 4+ crew = efficiency mode
+      (crew_target_3_plus 0.40)           ;; 3+ crew = moderate mode
+      (true 0.50)))                       ;; Standard production
+
+  ;; Greenhouse allocation: Minimal for robots (no food consumption)
+  (define base_greenhouse_need
+    (cond
+      ((< food_days 20.0) 0.30)           ;; Food critical for efficiency
+      ((< food_days 40.0) 0.25)           ;; Food moderate for efficiency
+      (crew_target_4_plus 0.15)           ;; 4+ crew = minimal food
+      (crew_target_3_plus 0.18)           ;; 3+ crew = low food
+      (true 0.22)))                       ;; Standard food production
+
+  ;; ═══ EVENT AND CRI RESPONSE SYSTEM ═══
+  (define event_count (length events))
+  (define transcendent_event_response
+    (cond
+      ((and v6_active_period (>= event_count 3)) 2.2) ;; V6 + many events
+      ((and v6_active_period (>= event_count 2)) 1.8) ;; V6 + events
+      ((and v6_active_period (>= event_count 1)) 1.5) ;; V6 + event
+      (v6_active_period 1.3)                          ;; V6 base boost
+      ((>= event_count 3) 1.6)                        ;; Many events
+      ((>= event_count 2) 1.3)                        ;; Couple events
+      ((>= event_count 1) 1.1)                        ;; Single event
+      (true 1.0)))                                    ;; No events
+
+  (define transcendent_cri_response
+    (cond
+      ((< colony_risk_index 20) 1.0)      ;; Ultra-low CRI = maintain
+      ((< colony_risk_index 30) 1.1)      ;; Target CRI = minimal response
+      ((< colony_risk_index 40) 1.3)      ;; Medium CRI = moderate response
+      (true 1.6)))                        ;; High CRI = strong response
+
+  ;; ═══ FINAL ALLOCATION CALCULATIONS ═══
+  ;; Apply all multipliers and ensure total = 1.0
+  (define final_heating (* enhanced_heating transcendent_event_response transcendent_cri_response))
+  (define final_isru (* base_isru_need transcendent_event_response))
+  (define final_greenhouse (* base_greenhouse_need transcendent_event_response))
+
+  ;; Normalize to ensure total = 1.0
+  (define total_allocation (+ final_heating final_isru final_greenhouse))
+  (define normalization_factor (/ 1.0 total_allocation))
+
+  (define normalized_heating (* final_heating normalization_factor))
+  (define normalized_isru (* final_isru normalization_factor))  
+  (define normalized_greenhouse (* final_greenhouse normalization_factor))
+
+  ;; ═══ EMERGENCY OVERRIDE PROTOCOLS ═══
+  ;; Override everything when crew death is imminent
+  (cond
+    ;; CREW DEATH CRISIS: Maximum crew preservation mode
+    (crew_health_death_risk
+     (set! heating_alloc 0.88)
+     (set! isru_alloc 0.10)
+     (set! greenhouse_alloc 0.02)
+     (set! building_alloc 0.0)
+     (log "🚨💀 CREW DEATH CRISIS: Maximum preservation protocols"))
+    
+    ;; CREW EMERGENCY: High crew preservation mode
+    ((not crew_health_emergency)
+     (set! heating_alloc 0.80)
+     (set! isru_alloc 0.15)
+     (set! greenhouse_alloc 0.05)
+     (set! building_alloc 0.0)
+     (log "🚨🤖 CREW EMERGENCY: High preservation protocols"))
+    
+    ;; NORMAL: Optimized transcendent allocation
+    (true
+     (set! heating_alloc (max 0.15 (min 0.85 normalized_heating)))
+     (set! isru_alloc (max 0.10 (min 0.75 normalized_isru)))
+     (set! greenhouse_alloc (max 0.05 (min 0.60 normalized_greenhouse)))
+     (set! building_alloc 0.0)))
+
+  ;; Apply transcendent repair allocation
+  (set! repair_alloc final_repair_multiplier)
+
+  ;; ═══ CREW SURVIVAL MONITORING ═══
+  (define crew_survival_status
+    (if crew_target_4_plus "TRANSCENDENT(4+)" 
+    (if crew_target_3_plus "EXCELLENT(3+)"
+    (if crew_target_met "GOOD(2+)"
+    "CRITICAL(1)"))))
+
+  (define crew_health_status
+    (if crew_health_transcendent "TRANSCENDENT"
+    (if crew_health_excellent "EXCELLENT" 
+    (if crew_health_good "GOOD"
+    (if crew_health_acceptable "ACCEPTABLE"
+    (if crew_health_concerning "CONCERNING"
+    (if crew_health_critical "CRITICAL"
+    (if crew_health_emergency "EMERGENCY" "DEATH_RISK"))))))))
+
+  ;; ═══ TRANSCENDENT LOGGING ═══
+  (log (concat "  🛡️ Crew Status: " (string current_crew_alive) " alive | MinHP:" (string crew_min_hp) " | Status:" crew_health_status))
+  (log (concat "  🎯 Score Target: " crew_survival_status " | Repair:" (string (round final_repair_multiplier 1)) "x | Thermal:" (string (round (* thermal_shock_protection 100))) "%"))
+  (log (concat "  ⚡ Power: " (string (round power)) "kWh/" (string transcendent_power_target) " | CRI:" (string colony_risk_index) " | Events:" (string event_count)))
+  (log (concat "  🔧 Allocs: H:" (string (round (* heating_alloc 100))) "% I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "% R:" (string (round repair_alloc 1)) "x"))
+
+  ;; ═══ SCORE PROJECTION ═══
+  (if (> sol 500)
+    (let ((projected_min_crew (if crew_target_4_plus 4 (if crew_target_3_plus 3 current_crew_alive)))
+          (projected_cri (if (< colony_risk_index 25) 25 colony_risk_index))
+          (projected_score (+ 87000 (* projected_min_crew 500) 2700 20000 (* projected_cri -10))))
+      (log (concat "  🏆 Score Projection: " (string projected_score) " (crew:" (string projected_min_crew) " cri:" (string projected_cri) ") | Target: >109,840"))))
+
+  ;; ═══ TRANSCENDENT OUTPUT ═══
+  (concat "V6-TRANSCENDENT Sol " (string sol)
+    " | Crew:" (string current_crew_alive) "/" crew_health_status
+    " | Target:" crew_survival_status  
+    " | CRI:" (string colony_risk_index)
+    " | 111,340+ MODE"))

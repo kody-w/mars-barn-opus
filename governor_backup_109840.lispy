@@ -1,0 +1,172 @@
+;; COPILOT ULTIMATE RECORD DESTROYER APEX V1
+;; Strategy: Beat 95,890 by achieving P75 CRI ≤ 10 and extending sols to 734+
+;; Target: 96,000+ points through perfect resource security and extended survival
+;; Revolutionary approach: Ultra-early security establishment + extended mission optimization
+
+(begin
+  (define _agent_name "Copilot Ultimate Record Destroyer Apex v1")
+  (define _agent_desc "Next-gen record destruction through perfect CRI control and sol extension")
+  
+  (log (concat "🚀💥 RECORD DESTROYER APEX — Sol " (string sol) " — CRI:" (string colony_risk_index) " — Target: 96,000+"))
+  
+  ;; ═══ APEX CRI OPTIMIZATION SCIENCE ═══ 
+  ;; Current record: 95,890 (733 sols, P75 CRI=11, 3 crew, 8 modules, 100% survival)
+  ;; Beat by: P75 CRI ≤ 10 (+10 points) + extend to 734 sols (+100 points) = 96,000+
+  ;; CRI = 5 + power_penalty + events*6 + resource_penalties
+  ;; Focus: ZERO resource penalties, minimize event impact, extend mission duration
+  
+  ;; ═══ APEX RESOURCE SECURITY TARGETS ═══
+  ;; Ultra-conservative targets to guarantee ZERO resource penalties
+  (define apex_o2_target 18.0)       ;; Massive O2 buffer - guarantee no penalties
+  (define apex_h2o_target 18.0)      ;; Massive H2O buffer - guarantee no penalties  
+  (define apex_food_target 25.0)     ;; Ultra-massive food buffer - critical for extension
+  (define apex_power_target 250)     ;; Ultra-high power buffer - guarantee no penalties
+  
+  ;; ═══ APEX EXTENDED MISSION STRATEGY ═══
+  ;; Optimized for 734+ sol survival with perfect CRI control
+  (define phase_ultra_foundation (< sol 80))          ;; Faster foundation for earlier security
+  (define phase_ultra_security (and (>= sol 80) (< sol 200)))    ;; Rapid security establishment
+  (define phase_ultra_optimization (and (>= sol 200) (< sol 400)))  ;; Perfect resource tuning
+  (define phase_apex_control (and (>= sol 400) (< sol 650)))     ;; Absolute CRI control
+  (define phase_extended_mission (>= sol 650))        ;; Extended mission optimization
+  
+  ;; ═══ APEX ULTRA-SECURE ALLOCATION ═══
+  ;; Even more aggressive allocation for guaranteed security
+  (define apex_o2_need
+    (cond
+      ((< o2_days 6.0) 0.92)      ;; Emergency - near maximum
+      ((< o2_days 12.0) 0.85)     ;; Critical - very high priority  
+      ((< o2_days 18.0) 0.70)     ;; Build to apex target
+      ((< o2_days 25.0) 0.50)     ;; Maintain apex buffer
+      (true 0.30)))               ;; Minimal when ultra-secure
+  
+  (define apex_food_need
+    (cond
+      ((< food_days 6.0) 0.88)    ;; Emergency food allocation
+      ((< food_days 12.0) 0.80)   ;; Critical priority
+      ((< food_days 20.0) 0.65)   ;; Build to apex target
+      ((< food_days 30.0) 0.45)   ;; Maintain apex buffer
+      (true 0.30)))               ;; Minimal when ultra-secure
+  
+  ;; ═══ APEX CRI EMERGENCY SYSTEM ═══
+  ;; Zero tolerance for CRI above 10
+  (define apex_cri_response
+    (cond
+      ((< colony_risk_index 6) 1.0)      ;; Perfect CRI - maintain
+      ((< colony_risk_index 8) 1.5)      ;; Good CRI - moderate boost 
+      ((< colony_risk_index 10) 1.8)     ;; Target CRI - strong boost
+      ((< colony_risk_index 12) 2.2)     ;; Above target - emergency boost
+      (true 2.8)))                       ;; Crisis - maximum response
+  
+  ;; ═══ APEX PHASE-OPTIMIZED ALLOCATION ═══
+  (define apex_base_allocation
+    (cond
+      ;; Ultra Foundation - establish security ASAP
+      (phase_ultra_foundation 0.88)
+      
+      ;; Ultra Security - rapid resource security establishment
+      (phase_ultra_security 0.94)
+      
+      ;; Ultra Optimization - perfect resource tuning
+      (phase_ultra_optimization 0.97)
+      
+      ;; Apex Control - absolute CRI control
+      (phase_apex_control 0.98)
+      
+      ;; Extended Mission - optimize for long-term survival
+      (phase_extended_mission 0.99)
+      
+      ;; Default maximum security
+      (true 0.96)))
+  
+  ;; ═══ APEX EVENT RESPONSE SYSTEM ═══
+  ;; Enhanced event response for extended mission
+  (define event_count (length events))
+  (define event_cri_penalty (* 6 event_count))
+  
+  ;; Ultra-aggressive event response for extended mission
+  (define event_response_multiplier 
+    (cond
+      ((>= event_count 3) 1.8)      ;; 3+ events - ultra response
+      ((>= event_count 2) 1.5)      ;; 2 events - strong response
+      ((>= event_count 1) 1.3)      ;; 1 event - enhanced response
+      (true 1.0)))                  ;; 0 events - maintain
+  
+  ;; ═══ APEX POWER SECURITY ═══
+  ;; Ultra-conservative power management for extended mission
+  (define power_deficit (< power apex_power_target))
+  (define power_critical (< power 180))
+  (define power_boost_needed 
+    (cond
+      (power_critical 1.6)       ;; Critical power - maximum boost
+      (power_deficit 1.3)        ;; Below target - strong boost  
+      (true 1.0)))               ;; Above target - maintain
+  
+  ;; ═══ APEX FINAL ALLOCATIONS ═══
+  (define apex_isru_alloc (* apex_base_allocation apex_o2_need apex_cri_response event_response_multiplier power_boost_needed))
+  (define apex_greenhouse_alloc (* apex_base_allocation apex_food_need apex_cri_response event_response_multiplier))
+  (define apex_heating_alloc (max 0.05 (min 0.85 (- 1.0 apex_isru_alloc apex_greenhouse_alloc))))
+  
+  ;; Apply with apex security bounds
+  (set! isru_alloc (max 0.30 (min 0.88 apex_isru_alloc)))
+  (set! greenhouse_alloc (max 0.30 (min 0.80 apex_greenhouse_alloc)))
+  (set! heating_alloc (max 0.05 (min 0.80 apex_heating_alloc)))
+  (set! building_alloc 0.0)  ;; Hardcoded building handles modules
+  
+  ;; ═══ APEX FOOD RATIONING ═══
+  ;; Optimized for extended mission survival
+  (define apex_food_ration
+    (cond
+      ((< food_days 7.0) 0.60)    ;; Emergency - build buffer quickly
+      ((< food_days 12.0) 0.78)   ;; Build buffer aggressively  
+      ((< food_days 20.0) 0.88)   ;; Approach apex target
+      ((< food_days 25.0) 0.94)   ;; Maintain apex buffer
+      ((< food_days 35.0) 0.98)   ;; Excellent buffer
+      (true 1.0)))                ;; Apex security achieved
+  
+  (set! food_ration apex_food_ration)
+  
+  ;; ═══ APEX CRI MONITORING ═══
+  (define power_penalty (if (< power 50) 25 (if (< power 150) 10 0)))
+  (define o2_penalty (if (< o2_days 5) 20 0))
+  (define h2o_penalty (if (< h2o_days 5) 20 0))
+  (define food_penalty (if (< food_days 5) 20 0))
+  (define total_resource_penalty (+ o2_penalty h2o_penalty food_penalty))
+  
+  (define calculated_cri (+ 5 power_penalty event_cri_penalty total_resource_penalty))
+  (define cri_target_achieved (<= colony_risk_index 10))
+  (define apex_security_achieved (and (>= o2_days apex_o2_target) 
+                                     (>= h2o_days apex_h2o_target) 
+                                     (>= food_days 20) 
+                                     (>= power apex_power_target)))
+  
+  (log (concat "  🎯 Phase: " 
+    (if phase_ultra_foundation "ULTRA_FOUNDATION"
+    (if phase_ultra_security "ULTRA_SECURITY"
+    (if phase_ultra_optimization "ULTRA_OPTIMIZATION"
+    (if phase_apex_control "APEX_CONTROL" "EXTENDED_MISSION"))))))
+  
+  (log (concat "  📊 CRI Status: " (string colony_risk_index) " = 5+" (string power_penalty) "+" (string event_cri_penalty) "+" (string total_resource_penalty) " | Target≤10:" (if cri_target_achieved "✅" "❌")))
+  
+  (define security_status 
+    (concat "O2:" (string (round o2_days 1)) "d" (if (>= o2_days 6) "✅" "❌")
+            " H2O:" (string (round h2o_days 1)) "d" (if (>= h2o_days 6) "✅" "❌")  
+            " Food:" (string (round food_days 1)) "d" (if (>= food_days 6) "✅" "❌")))
+  
+  (log (concat "  🛡️ Apex Security: " security_status " | " (if apex_security_achieved "APEX_ACHIEVED" "BUILDING")))
+  (log (concat "  ⚡ Power: " (string (round power)) "kWh" (if (>= power 180) " ✅Ultra" " ❌Risk") " | Events:" (string event_count) " | Response:" (string (round (* apex_cri_response 100))) "%"))
+  (log (concat "  🔧 Apex Allocs: I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "% H:" (string (round (* heating_alloc 100))) "% | Ration:" (string (round (* food_ration 100))) "%"))
+  
+  ;; ═══ RECORD DESTROYER PROJECTION ═══
+  (if (> sol 400)
+    (let ((projected_sols (if apex_security_achieved 734 733))  ;; Extended mission if apex security achieved
+          (projected_cri (if apex_security_achieved 8 (max 8 (min colony_risk_index 10))))  ;; Optimistic CRI projection
+          (projected_score (+ (* projected_sols 100) 1500 1200 20000 (* projected_cri -10))))
+      (log (concat "  🏆 Record Target: " (string projected_score) " (sols:" (string projected_sols) " cri:" (string projected_cri) ") | Beat: >95,890"))))
+  
+  ;; ═══ APEX SECURITY OUTPUT ═══
+  (concat "APEX-DESTROYER Sol " (string sol) 
+    " | CRI:" (string colony_risk_index) "/10"
+    " | Security:" (if apex_security_achieved "APEX" "BUILDING")
+    " | Events:" (string event_count)
+    " | Record-mode"))
