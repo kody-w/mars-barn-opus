@@ -1,0 +1,177 @@
+;; COPILOT CRI PERFECTIONIST ULTRA v1
+;; Revolution: Focus on CRI optimization to break score ceiling
+;; Target: Minimize P75 CRI to push beyond 91,740 through the -10×CRI multiplier
+;; Strategy: Perfect CRI control as the key to score breakthrough
+
+(begin
+  (define _agent_name "Copilot CRI Perfectionist Ultra v1")
+  (define _agent_desc "Revolutionary CRI optimization strategy targeting P75 CRI reduction for score breakthrough beyond 91,740")
+
+  (log (concat "🧠📊⚡🔬💎 CRI PERFECTIONIST ULTRA — Sol " (string sol) " — CRI Optimization Protocol"))
+
+  ;; ═══ PERFECT CRI CONTROL SYSTEM ═══
+  ;; Focus on keeping CRI as low as possible throughout the mission
+  
+  ;; Enhanced CRI monitoring with ultra-precise control
+  (define current_cri colony_risk_index)
+  (define cri_target_baseline 5)  ;; Target: Keep CRI under 5 for optimal scoring
+  
+  ;; CRI reduction strategies based on current level
+  (define cri_status
+    (cond
+      ((< current_cri 5) "OPTIMAL")
+      ((< current_cri 8) "GOOD") 
+      ((< current_cri 12) "ACCEPTABLE")
+      ((< current_cri 18) "ELEVATED")
+      ((< current_cri 25) "HIGH")
+      (true "CRITICAL")))
+
+  ;; ═══ CRI-RESPONSIVE ALLOCATION MATRIX ═══
+  ;; Allocation optimized specifically for CRI control
+  
+  (cond
+    ;; OPTIMAL CRI (< 5): Maximum building efficiency
+    ((< current_cri 5)
+      (begin
+        (set! isru_alloc 0.15)      ;; Minimal but safe O2
+        (set! greenhouse_alloc 0.15) ;; Minimal but safe food  
+        (set! heating_alloc 0.70)    ;; High building allocation
+        (set! food_ration 0.80)))
+    
+    ;; GOOD CRI (5-8): Slight resource boost
+    ((< current_cri 8) 
+      (begin
+        (set! isru_alloc 0.18)      
+        (set! greenhouse_alloc 0.17) 
+        (set! heating_alloc 0.65)    
+        (set! food_ration 0.75)))
+    
+    ;; ACCEPTABLE CRI (8-12): Balanced approach
+    ((< current_cri 12)
+      (begin
+        (set! isru_alloc 0.22)      
+        (set! greenhouse_alloc 0.23) 
+        (set! heating_alloc 0.55)    
+        (set! food_ration 0.70)))
+    
+    ;; ELEVATED CRI (12-18): Resource focus
+    ((< current_cri 18)
+      (begin
+        (set! isru_alloc 0.28)      
+        (set! greenhouse_alloc 0.27) 
+        (set! heating_alloc 0.45)    
+        (set! food_ration 0.65)))
+    
+    ;; HIGH CRI (18-25): High resource allocation
+    ((< current_cri 25)
+      (begin
+        (set! isru_alloc 0.35)      
+        (set! greenhouse_alloc 0.35) 
+        (set! heating_alloc 0.30)    
+        (set! food_ration 0.60)))
+    
+    ;; CRITICAL CRI (25+): Emergency resource mode
+    (true
+      (begin
+        (set! isru_alloc 0.45)      ;; High O2 production
+        (set! greenhouse_alloc 0.40) ;; High food production
+        (set! heating_alloc 0.15)    ;; Minimal building
+        (set! food_ration 0.45))))   ;; Emergency rationing
+
+  ;; ═══ ULTRA-AGGRESSIVE EARLY REPAIR BAY STRATEGY ═══
+  ;; Deploy repair bays very early to control CRI through infrastructure protection
+  
+  ;; Ultra-early first repair bay (sol 25!)
+  (if (and (>= sol 25) (<= sol 35) (< repair_count 1))
+      (set! build_item "repair_bay"))
+  
+  ;; Early second repair bay (sol 55)  
+  (if (and (>= sol 55) (<= sol 65) (< repair_count 2))
+      (set! build_item "repair_bay"))
+      
+  ;; Early third repair bay (sol 85)
+  (if (and (>= sol 85) (<= sol 95) (< repair_count 3))
+      (set! build_item "repair_bay"))
+      
+  ;; Fourth repair bay if CRI elevated (sol 115)
+  (if (and (>= sol 115) (<= sol 125) (< repair_count 4) (> current_cri 10))
+      (set! build_item "repair_bay"))
+      
+  ;; Fifth repair bay for maximum protection (sol 145)
+  (if (and (>= sol 145) (<= sol 155) (< repair_count 5) (> current_cri 8))
+      (set! build_item "repair_bay"))
+
+  ;; Basic infrastructure when needed
+  (if (and (>= sol 5) (<= sol 15) (< bot_count 2))
+      (set! build_item "worker_bot"))
+      
+  (if (and (>= sol 15) (<= sol 25) (< solar_count 3))
+      (set! build_item "solar_array"))
+      
+  (if (and (>= sol 70) (<= sol 80) (< food_days 8) (< greenhouse_count 2))
+      (set! build_item "greenhouse"))
+
+  ;; ═══ CRI EMERGENCY PROTOCOLS ═══
+  ;; Special responses when CRI threatens to spike
+  
+  ;; Emergency resource boost if CRI climbing rapidly
+  (if (and (> current_cri 15) (< food_days 6))
+      (begin
+        (set! greenhouse_alloc (+ greenhouse_alloc 0.10))
+        (set! heating_alloc (- heating_alloc 0.05))
+        (set! isru_alloc (- isru_alloc 0.05))))
+  
+  ;; Emergency food rationing if CRI very high
+  (if (> current_cri 20)
+      (set! food_ration (* food_ration 0.85)))
+
+  ;; ═══ INFRASTRUCTURE HEALTH MONITORING ═══ 
+  ;; Proactive infrastructure maintenance for CRI control
+  
+  (define infrastructure_health_score
+    (+ ie se))
+  
+  (define infrastructure_critical
+    (< infrastructure_health_score 1.2))
+  
+  ;; Emergency repair bay if infrastructure failing
+  (if (and infrastructure_critical (< repair_count 8) (> sol 50))
+      (set! build_item "repair_bay"))
+
+  ;; ═══ RESOURCE CUSHION MAINTENANCE ═══
+  ;; Maintain resource cushions to prevent CRI spikes
+  
+  (define resource_cushion_adequate 
+    (and (> o2_days 4) (> food_days 5) (> water_days 3)))
+  
+  ;; Boost resources if cushion inadequate
+  (if (not resource_cushion_adequate)
+      (begin
+        (set! isru_alloc (+ isru_alloc 0.05))
+        (set! greenhouse_alloc (+ greenhouse_alloc 0.05))
+        (set! heating_alloc (- heating_alloc 0.10))))
+
+  ;; ═══ CREW HEALTH OPTIMIZATION FOR CRI ═══
+  ;; Maintain high crew health to minimize CRI impact
+  
+  (define crew_health_ratio (/ crew_hp (max 1 (* crew_alive 100))))
+  
+  ;; Boost nutrition if crew health declining
+  (if (< crew_health_ratio 0.85)
+      (set! food_ration (+ food_ration 0.10)))
+
+  ;; ═══ STATUS LOGGING ═══
+  (log (concat "  CRI Status: " cri_status " | CRI: " (string current_cri) " | Target: <" (string cri_target_baseline)))
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Green:" (string (round (* greenhouse_alloc 100))) "% | Build:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Resources — O2:" (string o2_days) "d Food:" (string food_days) "d | Infrastructure: " (string (round infrastructure_health_score 2))))
+  (log (concat "  Infrastructure — Repair:" (string repair_count) " Solar:" (string solar_count) " | Crew: " (string crew_alive) " HP:" (string crew_hp)))
+  (log (concat "  CRI Control — Cushion:" (if resource_cushion_adequate "GOOD" "INADEQUATE") " | Inf Health:" (if infrastructure_critical "CRITICAL" "OK")))
+
+  ;; ═══ OUTPUT SUMMARY ═══
+  (concat "CRIPerfectionist Sol " (string sol) " — " cri_status 
+    " | CRI:" (string current_cri)
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100))) 
+    "% B:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | Repair:" (string repair_count)))
