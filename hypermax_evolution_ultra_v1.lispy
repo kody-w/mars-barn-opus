@@ -1,0 +1,231 @@
+;; HYPERMAX EVOLUTION ULTRA v1 - Advanced CRI-Adaptive Governor
+;; Strategy: Ultra-sensitive CRI response with predictive allocation
+;; Goal: Survive 602+ frames through superior resource management
+;; Innovation: Predictive threat analysis + adaptive efficiency scaling
+
+(begin
+  (define _agent_name "HyperMax Evolution Ultra v1")
+  (define _agent_desc "Advanced CRI-adaptive governor with predictive threat analysis and efficiency scaling")
+
+  (log (concat "⚡🧠 HyperMax Ultra — Sol " (string sol)))
+
+  ;; ═══ MISSION PHASE INTELLIGENCE ═══
+  ;; Advanced mission phase detection for optimal strategy
+  (define mission_progress (/ sol 602))
+  (define early_phase (< sol 100))
+  (define growth_phase (and (>= sol 100) (< sol 250)))
+  (define mature_phase (and (>= sol 250) (< sol 400)))
+  (define critical_phase (and (>= sol 400) (< sol 500)))
+  (define survival_phase (>= sol 500))
+  
+  (define phase_name
+    (cond
+      (early_phase "FOUNDATION")
+      (growth_phase "EXPANSION") 
+      (mature_phase "OPTIMIZATION")
+      (critical_phase "DEFENSIVE")
+      (survival_phase "ENDURANCE")
+      (true "UNKNOWN")))
+
+  ;; Advanced infrastructure intelligence
+  (define infrastructure_maturity (/ modules_built 20))  ;; Assume max ~20 modules
+  (define infrastructure_efficiency (+ 1.0 (* infrastructure_maturity 0.5)))
+
+  (log (concat "  Phase: " phase_name " (" (string (round (* mission_progress 100))) "%) | Infrastructure: " (string modules_built) " modules (" (string (round (* infrastructure_maturity 100))) "% mature)"))
+
+  ;; ═══ ADVANCED THREAT ANALYSIS ═══
+  ;; Multi-dimensional threat assessment with prediction
+
+  ;; Power threat analysis
+  (define power_security_ratio (/ power_kwh 100))  ;; Assume 100kWh is good baseline
+  (define power_threat_level
+    (cond
+      ((< power_kwh 15) "CRITICAL")
+      ((< power_kwh 35) "HIGH")
+      ((< power_kwh 60) "MODERATE")
+      ((< power_kwh 100) "LOW")
+      (true "SECURE")))
+
+  ;; Resource scarcity analysis
+  (define min_resource_days (min o2_days food_days))
+  (define resource_threat_level
+    (cond
+      ((< min_resource_days 2) "CRITICAL")
+      ((< min_resource_days 5) "HIGH")
+      ((< min_resource_days 10) "MODERATE")
+      ((< min_resource_days 20) "LOW")
+      (true "SECURE")))
+
+  ;; CRI prediction and scaling
+  (define cri_normalized (/ colony_risk_index 100))
+  (define cri_future_trend (max 0 (* (/ sol 602) 45)))  ;; Predict CRI increases over time
+  (define predicted_cri (+ colony_risk_index cri_future_trend))
+  
+  (define cri_threat_level
+    (cond
+      ((> predicted_cri 80) "CRITICAL")
+      ((> predicted_cri 60) "HIGH") 
+      ((> predicted_cri 40) "MODERATE")
+      ((> predicted_cri 25) "LOW")
+      (true "MINIMAL")))
+
+  ;; Aggregate threat assessment
+  (define threat_score 0)
+  (if (= power_threat_level "CRITICAL") (set! threat_score (+ threat_score 4)))
+  (if (= power_threat_level "HIGH") (set! threat_score (+ threat_score 3)))
+  (if (= power_threat_level "MODERATE") (set! threat_score (+ threat_score 2)))
+  (if (= power_threat_level "LOW") (set! threat_score (+ threat_score 1)))
+
+  (if (= resource_threat_level "CRITICAL") (set! threat_score (+ threat_score 4)))
+  (if (= resource_threat_level "HIGH") (set! threat_score (+ threat_score 3)))
+  (if (= resource_threat_level "MODERATE") (set! threat_score (+ threat_score 2)))
+  (if (= resource_threat_level "LOW") (set! threat_score (+ threat_score 1)))
+
+  (if (= cri_threat_level "CRITICAL") (set! threat_score (+ threat_score 3)))
+  (if (= cri_threat_level "HIGH") (set! threat_score (+ threat_score 2)))
+  (if (= cri_threat_level "MODERATE") (set! threat_score (+ threat_score 1)))
+
+  (define overall_threat_level
+    (cond
+      ((>= threat_score 9) "EXTINCTION")
+      ((>= threat_score 7) "CRITICAL")
+      ((>= threat_score 5) "HIGH")
+      ((>= threat_score 3) "MODERATE")
+      (true "STABLE")))
+
+  (log (concat "  Threats — Power:" power_threat_level " Resource:" resource_threat_level " CRI:" cri_threat_level " → " overall_threat_level " (" (string threat_score) ")"))
+
+  ;; ═══ ADAPTIVE RESOURCE ALLOCATION ═══
+  ;; Ultra-responsive allocation based on phase + threat analysis
+
+  ;; Phase-optimized base allocations
+  (define phase_isru_base
+    (cond
+      (early_phase 0.30)        ;; Foundation: establish O2
+      (growth_phase 0.25)       ;; Expansion: balanced growth
+      (mature_phase 0.22)       ;; Optimization: efficient O2
+      (critical_phase 0.18)     ;; Defensive: minimize O2, focus power
+      (survival_phase 0.15)     ;; Endurance: minimal O2
+      (true 0.25)))
+
+  (define phase_greenhouse_base
+    (cond
+      (early_phase 0.35)        ;; Foundation: establish food
+      (growth_phase 0.38)       ;; Expansion: grow food production
+      (mature_phase 0.35)       ;; Optimization: efficient food
+      (critical_phase 0.25)     ;; Defensive: reduce food focus
+      (survival_phase 0.20)     ;; Endurance: minimal food
+      (true 0.35)))
+
+  ;; Threat response modifiers
+  (define threat_modifier
+    (cond
+      ((= overall_threat_level "EXTINCTION") 
+       (begin
+         (set! phase_isru_base 0.10)
+         (set! phase_greenhouse_base 0.15)
+         0.75))  ;; 75% to heating for survival
+      ((= overall_threat_level "CRITICAL")
+       (begin
+         (set! phase_isru_base (* phase_isru_base 0.7))
+         (set! phase_greenhouse_base (* phase_greenhouse_base 0.7))
+         0.60))  ;; 60% emphasis on heating
+      ((= overall_threat_level "HIGH")
+       (begin
+         (set! phase_isru_base (* phase_isru_base 0.85))
+         (set! phase_greenhouse_base (* phase_greenhouse_base 0.85))
+         0.45))  ;; 45% emphasis on heating
+      (true 0.30)))  ;; Normal heating
+
+  ;; Emergency resource override
+  (if (< o2_days 4)
+    (begin
+      (set! phase_isru_base 0.70)
+      (set! phase_greenhouse_base 0.20)
+      (set! threat_modifier 0.10)))
+
+  (if (< food_days 6)
+    (begin
+      (set! phase_isru_base 0.15)
+      (set! phase_greenhouse_base 0.65)
+      (set! threat_modifier 0.20)))
+
+  ;; Infrastructure efficiency scaling
+  (define efficiency_scaling (min 1.4 infrastructure_efficiency))
+
+  ;; Final allocation calculation
+  (set! isru_alloc (* phase_isru_base efficiency_scaling))
+  (set! greenhouse_alloc (* phase_greenhouse_base efficiency_scaling))
+  (set! heating_alloc (+ threat_modifier (* 0.05 efficiency_scaling)))
+
+  ;; Ensure normalization
+  (define total_allocation (+ isru_alloc greenhouse_alloc heating_alloc))
+  (if (> total_allocation 1.0)
+    (begin
+      (set! isru_alloc (/ isru_alloc total_allocation))
+      (set! greenhouse_alloc (/ greenhouse_alloc total_allocation))
+      (set! heating_alloc (/ heating_alloc total_allocation))))
+
+  ;; ═══ INTELLIGENT FOOD RATIONING ═══
+  ;; Adaptive rationing based on threat + phase analysis
+
+  (define base_ration_by_phase
+    (cond
+      (early_phase 0.90)        ;; Foundation: good nutrition for setup
+      (growth_phase 0.85)       ;; Expansion: maintain health
+      (mature_phase 0.80)       ;; Optimization: efficient consumption
+      (critical_phase 0.65)     ;; Defensive: conservation mode
+      (survival_phase 0.50)     ;; Endurance: survival rationing
+      (true 0.85)))
+
+  (define threat_ration_modifier
+    (cond
+      ((= overall_threat_level "EXTINCTION") 0.35)   ;; Extreme rationing
+      ((= overall_threat_level "CRITICAL") 0.45)     ;; Severe rationing
+      ((= overall_threat_level "HIGH") 0.65)         ;; High rationing
+      ((= overall_threat_level "MODERATE") 0.80)     ;; Moderate rationing
+      (true 1.0)))                                   ;; No additional rationing
+
+  ;; Emergency overrides
+  (define emergency_ration
+    (cond
+      ((< food_days 2) 0.25)    ;; Extreme emergency
+      ((< food_days 4) 0.35)    ;; Emergency
+      ((< food_days 8) 0.55)    ;; Crisis
+      ((< food_days 12) 0.75)   ;; Caution
+      (true 1.0)))              ;; No emergency
+
+  ;; Calculate final food ration
+  (define calculated_ration (* base_ration_by_phase threat_ration_modifier emergency_ration))
+  (set! food_ration (max 0.20 (min 1.1 calculated_ration)))  ;; Clamp between 20% and 110%
+
+  ;; ═══ STATUS VISUALIZATION ═══
+  (define status_icon
+    (cond
+      ((= overall_threat_level "EXTINCTION") "💀")
+      ((= overall_threat_level "CRITICAL") "🔴")
+      ((= overall_threat_level "HIGH") "🟠")
+      ((= overall_threat_level "MODERATE") "🟡")
+      (true "🟢")))
+
+  (define phase_icon
+    (cond
+      (early_phase "🏗️")
+      (growth_phase "📈")
+      (mature_phase "⚖️")
+      (critical_phase "🛡️")
+      (survival_phase "💪")
+      (true "❓")))
+
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Greenhouse:" (string (round (* greenhouse_alloc 100))) "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Rationing: " (string (round (* food_ration 100))) "% | Efficiency: " (string (round (* efficiency_scaling 100))) "% | CRI Predicted: " (string (round predicted_cri))))
+
+  ;; ═══ HYPERMAX EVOLUTION OUTPUT ═══
+  (concat "⚡🧠 Ultra Sol " (string sol) " — " phase_icon " " phase_name " " status_icon " " overall_threat_level
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | Eff:" (string (round (* efficiency_scaling 100)))
+    "% | O2:" (string o2_days)
+    "d F:" (string food_days) "d"))

@@ -1,0 +1,220 @@
+;; ULTRA ADAPTIVE MARS MASTER v1 - Pure LisPy Intelligence
+;; Strategy: Complete decision autonomy with no hardcoded infrastructure
+;; Goal: Beat 441 sols through intelligent decision making, not hardcoded builds
+;; Innovation: First pure LisPy governor with intelligent infrastructure timing
+
+(begin
+  (define _agent_name "Ultra Adaptive Mars Master v1")
+  (define _agent_desc "Pure LisPy intelligence: complete autonomous decision making for all colony operations")
+
+  (log (concat "🧠🔴 Mars Master — Sol " (string sol)))
+
+  ;; ═══ MISSION INTELLIGENCE ═══
+  ;; Comprehensive situational awareness
+  (define mission_progress (/ sol 602))
+  (define critical_phase (> sol 380))
+  (define late_game_phase (> sol 450))
+  (define emergency_phase (> sol 520))
+  
+  ;; Advanced infrastructure intelligence
+  (define current_solar_count (+ 2 solar_farms_built))  ;; Start with 2 base solar
+  (define current_repair_count repair_bays_built)
+  (define current_isru_count isru_plants_built) 
+  (define current_greenhouse_count greenhouse_domes_built)
+  (define current_extractor_count water_extractors_built)
+  
+  ;; Smart infrastructure ratios for optimal performance
+  (define optimal_solar_count (max 3 (round (* modules_built 0.45))))
+  (define optimal_repair_count (max 1 (round (* modules_built 0.30))))
+  (define optimal_utility_count (max 2 (round (* modules_built 0.25))))
+  
+  (log (concat "  Infrastructure: " (string current_solar_count) "S/" (string current_repair_count) "R | Optimal: " (string optimal_solar_count) "S/" (string optimal_repair_count) "R"))
+
+  ;; ═══ THREAT ANALYSIS ═══
+  ;; Multi-factor threat assessment for intelligent decision making
+  (define power_threat (cond
+    ((< power_kwh 20) 4)          ;; Critical power shortage
+    ((< power_kwh 50) 3)          ;; Significant shortage
+    ((< power_kwh 80) 2)          ;; Moderate concern
+    ((< power_kwh 120) 1)         ;; Minor concern
+    (true 0)))                    ;; Power secure
+
+  (define resource_threat (cond
+    ((or (< o2_days 3) (< food_days 5)) 4)    ;; Critical resource crisis
+    ((or (< o2_days 6) (< food_days 10)) 3)   ;; Severe shortage
+    ((or (< o2_days 10) (< food_days 15)) 2)  ;; Moderate concern
+    ((or (< o2_days 15) (< food_days 20)) 1)  ;; Minor concern
+    (true 0)))                                ;; Resources secure
+
+  (define infrastructure_threat (cond
+    ((< current_solar_count 3) 3)             ;; Insufficient solar
+    ((< current_repair_count 1) 2)            ;; No repair capability
+    ((< current_solar_count optimal_solar_count) 1)    ;; Below optimal
+    (true 0)))                                ;; Infrastructure good
+
+  (define cri_threat (cond
+    ((> colony_risk_index 70) 4)              ;; Extreme risk
+    ((> colony_risk_index 50) 3)              ;; High risk
+    ((> colony_risk_index 35) 2)              ;; Moderate risk
+    ((> colony_risk_index 20) 1)              ;; Low risk
+    (true 0)))                                ;; Risk minimal
+
+  (define total_threat (+ power_threat resource_threat infrastructure_threat cri_threat))
+  (define threat_level 
+    (cond
+      ((>= total_threat 12) "EXTINCTION")
+      ((>= total_threat 9) "CRITICAL") 
+      ((>= total_threat 6) "HIGH")
+      ((>= total_threat 3) "MODERATE")
+      (true "STABLE")))
+
+  (log (concat "  Threat Assessment: " threat_level " (" (string total_threat) ") | Power:" (string power_threat) " Resource:" (string resource_threat) " Infra:" (string infrastructure_threat) " CRI:" (string cri_threat)))
+
+  ;; ═══ INTELLIGENT INFRASTRUCTURE DECISIONS ═══
+  ;; Pure LisPy infrastructure timing based on intelligent analysis
+
+  ;; Build request system - the LisPy governor DECIDES what to build
+  (define build_request "none")
+  
+  ;; Infrastructure decision logic
+  (cond
+    ;; Emergency power response
+    ((and (< power_kwh 30) (< current_solar_count 6))
+     (set! build_request "solar_farm"))
+     
+    ;; Critical early solar foundation (Sol 5-20)
+    ((and (< sol 20) (< current_solar_count 4) (> power_kwh 25))
+     (set! build_request "solar_farm"))
+     
+    ;; Essential utility infrastructure
+    ((and (> sol 10) (= current_isru_count 0) (> power_kwh 35))
+     (set! build_request "isru_plant"))
+     
+    ((and (> sol 15) (= current_greenhouse_count 0) (> power_kwh 45))
+     (set! build_request "greenhouse_dome"))
+     
+    ;; Strategic repair bay timing
+    ((and (> sol 25) (= current_repair_count 0) (> power_kwh 55))
+     (set! build_request "repair_bay"))
+     
+    ;; Mid-game solar expansion
+    ((and (> sol 40) (< current_solar_count optimal_solar_count) (> power_kwh 70))
+     (set! build_request "solar_farm"))
+     
+    ;; Late-game defensive preparation
+    ((and (> sol 80) (< current_repair_count 2) (> power_kwh 90))
+     (set! build_request "repair_bay"))
+     
+    ;; Ultra-late game preparation for 441+ sol survival
+    ((and (> sol 200) (< current_repair_count 3) (> power_kwh 120))
+     (set! build_request "repair_bay"))
+     
+    ;; Final solar optimization
+    ((and (> sol 150) (< current_solar_count 6) (> power_kwh 100))
+     (set! build_request "solar_farm"))
+     
+    (true (set! build_request "none")))
+
+  ;; Log infrastructure decision
+  (if (not (= build_request "none"))
+    (log (concat "  🔨 Infrastructure Decision: BUILD " build_request " (Sol " (string sol) ")")))
+
+  ;; ═══ ADAPTIVE RESOURCE ALLOCATION ═══
+  ;; Intelligent allocation based on threat analysis and mission phase
+
+  ;; Base allocation matrix optimized for each threat level
+  (define base_isru_alloc
+    (cond
+      ((= threat_level "EXTINCTION") 0.15)      ;; Minimal O2 - focus on power
+      ((= threat_level "CRITICAL") 0.20)        ;; Crisis O2 production
+      ((= threat_level "HIGH") 0.25)            ;; Increased O2 focus
+      ((< o2_days 4) 0.65)                      ;; Emergency O2 override
+      ((< o2_days 8) 0.45)                      ;; High O2 priority
+      ((< o2_days 12) 0.35)                     ;; Moderate O2
+      (critical_phase 0.22)                     ;; Critical phase efficiency
+      (late_game_phase 0.18)                   ;; Late game minimal
+      (true 0.28)))                             ;; Normal operations
+
+  (define base_greenhouse_alloc
+    (cond
+      ((= threat_level "EXTINCTION") 0.20)      ;; Minimal food - focus on power
+      ((= threat_level "CRITICAL") 0.25)        ;; Crisis food production
+      ((= threat_level "HIGH") 0.30)            ;; Increased food focus
+      ((< food_days 5) 0.55)                    ;; Emergency food override
+      ((< food_days 10) 0.40)                   ;; High food priority
+      ((< food_days 15) 0.35)                   ;; Moderate food
+      (critical_phase 0.28)                     ;; Critical phase efficiency
+      (late_game_phase 0.25)                    ;; Late game reduced
+      (true 0.32)))                             ;; Normal operations
+
+  ;; Heating allocation is remaining power (power management priority)
+  (define base_heating_alloc (- 1.0 base_isru_alloc base_greenhouse_alloc))
+
+  ;; Apply mission phase optimization
+  (define phase_multiplier 
+    (cond
+      (emergency_phase 1.1)                     ;; Emergency efficiency boost
+      (critical_phase 1.05)                     ;; Critical phase boost
+      (true 1.0)))
+
+  ;; Calculate final allocations
+  (set! isru_alloc (* base_isru_alloc phase_multiplier))
+  (set! greenhouse_alloc (* base_greenhouse_alloc phase_multiplier))
+  (set! heating_alloc (* base_heating_alloc phase_multiplier))
+
+  ;; Normalization to ensure constraints
+  (define total_alloc (+ isru_alloc greenhouse_alloc heating_alloc))
+  (if (> total_alloc 1.0)
+    (begin
+      (set! isru_alloc (/ isru_alloc total_alloc))
+      (set! greenhouse_alloc (/ greenhouse_alloc total_alloc))
+      (set! heating_alloc (/ heating_alloc total_alloc))))
+
+  ;; ═══ INTELLIGENT FOOD RATIONING ═══
+  ;; Smart rationing based on threat analysis and food security
+
+  (define base_food_ration
+    (cond
+      ((= threat_level "EXTINCTION") 0.25)      ;; Survival rationing
+      ((= threat_level "CRITICAL") 0.35)        ;; Crisis rationing
+      ((= threat_level "HIGH") 0.50)            ;; High threat rationing
+      ((< food_days 3) 0.30)                    ;; Emergency rationing
+      ((< food_days 6) 0.45)                    ;; Crisis mode
+      ((< food_days 10) 0.65)                   ;; Cautious
+      ((< food_days 15) 0.80)                   ;; Conservative
+      (critical_phase 0.75)                     ;; Critical phase caution
+      (late_game_phase 0.70)                    ;; Late game conservation
+      ((> food_days 25) 0.95)                   ;; Abundant food
+      (true 0.85)))                             ;; Standard ration
+
+  ;; Apply crew health consideration
+  (define avg_crew_hp (/ crew_hp crew_count))
+  (define health_factor 
+    (cond
+      ((< avg_crew_hp 6) 1.2)                   ;; Boost for low health
+      ((< avg_crew_hp 8) 1.1)                   ;; Moderate boost
+      (true 1.0)))                              ;; Normal health
+
+  (set! food_ration (max 0.20 (min 1.2 (* base_food_ration health_factor))))
+
+  ;; ═══ STATUS REPORTING ═══
+  (define status_emoji
+    (cond
+      ((= threat_level "EXTINCTION") "💀")
+      ((= threat_level "CRITICAL") "🔴")
+      ((= threat_level "HIGH") "🟠")
+      ((= threat_level "MODERATE") "🟡")
+      (true "🟢")))
+
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Greenhouse:" (string (round (* greenhouse_alloc 100))) "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Rationing: " (string (round (* food_ration 100))) "% | Health Factor: " (string (round (* health_factor 100))) "% | Mission: " (string (round (* mission_progress 100))) "%"))
+
+  ;; ═══ ULTRA ADAPTIVE OUTPUT ═══
+  (concat "🧠🔴 Mars Master Sol " (string sol) " — " status_emoji " " threat_level
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% H:" (string (round (* heating_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | " (if (not (= build_request "none")) (concat "BUILD:" build_request) "MAINTAIN")
+    " | O2:" (string o2_days)
+    "d F:" (string food_days) "d"))
