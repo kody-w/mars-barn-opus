@@ -640,8 +640,8 @@
   ];
 
   const UNIT_RADIUS = 1.2;
-  const BUILDING_PUSH = 3.0;  // repulsion strength from buildings
-  const UNIT_PUSH = 2.0;      // repulsion strength between units
+  const BUILDING_PUSH = 0.6;  // gentle repulsion from buildings
+  const UNIT_PUSH = 0.4;      // gentle repulsion between units
 
   // ─── DUST PARTICLES ──────────────────────────────────────────
   const dustCount = 1500;
@@ -890,55 +890,68 @@
       // Smooth interpolation (desired position)
       const t = u.progress;
       const st = t * t * (3 - 2 * t); // smoothstep
-      let px = cx + (nx - cx) * st;
-      let pz = cz + (nz - cz) * st;
+      let desiredX = cx + (nx - cx) * st;
+      let desiredZ = cz + (nz - cz) * st;
 
-      // ── Collision avoidance ──
+      // ── Soft collision avoidance (accumulate gentle nudges) ──
       let pushX = 0, pushZ = 0;
 
-      // Repel from buildings
+      // Repel from buildings — soft quadratic falloff
       for (const ob of obstacles) {
-        const dx = px - ob.x;
-        const dz = pz - ob.z;
+        const dx = desiredX - ob.x;
+        const dz = desiredZ - ob.z;
         const dist = Math.sqrt(dx * dx + dz * dz);
         const minDist = ob.r + UNIT_RADIUS;
         if (dist < minDist && dist > 0.01) {
-          const overlap = minDist - dist;
-          const nx2 = dx / dist, nz2 = dz / dist;
-          pushX += nx2 * overlap * BUILDING_PUSH;
-          pushZ += nz2 * overlap * BUILDING_PUSH;
+          const penetration = (minDist - dist) / minDist; // 0..1
+          const force = penetration * penetration * BUILDING_PUSH;
+          pushX += (dx / dist) * force;
+          pushZ += (dz / dist) * force;
         }
       }
 
-      // Repel from other units
+      // Repel from other units — soft quadratic falloff
       for (let j = 0; j < units.length; j++) {
         if (j === ui) continue;
         const other = units[j];
-        const dx = px - other.group.position.x;
-        const dz = pz - other.group.position.z;
+        const dx = desiredX - other.group.position.x;
+        const dz = desiredZ - other.group.position.z;
         const dist = Math.sqrt(dx * dx + dz * dz);
-        const minDist = UNIT_RADIUS * 2;
+        const minDist = UNIT_RADIUS * 3;
         if (dist < minDist && dist > 0.01) {
-          const overlap = minDist - dist;
-          const nx2 = dx / dist, nz2 = dz / dist;
-          pushX += nx2 * overlap * UNIT_PUSH;
-          pushZ += nz2 * overlap * UNIT_PUSH;
+          const penetration = (minDist - dist) / minDist;
+          const force = penetration * penetration * UNIT_PUSH;
+          pushX += (dx / dist) * force;
+          pushZ += (dz / dist) * force;
         }
       }
 
-      px += pushX;
-      pz += pushZ;
+      const targetX = desiredX + pushX;
+      const targetZ = desiredZ + pushZ;
 
-      const ty = getTerrainY(px, pz);
+      // Smooth lerp toward target (no snapping)
+      const lerpFactor = 1 - Math.pow(0.001, dt);
+      const prevX = u.group.position.x;
+      const prevZ = u.group.position.z;
+      const finalX = prevX + (targetX - prevX) * lerpFactor;
+      const finalZ = prevZ + (targetZ - prevZ) * lerpFactor;
 
-      u.direction.set(nx - cx + pushX * 0.5, 0, nz - cz + pushZ * 0.5).normalize();
-      u.group.position.set(px, ty, pz);
+      const ty = getTerrainY(finalX, finalZ);
 
-      // Face direction
-      if (u.direction.lengthSq() > 0.01) {
-        const angle = Math.atan2(u.direction.x, u.direction.z);
-        u.group.rotation.y = angle;
+      u.group.position.set(finalX, ty, finalZ);
+
+      // Smooth facing — lerp rotation instead of snapping
+      const moveX = finalX - prevX;
+      const moveZ = finalZ - prevZ;
+      if (moveX * moveX + moveZ * moveZ > 0.0001) {
+        const targetAngle = Math.atan2(moveX, moveZ);
+        let angleDiff = targetAngle - u.group.rotation.y;
+        // Wrap to -PI..PI
+        while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+        while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+        u.group.rotation.y += angleDiff * Math.min(dt * 4, 1);
       }
+      u.direction.set(Math.sin(u.group.rotation.y), 0, Math.cos(u.group.rotation.y));
 
       // Bob animation
       u.group.position.y = ty + Math.sin(elapsed * 3 + ci) * 0.08;
