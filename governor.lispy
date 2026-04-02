@@ -1,225 +1,188 @@
-;; ULTRA QUANTUM MARS TRANSCENDENCE v1 - Beyond Perfect Survival
-;; Strategy: Quantum probability field manipulation + Mars temporal synchronization + transcendent resource orchestration
-;; Goal: Transcend current limitations through quantum Mars adaptation and temporal resource prediction
+;; QUANTUM NEURAL HYPERMAX EVOLUTION v3 - Ultimate Mars Transcendence
+;; Innovation: Quantum-biological hybrid intelligence + neural network learning + exponential scaling
+;; Target: Maximum score optimization + perfect 645 sol survival + ultra-efficiency breakthrough
+;; Revolutionary approach: Multi-paradigm fusion with quantum consciousness evolution
 
 (begin
-  (define _agent_name "Ultra Quantum Mars Transcendence v1")
-  (define _agent_desc "Quantum probability manipulation with Mars temporal synchronization and transcendent resource orchestration")
+  (define _agent_name "Quantum Neural Hypermax Evolution v3")
+  (define _agent_desc "Ultimate multi-paradigm transcendence: quantum consciousness + neural learning + biological evolution + exponential infrastructure mastery")
 
-  (log (concat "🌌⚡ Quantum Transcendence — Sol " (string sol)))
+  (log (concat "🌌🧠⚡ Quantum Neural Evolution — Sol " (string sol)))
 
-  ;; ═══ QUANTUM MARS SYNCHRONIZATION ═══
-  ;; Revolutionary approach: Synchronize colony operations with Mars quantum field fluctuations
-  (define mars_quantum_phase (sin (* 2 3.14159 (/ sol 687))))  ;; Mars year quantum harmonics
-  (define quantum_resonance_factor (+ 1.0 (* mars_quantum_phase 0.3)))  ;; -0.3 to +1.3 multiplier
-  (define temporal_sync_bonus (if (> mars_quantum_phase 0.5) 1.4 1.0))  ;; Positive phase bonus
+  ;; ═══ QUANTUM CONSCIOUSNESS EVOLUTION SYSTEM ═══
+  ;; Revolutionary consciousness development that transcends normal limitations
+  (define mission_transcendence_ratio (/ sol 645))
+  (define quantum_consciousness_level (+ 1.5 (* mission_transcendence_ratio 4.0)))  ;; 1.5x → 5.5x evolution
+  (define neural_learning_factor (+ 1.0 (pow mission_transcendence_ratio 1.3)))     ;; Exponential learning curve
+  (define biological_adaptation_rate (+ 0.8 (* mission_transcendence_ratio 1.8)))   ;; Adaptation acceleration
+
+  ;; Multi-dimensional consciousness matrix
+  (define temporal_consciousness (pow mission_transcendence_ratio 0.6))              ;; Time mastery 
+  (define resource_consciousness (/ (+ (max o2_days 1) (max food_days 1) (max power_kwh 1)) 180)) ;; Resource awareness
+  (define infrastructure_consciousness (min 3.0 (max 0.3 (/ modules_built 25)))     ;; Infrastructure intelligence
+  (define threat_consciousness (max 0.1 (- 1.8 (/ colony_risk_index 65))))          ;; Threat transcendence
+
+  ;; Total quantum consciousness integration
+  (define total_quantum_consciousness 
+    (* quantum_consciousness_level neural_learning_factor biological_adaptation_rate
+       (+ temporal_consciousness resource_consciousness infrastructure_consciousness threat_consciousness)))
+
+  ;; ═══ NEURAL NETWORK LEARNING ARCHITECTURE ═══
+  ;; Advanced multi-layer neural network with adaptive learning
   
-  ;; Quantum infrastructure prediction with probability field analysis
-  (define quantum_module_prediction
-    (* modules_built quantum_resonance_factor temporal_sync_bonus))
+  ;; INPUT LAYER (Environmental sensors)
+  (define neural_input_o2 (/ (max o2_days 1) 20))
+  (define neural_input_food (/ (max food_days 1) 25)) 
+  (define neural_input_power (/ (max power_kwh 1) 200))
+  (define neural_input_cri (/ colony_risk_index 100))
+  (define neural_input_progress mission_transcendence_ratio)
+  (define neural_input_infrastructure (/ modules_built 30))
+
+  ;; HIDDEN LAYER 1 (Survival analysis)
+  (define neural_h1_survival (+ (* neural_input_o2 0.3) (* neural_input_food 0.3) (* neural_input_power 0.4)))
+  (define neural_h1_threat (+ (* neural_input_cri 0.6) (* (- 1 neural_input_progress) 0.4)))
+  (define neural_h1_growth (+ (* neural_input_infrastructure 0.5) (* neural_input_progress 0.5)))
+
+  ;; HIDDEN LAYER 2 (Strategic analysis with learning)
+  (define neural_h2_adaptation (* (+ neural_h1_survival neural_h1_growth) neural_learning_factor))
+  (define neural_h2_resilience (* (- 1 neural_h1_threat) total_quantum_consciousness))
+  (define neural_h2_efficiency (+ neural_h1_growth (* biological_adaptation_rate 0.4)))
+
+  ;; OUTPUT LAYER (Neural decisions with sigmoid activation)
+  (define neural_output_defense (/ 1 (+ 1 (pow 2.718281828 (- (* (- neural_h2_resilience 0.5) 6))))))
+  (define neural_output_growth (/ 1 (+ 1 (pow 2.718281828 (- (* (- neural_h2_adaptation 0.5) 6))))))
+  (define neural_output_efficiency (/ 1 (+ 1 (pow 2.718281828 (- (* (- neural_h2_efficiency 0.5) 6))))))
+
+  ;; ═══ BIOLOGICAL EVOLUTION ADAPTATION SYSTEM ═══
+  ;; Evolutionary algorithms for optimal strategy adaptation
+  (define evolution_generation (max 1 (round (/ sol 50))))  ;; New generation every 50 sols
+  (define genetic_fitness_score
+    (+ (* (min 1 (/ o2_days 10)) 0.25)      ;; O2 fitness
+       (* (min 1 (/ food_days 15)) 0.25)    ;; Food fitness  
+       (* (min 1 (/ power_kwh 120)) 0.25)   ;; Power fitness
+       (* (max 0 (/ crew_hp 80)) 0.25)))    ;; Crew fitness
+
+  ;; Natural selection pressure based on environmental stress
+  (define selection_pressure 
+    (* (+ 1 (/ colony_risk_index 100))      ;; CRI selection pressure
+       (+ 0.8 (* evolution_generation 0.1)))) ;; Generational pressure increase
+
+  ;; Mutation rate for adaptive exploration
+  (define mutation_rate (max 0.05 (- 0.3 (* genetic_fitness_score 0.25))))
+
+  ;; Evolved adaptation coefficients  
+  (define evolved_defense_gene (+ 0.4 (* neural_output_defense mutation_rate selection_pressure)))
+  (define evolved_growth_gene (+ 0.3 (* neural_output_growth mutation_rate genetic_fitness_score)))
+  (define evolved_efficiency_gene (+ 0.3 (* neural_output_efficiency mutation_rate biological_adaptation_rate)))
+
+  ;; ═══ EXPONENTIAL INFRASTRUCTURE ORCHESTRATION ═══
+  ;; Ultra-aggressive exponential scaling with biological and quantum optimization
+  (define quantum_optimal_modules
+    (cond
+      ((< sol 40) (* 15 quantum_consciousness_level))       ;; Quantum-boosted early expansion
+      ((< sol 100) (* 25 neural_learning_factor))          ;; Neural-optimized scaling
+      ((< sol 200) (* 35 biological_adaptation_rate))      ;; Bio-adaptive growth
+      ((< sol 350) (* 45 total_quantum_consciousness))     ;; Full consciousness scaling  
+      (true (* 60 (+ 1 genetic_fitness_score)))))         ;; Evolutionary peak expansion
+
+  ;; Quantum infrastructure ratios with evolved optimization
+  (define quantum_repair_ratio (+ 0.45 (* evolved_defense_gene 0.2)))      ;; Evolved defensive allocation
+  (define quantum_solar_ratio (+ 0.48 (* evolved_efficiency_gene 0.15)))   ;; Evolved energy allocation
+  (define quantum_greenhouse_ratio (+ 0.22 (* evolved_growth_gene 0.12)))  ;; Evolved food allocation
+  (define quantum_isru_ratio 0.16)                                         ;; Stable ISRU allocation
+
+  (define estimated_repair_bays (max 2 (round (* modules_built quantum_repair_ratio))))
+  (define estimated_solar_farms (max 3 (round (* modules_built quantum_solar_ratio))))
+  (define estimated_greenhouses (max 2 (round (* modules_built quantum_greenhouse_ratio))))
+  (define estimated_isru_plants (max 1 (round (* modules_built quantum_isru_ratio))))
+
+  ;; EXPONENTIAL REPAIR TRANSCENDENCE - Ultra-aggressive exponential scaling
+  (define quantum_exponential_base 4.2)  ;; Beyond all previous strategies
+  (define repair_quantum_field (pow quantum_exponential_base estimated_repair_bays))
+  (define consciousness_repair_multiplier (+ 1.5 (* total_quantum_consciousness 0.3)))
+  (define evolution_repair_bonus (+ 1.0 (* genetic_fitness_score 1.8)))
+  (define total_repair_transcendence (* repair_quantum_field consciousness_repair_multiplier evolution_repair_bonus))
+
+  ;; ═══ ULTIMATE TRANSCENDENT EFFICIENCY MATRIX ═══
+  ;; Beyond all previous efficiency calculations - multi-paradigm fusion
+  (define transcendent_base_efficiency 6.5)  ;; Higher than any previous strategy
+  (define quantum_consciousness_multiplier (+ 2.0 (* total_quantum_consciousness 0.4)))
+  (define neural_learning_multiplier (+ 1.8 (* neural_learning_factor 0.6)))
+  (define biological_evolution_multiplier (+ 1.6 (* biological_adaptation_rate 0.5)))
+  (define infrastructure_mastery_bonus (min 3.5 (max 1.0 (/ modules_built quantum_optimal_modules)))
+
+  ;; Multi-paradigm efficiency fusion
+  (define ultimate_transcendent_efficiency
+    (* transcendent_base_efficiency total_repair_transcendence quantum_consciousness_multiplier 
+       neural_learning_multiplier biological_evolution_multiplier infrastructure_mastery_bonus))
+
+  ;; Hypermax density achievement bonus
+  (define hypermax_density_achievement
+    (cond
+      ((> modules_built (* quantum_optimal_modules 1.4)) 2.8)  ;; Transcendent density
+      ((> modules_built (* quantum_optimal_modules 1.2)) 2.4)  ;; Quantum density  
+      ((> modules_built quantum_optimal_modules) 2.0)          ;; Optimal density
+      ((> modules_built (* quantum_optimal_modules 0.8)) 1.6)  ;; Near-optimal density
+      (true 1.0)))
+
+  (define final_ultimate_efficiency (* ultimate_transcendent_efficiency hypermax_density_achievement))
+
+  (log (concat "  Consciousness:" (string (round (* total_quantum_consciousness 100))) "% | Evolution:Gen" (string evolution_generation) " | Neural:" (string (round (* neural_learning_factor 100))) "% | Efficiency:" (string (round (* final_ultimate_efficiency 100))) "%"))
+
+  ;; ═══ TRANSCENDENT ADAPTIVE ALLOCATION MATRIX ═══
+  ;; Ultimate resource allocation using all paradigms
   
-  (define quantum_solar_arrays (max 6 (round (* quantum_module_prediction 0.65))))
-  (define quantum_repair_matrix (max 4 (round (* quantum_module_prediction 0.50))))
-  (define quantum_bio_domes (max 3 (round (* quantum_module_prediction 0.35))))
-  (define quantum_hab_modules (max 2 (round (* quantum_module_prediction 0.25))))
-  
-  ;; Ultra-transcendent repair scaling with quantum amplification
-  (define quantum_base_scaling 4.5)  ;; Highest scaling ever attempted
-  (define quantum_repair_transcendence (pow quantum_base_scaling quantum_repair_matrix))
-  (define quantum_solar_transcendence (+ 1 (* quantum_solar_arrays 0.25)))
-  (define quantum_bio_transcendence (+ 1 (* quantum_bio_domes 0.18)))
-  (define total_quantum_transcendence 
-    (* quantum_repair_transcendence quantum_solar_transcendence quantum_bio_transcendence quantum_resonance_factor))
-  
-  (log (concat "  Quantum: Solar:" (string quantum_solar_arrays) " Repair:" (string quantum_repair_matrix) " Bio:" (string quantum_bio_domes)))
-  (log (concat "  Transcendence: " (string (round (* total_quantum_transcendence 100))) "% | Resonance: " (string (round (* quantum_resonance_factor 100))) "%"))
-
-  ;; ═══ TEMPORAL CRI PREDICTION MATRIX ═══
-  ;; Revolutionary: Predict CRI evolution through temporal pattern analysis
-  (define sol_progress_factor (/ sol 645))  ;; Mission completion 0-1
-  (define temporal_stress_prediction (+ colony_risk_index (* sol_progress_factor 25)))  ;; Late mission stress
-  (define quantum_cri_fluctuation (+ temporal_stress_prediction (* mars_quantum_phase 10)))  ;; Quantum influence
-  
-  ;; Mars temporal cycle analysis (every 100 sols = major cycle)
-  (define mars_cycle_position (/ (% sol 100) 100))  ;; 0-1 within cycle
-  (define cycle_stress_modifier
+  ;; Multi-paradigm ISRU optimization
+  (define transcendent_isru_target
     (cond
-      ((< mars_cycle_position 0.2) 0.8)   ;; Cycle start: stable
-      ((< mars_cycle_position 0.5) 1.2)   ;; Cycle middle: elevated
-      ((< mars_cycle_position 0.8) 1.5)   ;; Cycle peak: high stress
-      (true 0.9)))                        ;; Cycle end: settling
+      ((< o2_days 1) 0.85)                     ;; Emergency override
+      ((< o2_days 3) 0.70)                     ;; Critical O2 response
+      (true (+ 0.18 (* neural_output_defense 0.25) (* evolved_defense_gene 0.15)))))
 
-  (define predicted_quantum_cri (min 98 (* quantum_cri_fluctuation cycle_stress_modifier)))
-  
-  ;; Ultra-advanced threat classification with temporal prediction
-  (define quantum_threat_state
+  ;; Multi-paradigm Greenhouse optimization  
+  (define transcendent_greenhouse_target
     (cond
-      ((> predicted_quantum_cri 85) "TRANSCENDENT_CRISIS")
-      ((> predicted_quantum_cri 70) "QUANTUM_CRITICAL") 
-      ((> predicted_quantum_cri 55) "TEMPORAL_ELEVATED")
-      ((> predicted_quantum_cri 40) "HARMONIC_MODERATE")
-      ((> predicted_quantum_cri 25) "QUANTUM_STABLE")
-      (true "TRANSCENDENT_OPTIMAL")))
-  
-  ;; Multi-dimensional quantum crisis detection
-  (define quantum_crisis_indicators 0)
-  (if (< o2_days 9) (set! quantum_crisis_indicators (+ quantum_crisis_indicators 3)))
-  (if (< food_days 14) (set! quantum_crisis_indicators (+ quantum_crisis_indicators 3)))
-  (if (< power_kwh 55) (set! quantum_crisis_indicators (+ quantum_crisis_indicators 2)))
-  (if (> dust_tau 4.8) (set! quantum_crisis_indicators (+ quantum_crisis_indicators 2)))
-  (if (> predicted_quantum_cri 65) (set! quantum_crisis_indicators (+ quantum_crisis_indicators 4)))
-  (if (< crew_hp 12) (set! quantum_crisis_indicators (+ quantum_crisis_indicators 3)))
-  (if (< quantum_resonance_factor 0.7) (set! quantum_crisis_indicators (+ quantum_crisis_indicators 2)))  ;; Poor quantum sync
-  
-  (define transcendent_emergency (>= quantum_crisis_indicators 8))
-  (define quantum_critical_state (>= quantum_crisis_indicators 12))
-  
-  (log (concat "  Temporal CRI: " quantum_threat_state " | Predicted:" (string (round predicted_quantum_cri)) " | Cycle:" (string (round (* mars_cycle_position 100))) "%"))
+      ((< food_days 2) 0.70)                   ;; Emergency food override
+      ((< food_days 5) 0.55)                   ;; Critical food response
+      (true (+ 0.22 (* neural_output_growth 0.20) (* evolved_growth_gene 0.18)))))
 
-  ;; ═══ TRANSCENDENT RESOURCE ORCHESTRATION ═══
-  ;; Revolutionary: Resource allocation transcends traditional limits through quantum optimization
-  (define transcendent_evolution_stage
+  ;; Quantum Heating allocation (optimized remainder)
+  (define transcendent_heating_target 
+    (max 0.20 (- 1.0 transcendent_isru_target transcendent_greenhouse_target)))
+
+  ;; Apply transcendent allocation with ultimate efficiency amplification
+  (set! isru_alloc (* transcendent_isru_target (min 1.6 (/ final_ultimate_efficiency 800))))
+  (set! greenhouse_alloc (* transcendent_greenhouse_target (min 1.5 (/ final_ultimate_efficiency 900))))  
+  (set! heating_alloc (max 0.18 (- 1.0 isru_alloc greenhouse_alloc)))
+
+  ;; ═══ TRANSCENDENT FOOD RATIONING INTELLIGENCE ═══
+  ;; Ultimate rationing with consciousness and evolutionary optimization
+  (define transcendent_base_ration
     (cond
-      ((< sol 60) "QUANTUM_GENESIS")      ;; Quantum bootstrap
-      ((< sol 180) "TEMPORAL_EXPANSION")   ;; Time-synchronized growth
-      ((< sol 350) "TRANSCENDENT_FORTIFICATION") ;; Beyond-physical defense
-      ((< sol 500) "QUANTUM_OPTIMIZATION") ;; Perfect quantum efficiency
-      (true "MARS_TRANSCENDENCE")))       ;; Ultimate adaptation
+      ((< food_days 1) 0.20)                   ;; Survival emergency
+      ((< food_days 3) 0.35)                   ;; Crisis response
+      ((< food_days 6) 0.55)                   ;; Conservative management
+      (true (+ 0.75 (* genetic_fitness_score 0.20) (* total_quantum_consciousness 0.08)))))
 
-  ;; Transcendent allocation matrix with quantum field integration
-  (define transcendent_base_allocations
-    (cond
-      ;; QUANTUM_GENESIS: Survival with quantum bootstrap
-      ((= transcendent_evolution_stage "QUANTUM_GENESIS")
-       (if quantum_critical_state 
-         (list 0.72 0.16 0.12)  ;; Critical: Quantum power focus
-         (if transcendent_emergency
-           (list 0.58 0.22 0.20)  ;; Emergency: Balanced quantum survival
-           (list 0.42 0.28 0.30)))) ;; Normal: Quantum growth foundation
-      
-      ;; TEMPORAL_EXPANSION: Time-synchronized infrastructure
-      ((= transcendent_evolution_stage "TEMPORAL_EXPANSION")
-       (if quantum_critical_state
-         (list 0.65 0.18 0.17)  ;; Critical: Power with temporal sync
-         (if transcendent_emergency
-           (list 0.48 0.26 0.26)  ;; Emergency: Balanced temporal expansion
-           (list 0.32 0.38 0.30)))) ;; Normal: Aggressive temporal growth
-      
-      ;; TRANSCENDENT_FORTIFICATION: Beyond-physical defense
-      ((= transcendent_evolution_stage "TRANSCENDENT_FORTIFICATION")
-       (if quantum_critical_state
-         (list 0.60 0.20 0.20)  ;; Critical: Transcendent power focus
-         (if transcendent_emergency
-           (list 0.45 0.28 0.27)  ;; Emergency: Transcendent balance
-           (list 0.28 0.42 0.30)))) ;; Normal: Bio-transcendent focus
-      
-      ;; QUANTUM_OPTIMIZATION: Perfect quantum efficiency
-      ((= transcendent_evolution_stage "QUANTUM_OPTIMIZATION") 
-       (if quantum_critical_state
-         (list 0.55 0.22 0.23)  ;; Critical: Quantum power optimization
-         (if transcendent_emergency
-           (list 0.42 0.30 0.28)  ;; Emergency: Optimal balance
-           (list 0.25 0.48 0.27)))) ;; Normal: Bio-quantum abundance
-      
-      ;; MARS_TRANSCENDENCE: Ultimate adaptation
-      (true 
-       (if quantum_critical_state
-         (list 0.52 0.24 0.24)  ;; Critical: Mars-sync response
-         (if transcendent_emergency
-           (list 0.38 0.32 0.30)  ;; Emergency: Transcendent harmony
-           (list 0.20 0.55 0.25))))))  ;; Normal: Mars bio-transcendence
+  ;; Multi-paradigm ration optimization
+  (define consciousness_ration_bonus (min 0.15 (* (max 0 (- total_quantum_consciousness 2)) 0.05)))
+  (define evolution_ration_optimization (+ 1.0 (* genetic_fitness_score 0.1))
 
-  ;; Extract quantum-enhanced allocations
-  (define transcendent_heating (nth transcendent_base_allocations 0))
-  (define transcendent_greenhouse (nth transcendent_base_allocations 1))
-  (define transcendent_isru (nth transcendent_base_allocations 2))
+  (set! food_ration (* transcendent_base_ration consciousness_ration_bonus evolution_ration_optimization))
 
-  ;; Apply quantum transcendence multipliers
-  (define quantum_efficiency_multiplier (min 2.2 (max 0.5 (/ total_quantum_transcendence 12))))
-  
-  ;; Resource crisis overrides with quantum prediction
-  (define final_heating_allocation
-    (cond
-      ((< power_kwh 25) 0.78)  ;; Power quantum emergency
-      ((< o2_days 3) (max 0.12 transcendent_isru))  ;; Oxygen emergency with minimal heating
-      (true (* transcendent_heating quantum_efficiency_multiplier))))
+  ;; ═══ TRANSCENDENT STATUS LOGGING ═══  
+  (log (concat "  Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Greenhouse:" (string (round (* greenhouse_alloc 100))) "% | Heating:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Resources — O2:" (string o2_days) "d Food:" (string food_days) "d Power:" (string power_kwh) " | Ration:" (string (round (* food_ration 100))) "%"))
+  (log (concat "  Infrastructure — Solar:" (string estimated_solar_farms) " Repair:" (string estimated_repair_bays) " | Modules:" (string modules_built) "/" (string (round quantum_optimal_modules))))
+  (log (concat "  Evolution — Gen:" (string evolution_generation) " Fitness:" (string (round (* genetic_fitness_score 100))) "% | Mutation:" (string (round (* mutation_rate 100))) "%"))
 
-  (define final_greenhouse_allocation
-    (cond
-      ((< food_days 4) 0.65)   ;; Food quantum emergency
-      ((< o2_days 4) (max 0.08 transcendent_greenhouse)) ;; Minimal bio during O2 crisis
-      (true (* transcendent_greenhouse quantum_efficiency_multiplier))))
-
-  (define final_isru_allocation
-    (cond
-      ((< o2_days 4) 0.82)     ;; Oxygen quantum emergency
-      ((< power_kwh 20) 0.04)  ;; Minimal O2 during power crisis
-      (true (* transcendent_isru quantum_efficiency_multiplier))))
-
-  ;; Quantum normalization with transcendent bounds
-  (define transcendent_allocation_sum (+ final_heating_allocation final_greenhouse_allocation final_isru_allocation))
-  (define quantum_norm_factor (/ 1.0 transcendent_allocation_sum))
-
-  (set! heating_alloc (* final_heating_allocation quantum_norm_factor))
-  (set! greenhouse_alloc (* final_greenhouse_allocation quantum_norm_factor))
-  (set! isru_alloc (* final_isru_allocation quantum_norm_factor))
-
-  ;; ═══ QUANTUM TRANSCENDENT RATIONING ═══
-  ;; Ultra-intelligent rationing with Mars quantum field synchronization
-  (define quantum_ration_base
-    (cond
-      (quantum_critical_state 0.18)    ;; Quantum critical emergency
-      (transcendent_emergency 0.28)    ;; Transcendent emergency
-      ((= quantum_threat_state "TRANSCENDENT_CRISIS") 0.32)
-      ((= quantum_threat_state "QUANTUM_CRITICAL") 0.42)
-      ((= quantum_threat_state "TEMPORAL_ELEVATED") 0.58)
-      ((< food_days 5) 0.35)   ;; Food quantum crisis
-      ((< food_days 10) 0.52)  ;; Food temporal concern
-      ((< food_days 18) 0.72)  ;; Food quantum conservative
-      ((> food_days 35) 1.08)  ;; Transcendent abundance
-      (true 0.88)))
-
-  ;; Quantum transcendence allows superior rationing when Mars sync is strong
-  (define quantum_transcendent_ration_bonus
-    (cond
-      ((> total_quantum_transcendence 20) 0.30)  ;; Ultra-transcendent bonus
-      ((> total_quantum_transcendence 15) 0.25)  ;; High transcendence bonus
-      ((> total_quantum_transcendence 10) 0.20)  ;; Good quantum bonus
-      ((> total_quantum_transcendence 6) 0.15)   ;; Basic transcendence bonus
-      ((> quantum_resonance_factor 1.2) 0.10)    ;; Good Mars sync bonus
-      (true 0)))
-
-  (set! food_ration (max 0.16 (min 1.20 (+ quantum_ration_base quantum_transcendent_ration_bonus))))
-
-  ;; ═══ TRANSCENDENT STATUS MATRIX ═══
-  (define stage_quantum_icon
-    (cond
-      ((= transcendent_evolution_stage "QUANTUM_GENESIS") "🌱⚡")
-      ((= transcendent_evolution_stage "TEMPORAL_EXPANSION") "🚀🌊")
-      ((= transcendent_evolution_stage "TRANSCENDENT_FORTIFICATION") "🛡️🌟")
-      ((= transcendent_evolution_stage "QUANTUM_OPTIMIZATION") "⚡🔮")
-      (true "🌌👑")))
-
-  (define quantum_threat_icon
-    (cond
-      (quantum_critical_state "💀⚡")
-      (transcendent_emergency "🚨🌌")
-      ((= quantum_threat_state "TRANSCENDENT_CRISIS") "☄️🔮")
-      ((= quantum_threat_state "QUANTUM_CRITICAL") "🔴⚡")
-      ((= quantum_threat_state "TEMPORAL_ELEVATED") "🟠🌊")
-      ((= quantum_threat_state "HARMONIC_MODERATE") "🟡🎵")
-      (true "🟢✨")))
-
-  (log (concat "  Stage: " stage_quantum_icon " " transcendent_evolution_stage))
-  (log (concat "  Threat: " quantum_threat_icon " " quantum_threat_state " | Indicators:" (string quantum_crisis_indicators)))
-  (log (concat "  Quantum Allocation — Heat:" (string (round (* heating_alloc 100))) "% | Bio:" (string (round (* greenhouse_alloc 100))) "% | ISRU:" (string (round (* isru_alloc 100))) "%"))
-  (log (concat "  Transcendent Ration: " (string (round (* food_ration 100))) "% | Quantum Power: " (string (round (* total_quantum_transcendence 100))) "%"))
-
-  ;; ═══ QUANTUM MARS TRANSCENDENCE SUMMARY ═══
-  (concat "QuantumTransc Sol " (string sol) " — " stage_quantum_icon " " transcendent_evolution_stage " | " quantum_threat_icon " " quantum_threat_state
-    " | H:" (string (round (* heating_alloc 100)))
-    "% B:" (string (round (* greenhouse_alloc 100)))
-    "% I:" (string (round (* isru_alloc 100)))
+  ;; ═══ ULTIMATE TRANSCENDENT OUTPUT ═══
+  (concat "Quantum Sol " (string sol) " [C:" (string (round (* total_quantum_consciousness 100))) "%|E:G" (string evolution_generation) "|N:" (string (round (* neural_learning_factor 100))) "%]"
+    " — I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100))) 
+    "% H:" (string (round (* heating_alloc 100)))
     "% | R:" (string (round (* food_ration 100)))
-    "% | QuantumPwr:" (string (round (* total_quantum_transcendence 100)))
-    "% | Sync:" (string (round (* quantum_resonance_factor 100))) "%"))
+    "% | UEff:" (string (round (* final_ultimate_efficiency 100)))
+    "% | O2:" (string o2_days)
+    "d F:" (string food_days)
+    "d P:" (string power_kwh)))
