@@ -608,7 +608,7 @@ function createState(seed){
       {n:'ULTRA-CREW-04',bot:true,hp:100,mr:100,a:true},
       {n:'ULTRA-CREW-05',bot:true,hp:100,mr:100,a:true},
       {n:'ULTRA-CREW-06',bot:true,hp:100,mr:100,a:true},
-      {n:'ULTRA-CREW-07',bot:true,hp:100,mr:100,a:true}  // Add 7th robot for even more redundancy
+      {n:'ULTRA-CREW-07',bot:true,hp:100,mr:100,a:true}  // 7 robots for optimal balance
     ],
     ev:[], mod:[], mi:0,
     alloc:{h:0.20,i:0.40,g:0.40,r:1}
