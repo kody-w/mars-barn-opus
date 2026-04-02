@@ -1,0 +1,161 @@
+;; COPILOT ULTIMATE CRI PERFECTIONIST v1
+;; Revolutionary Paradigm: Perfect CRI Minimization for Maximum Monte Carlo Score
+;; Goal: Achieve P75 CRI of 3 or lower to beat the 90,500 record
+;; Innovation: Ultra-conservative resource strategy to minimize CRI variance across all runs
+
+(begin
+  (define _agent_name "Copilot Ultimate CRI Perfectionist v1")
+  (define _agent_desc "Perfect CRI minimization strategy for maximum Monte Carlo score advantage")
+
+  (log (concat "💎🎯🔬⚡💯 CRI PERFECTIONIST — Sol " (string sol) " — Perfect CRI Control"))
+
+  ;; ═══ PERFECT CRI TARGET SYSTEM ═══
+  ;; Ultra-conservative CRI targets to minimize variance
+  (define perfect_cri_targets
+    (cond
+      ((< sol 100) 3)    ;; Early game: target CRI 3
+      ((< sol 200) 4)    ;; Mid-early: target CRI 4
+      ((< sol 350) 5)    ;; Mid game: target CRI 5
+      ((< sol 500) 6)    ;; Late-mid: target CRI 6
+      ((< sol 600) 7)    ;; Late game: target CRI 7
+      (true 8)))         ;; End game: target CRI 8
+
+  ;; Perfect CRI control variables
+  (define cri_current colony_risk_index)
+  (define cri_target perfect_cri_targets)
+  (define cri_excess (max 0 (- cri_current cri_target)))
+  (define cri_perfect_mode (> cri_excess 2))  ;; More aggressive trigger
+
+  ;; ═══ ULTRA RESOURCE ABUNDANCE STRATEGY ═══
+  ;; Massive resource buffers to guarantee CRI stays low
+  (define ultra_abundance_targets
+    (cond
+      ((< sol 100) (list 25 40 30))    ;; Massive early buffers
+      ((< sol 300) (list 22 35 28))    ;; Large mid-game buffers
+      ((< sol 500) (list 20 30 25))    ;; Solid late-game buffers
+      (true (list 18 28 23))))         ;; Conservative end-game buffers
+
+  (define o2_ultra_target (nth ultra_abundance_targets 0))
+  (define food_ultra_target (nth ultra_abundance_targets 1))
+  (define water_ultra_target (nth ultra_abundance_targets 2))
+
+  ;; Perfect resource deficit scoring with enhanced weighting
+  (define perfect_resource_deficit
+    (+ (* (max 0 (- o2_ultra_target o2_days)) 2)     ;; Heavy O2 weighting
+       (* (max 0 (- food_ultra_target food_days)) 1.5) ;; Heavy food weighting
+       (* (max 0 (- water_ultra_target water_days)) 1.2))) ;; Water weighting
+
+  ;; ═══ CRI-PERFECTIONIST ALLOCATION MATRIX ═══
+  ;; Ultra-conservative allocation focused on resource abundance
+  (define perfectionist_allocation
+    (cond
+      ;; Perfect CRI zone (≤ target) - minimal building
+      ((<= cri_current cri_target)
+       (cond
+         ((< perfect_resource_deficit 5) (list 0.12 0.83 0.05))  ;; Optimal abundance
+         ((< perfect_resource_deficit 10) (list 0.15 0.80 0.05)) ;; Good abundance
+         ((< perfect_resource_deficit 15) (list 0.18 0.77 0.05)) ;; Moderate abundance
+         (true (list 0.22 0.73 0.05))))                          ;; Low abundance
+         
+      ;; Slightly above target (1-2 over) - resource focus
+      ((<= cri_excess 2)
+       (cond
+         ((< perfect_resource_deficit 5) (list 0.18 0.77 0.05))  ;; Focus on resources
+         ((< perfect_resource_deficit 10) (list 0.22 0.73 0.05)) ;; Moderate focus
+         ((< perfect_resource_deficit 15) (list 0.25 0.70 0.05)) ;; Standard focus
+         (true (list 0.28 0.67 0.05))))                          ;; Higher focus
+         
+      ;; Moderately above target (3-5 over) - strong resource focus
+      ((<= cri_excess 5)
+       (cond
+         ((< perfect_resource_deficit 8) (list 0.25 0.70 0.05))  ;; Resource priority
+         ((< perfect_resource_deficit 15) (list 0.28 0.67 0.05)) ;; Higher priority
+         (true (list 0.32 0.63 0.05))))                          ;; Strong priority
+         
+      ;; High excess (6+ over) - emergency resource mode
+      (true
+       (cond
+         ((< perfect_resource_deficit 10) (list 0.32 0.63 0.05)) ;; Emergency mode
+         ((< perfect_resource_deficit 20) (list 0.38 0.57 0.05)) ;; Crisis mode
+         (true (list 0.45 0.50 0.05))))))                        ;; Survival mode
+
+  (set! isru_alloc (nth perfectionist_allocation 0))
+  (set! greenhouse_alloc (nth perfectionist_allocation 1))
+  (set! heating_alloc (nth perfectionist_allocation 2))
+
+  ;; ═══ PERFECT ABUNDANCE FOOD RATIONING ═══
+  ;; Rationing designed to maintain massive food buffers
+  (define perfect_abundance_rationing
+    (cond
+      ((< food_days 5) 0.50)       ;; Emergency prevention
+      ((< food_days 12) 0.70)      ;; Crisis prevention
+      ((< food_days 20) 0.85)      ;; Conservative prevention
+      ((< food_days 30) 1.00)      ;; Standard operations
+      ((< food_days 40) 1.10)      ;; Abundance operations
+      ((< food_days 50) 1.20)      ;; High abundance
+      (true 1.30)))                ;; Maximum abundance
+
+  ;; Perfect crew health optimization
+  (define crew_health_ratio (/ (+ crew_hp) (max 1 (* crew_alive 100))))
+  (define perfect_health_boost
+    (cond
+      ((< crew_health_ratio 0.75) 1.4)   ;; Strong health boost
+      ((< crew_health_ratio 0.85) 1.2)   ;; Moderate health boost
+      ((< crew_health_ratio 0.95) 1.1)   ;; Small health boost
+      (true 1.0)))                       ;; No boost needed
+
+  ;; Perfect CRI adjustment for rationing
+  (define perfect_cri_adjustment
+    (cond
+      ((> cri_excess 5) 1.15)     ;; Boost when CRI high
+      ((> cri_excess 2) 1.10)     ;; Moderate boost
+      ((> cri_excess 0) 1.05)     ;; Small boost
+      (true 1.0)))                ;; No adjustment
+
+  ;; Perfect abundance boost for high resource days
+  (define perfect_abundance_boost
+    (+ 1.0 (* (max 0 (- (+ o2_days food_days water_days) 80)) 0.008)))
+
+  (set! food_ration 
+    (max 0.40 (min 1.7 (* perfect_abundance_rationing 
+                         perfect_health_boost 
+                         perfect_cri_adjustment 
+                         perfect_abundance_boost))))
+
+  ;; ═══ PERFECT CRI SCORE PREDICTION ═══
+  ;; Enhanced score prediction with CRI optimization focus
+  (define predicted_modules 21)  ;; Conservative module prediction
+  (define cri_optimization_bonus (* (max 0 (- 10 cri_current)) 50))  ;; Big CRI bonus
+
+  (define perfect_predicted_score
+    (+ (* 659 100)                              ;; Base survival score
+       (* 3 500)                                ;; Crew score
+       (* predicted_modules 150)                ;; Module score
+       (* 1.0 200 100)                          ;; Survival rate score
+       (* cri_current -7)                       ;; Enhanced CRI penalty reduction
+       cri_optimization_bonus))                 ;; CRI optimization bonus
+
+  ;; ═══ PERFECTIONIST OPTIMIZATION METRICS ═══
+  (define perfectionist_efficiency
+    (let* ((ultra_resource_security (* (+ o2_days food_days water_days) 10))
+           (perfect_cri_bonus (* (max 0 (- 15 cri_current)) 20))
+           (abundance_efficiency (* (min greenhouse_alloc 0.85) 100))
+           (perfect_crew_performance (* crew_alive crew_health_ratio 80))
+           (resource_abundance_bonus (* (max 0 (- (+ o2_days food_days water_days) 60)) 5)))
+      (+ ultra_resource_security perfect_cri_bonus abundance_efficiency
+         perfect_crew_performance resource_abundance_bonus)))
+
+  ;; ═══ PERFECTIONIST STATUS DISPLAY ═══
+  (log (concat "  💎 Perfect CRI Control — Current:" (string cri_current) " Target:<=" (string cri_target) " Excess:" (string cri_excess) " | Mode:" (if cri_perfect_mode "ACTIVE" "PERFECT")))
+  (log (concat "  🎯 Ultra Abundance — O2:" (string o2_days) "/" (string o2_ultra_target) "d Food:" (string food_days) "/" (string food_ultra_target) "d Water:" (string water_days) "/" (string water_ultra_target) "d"))
+  (log (concat "  🔬 Perfectionist Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Green:" (string (round (* greenhouse_alloc 100))) "% | Heat:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  ⚡ Perfect Prediction: " (string (round perfect_predicted_score)) " | Efficiency: " (string (round perfectionist_efficiency)) " | CRI Bonus: " (string (round cri_optimization_bonus))))
+  (log (concat "  💯 Perfect Health — Ratio:" (string (round (* crew_health_ratio 100))) "% | Ration:" (string (round (* food_ration 100))) "% | Deficit:" (string (round perfect_resource_deficit))))
+
+  ;; ═══ CRI PERFECTIONIST OUTPUT ═══
+  (concat "💎🎯🔬⚡💯 CRIPerfectionist Sol " (string sol) " — CRI:" (string cri_current) "→" (string cri_target)
+    " | PPS:" (string (round perfect_predicted_score))
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | O2:" (string o2_days) "d F:" (string food_days) "d | Def:" (string (round perfect_resource_deficit))))
