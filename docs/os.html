@@ -1187,39 +1187,58 @@ window.os = {
 
     // ── Core: Fetch + Parse + Render ──
     async open(url) {
+      // Auto-add https:// if user just types a domain
+      if (url && !url.startsWith('http') && !url.startsWith('/') && !url.startsWith('about:') && url.includes('.')) {
+        url = 'https://' + url;
+      }
       this._url = url;
       this._history.push(url);
-      // about:blank and empty URLs — just open an empty browser window
+      this._historyIndex = this._history.length - 1;
+
+      // about:blank and empty URLs — show homepage
       if (!url || url === 'about:blank' || url === '') {
-        this._html = '<html><head><title>New Tab</title></head><body style="background:#0d1117;color:#c9d1d9;font-family:monospace;padding:40px;text-align:center"><h1 style="color:#f0883e">🌐 vOS Browser</h1><p>Type a URL in the terminal:</p><pre style="color:#58a6ff">(browser-open "http://localhost:8787/player.html")</pre></body></html>';
+        this._html = '<html><head><title>New Tab</title></head><body style="background:#0d1117;color:#c9d1d9;font-family:monospace;padding:40px;text-align:center"><h1 style="color:#f0883e">🌐 vOS Browser</h1><p>Type a URL in the bar above and press Enter</p></body></html>';
         const parser = new DOMParser();
         this._doc = parser.parseFromString(this._html, 'text/html');
         this._status = 200;
         this._renderToGUI(url);
-        return 'Ready — use (browser-open "url") to navigate';
+        return 'Ready';
       }
+
+      // For external URLs: skip fetch, load directly in iframe
+      // (fetch will fail due to CORS, and srcdoc strips CSS/JS context)
+      const isExternal = url.startsWith('https://') || url.startsWith('http://');
+      const isSameOrigin = !isExternal || url.includes(window.location.host);
+
+      if (isExternal && !isSameOrigin) {
+        // External site: load directly in iframe, skip the headless engine
+        this._html = '';
+        this._doc = null;
+        this._status = 0;
+        this._renderToGUI(url, true); // true = direct iframe load
+        return 'Loading: ' + url;
+      }
+
+      // Same-origin: use the headless engine (fetch → parse → srcdoc)
       try {
         const resp = await fetch(url);
         this._status = resp.status;
         this._html = await resp.text();
-        // Parse into virtual DOM
         const parser = new DOMParser();
         this._doc = parser.parseFromString(this._html, 'text/html');
-        // Render into GUI window (visual display)
         this._renderToGUI(url);
         return 'Loaded: ' + url + ' (' + this._status + ', ' + this._html.length + ' bytes)';
       } catch (e) {
-        // Cross-origin or network error — render error page
-        this._html = '<html><head><title>Error</title></head><body style="background:#0d1117;color:#c9d1d9;font-family:monospace;padding:40px"><h1 style="color:#da3633">⚠️ ' + e.message + '</h1><p style="color:#8b949e">URL: ' + url + '</p><p style="color:#58a6ff">Cross-origin pages can\'t be fetched directly.<br>Try a same-origin URL or use (browser-eval "fetch(url)") for APIs.</p></body></html>';
-        const parser = new DOMParser();
-        this._doc = parser.parseFromString(this._html, 'text/html');
+        // Fetch failed — try direct iframe load as fallback
+        this._html = '';
+        this._doc = null;
         this._status = 0;
-        this._renderToGUI(url);
-        return 'Error: ' + e.message;
+        this._renderToGUI(url, true);
+        return 'Direct load: ' + url;
       }
     },
 
-    _renderToGUI(url) {
+    _renderToGUI(url, directLoad) {
       const winId = 'win-iframe-vbrowser';
       let win = document.getElementById(winId);
       if (!win) {
@@ -1263,13 +1282,14 @@ window.os = {
       // For same-origin: use srcdoc (headless engine renders). For cross-origin: use src directly.
       const iframe = win.querySelector('iframe');
       if (iframe) {
-        if (this._status > 0 && this._html) {
-          iframe.removeAttribute('src');
-          iframe.srcdoc = this._html;
-        } else if (url && url !== 'about:blank' && url !== '') {
-          // Cross-origin fallback: let the iframe load it directly
+        if (directLoad) {
+          // External site: load URL directly in iframe
           iframe.removeAttribute('srcdoc');
           iframe.src = url;
+        } else if (this._html) {
+          // Same-origin: inject fetched HTML via srcdoc
+          iframe.removeAttribute('src');
+          iframe.srcdoc = this._html;
         }
       }
       win.classList.add('open');
