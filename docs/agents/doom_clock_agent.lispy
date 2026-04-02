@@ -1,0 +1,66 @@
+;; doom_clock_agent.lispy — Predicts death sol from current burn rate. OG: Mars-native.
+
+(begin
+  (define _agent_name "Doom Clock")
+  (define _agent_desc "Predicts the colony death sol from current resource burn rates. The clock is always ticking.")
+
+  (log "💀 ═══ DOOM CLOCK ═══")
+  (log (concat "  Sol " (string sol) " — Calculating time of death..."))
+  (log "")
+
+  ;; Determine limiting resource (whichever runs out first)
+  (define o2_death   (+ sol o2_days))
+  (define h2o_death  (+ sol h2o_days))
+  (define food_death (+ sol food_days))
+
+  ;; Power death is more complex — estimate sols until power failure cascades
+  (define power_death
+    (if (< power_kwh 50)
+      (+ sol (round (* (/ power_kwh 10) 2)))
+      (+ sol 999)))
+
+  ;; Find the earliest death
+  (define death_sol (min o2_death h2o_death food_death power_death))
+  (define sols_remaining (- death_sol sol))
+
+  ;; Determine cause of death
+  (define cause
+    (cond
+      ((= death_sol o2_death)   "🫁 ASPHYXIATION — O₂ depletion")
+      ((= death_sol h2o_death)  "💧 DEHYDRATION — H₂O depletion")
+      ((= death_sol food_death) "🌾 STARVATION — food depletion")
+      ((= death_sol power_death) "⚡ SYSTEM FAILURE — power collapse")
+      (true                      "❓ UNKNOWN")))
+
+  ;; Urgency level
+  (define urgency
+    (cond
+      ((< sols_remaining 5)  "💀💀💀 IMMINENT DEATH")
+      ((< sols_remaining 10) "💀💀  CRITICAL")
+      ((< sols_remaining 20) "💀    WARNING")
+      ((< sols_remaining 50) "⏰    CAUTION")
+      (true                  "✓     STABLE")))
+
+  (log "  ⏱️ RESOURCE DEPLETION TIMELINE:")
+  (log (concat "    O₂ exhausted:    Sol " (string o2_death) " (" (string o2_days) " sols)"))
+  (log (concat "    H₂O exhausted:   Sol " (string h2o_death) " (" (string h2o_days) " sols)"))
+  (log (concat "    Food exhausted:  Sol " (string food_death) " (" (string food_days) " sols)"))
+  (if (< power_death (+ sol 500))
+    (log (concat "    Power collapse:  Sol " (string power_death)))
+    (log "    Power collapse:  Not imminent"))
+  (log "")
+  (log (concat "  💀 PREDICTED DEATH: Sol " (string death_sol)))
+  (log (concat "  ⏳ SOLS REMAINING:  " (string sols_remaining)))
+  (log (concat "  ☠️  CAUSE:           " cause))
+  (log (concat "  🚨 URGENCY:         " urgency))
+  (log "")
+
+  (if (< sols_remaining 10)
+    (log "  ⚠️  THE CLOCK IS ALMOST OUT. ACT NOW OR DIE.")
+    (if (< sols_remaining 30)
+      (log "  ⚠️  Time is running short. Reallocate resources.")
+      (log "  ✓  Colony has breathing room. Stay vigilant.")))
+
+  (log "═══════════════════════")
+
+  (concat "Doom Clock: " (string sols_remaining) " sols remain — " cause))

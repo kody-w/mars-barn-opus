@@ -1,0 +1,37 @@
+;; calendar_agent.lispy — Mars calendar: year, sol-in-year, season, next supply window. OG: calendar_agent.py
+
+(begin
+  (define _agent_name "Calendar Agent")
+  (define _agent_desc "Mars calendar utility. Computes year, season, and next supply window from current sol.")
+
+  ;; Mars year = 668.6 sols
+  (define mars_year_sols 668.6)
+  (define current_sol sol)
+
+  ;; Compute Mars year and sol-in-year
+  (define mars_year (floor (/ current_sol mars_year_sols)))
+  (define sol_in_year (% current_sol (floor mars_year_sols)))
+
+  ;; Determine season (4 equal quarters of ~167 sols)
+  (define season_sol (% sol_in_year 167))
+  (define season
+    (cond
+      ((< sol_in_year 167) "🌱 Spring (Ls 0–90)")
+      ((< sol_in_year 334) "☀️ Summer (Ls 90–180)")
+      ((< sol_in_year 501) "🍂 Autumn (Ls 180–270)")
+      (true                "❄️ Winter (Ls 270–360)")))
+
+  ;; Supply windows every 780 sols (Earth-Mars synodic period ≈ 780 sols)
+  (define supply_period 780)
+  (define sols_since_last (% current_sol supply_period))
+  (define next_supply (- supply_period sols_since_last))
+
+  (log "📅 ═══ MARS CALENDAR ═══")
+  (log (concat "  Sol:          " (string current_sol)))
+  (log (concat "  Mars Year:    " (string mars_year)))
+  (log (concat "  Sol in Year:  " (string sol_in_year) " / 668"))
+  (log (concat "  Season:       " season))
+  (log (concat "  Next Supply:  " (string next_supply) " sols away"))
+  (log "═══════════════════════")
+
+  (concat "Sol " (string current_sol) " — MY" (string mars_year) " — " season " — Supply in " (string next_supply) " sols"))

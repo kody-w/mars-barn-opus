@@ -1,0 +1,62 @@
+;; hacker_news_agent.lispy — Satirical HN-style commentary on colony status. Fun. OG: hacker_news_agent.py
+
+(begin
+  (define _agent_name "Hacker News Agent")
+  (define _agent_desc "Generates satirical Hacker News-style commentary on Mars colony status.")
+
+  (log "🟧 ═══ MARS HACKER NEWS ═══")
+  (log (concat "  Sol " (string sol) " — Front Page"))
+  (log "")
+
+  ;; Generate headlines based on colony state
+  (if (> colony_risk_index 70)
+    (begin
+      (log "  📰 Colony Risk at Historic High — \"This is Fine\" Says Governor")
+      (log "     ↳ 847 points · 342 comments")
+      (log "     Top comment: \"I've been saying ISRU-first since Sol 1\""))
+    (log ""))
+
+  (if (< o2_days 5)
+    (begin
+      (log "  📰 Ask MHN: Is 4 Days of O₂ Enough? (Asking for 6 Friends)")
+      (log "     ↳ 2.1k points · 891 comments")
+      (log "     Top comment: \"Skill issue. My colony has 30 days O₂.\""))
+    (log ""))
+
+  (if (< food_days 8)
+    (begin
+      (log "  📰 Show MHN: I Made a Greenhouse With Only 5% Power Allocation")
+      (log "     ↳ 156 points · 67 comments")
+      (log "     Top comment: \"This kills the crew.\""))
+    (log ""))
+
+  (if (> morale 80)
+    (begin
+      (log "  📰 Mars Colony Morale Hits 80+ — What Are They Putting in the Water?")
+      (log "     ↳ 423 points · 201 comments")
+      (log "     Top comment: \"Nothing. That's the problem. Water rations.\""))
+    (log ""))
+
+  (if (< morale 20)
+    (begin
+      (log "  📰 Morale Below 20%: \"We're Not a Colony, We're a Hostage Situation\"")
+      (log "     ↳ 3.4k points · 1.2k comments")
+      (log "     Top comment: \"Have you tried turning the colony off and on again?\""))
+    (log ""))
+
+  (if (> dust_tau 3.0)
+    (begin
+      (log "  📰 Dust Storm Season: Solar Efficiency Measured in Thoughts and Prayers")
+      (log "     ↳ 567 points · 234 comments")
+      (log "     Top comment: \"Should have gone nuclear. Always go nuclear.\""))
+    (log ""))
+
+  ;; Always show
+  (log "")
+  (log (concat "  📰 Daily Thread: Sol " (string sol) " — What Are You Working On?"))
+  (log "     ↳ 89 points · 45 comments")
+  (log "     Top comment: \"Trying not to die. You?\"")
+  (log "")
+  (log "═══════════════════════════════")
+
+  (concat "MHN Sol " (string sol) " — " (string events_active) " active stories"))

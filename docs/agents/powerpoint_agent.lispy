@@ -1,0 +1,69 @@
+;; powerpoint_agent.lispy — Generates a text-based "slide deck" summary of colony state. OG: powerpoint_agent.py
+
+(begin
+  (define _agent_name "Slide Deck Agent")
+  (define _agent_desc "Generates a text-based slide deck summary of colony state — the LisPy equivalent of PowerPoint.")
+
+  (define total_slides 5)
+
+  ;; Slide 1: Title
+  (log "╔══════════════════════════════════╗")
+  (log "║    MARS COLONY STATUS REPORT     ║")
+  (log (concat "║          Sol " (string sol) "                  ║"))
+  (log "║    Colony Operations Briefing    ║")
+  (log "╚══════════════════════════════════╝")
+  (log "                               [1/5]")
+  (log "")
+
+  ;; Slide 2: Crew & Morale
+  (log "╔══════════════════════════════════╗")
+  (log "║  SLIDE 2: CREW STATUS            ║")
+  (log "╠══════════════════════════════════╣")
+  (log (concat "║  👥 Crew:   " (string crew_alive) "/" (string crew_total) " operational"))
+  (log (concat "║  😊 Morale: " (string morale) "%"))
+  (log (concat "║  ⚠️  Risk:   " (string colony_risk_index) "%"))
+  (log "╚══════════════════════════════════╝")
+  (log "                               [2/5]")
+  (log "")
+
+  ;; Slide 3: Resources
+  (log "╔══════════════════════════════════╗")
+  (log "║  SLIDE 3: RESOURCE INVENTORY     ║")
+  (log "╠══════════════════════════════════╣")
+  (log (concat "║  🫁 Oxygen:  " (string o2_days) " days"))
+  (log (concat "║  💧 Water:   " (string h2o_days) " days"))
+  (log (concat "║  🌾 Food:    " (string food_days) " days"))
+  (log (concat "║  ⚡ Power:   " (string power_kwh) " kWh"))
+  (log "╚══════════════════════════════════╝")
+  (log "                               [3/5]")
+  (log "")
+
+  ;; Slide 4: Environment
+  (log "╔══════════════════════════════════╗")
+  (log "║  SLIDE 4: MARS ENVIRONMENT       ║")
+  (log "╠══════════════════════════════════╣")
+  (log (concat "║  🌪️ Dust τ:     " (string dust_tau)))
+  (log (concat "║  ☀️ Solar Eff:  " (string solar_eff) "%"))
+  (log (concat "║  🏗️ Modules:    " (string modules_built)))
+  (log (concat "║  📡 Events:     " (string events_active)))
+  (log "╚══════════════════════════════════╝")
+  (log "                               [4/5]")
+  (log "")
+
+  ;; Slide 5: Recommendation
+  (define recommendation
+    (cond
+      ((> colony_risk_index 70) "IMMEDIATE ACTION REQUIRED")
+      ((> colony_risk_index 40) "Monitor closely, adjust allocations")
+      (true                     "Continue current strategy")))
+
+  (log "╔══════════════════════════════════╗")
+  (log "║  SLIDE 5: RECOMMENDATION         ║")
+  (log "╠══════════════════════════════════╣")
+  (log (concat "║  🎯 " recommendation))
+  (log "║                                  ║")
+  (log "║  Thank you. Questions?           ║")
+  (log "╚══════════════════════════════════╝")
+  (log "                               [5/5]")
+
+  (concat "Deck generated: 5 slides — Sol " (string sol)))

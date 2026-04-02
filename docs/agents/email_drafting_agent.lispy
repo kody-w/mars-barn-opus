@@ -1,0 +1,57 @@
+;; email_drafting_agent.lispy — Drafts a colony status report "email" (formatted text). OG: email_drafting_agent.py
+
+(begin
+  (define _agent_name "Email Drafting Agent")
+  (define _agent_desc "Drafts a formatted colony status report email for transmission to Earth.")
+
+  (define urgency
+    (cond
+      ((> colony_risk_index 70) "[URGENT]")
+      ((> colony_risk_index 40) "[IMPORTANT]")
+      (true                     "[ROUTINE]")))
+
+  (log "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+  (log (concat "From:    Mars Colony Operations <ops@colony.mars>"))
+  (log (concat "To:      Earth Mission Control <mc@earth.nasa>"))
+  (log (concat "Subject: " urgency " Sol " (string sol) " Status Report"))
+  (log (concat "Date:    Sol " (string sol) " (14-min light delay)"))
+  (log "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+  (log "")
+  (log "Mission Control,")
+  (log "")
+  (log (concat "This is the Sol " (string sol) " status report from Mars Colony Operations."))
+  (log "")
+  (log "CREW STATUS:")
+  (log (concat "  Active crew: " (string crew_alive) " of " (string crew_total)))
+  (log (concat "  Morale index: " (string morale) "%"))
+  (log "")
+  (log "RESOURCE INVENTORY:")
+  (log (concat "  Oxygen reserves:  " (string o2_days) " days"))
+  (log (concat "  Water reserves:   " (string h2o_days) " days"))
+  (log (concat "  Food reserves:    " (string food_days) " days"))
+  (log (concat "  Power available:  " (string power_kwh) " kWh"))
+  (log "")
+  (log "COLONY RISK ASSESSMENT:")
+  (log (concat "  Colony Risk Index: " (string colony_risk_index) "%"))
+  (log (concat "  Active events:     " (string events_active)))
+  (log (concat "  Dust optical depth: " (string dust_tau)))
+  (log (concat "  Solar efficiency:   " (string solar_eff) "%"))
+  (log "")
+
+  (cond
+    ((> colony_risk_index 70)
+      (log "IMMEDIATE CONCERN: Colony risk is critical. Requesting emergency resupply evaluation."))
+    ((< o2_days 5)
+      (log "IMMEDIATE CONCERN: Oxygen reserves critically low. ISRU at maximum allocation."))
+    ((< food_days 7)
+      (log "NOTE: Food reserves declining. Greenhouse priority increased."))
+    (true
+      (log "All systems within acceptable parameters. No immediate concerns.")))
+
+  (log "")
+  (log "Respectfully,")
+  (log "Colony Governor (Autonomous)")
+  (log "Mars Colony Operations")
+  (log "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+  (concat urgency " Sol " (string sol) " report drafted — " (string crew_alive) " crew, risk " (string colony_risk_index) "%"))

@@ -1,0 +1,65 @@
+;; sentiment_agent.lispy — Bull/bear market sentiment from colony state. OG: Mars-native.
+
+(begin
+  (define _agent_name "Sentiment Agent")
+  (define _agent_desc "Analyzes bull/bear market sentiment for the colony based on resource trends and risk levels.")
+
+  (log "📈 ═══ COLONY SENTIMENT ANALYSIS ═══")
+  (log (concat "  Sol " (string sol)))
+  (log "")
+
+  ;; Score individual factors (-10 to +10 each)
+  (define o2_score
+    (cond ((> o2_days 20) 10) ((> o2_days 10) 5) ((> o2_days 5) -2) (true -10)))
+  (define food_score
+    (cond ((> food_days 25) 10) ((> food_days 15) 5) ((> food_days 7) -2) (true -10)))
+  (define power_score
+    (cond ((> power_kwh 200) 10) ((> power_kwh 100) 5) ((> power_kwh 50) -3) (true -10)))
+  (define morale_score
+    (cond ((> morale 70) 10) ((> morale 50) 5) ((> morale 30) -3) (true -10)))
+  (define risk_score
+    (cond ((< colony_risk_index 20) 10) ((< colony_risk_index 40) 5) ((< colony_risk_index 70) -3) (true -10)))
+  (define dust_score
+    (cond ((< dust_tau 1.0) 8) ((< dust_tau 2.0) 3) ((< dust_tau 4.0) -3) (true -8)))
+  (define crew_score
+    (if (= crew_alive crew_total) 10 (* -5 (- crew_total crew_alive))))
+
+  ;; Aggregate sentiment (-70 to +70)
+  (define raw_sentiment (+ o2_score food_score power_score morale_score risk_score dust_score crew_score))
+  ;; Normalize to -100 to +100
+  (define sentiment (round (* (/ raw_sentiment 70) 100)))
+
+  ;; Determine market phase
+  (define phase
+    (cond
+      ((> sentiment 50)  "🟢 EXTREME BULL — colony thriving")
+      ((> sentiment 20)  "🟢 BULL — positive outlook")
+      ((> sentiment -20) "🟡 NEUTRAL — mixed signals")
+      ((> sentiment -50) "🔴 BEAR — declining conditions")
+      (true              "🔴 EXTREME BEAR — colony in crisis")))
+
+  (define emoji
+    (cond ((> sentiment 20) "🐂") ((< sentiment -20) "🐻") (true "😐")))
+
+  (log (concat "  " emoji " SENTIMENT: " (string sentiment) "/100"))
+  (log (concat "  PHASE: " phase))
+  (log "")
+  (log "  Factor Breakdown:")
+  (log (concat "    O₂:      " (string o2_score) "/10"))
+  (log (concat "    Food:     " (string food_score) "/10"))
+  (log (concat "    Power:    " (string power_score) "/10"))
+  (log (concat "    Morale:   " (string morale_score) "/10"))
+  (log (concat "    Risk:     " (string risk_score) "/10"))
+  (log (concat "    Dust:     " (string dust_score) "/10"))
+  (log (concat "    Crew:     " (string crew_score) "/10"))
+  (log "")
+
+  (if (> sentiment 20)
+    (log "  📊 Recommendation: HOLD — maintain current strategy")
+    (if (< sentiment -20)
+      (log "  📊 Recommendation: SELL — emergency reallocate, cut losses")
+      (log "  📊 Recommendation: HEDGE — diversify allocations")))
+
+  (log "═══════════════════════════════════")
+
+  (concat emoji " Sentiment " (string sentiment) "/100 — " phase))

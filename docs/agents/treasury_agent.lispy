@@ -1,0 +1,61 @@
+;; treasury_agent.lispy — MARS token distribution calculator. OG: Mars-native.
+
+(begin
+  (define _agent_name "Treasury Agent")
+  (define _agent_desc "Calculates MARS token distribution based on colony performance and contribution metrics.")
+
+  (log "🏦 ═══ MARS TREASURY ═══")
+  (log (concat "  Sol " (string sol) " — Token Distribution Report"))
+  (log "")
+
+  ;; Base emission: 1000 MARS per sol
+  (define base_emission 1000)
+
+  ;; Survival multiplier: alive crew ratio
+  (define survival_mult (/ crew_alive (max crew_total 1)))
+
+  ;; Performance multiplier based on risk (lower risk = higher reward)
+  (define perf_mult
+    (cond
+      ((< colony_risk_index 20) 2.0)
+      ((< colony_risk_index 40) 1.5)
+      ((< colony_risk_index 60) 1.0)
+      ((< colony_risk_index 80) 0.5)
+      (true                     0.1)))
+
+  ;; Morale bonus (high morale = bonus tokens)
+  (define morale_mult (+ 0.5 (* (/ morale 100) 1.0)))
+
+  ;; Total emission for this sol
+  (define sol_emission (round (* base_emission survival_mult perf_mult morale_mult)))
+
+  ;; Distribution splits
+  (define governor_share  (round (* sol_emission 0.40)))
+  (define crew_share      (round (* sol_emission 0.30)))
+  (define reserve_share   (round (* sol_emission 0.20)))
+  (define community_share (round (* sol_emission 0.10)))
+
+  ;; Per-crew share
+  (define per_crew (if (> crew_alive 0) (round (/ crew_share crew_alive)) 0))
+
+  ;; Cumulative estimate
+  (define cumulative_est (* sol_emission sol))
+
+  (log "  📊 EMISSION CALCULATION:")
+  (log (concat "    Base emission:      " (string base_emission) " MARS/sol"))
+  (log (concat "    Survival mult:      " (string survival_mult) "x (" (string crew_alive) "/" (string crew_total) ")"))
+  (log (concat "    Performance mult:   " (string perf_mult) "x (risk " (string colony_risk_index) "%)"))
+  (log (concat "    Morale mult:        " (string morale_mult) "x (morale " (string morale) "%)"))
+  (log (concat "    ─────────────────────"))
+  (log (concat "    Sol emission:       " (string sol_emission) " MARS"))
+  (log "")
+  (log "  💰 DISTRIBUTION:")
+  (log (concat "    Governor (40%):     " (string governor_share) " MARS"))
+  (log (concat "    Crew pool (30%):    " (string crew_share) " MARS (" (string per_crew) " per person)"))
+  (log (concat "    Reserve (20%):      " (string reserve_share) " MARS"))
+  (log (concat "    Community (10%):    " (string community_share) " MARS"))
+  (log "")
+  (log (concat "  📈 Cumulative est:    ~" (string cumulative_est) " MARS (over " (string sol) " sols)"))
+  (log "═══════════════════════════════════")
+
+  (concat "Treasury Sol " (string sol) " — Emitted " (string sol_emission) " MARS — " (string per_crew) " per crew"))

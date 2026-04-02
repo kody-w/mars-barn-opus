@@ -1,0 +1,32 @@
+;; duckduckgo_search_agent.lispy — Searches the prompt library (prompt-list, prompt-tags). OG: duckduckgo_search_agent.py
+
+(begin
+  (define _agent_name "Search Agent")
+  (define _agent_desc "Searches the LisPy prompt library. The colony equivalent of a web search engine.")
+
+  (define query _input)
+
+  (log (concat "🔍 Searching prompt library for: \"" query "\""))
+
+  ;; Get all available prompts
+  (define all_prompts (prompt-list))
+  (define prompt_count (length all_prompts))
+
+  (log (concat "📚 Library contains " (string prompt_count) " prompts"))
+
+  ;; Search by tag if query looks like a category
+  (define tag_results (prompt-tags query))
+  (define tag_count (length tag_results))
+
+  (if (> tag_count 0)
+    (begin
+      (log (concat "🏷️  Found " (string tag_count) " results tagged \"" query "\":"))
+      (map (begin (log (concat "  → " _))) tag_results))
+    (log "  No tag matches — showing full library"))
+
+  ;; Always show the full library listing
+  (log "")
+  (log "📖 Full prompt library:")
+  (map (begin (log (concat "  • " _))) all_prompts)
+
+  (concat "Search complete: " (string tag_count) " tag matches, " (string prompt_count) " total prompts"))

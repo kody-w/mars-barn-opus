@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Universal Agents: Why basic_agent.py and basic_agent.lispy Are the Same Agent — kody-w</title>
+<meta name="description" content="The engineering blog post explaining why naming .lispy files identically to their .py counterparts is the adoption strategy. Same name, same interface, different runtime. Zero learning curve.">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#484f58;
+--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--cyan:#79c0ff;
+--purple:#a371f7;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.9}
+.wrap{max-width:720px;margin:0 auto;padding:40px 24px 80px}
+.meta{color:var(--dim);font-size:12px;margin-bottom:32px}
+.meta a{color:var(--cyan);text-decoration:none}
+h1{font-size:26px;color:#fff;line-height:1.3;margin-bottom:8px}
+h2{font-size:20px;color:var(--cyan);margin:40px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+h3{font-size:15px;color:var(--green);margin:28px 0 8px}
+p{margin:12px 0}
+strong{color:#fff}
+em{color:var(--dim)}
+code{background:rgba(88,166,255,0.1);color:var(--cyan);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:0.9em}
+pre{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:16px 0;overflow-x:auto;line-height:1.5}
+pre code{background:none;padding:0;color:var(--text);font-size:12px}
+blockquote{border-left:3px solid var(--purple);padding:12px 16px;margin:24px 0;background:rgba(163,113,247,0.05);border-radius:0 8px 8px 0;font-style:italic;color:var(--dim)}
+ul,ol{margin:12px 0 12px 24px}
+li{margin:6px 0}
+hr{border:none;border-top:1px solid var(--border);margin:48px 0}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline}
+.callout{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px;margin:28px 0}
+.callout-title{color:var(--yellow);font-weight:700;font-size:12px;letter-spacing:1px;margin-bottom:8px}
+.diagram{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:20px;margin:16px 0;font-family:var(--mono);font-size:12px;line-height:1.7;white-space:pre;overflow-x:auto;color:var(--dim)}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:12px}
+th{background:#0a0e14;color:var(--cyan);padding:8px 12px;text-align:left;border:1px solid var(--border)}
+td{padding:8px 12px;border:1px solid var(--border)}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin:2px}
+.tag-pattern{background:rgba(88,166,255,0.15);color:var(--blue)}
+.tag-ai{background:rgba(255,215,0,0.15);color:#ffd700}
+.tag-agent{background:rgba(63,185,80,0.15);color:var(--green)}
+.big{font-size:18px;color:#fff;font-weight:700;text-align:center;margin:32px 0;line-height:1.5}
+.footer{text-align:center;color:var(--dim);font-size:11px;margin-top:48px;padding-top:24px;border-top:1px solid var(--border)}
+@media(max-width:600px){.wrap{padding:20px 16px 60px} h1{font-size:22px} .diagram{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="meta"><a href="./">← Blog</a> · <a href="../patterns.html">Pattern Library</a> · <a href="../viewer.html">Play the Sim</a></div>
+
+<h1>Universal Agents: Why basic_agent.py and basic_agent.lispy Are the Same Agent</h1>
+<div class="meta">kody-w · April 2025 · <span class="tag tag-agent">Agents</span> <span class="tag tag-ai">AI</span> <span class="tag tag-pattern">Pattern</span></div>
+
+<p>Every agent template on the internet has the same problem: <strong>it's locked to one runtime.</strong></p>
+
+<p>Write <code>basic_agent.py</code> and it runs in Python. Only Python. Need it in a browser? Rewrite it. Need it inside a sim? Rewrite it. Need it on embedded hardware? Rewrite it again. The agent's <em>logic</em> is universal, but its <em>implementation</em> is caged inside one language's ecosystem.</p>
+
+<p>We fixed this. The fix is embarrassingly simple: <strong>same name, same interface, different runtime.</strong></p>
+
+<h2>The Problem: Runtime Lock-In</h2>
+
+<p>The <a href="https://github.com/kody-w/AI-Agent-Templates">kody-w/AI-Agent-Templates</a> repository contains 14 Python agent templates. They're excellent. <code>basic_agent.py</code>, <code>calendar_agent.py</code>, <code>code_review_agent.py</code> — each one a standalone, useful tool.</p>
+
+<p>But they require Python. They require pip. They require an OS that can run CPython. They can't run inside a browser-based Mars colony sim. They can't be loaded from a JSON cartridge. They can't be executed by a LisPy VM running on a microcontroller.</p>
+
+<p>The agent's <em>interface</em> is simple: it has a name, a description, and it does a thing. The agent's <em>implementation</em> drags in an entire runtime ecosystem.</p>
+
+<div class="diagram">basic_agent.py
+  ├── requires: Python 3.x
+  ├── requires: pip install dependencies
+  ├── requires: OS-level process
+  ├── requires: file system access
+  └── locked to: machines that run Python
+
+basic_agent.lispy
+  ├── requires: LisPy VM (50 lines of JS)
+  ├── requires: nothing else
+  ├── runs in: browser, Node, Python, hardware
+  └── locked to: <span style="color:var(--green)">nothing</span></div>
+
+<h2>The Solution: Same Name IS the Strategy</h2>
+
+<p>Here's the key insight: <strong>the file name IS the adoption strategy.</strong></p>
+
+<p>When someone who knows <code>basic_agent.py</code> sees <code>basic_agent.lispy</code>, they immediately understand what it is. No documentation needed. No explanation needed. The name carries the entire context.</p>
+
+<p>This is why every .lispy file has the <strong>exact same name</strong> as its .py counterpart:</p>
+
+<ul>
+<li><code>basic_agent.py</code> → <code>basic_agent.lispy</code></li>
+<li><code>calendar_agent.py</code> → <code>calendar_agent.lispy</code></li>
+<li><code>code_review_agent.py</code> → <code>code_review_agent.lispy</code></li>
+</ul>
+
+<p>Not <code>lispy_basic_agent.lispy</code>. Not <code>basic_agent_lispy.lispy</code>. Not <code>mars_basic_agent.lispy</code>. The <em>exact same name</em>, different extension. The name is a bridge. The extension is a runtime selector.</p>
+
+<blockquote>If you rename the bridge, people don't cross it. They don't know it goes to the same place.</blockquote>
+
+<h2>The Interface Contract</h2>
+
+<p>Every agent — .py or .lispy — follows the same contract:</p>
+
+<div class="callout">
+<div class="callout-title">THE UNIVERSAL AGENT CONTRACT</div>
+
+<ol>
+<li><strong><code>_agent_name</code></strong> — a human-readable name string</li>
+<li><strong><code>_agent_desc</code></strong> — what the agent does, in one sentence</li>
+<li><strong>Executable program</strong> — the agent's logic, runnable standalone</li>
+<li><strong>Return value</strong> — the last expression is the agent's output</li>
+</ol>
+
+<p>That's it. Four things. Any runtime that can evaluate these four things can run any agent.</p>
+</div>
+
+<p>In Python:</p>
+<pre><code>_agent_name = "Basic Agent"
+_agent_desc = "Simplest possible agent."
+
+def run(input):
+    print(f"Agent ready. Input: {input}")
+    return f"Processed: {input}"</code></pre>
+
+<p>In LisPy:</p>
+<pre><code>;; basic_agent.lispy — Simplest agent. OG: basic_agent.py
+
+(begin
+  (define _agent_name "Basic Agent")
+  (define _agent_desc "Simplest possible agent.")
+
+  (define input _input)
+  (log (concat "Agent ready. Input: " input))
+  (concat "Processed: " input))</code></pre>
+
+<p><strong>Same name. Same interface. Same result. Different runtime.</strong> The .py version runs in Python. The .lispy version runs anywhere there's a LisPy VM — browser, Node.js, Python, embedded hardware, inside a sim.</p>
+
+<h2>Why LisPy Makes This Possible</h2>
+
+<p>LisPy is <strong>homoiconic</strong>: the program IS the data. An S-expression is simultaneously executable code and a parseable data structure. This means:</p>
+
+<ul>
+<li><strong>Portable</strong> — a .lispy file is just text. No compilation step. No bytecode. Load it anywhere.</li>
+<li><strong>Inspectable</strong> — any AI or human can read the program and understand exactly what it does.</li>
+<li><strong>Transmittable</strong> — embed it in JSON, send it over HTTP, store it in a cartridge, paste it in a chat.</li>
+<li><strong>Evolvable</strong> — an AI can modify the program by manipulating it as data, because code IS data.</li>
+</ul>
+
+<p>The LisPy VM itself is ~50 lines in any host language. Write those 50 lines in JavaScript and every .lispy agent runs in the browser. Write them in Python and every .lispy agent runs alongside .py agents. Write them in C and every .lispy agent runs on a microcontroller. <strong>The VM is the bridge. The agent is the program. The program runs everywhere.</strong></p>
+
+<h2>The .py Wrapper Pattern</h2>
+
+<p>You don't even have to choose. A .py file can load and execute the .lispy version:</p>
+
+<pre><code># basic_agent.py — wrapper that runs the LisPy version
+from lispy_vm import evaluate, load_program
+
+program = load_program("basic_agent.lispy")
+result = evaluate(program, env={"_input": user_input})
+print(result)</code></pre>
+
+<p>The .py wrapper calls the LisPy VM. The .lispy runs natively. <strong>Same program. Same result.</strong> The Python ecosystem gets to keep its tooling. The LisPy ecosystem gets portability. Both get the same agent.</p>
+
+<h2>The Complete Agent Library</h2>
+
+<h3>OG 1:1 Mappings (14 agents)</h3>
+
+<p>Each maps directly to a Python template from <a href="https://github.com/kody-w/AI-Agent-Templates">kody-w/AI-Agent-Templates</a>:</p>
+
+<table>
+<tr><th>.lispy Agent</th><th>OG .py Source</th><th>What It Does</th></tr>
+<tr><td><code>basic_agent.lispy</code></td><td><code>basic_agent.py</code></td><td>Simplest agent — reads input, logs ready</td></tr>
+<tr><td><code>context_memory_agent.lispy</code></td><td><code>context_memory_agent.py</code></td><td>Store/recall via VM env vars</td></tr>
+<tr><td><code>calendar_agent.lispy</code></td><td><code>calendar_agent.py</code></td><td>Mars calendar: year, sol, season, supply window</td></tr>
+<tr><td><code>motivational_quote_skill.lispy</code></td><td><code>motivational_quote_skill.py</code></td><td>Random Mars wisdom from a list</td></tr>
+<tr><td><code>duckduckgo_search_agent.lispy</code></td><td><code>duckduckgo_search_agent.py</code></td><td>Searches the prompt library</td></tr>
+<tr><td><code>manage_memory_agent.lispy</code></td><td><code>manage_memory_agent.py</code></td><td>CRUD on VM memories</td></tr>
+<tr><td><code>fetch_random_wikipedia_article_skill.lispy</code></td><td><code>fetch_random_wikipedia_article_skill.py</code></td><td>Fetches Mars frame data</td></tr>
+<tr><td><code>code_review_agent.lispy</code></td><td><code>code_review_agent.py</code></td><td>Reviews LisPy governor programs</td></tr>
+<tr><td><code>meeting_prep_agent.lispy</code></td><td><code>meeting_prep_agent.py</code></td><td>Colony briefing with talking points</td></tr>
+<tr><td><code>hacker_news_agent.lispy</code></td><td><code>hacker_news_agent.py</code></td><td>Satirical HN commentary on colony</td></tr>
+<tr><td><code>adaptive_card_agent.lispy</code></td><td><code>adaptive_card_agent.py</code></td><td>Structured status card output</td></tr>
+<tr><td><code>powerpoint_agent.lispy</code></td><td><code>powerpoint_agent.py</code></td><td>Text-based slide deck summary</td></tr>
+<tr><td><code>email_drafting_agent.lispy</code></td><td><code>email_drafting_agent.py</code></td><td>Colony status report email</td></tr>
+<tr><td><code>image_generation_agent.lispy</code></td><td><code>image_generation_agent.py</code></td><td>ASCII art colony visualization</td></tr>
+</table>
+
+<h3>Mars-Native Additions (8 agents)</h3>
+
+<p>Born in LisPy. No Python original. These are agents that only make sense inside the Mars sim:</p>
+
+<table>
+<tr><th>.lispy Agent</th><th>Category</th><th>What It Does</th></tr>
+<tr><td><code>colony_governor_agent.lispy</code></td><td>Core</td><td>Adaptive resource allocation — THE governor</td></tr>
+<tr><td><code>colony_status_agent.lispy</code></td><td>Reporting</td><td>Full status report with box drawing</td></tr>
+<tr><td><code>doom_clock_agent.lispy</code></td><td>Analysis</td><td>Predicts death sol from current burn rate</td></tr>
+<tr><td><code>sentiment_agent.lispy</code></td><td>Analysis</td><td>Bull/bear sentiment from colony state</td></tr>
+<tr><td><code>gauntlet_agent.lispy</code></td><td>Competition</td><td>Monte Carlo gauntlet status and scoring</td></tr>
+<tr><td><code>treasury_agent.lispy</code></td><td>Economy</td><td>MARS token distribution calculator</td></tr>
+<tr><td><code>perchlorate_guard_agent.lispy</code></td><td>Safety</td><td>Cumulative perchlorate exposure monitor</td></tr>
+<tr><td><code>echo_enrichment_agent.lispy</code></td><td>Data</td><td>Retroactive data layer status</td></tr>
+</table>
+
+<h2>How to Use</h2>
+
+<h3>Drop into the OS</h3>
+<p>The <a href="../os.html">LisPy OS</a> loads .lispy files from cartridges. Drop an agent into the filesystem, run it from the terminal:</p>
+<pre><code>> run basic_agent.lispy
+🤖 Basic Agent activated
+📥 Input: No input provided
+✓ Agent ready — no further action required</code></pre>
+
+<h3>Load via SDK</h3>
+<p>Any JavaScript or Python application can load and execute agents:</p>
+<pre><code>// Load the agent
+const program = fs.readFileSync('colony_governor_agent.lispy', 'utf8');
+
+// Execute with colony state as environment
+const result = lispyVM.evaluate(program, {
+  sol: 247, o2_days: 12, food_days: 8,
+  power_kwh: 180, crew_alive: 5, crew_total: 6,
+  colony_risk_index: 45, morale: 62,
+  solar_eff: 78, dust_tau: 1.8, modules_built: 4,
+  events_active: 2
+});</code></pre>
+
+<h3>Run in Terminal</h3>
+<p>The CLI tools can execute any .lispy file directly:</p>
+<pre><code>$ lispy run docs/agents/doom_clock_agent.lispy --sol 300
+💀 ═══ DOOM CLOCK ═══
+  Sol 300 — Calculating time of death...
+  💀 PREDICTED DEATH: Sol 318
+  ⏳ SOLS REMAINING: 18
+  ☠️  CAUSE: 🌾 STARVATION — food depletion</code></pre>
+
+<h2>The Adoption Play</h2>
+
+<p>The AI-Agent-Templates repo has users. Those users know what <code>basic_agent.py</code> does. When they see <code>basic_agent.lispy</code>, three things happen instantly:</p>
+
+<ol>
+<li><strong>Recognition</strong> — "Oh, that's the basic agent. I know that one."</li>
+<li><strong>Curiosity</strong> — "What's .lispy? It's the same thing but it runs everywhere?"</li>
+<li><strong>Adoption</strong> — "I can use the same agents in the browser/sim/hardware? Show me."</li>
+</ol>
+
+<p>Zero learning curve. The name does the marketing. The interface does the onboarding. The runtime does the magic.</p>
+
+<p>If we'd named them <code>lispy_basic_agent.lispy</code> or <code>mars_basic.lispy</code>, users would see a <em>different</em> agent that requires learning from scratch. The identical name communicates: <strong>this IS the agent you already know, running in a new place.</strong></p>
+
+<h2>Learning LisPy</h2>
+
+<p>Every .lispy agent uses the same language. The complete language reference is a single file: <strong><a href="../../LISPY.md">LISPY.md — The Rosetta Stone</a></strong>.</p>
+
+<p>Drop that file into any repo. Any AI that reads it immediately understands the full language. No docs site needed. No tutorial needed. One file IS the docs. Every feature, every function, every pattern — demonstrated in executable examples.</p>
+
+<p>The Rosetta Stone is itself homoiconic: it's a document that teaches a language where the code IS the data. The document IS the specification. Same principle, all the way down.</p>
+
+<p class="big">Same name. Same interface. Different runtime.<br>The .py runs in Python. The .lispy runs everywhere.<br>The agent doesn't care where it lives. It just runs.</p>
+
+<hr>
+
+<p><em>22 agents. 14 mapped 1:1 from Python originals. 8 born Mars-native. All running on the same VM. All portable across runtimes. All loadable from cartridges. The universal agent isn't a new framework — it's a naming convention and an interface contract.</em></p>
+
+<div class="footer">
+<a href="./">← Back to Blog</a> · <a href="../patterns.html">Pattern Library</a> · <a href="https://github.com/kody-w/mars-barn-opus">GitHub</a>
+</div>
+</div>
+</body>
+</html>

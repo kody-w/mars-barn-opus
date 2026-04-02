@@ -1,0 +1,52 @@
+;; meeting_prep_agent.lispy — Colony briefing: key metrics, talking points, recommendation. OG: meeting_prep_agent.py
+
+(begin
+  (define _agent_name "Meeting Prep Agent")
+  (define _agent_desc "Prepares a colony briefing with key metrics, talking points, and recommendations.")
+
+  (log "📋 ═══ COLONY BRIEFING PREP ═══")
+  (log (concat "  Sol " (string sol) " — Pre-Meeting Summary"))
+  (log "")
+
+  ;; Key metrics
+  (log "  📊 KEY METRICS")
+  (log (concat "    Crew:    " (string crew_alive) "/" (string crew_total) " alive"))
+  (log (concat "    Risk:    " (string colony_risk_index) "%"))
+  (log (concat "    Morale:  " (string morale) "%"))
+  (log (concat "    O₂:     " (string o2_days) " days"))
+  (log (concat "    H₂O:    " (string h2o_days) " days"))
+  (log (concat "    Food:    " (string food_days) " days"))
+  (log (concat "    Power:   " (string power_kwh) " kWh"))
+  (log "")
+
+  ;; Talking points
+  (define critical_items (list))
+  (define critical_o2 (< o2_days 7))
+  (define critical_food (< food_days 10))
+  (define critical_power (< power_kwh 80))
+  (define critical_morale (< morale 30))
+  (define high_risk (> colony_risk_index 60))
+
+  (log "  💬 TALKING POINTS")
+  (if critical_o2    (log "    🔴 O₂ supply critical — discuss ISRU priority"))
+  (if critical_food  (log "    🔴 Food supply low — discuss rationing"))
+  (if critical_power (log "    🟡 Power marginal — discuss solar maintenance"))
+  (if critical_morale (log "    🟡 Morale dangerously low — discuss crew welfare"))
+  (if high_risk      (log "    🔴 Colony risk index elevated — emergency protocols"))
+  (if (and (not critical_o2) (not critical_food) (not critical_power))
+    (log "    🟢 All systems nominal — focus on growth"))
+  (log "")
+
+  ;; Recommendation
+  (define recommendation
+    (cond
+      ((> colony_risk_index 70) "EMERGENCY: Activate crisis protocols. All hands meeting.")
+      ((or critical_o2 critical_food) "URGENT: Resource shortfall. Reallocate immediately.")
+      ((or critical_power critical_morale) "CAUTION: Monitor closely. Adjust allocations this sol.")
+      (true "NOMINAL: Continue current strategy. Review growth targets.")))
+
+  (log "  🎯 RECOMMENDATION")
+  (log (concat "    " recommendation))
+  (log "═══════════════════════════════")
+
+  (concat "Briefing ready — " recommendation))

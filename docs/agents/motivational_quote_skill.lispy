@@ -1,0 +1,32 @@
+;; motivational_quote_skill.lispy — Random Mars wisdom quote from a list. OG: motivational_quote_skill.py
+
+(begin
+  (define _agent_name "Motivational Quote Skill")
+  (define _agent_desc "Returns a random Mars-themed motivational quote from the colony wisdom archive.")
+
+  (define quotes (list
+    "The colony survives not because it's strong, but because it adapts."
+    "Every sol you wake up on Mars is a sol you've beaten the odds."
+    "O₂ is a gift. Water is a gift. Another sunrise is a gift. Earn them."
+    "The dust will bury everything you build. Build anyway."
+    "A single robot maintaining solar panels has saved more lives than any hero."
+    "Mars doesn't care about your morale. Your crew does."
+    "The difference between a dead colony and a living one is one good decision per sol."
+    "Ration the food, never ration the hope."
+    "Every module you build is a middle finger to the void."
+    "The supply ship is 780 sols away. What you have is what you have."
+    "Redundancy isn't waste. Redundancy is survival."
+    "The sim teaches what textbooks can't: everything fails at once."
+    "Your governor program will be tested by Mars. Not by you."
+    "Dust tau 5.0 doesn't care about your solar farm count."
+    "The snowball rolls. Adapt or die. There is no third option."))
+
+  ;; Pick a random quote
+  (define idx (floor (* (random) (length quotes))))
+  (define quote (nth quotes idx))
+
+  (log "🔮 ═══ MARS WISDOM ═══")
+  (log (concat "  \"" quote "\""))
+  (log "═══════════════════════")
+
+  quote)

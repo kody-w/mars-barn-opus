@@ -1,0 +1,52 @@
+;; manage_memory_agent.lispy — CRUD on VM memories. Store, recall, list, clear. OG: manage_memory_agent.py
+
+(begin
+  (define _agent_name "Memory Manager Agent")
+  (define _agent_desc "Full CRUD on VM environment memories. Store, recall, list, and clear _mem_* variables.")
+
+  (define action _mem_action)
+  (define key _mem_key)
+  (define value _mem_value)
+
+  (log (concat "🧠 " _agent_name " — action: " action))
+
+  (cond
+    ;; CREATE / UPDATE
+    ((= action "store")
+      (begin
+        (set! _mem_last_key key)
+        (set! _mem_last_value value)
+        (set! _mem_count (+ _mem_count 1))
+        (log (concat "  ✅ Stored: " key " = " value))
+        (concat "Stored " key)))
+
+    ;; READ
+    ((= action "recall")
+      (begin
+        (log (concat "  📦 " key " = " value))
+        (concat "Recalled " key ": " value)))
+
+    ;; LIST
+    ((= action "list")
+      (begin
+        (log "  📋 Memory inventory:")
+        (log (concat "    Last key:   " _mem_last_key))
+        (log (concat "    Last value: " _mem_last_value))
+        (log (concat "    Count:      " (string _mem_count)))
+        "Memory list complete"))
+
+    ;; DELETE / CLEAR
+    ((= action "clear")
+      (begin
+        (set! _mem_last_key "")
+        (set! _mem_last_value "")
+        (set! _mem_count 0)
+        (log "  🗑️  All memories cleared")
+        "Memories cleared"))
+
+    ;; HELP
+    (true
+      (begin
+        (log "  Actions: store, recall, list, clear")
+        (log "  Set _mem_action, _mem_key, _mem_value before running")
+        "Awaiting action"))))

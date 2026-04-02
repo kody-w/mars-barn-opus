@@ -1,0 +1,69 @@
+;; perchlorate_guard_agent.lispy — Monitors perchlorate cumulative exposure. OG: Mars-native.
+
+(begin
+  (define _agent_name "Perchlorate Guard")
+  (define _agent_desc "Monitors cumulative perchlorate exposure and alerts when thresholds are breached.")
+
+  (log "☣️ ═══ PERCHLORATE GUARD ═══")
+  (log (concat "  Sol " (string sol) " — Exposure Monitoring"))
+  (log "")
+
+  ;; Perchlorate accumulates ~0.02 units per sol on Mars surface
+  ;; Higher dust = higher perchlorate mobilization
+  (define base_rate 0.02)
+  (define dust_multiplier (+ 1.0 (* dust_tau 0.3)))
+  (define sol_exposure (* base_rate dust_multiplier))
+
+  ;; Cumulative exposure estimate (assumes linear from Sol 0)
+  (define cumulative (* sol_exposure sol))
+
+  ;; Thresholds (units are arbitrary but consistent)
+  ;; 0-2: safe, 2-5: caution, 5-8: danger, 8+: critical
+  (define level
+    (cond
+      ((< cumulative 2.0) "🟢 SAFE")
+      ((< cumulative 5.0) "🟡 CAUTION")
+      ((< cumulative 8.0) "🔴 DANGER")
+      (true               "☠️  CRITICAL")))
+
+  (define pct_of_lethal (round (* (/ cumulative 10.0) 100)))
+
+  (log "  📊 EXPOSURE DATA:")
+  (log (concat "    Base rate:        " (string base_rate) " units/sol"))
+  (log (concat "    Dust multiplier:  " (string dust_multiplier) "x (dust τ=" (string dust_tau) ")"))
+  (log (concat "    Sol exposure:     " (string sol_exposure) " units"))
+  (log (concat "    Cumulative:       " (string cumulative) " units"))
+  (log (concat "    % of lethal:      " (string pct_of_lethal) "%"))
+  (log "")
+  (log (concat "  ⚠️  STATUS: " level))
+  (log "")
+
+  ;; Mitigation recommendations
+  (cond
+    ((>= cumulative 8.0)
+      (begin
+        (log "  🚨 CRITICAL: Perchlorate at lethal levels!")
+        (log "    → Evacuate exposed areas immediately")
+        (log "    → Full decontamination required")
+        (log "    → Seal all joints and actuators")))
+    ((>= cumulative 5.0)
+      (begin
+        (log "  ⚠️  DANGER: Reduce outdoor operations")
+        (log "    → Limit EVA to essential tasks")
+        (log "    → Increase air filtration cycling")
+        (log "    → Schedule joint inspections every 20 sols")))
+    ((>= cumulative 2.0)
+      (begin
+        (log "  ⚠️  CAUTION: Perchlorate accumulating")
+        (log "    → Monitor equipment corrosion")
+        (log "    → Schedule joint inspections every 50 sols")))
+    (true
+      (begin
+        (log "  ✅ Levels within safe limits")
+        (log "    → Continue standard operations"))))
+
+  (log "")
+  (log "  THRESHOLDS: <2 safe | 2-5 caution | 5-8 danger | 8+ critical")
+  (log "═══════════════════════════════════")
+
+  (concat "Perchlorate: " (string cumulative) " units — " level " — " (string pct_of_lethal) "% of lethal"))

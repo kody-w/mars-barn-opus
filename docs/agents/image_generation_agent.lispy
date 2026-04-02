@@ -1,0 +1,75 @@
+;; image_generation_agent.lispy — Generates ASCII art of colony based on state (dome, panels, crew). OG: image_generation_agent.py
+
+(begin
+  (define _agent_name "Image Generation Agent")
+  (define _agent_desc "Generates ASCII art visualization of the Mars colony based on current state.")
+
+  ;; Sky changes with dust level
+  (define sky
+    (cond
+      ((> dust_tau 4.0) "░░░░░░░░░░░░░░░░░░░░░░░░░░  DUST STORM")
+      ((> dust_tau 2.0) "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~   Hazy skies")
+      (true             "· · · ✦ · · · ✦ · · · ✦ ·   Clear sky")))
+
+  ;; Solar panels scale with solar_eff
+  (define panels
+    (cond
+      ((> solar_eff 70) "  ╔═╗ ╔═╗ ╔═╗ ╔═╗  Solar: GOOD")
+      ((> solar_eff 40) "  ╔═╗ ╔═╗ ░░░ ░░░  Solar: DEGRADED")
+      (true             "  ░░░ ░░░ ░░░ ░░░  Solar: FAILING")))
+
+  ;; Dome status based on risk
+  (define dome
+    (cond
+      ((> colony_risk_index 70)
+        (list
+          "      ╱ ⚠️ ⚠️ ╲"
+          "    ╱  CRITICAL  ╲"
+          "   ╱───────────────╲"
+          "  │ DOME INTEGRITY  │"
+          "  │   COMPROMISED   │"))
+      ((> colony_risk_index 40)
+        (list
+          "      ╱ ● ● ╲"
+          "    ╱  CAUTION  ╲"
+          "   ╱───────────────╲"
+          "  │  DOME NOMINAL   │"
+          "  │   MONITORING    │"))
+      (true
+        (list
+          "      ╱ ✦ ✦ ╲"
+          "    ╱   SAFE   ╲"
+          "   ╱───────────────╲"
+          "  │  DOME SECURE    │"
+          "  │   ALL CLEAR     │"))))
+
+  ;; Crew indicator
+  (define crew_display
+    (cond
+      ((>= crew_alive 5) "  👤👤👤👤👤+  Full crew")
+      ((>= crew_alive 3) "  👤👤👤      Skeleton crew")
+      ((>= crew_alive 1) "  👤          Sole survivor")
+      (true              "  💀          No survivors")))
+
+  ;; Ground with modules
+  (define ground
+    (concat "  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  Modules: " (string modules_built)))
+
+  ;; Render
+  (log "🖼️ ═══ COLONY VISUALIZATION ═══")
+  (log "")
+  (log sky)
+  (log "")
+  (log panels)
+  (log "")
+  (map (begin (log _)) dome)
+  (log "")
+  (log crew_display)
+  (log "")
+  (log ground)
+  (log "  ═══════════════════════════")
+  (log (concat "  Sol " (string sol) " | Risk " (string colony_risk_index) "% | Morale " (string morale) "%"))
+  (log "")
+  (log "═══════════════════════════════")
+
+  (concat "Colony art generated — Sol " (string sol)))

@@ -1,0 +1,55 @@
+;; colony_status_agent.lispy — Full status report with box drawing. OG: Mars-native.
+
+(begin
+  (define _agent_name "Colony Status Agent")
+  (define _agent_desc "Generates a comprehensive colony status report with box-drawing characters.")
+
+  (define bar_width 20)
+
+  ;; Helper: create a bar [████░░░░░░] from a percentage
+  (define make_bar (begin
+    (define filled (round (* bar_width (/ _ 100))))
+    (define empty (- bar_width filled))
+    (concat (reduce (concat _acc "█") (range filled) "")
+            (reduce (concat _acc "░") (range empty) ""))))
+
+  (log "┌─────────────────────────────────────────┐")
+  (log (concat "│  🔴 MARS COLONY STATUS — Sol " (string sol)))
+  (log "├─────────────────────────────────────────┤")
+  (log "│  CREW                                   │")
+  (log (concat "│  👥 " (string crew_alive) "/" (string crew_total) " alive"))
+  (log (concat "│  😊 Morale: " (string morale) "%"))
+  (log "├─────────────────────────────────────────┤")
+  (log "│  RESOURCES                              │")
+  (log (concat "│  🫁 O₂:    " (string o2_days) " days"
+    (if (< o2_days 5) "  ⚠️ CRITICAL" "")))
+  (log (concat "│  💧 H₂O:   " (string h2o_days) " days"
+    (if (< h2o_days 5) "  ⚠️ CRITICAL" "")))
+  (log (concat "│  🌾 Food:   " (string food_days) " days"
+    (if (< food_days 7) "  ⚠️ LOW" "")))
+  (log (concat "│  ⚡ Power:  " (string power_kwh) " kWh"
+    (if (< power_kwh 80) "  ⚠️ LOW" "")))
+  (log "├─────────────────────────────────────────┤")
+  (log "│  RISK ASSESSMENT                        │")
+  (log (concat "│  Colony Risk Index: " (string colony_risk_index) "%"))
+  (log (concat "│  "
+    (cond
+      ((> colony_risk_index 70) "🔴 CRITICAL — immediate action required")
+      ((> colony_risk_index 40) "🟡 ELEVATED — monitor closely")
+      (true                     "🟢 NOMINAL — within parameters"))))
+  (log "├─────────────────────────────────────────┤")
+  (log "│  ENVIRONMENT                            │")
+  (log (concat "│  🌪️  Dust τ:     " (string dust_tau)
+    (if (> dust_tau 3.0) "  ⚠️ STORM" "")))
+  (log (concat "│  ☀️  Solar Eff:  " (string solar_eff) "%"))
+  (log (concat "│  🏗️  Modules:    " (string modules_built)))
+  (log (concat "│  📡 Events:     " (string events_active)))
+  (log "├─────────────────────────────────────────┤")
+  (log "│  ALLOCATIONS                            │")
+  (log (concat "│  ISRU:       " (string (* heating_alloc 100)) "%"))
+  (log (concat "│  Greenhouse: " (string (* greenhouse_alloc 100)) "%"))
+  (log (concat "│  Heating:    " (string (* heating_alloc 100)) "%"))
+  (log "└─────────────────────────────────────────┘")
+
+  (concat "Status Sol " (string sol) " — Crew " (string crew_alive) "/" (string crew_total)
+    " — Risk " (string colony_risk_index) "%"))

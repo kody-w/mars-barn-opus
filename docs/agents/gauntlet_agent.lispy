@@ -1,0 +1,58 @@
+;; gauntlet_agent.lispy — Reports competition status, scoring rules, record. OG: Mars-native.
+
+(begin
+  (define _agent_name "Gauntlet Agent")
+  (define _agent_desc "Reports Monte Carlo gauntlet competition status, scoring rules, and current record.")
+
+  (log "🏆 ═══ GAUNTLET STATUS ═══")
+  (log (concat "  Sol " (string sol) " — Competition Dashboard"))
+  (log "")
+
+  ;; Compute a simple score based on colony state
+  ;; Score = crew_alive * 100 + sum(resource_days) + modules * 50 - risk * 2
+  (define resource_score (+ o2_days h2o_days food_days))
+  (define module_bonus (* modules_built 50))
+  (define risk_penalty (* colony_risk_index 2))
+  (define crew_bonus (* crew_alive 100))
+  (define morale_bonus (round (* morale 0.5)))
+
+  (define total_score (+ crew_bonus resource_score module_bonus morale_bonus (- 0 risk_penalty)))
+
+  (log "  📋 SCORING RULES:")
+  (log "    +100 pts  per crew alive")
+  (log "    +1 pt     per resource day (O₂ + H₂O + Food)")
+  (log "    +50 pts   per module built")
+  (log "    +0.5 pts  per morale %")
+  (log "    -2 pts    per risk %")
+  (log "")
+
+  (log "  📊 CURRENT SCORE BREAKDOWN:")
+  (log (concat "    Crew:      +" (string crew_bonus) " (" (string crew_alive) " alive)"))
+  (log (concat "    Resources: +" (string resource_score) " days total"))
+  (log (concat "    Modules:   +" (string module_bonus) " (" (string modules_built) " built)"))
+  (log (concat "    Morale:    +" (string morale_bonus)))
+  (log (concat "    Risk:      -" (string risk_penalty)))
+  (log "    ─────────────────")
+  (log (concat "    TOTAL:     " (string total_score) " pts"))
+  (log "")
+
+  ;; Viability check
+  (define viable (and (> crew_alive 0) (> o2_days 0) (> food_days 0)))
+  (if viable
+    (begin
+      (log "  ✅ STATUS: VIABLE — colony is competition-eligible")
+      (log (concat "    Survived " (string sol) " sols")))
+    (begin
+      (log "  ❌ STATUS: NON-VIABLE — colony eliminated")
+      (log "    Submit a new governor program to re-enter")))
+
+  (log "")
+  (log "  🏅 GAUNTLET RULES:")
+  (log "    • 100 independent Monte Carlo runs")
+  (log "    • Same frames, different RNG seeds")
+  (log "    • Median score = official ranking")
+  (log "    • All versions sequential (v1→v2→...)")
+  (log "    • Damage carries forward between versions")
+  (log "═══════════════════════════════════")
+
+  (concat "Gauntlet Sol " (string sol) " — Score: " (string total_score) " — " (if viable "VIABLE" "ELIMINATED")))

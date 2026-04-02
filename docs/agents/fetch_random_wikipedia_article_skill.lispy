@@ -1,0 +1,41 @@
+;; fetch_random_wikipedia_article_skill.lispy — Fetches Mars frame data instead of Wikipedia. Shows latest sol conditions. OG: fetch_random_wikipedia_article_skill.py
+
+(begin
+  (define _agent_name "Mars Frame Fetcher")
+  (define _agent_desc "Fetches current Mars frame data — the colony equivalent of a random Wikipedia article.")
+
+  (log "🌐 Fetching current Mars frame data...")
+
+  ;; Read environment — these are the live frame values
+  (define current_sol sol)
+  (define oxygen o2_days)
+  (define water h2o_days)
+  (define food food_days)
+  (define power power_kwh)
+  (define crew crew_alive)
+  (define risk colony_risk_index)
+  (define mood morale)
+  (define dust dust_tau)
+  (define solar solar_eff)
+  (define modules modules_built)
+  (define events events_active)
+
+  (log "📡 ═══ MARS FRAME DATA ═══")
+  (log (concat "  Sol:        " (string current_sol)))
+  (log "  ─── Resources ───")
+  (log (concat "  O₂:        " (string oxygen) " days"))
+  (log (concat "  H₂O:       " (string water) " days"))
+  (log (concat "  Food:       " (string food) " days"))
+  (log (concat "  Power:      " (string power) " kWh"))
+  (log "  ─── Colony ───")
+  (log (concat "  Crew:       " (string crew) "/" (string crew_total)))
+  (log (concat "  Risk:       " (string risk) "%"))
+  (log (concat "  Morale:     " (string mood) "%"))
+  (log "  ─── Environment ───")
+  (log (concat "  Dust τ:     " (string dust)))
+  (log (concat "  Solar Eff:  " (string solar) "%"))
+  (log (concat "  Modules:    " (string modules)))
+  (log (concat "  Events:     " (string events)))
+  (log "═══════════════════════════")
+
+  (concat "Frame Sol " (string current_sol) " — Crew " (string crew) " — Risk " (string risk) "%"))

@@ -1,0 +1,14 @@
+;; basic_agent.lispy — Simplest agent. Logs ready. Takes _input from env. OG: basic_agent.py
+
+(begin
+  (define _agent_name "Basic Agent")
+  (define _agent_desc "Simplest possible agent. Reads input, logs status, returns ready.")
+
+  ;; Read input from environment (set by caller or VM)
+  (define input (if (= _input "") "No input provided" _input))
+
+  (log (concat "🤖 " _agent_name " activated"))
+  (log (concat "📥 Input: " input))
+  (log "✓ Agent ready — no further action required")
+
+  (concat _agent_name " processed: " input))

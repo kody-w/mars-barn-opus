@@ -1,0 +1,61 @@
+;; code_review_agent.lispy — Reviews LisPy governor programs. Checks allocation totals, missing priorities, common mistakes. OG: code_review_agent.py
+
+(begin
+  (define _agent_name "Code Review Agent")
+  (define _agent_desc "Reviews LisPy governor programs for allocation errors, missing priorities, and common mistakes.")
+
+  (log (concat "🔍 " _agent_name " — reviewing governor program"))
+
+  ;; Check allocation totals (must sum to ~1.0)
+  (define total_alloc (+ heating_alloc isru_alloc greenhouse_alloc))
+  (define alloc_ok (and (>= total_alloc 0.95) (<= total_alloc 1.05)))
+
+  ;; Check for zero allocations (common mistake)
+  (define heating_zero (= heating_alloc 0))
+  (define isru_zero (= isru_alloc 0))
+  (define greenhouse_zero (= greenhouse_alloc 0))
+
+  ;; Check resource awareness
+  (define handles_o2 (> isru_alloc 0.1))
+  (define handles_food (> greenhouse_alloc 0.1))
+  (define handles_heat (> heating_alloc 0.05))
+
+  ;; Check food ration
+  (define ration_ok (and (>= food_ration 0.3) (<= food_ration 1.0)))
+
+  (define issues 0)
+
+  (log "📋 ═══ CODE REVIEW REPORT ═══")
+
+  ;; Allocation total check
+  (if alloc_ok
+    (log (concat "  ✅ Allocation total: " (string total_alloc) " (OK)"))
+    (begin
+      (log (concat "  ❌ Allocation total: " (string total_alloc) " (should be ~1.0)"))
+      (set! issues (+ issues 1))))
+
+  ;; Zero allocation warnings
+  (if heating_zero
+    (begin (log "  ⚠️  Heating at 0% — crew will freeze!") (set! issues (+ issues 1)))
+    (log (concat "  ✅ Heating: " (string heating_alloc))))
+  (if isru_zero
+    (begin (log "  ⚠️  ISRU at 0% — no O₂ or H₂O production!") (set! issues (+ issues 1)))
+    (log (concat "  ✅ ISRU: " (string isru_alloc))))
+  (if greenhouse_zero
+    (begin (log "  ⚠️  Greenhouse at 0% — no food growth!") (set! issues (+ issues 1)))
+    (log (concat "  ✅ Greenhouse: " (string greenhouse_alloc))))
+
+  ;; Food ration check
+  (if ration_ok
+    (log (concat "  ✅ Food ration: " (string food_ration)))
+    (begin
+      (log (concat "  ❌ Food ration: " (string food_ration) " (should be 0.3–1.0)"))
+      (set! issues (+ issues 1))))
+
+  (log "═══════════════════════════════")
+  (log (concat "  Issues found: " (string issues)))
+  (if (= issues 0)
+    (log "  🎉 LGTM — program looks good!")
+    (log "  🔧 Fix the above issues before deploying"))
+
+  (concat "Review complete: " (string issues) " issues found"))

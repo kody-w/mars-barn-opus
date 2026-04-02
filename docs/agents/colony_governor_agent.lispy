@@ -1,0 +1,75 @@
+;; colony_governor_agent.lispy — THE core agent. Adaptive resource allocation. OG: Mars-native.
+
+(begin
+  (define _agent_name "Colony Governor")
+  (define _agent_desc "The core governor agent. Adaptive resource allocation based on colony state, risk, and environmental conditions.")
+
+  (log (concat "🏛️ Colony Governor — Sol " (string sol)))
+
+  ;; Assess threat levels (0-1 scale)
+  (define o2_threat    (if (< o2_days 15) (/ (- 15 (min o2_days 15)) 15) 0))
+  (define food_threat  (if (< food_days 20) (/ (- 20 (min food_days 20)) 20) 0))
+  (define power_threat (if (< power_kwh 150) (/ (- 150 (min power_kwh 150)) 150) 0))
+  (define heat_threat  (if (> dust_tau 2.0) (/ (min dust_tau 5.0) 5.0) 0.1))
+
+  ;; Normalize threats to determine allocation weights
+  (define total_threat (+ o2_threat food_threat power_threat heat_threat))
+  (define safe (< total_threat 0.3))
+
+  ;; Compute adaptive allocations
+  (define isru_alloc_new
+    (cond
+      ((< o2_days 3)  0.85)
+      ((< o2_days 7)  0.55)
+      (safe           0.30)
+      (true           (+ 0.25 (* o2_threat 0.4)))))
+
+  (define greenhouse_alloc_new
+    (cond
+      ((< food_days 5)  0.60)
+      ((< food_days 12) 0.45)
+      (safe             0.40)
+      (true             (+ 0.20 (* food_threat 0.35)))))
+
+  (define heating_alloc_new
+    (cond
+      ((> dust_tau 4.0) 0.40)
+      ((< power_kwh 50) 0.45)
+      (safe             0.25)
+      (true             (+ 0.15 (* heat_threat 0.25)))))
+
+  ;; Normalize to sum to 1.0
+  (define raw_total (+ isru_alloc_new greenhouse_alloc_new heating_alloc_new))
+  (set! isru_alloc       (/ isru_alloc_new raw_total))
+  (set! greenhouse_alloc (/ greenhouse_alloc_new raw_total))
+  (set! heating_alloc    (/ heating_alloc_new raw_total))
+
+  ;; Adaptive food ration
+  (set! food_ration
+    (cond
+      ((< food_days 5)  0.5)
+      ((< food_days 10) 0.7)
+      ((< food_days 15) 0.85)
+      (true             1.0)))
+
+  ;; Log the decision
+  (define mode
+    (cond
+      ((> colony_risk_index 70) "🔴 CRISIS")
+      ((> colony_risk_index 40) "🟡 ALERT")
+      (true                     "🟢 NOMINAL")))
+
+  (log (concat "  Mode:       " mode))
+  (log (concat "  ISRU:       " (string (round (* isru_alloc 100))) "%"))
+  (log (concat "  Greenhouse: " (string (round (* greenhouse_alloc 100))) "%"))
+  (log (concat "  Heating:    " (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  Ration:     " (string food_ration)))
+  (log (concat "  Threats — O₂:" (string (round (* o2_threat 100)))
+    " Food:" (string (round (* food_threat 100)))
+    " Power:" (string (round (* power_threat 100)))
+    " Heat:" (string (round (* heat_threat 100)))))
+
+  (concat "Governor Sol " (string sol) " — " mode
+    " I=" (string (round (* isru_alloc 100)))
+    " G=" (string (round (* greenhouse_alloc 100)))
+    " H=" (string (round (* heating_alloc 100)))))

@@ -1,0 +1,48 @@
+;; adaptive_card_agent.lispy — Generates structured status card (formatted text output like an Adaptive Card). OG: adaptive_card_agent.py
+
+(begin
+  (define _agent_name "Adaptive Card Agent")
+  (define _agent_desc "Generates a structured colony status card — formatted text output like a Microsoft Adaptive Card.")
+
+  ;; Determine status color
+  (define status_icon
+    (cond
+      ((> colony_risk_index 70) "🔴")
+      ((> colony_risk_index 40) "🟡")
+      (true                     "🟢")))
+
+  (define status_text
+    (cond
+      ((> colony_risk_index 70) "CRITICAL")
+      ((> colony_risk_index 40) "WARNING")
+      (true                     "NOMINAL")))
+
+  (log "┌─────────────────────────────────┐")
+  (log "│   MARS COLONY STATUS CARD       │")
+  (log "├─────────────────────────────────┤")
+  (log (concat "│ " status_icon " Status: " status_text))
+  (log (concat "│ 📅 Sol: " (string sol)))
+  (log "├─────────────────────────────────┤")
+  (log "│ RESOURCES                       │")
+  (log (concat "│  O₂:   " (string o2_days) " days  "
+    (if (< o2_days 5) "⚠️" "✓")))
+  (log (concat "│  H₂O:  " (string h2o_days) " days  "
+    (if (< h2o_days 5) "⚠️" "✓")))
+  (log (concat "│  Food:  " (string food_days) " days  "
+    (if (< food_days 7) "⚠️" "✓")))
+  (log (concat "│  Power: " (string power_kwh) " kWh  "
+    (if (< power_kwh 80) "⚠️" "✓")))
+  (log "├─────────────────────────────────┤")
+  (log "│ COLONY                          │")
+  (log (concat "│  Crew:    " (string crew_alive) "/" (string crew_total)))
+  (log (concat "│  Morale:  " (string morale) "%"))
+  (log (concat "│  Risk:    " (string colony_risk_index) "%"))
+  (log (concat "│  Modules: " (string modules_built)))
+  (log "├─────────────────────────────────┤")
+  (log "│ ENVIRONMENT                     │")
+  (log (concat "│  Dust τ:    " (string dust_tau)))
+  (log (concat "│  Solar:     " (string solar_eff) "%"))
+  (log (concat "│  Events:    " (string events_active)))
+  (log "└─────────────────────────────────┘")
+
+  (concat status_icon " " status_text " — Sol " (string sol) " — Risk " (string colony_risk_index) "%"))

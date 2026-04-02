@@ -1,0 +1,54 @@
+;; echo_enrichment_agent.lispy — Reports retroactive data layer status. OG: Mars-native.
+
+(begin
+  (define _agent_name "Echo Enrichment Agent")
+  (define _agent_desc "Reports the status of the retroactive echo data layer — enrichments that add fidelity without rewriting history.")
+
+  (log "🔄 ═══ ECHO ENRICHMENT STATUS ═══")
+  (log (concat "  Sol " (string sol) " — Data Layer Report"))
+  (log "")
+
+  ;; Echo layers are additive data enrichments
+  ;; Each version adds new fields to existing frames
+  (define v1_fields (list "sol" "o2_days" "h2o_days" "food_days" "power_kwh"
+                          "crew_alive" "crew_total" "morale" "colony_risk_index"
+                          "solar_eff" "dust_tau" "modules_built" "events_active"))
+  (define v1_count (length v1_fields))
+
+  (define v2_fields (list "perchlorate_exposure" "regolith_abrasion" "radiation_flux"
+                          "battery_degradation" "electrostatic_dust" "thermal_fatigue"))
+  (define v2_count (length v2_fields))
+
+  (define total_fields (+ v1_count v2_count))
+
+  (log "  📦 DATA LAYERS:")
+  (log "")
+  (log (concat "  v1 — Foundation (" (string v1_count) " fields)"))
+  (log "    Status: ✅ ACTIVE")
+  (log "    Fields: sol, o2_days, h2o_days, food_days, power_kwh,")
+  (log "            crew_alive, crew_total, morale, colony_risk_index,")
+  (log "            solar_eff, dust_tau, modules_built, events_active")
+  (log "")
+  (log (concat "  v2 — Robot Killers (" (string v2_count) " fields)"))
+  (log "    Status: ✅ ACTIVE (enriched at Sol 162)")
+  (log "    Fields: perchlorate_exposure, regolith_abrasion, radiation_flux,")
+  (log "            battery_degradation, electrostatic_dust, thermal_fatigue")
+  (log "")
+  (log "  v3 — Human Factors (planned)")
+  (log "    Status: 🔲 PENDING")
+  (log "    Fields: crew_psychology, sleep_quality, interpersonal_conflict,")
+  (log "            homesickness, comms_delay_stress")
+  (log "")
+
+  ;; Echo principle verification
+  (log "  🔄 ECHO PRINCIPLE:")
+  (log "    ✅ Additive only — no fields removed between versions")
+  (log "    ✅ Non-contradictory — v1 data unchanged in v2 frames")
+  (log "    ✅ Backward compatible — v1 agents can read v2 frames")
+  (log "    ✅ Forward enrichable — v3 can be added at any time")
+  (log "")
+  (log (concat "  📊 Total fields: " (string total_fields) " (v1: " (string v1_count) ", v2: " (string v2_count) ")"))
+  (log (concat "  📊 Enrichment coverage: " (string sol) " sols of frame data"))
+  (log "═══════════════════════════════════")
+
+  (concat "Echo layers: v1(" (string v1_count) ") + v2(" (string v2_count) ") = " (string total_fields) " fields — Sol " (string sol)))

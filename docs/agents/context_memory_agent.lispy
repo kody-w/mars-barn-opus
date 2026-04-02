@@ -1,0 +1,38 @@
+;; context_memory_agent.lispy — Store/recall using VM env vars (_mem_*). OG: context_memory_agent.py
+
+(begin
+  (define _agent_name "Context Memory Agent")
+  (define _agent_desc "Stores and recalls context using VM environment variables prefixed _mem_.")
+
+  ;; Store a memory: set _mem_<key> in the VM env
+  (define store_key (if (= _mem_action "store") _mem_key ""))
+  (define store_val (if (= _mem_action "store") _mem_value ""))
+
+  (cond
+    ;; Store mode
+    ((= _mem_action "store")
+      (begin
+        (set! _mem_last_key store_key)
+        (log (concat "💾 Stored: " store_key " = " store_val))
+        (concat "Memory stored: " store_key)))
+
+    ;; Recall mode
+    ((= _mem_action "recall")
+      (begin
+        (log (concat "🔍 Recalling: " _mem_key))
+        (log (concat "📦 Value: " _mem_value))
+        (concat "Recalled " _mem_key ": " _mem_value)))
+
+    ;; List mode: show last stored key
+    ((= _mem_action "list")
+      (begin
+        (log "📋 Listing memories (last key):")
+        (log (concat "  Last stored: " _mem_last_key))
+        "Memory list complete"))
+
+    ;; Default
+    (true
+      (begin
+        (log (concat "🧠 " _agent_name " ready"))
+        (log "Set _mem_action to: store, recall, or list")
+        "Awaiting memory command"))))
