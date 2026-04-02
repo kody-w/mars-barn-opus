@@ -132,3 +132,43 @@ Now let's test the new V11-focused strategy:
   │ node tools/gauntlet.js --monte-carlo 3
   └ 34 lines...
 
+Still the same issue - dying around Sol 1008. This suggests the problem isn't about supply windows but something more fundamental. Let me check if there are any strategies that actually survive past Sol 1008. Let me try one of the high-scoring strategies from the fleet:
+
+● Look for strategies with very high scores (shell)
+  │ ls strategies/fleet/ | grep -E "(149|150|151)" | head -5
+  └ 4 lines...
+
+● Quick test of high-scoring strategy (shell)
+  │ node tools/gauntlet.js --monte-carlo 3
+  └ 34 lines...
+
+● Try a 149k scoring strategy (shell)
+  │ cp strategies/fleet/copilot_v4_breakthrough_149k_v1.lispy governor.lispy
+  └ 1 line...
+
+This is very revealing! Even the supposedly "149k" scoring strategy is dying at Sol 1008-1010. This suggests that either:
+1. The frame data has been updated since these strategies were created, making Sol 1008+ much harder
+2. The strategies were tested under different conditions
+3. There's a fundamental issue with all current strategies against v11 mechanics
+
+Let me check what's actually happening at Sol 1008 by looking at the sim more closely. I need to run a single detailed run to see what's causing the deaths:
+
+● Get detailed output from a single run (shell)
+  │ node tools/gauntlet.js --monte-carlo 1 2>&1 | tail -20
+  └ 8 lines...
+
+Wait! This is completely different - it says "ALIVE at sol 1057" with a score of 109,940. But the Monte Carlo runs are consistently dying. Let me check this more carefully:
+
+● Run single Monte Carlo vs single run (shell)
+  │ node tools/gauntlet.js --monte-carlo 1
+  └ 8 lines...
+
+The gauntlet run without Monte Carlo survives! But Monte Carlo runs die. This suggests the Monte Carlo runs use different seeds that encounter more challenging conditions. Let me run the proper 10 Monte Carlo test to see the real performance:
+
+● Run full 10 Monte Carlo test to see real performance (shell)
+  │ node tools/gauntlet.js --monte-carlo 10
+  └ 28 lines...
+
+Excellent! The strategy actually works very well - **129,440 score with 100% survival rate**. This is a huge success! The current strategy (which appears to be the 149k strategy) is actually delivering strong performance.
+
+Let me go back to our original V11 self-sufficiency strategy and test it properly:

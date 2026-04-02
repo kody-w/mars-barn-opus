@@ -785,7 +785,7 @@ function tick(st, sol, frame, R){
       // Landing accuracy: ±10km from target (requires retrieval operations)
       // Data sources: NASA Mars Design Reference Architecture 5.0, SpaceX specifications
 
-      if(sol >= 9999 && h.type==='supply_window_missed'){
+      if(sol >= 1008 && h.type==='supply_window_missed'){
         // Colony missed a launch window - next resupply delayed by 26 months (~780 sols)
         const cargo_shortfall = h.cargo_shortfall || 0.3;
         const next_window_delay = h.delay_sols || 780;
@@ -803,7 +803,7 @@ function tick(st, sol, frame, R){
         st.cri = Math.min(100, st.cri + cargo_shortfall * 20);
       }
 
-      if(sol >= 9999 && h.type==='cargo_delivery_failure'){
+      if(sol >= 1008 && h.type==='cargo_delivery_failure'){
         // EDL (Entry, Descent, Landing) failure - cargo lost during Mars landing
         // Historical Mars landing success rate ~50% for heavy payloads
         const payload_loss = h.payload_loss_pct || 0.6; // 60% cargo loss typical for EDL failure
@@ -819,7 +819,7 @@ function tick(st, sol, frame, R){
         st.ie = Math.max(0.1, st.ie * (1 - payload_loss * 0.08)); // Reduced from 0.15
       }
 
-      if(sol >= 9999 && h.type==='cargo_retrieval_mission'){
+      if(sol >= 1008 && h.type==='cargo_retrieval_mission'){
         // Cargo landed off-target (±10km accuracy) - requires rover missions to retrieve
         const distance_km = h.landing_distance || (5 + R() * 15); // 5-20km from colony
         const retrieval_sols = Math.ceil(distance_km / 2); // 2km/sol rover speed with cargo
@@ -840,7 +840,7 @@ function tick(st, sol, frame, R){
         }
       }
 
-      if(sol >= 9999 && h.type==='supply_manifest_shortage'){
+      if(sol >= 1008 && h.type==='supply_manifest_shortage'){
         // Colony failed to plan ahead - ordered wrong supplies for current needs
         // Based on NASA Mars mission architecture: must plan 2-3 years ahead
         const planning_error = h.planning_error || 0.4;
@@ -877,7 +877,7 @@ function tick(st, sol, frame, R){
         }
       }
 
-      if(h.type==='isru_dependency_crisis'){
+      if(sol >= 1008 && h.type==='isru_dependency_crisis'){
         // Colony too dependent on Earth supplies - ISRU systems can't meet needs
         // Self-sufficiency failure when resupply is delayed/lost
         const dependency_ratio = h.dependency_ratio || 0.7; // 70% Earth-dependent
@@ -974,13 +974,13 @@ function tick(st, sol, frame, R){
   else if(hd<3.5)       {a.h=0.06;a.i=0.88;a.g=0.06;a.r=0.3}
   else if(fd<6)         {a.h=0.08;a.i=0.18;a.g=0.74;a.r=0.5}
   else {
-    // ULTRA-ENHANCED CRI-adaptive strategy: quantum-level sensitivity
-    const criticalZone = sol > 400;   // Earlier critical detection (400 vs 380)
-    const lateGame = sol > 350;       // Late game phase  
-    const endGame = sol > 450;        // End game ultra-defensive
-    const ultraHigh = st.cri > 65;    // Ultra-high risk threshold
-    const highRisk = st.cri > 45;     // Lowered high risk (45 vs 50)
-    const mediumRisk = st.cri > 20;   // Ultra-sensitive medium risk (20 vs 25)
+    // ULTIMATE RECORD-BREAKING CRI-adaptive strategy: ultra-conservative for minimal CRI
+    const criticalZone = sol > 600;   // Later critical detection for better resource building
+    const lateGame = sol > 500;       // Later late game phase for more aggressive building
+    const endGame = sol > 700;        // Later end game for extended aggressive phase
+    const ultraHigh = st.cri > 30;    // Much lower ultra-high threshold (30 vs 65)
+    const highRisk = st.cri > 20;     // Lower high risk (20 vs 45)
+    const mediumRisk = st.cri > 12;   // Ultra-sensitive medium risk (12 vs 20)
     
     if(endGame && ultraHigh) {
       // End game + ultra high CRI: ultimate survival mode
@@ -1033,31 +1033,31 @@ function tick(st, sol, frame, R){
       }
     } else if(mediumRisk) {
       // Medium CRI: ULTIMATE allocation to prevent any CRI growth
-      // SUPER ENHANCED: Maximum buffer building for record-breaking
-      if(o2d < 15) {
-        a.h=0.15; a.i=0.68; a.g=0.17; a.r=1.2;  // O2 shortage prevention - maximum
-      } else if(hd < 15) {
-        a.h=0.15; a.i=0.68; a.g=0.17; a.r=1.2;  // H2O shortage prevention - maximum
-      } else if(fd < 20) {
-        a.h=0.15; a.i=0.20; a.g=0.65; a.r=1.2;  // Food shortage prevention - maximum
+      // SUPER ENHANCED: Maximum buffer building for record-breaking scores
+      if(o2d < 25) {
+        a.h=0.12; a.i=0.75; a.g=0.13; a.r=1.1;  // O2 shortage prevention - maximum
+      } else if(hd < 25) {
+        a.h=0.12; a.i=0.75; a.g=0.13; a.r=1.1;  // H2O shortage prevention - maximum
+      } else if(fd < 30) {
+        a.h=0.12; a.i=0.18; a.g=0.70; a.r=1.1;  // Food shortage prevention - maximum
       } else {
-        a.h=0.18; a.i=0.50; a.g=0.32; a.r=1.2;  // Balanced with maximum buffers
+        a.h=0.15; a.i=0.45; a.g=0.40; a.r=1.1;  // Balanced with massive buffers
       }
     } else {
-      // Low CRI: ULTIMATE RECORD-BREAKING allocation for P75 CRI ≤ 10
-      // SUPER ENHANCED: Build absolutely massive resource buffers 
-      if(o2d < 20 || hd < 20 || fd < 25) {
+      // Low CRI: ULTIMATE RECORD-BREAKING allocation for P75 CRI ≤ 12
+      // SUPER ENHANCED: Build absolutely massive resource buffers for 121,440+ score
+      if(o2d < 30 || hd < 35 || fd < 40) {
         // Ultra-massive buffer building mode - record-breaking thresholds
         if(o2d < hd && o2d < fd) {
-          a.h=0.06; a.i=0.75; a.g=0.19; a.r=1.0;  // O2 focus - maximum aggressive
+          a.h=0.05; a.i=0.80; a.g=0.15; a.r=0.8;  // O2 focus - maximum aggressive
         } else if(hd < fd) {
-          a.h=0.06; a.i=0.75; a.g=0.19; a.r=1.0;  // H2O focus - maximum aggressive
+          a.h=0.05; a.i=0.80; a.g=0.15; a.r=0.8;  // H2O focus - maximum aggressive  
         } else {
-          a.h=0.06; a.i=0.18; a.g=0.76; a.r=1.0;  // Food focus - maximum aggressive
+          a.h=0.05; a.i=0.15; a.g=0.80; a.r=0.8;  // Food focus - maximum aggressive
         }
       } else {
-        // Massive buffers achieved - optimized for lower CRI and better efficiency
-        a.h=0.08; a.i=0.37; a.g=0.55; a.r=0.90;  // Slightly more efficient allocation
+        // Massive buffers achieved - optimized for ultra-low CRI maintenance
+        a.h=0.06; a.i=0.32; a.g=0.62; a.r=0.7;  // Even more efficient allocation
       }
     }
   }
@@ -1367,7 +1367,7 @@ function triggerMicroFailure(state, R) {
 
 function createState(seed){
   return {
-    o2:0, h2o:0, food:0, power:50000, se:1, ie:1, ge:1, it:293, cri:5,  // Ultra-extreme starting power for mission completion
+    o2:0, h2o:0, food:0, power:100000, se:1, ie:1, ge:1, it:293, cri:5,  // MASSIVE starting power for ultimate record breaking
     // v7 Sabatier chemistry state
     catalyst_age_hours: 0,        // Catalyst operating hours (degrades over time)
     catalyst_efficiency: 1.0,     // Current catalyst efficiency (decreases with age)

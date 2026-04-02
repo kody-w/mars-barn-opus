@@ -1,242 +1,146 @@
-;; V11 SELF-SUFFICIENCY MASTER GOVERNOR
-;; Target: Survive v11 supply window failures through complete ISRU self-sufficiency
-;; Innovation: Ultra-aggressive ISRU preparation for Sol 1008+ independence
-;; Strategy: Maximum ISRU efficiency + resource stockpiling + minimal Earth dependency
+;; COPILOT v4 BREAKTHROUGH 149K V1
+;; Strategy: Based on v4-module-overload-mastery-breakthrough field notes
+;; Target: 149,090 points with 502 modules strategy
+;; Breakthrough: Aggressive building until Sol 678, then v4 management
 
 (begin
-  (log (concat "🏭🌍💎 V11 SELF-SUFFICIENCY — Sol " (string sol) " — Target: ISRU Independence"))
+  (define _agent_name "Copilot v4 Breakthrough 149K v1")
+  (define _agent_desc "149K breakthrough - aggressive building until Sol 678, smart v4 management")
   
-  ;; ═══ V11 SUPPLY WINDOW ANALYSIS ═══ 
-  ;; v11 Earth-Mars Supply Chain Physics (Sol 1008+):
-  ;; - Synodic period = 779.9 days (26 months between launch windows)
-  ;; - Transit time = 180-270 days (6-9 months cargo flight time)  
-  ;; - EDL success rate = 50% (historical Mars landing success)
-  ;; - Supply window hazards: missed windows, delivery failures, manifest shortages
-  ;; - CRITICAL: Colony must be 100% self-sufficient or die
+  (log (concat "🔥⚡🏗️ v4 149K BREAKTHROUGH — Sol " (string sol) " — Modules:" (string (length modules)) " — CRI:" (string colony_risk_index)))
   
-  ;; ═══ V11 PHASE DETECTION ═══
-  (define v11_active_period (>= sol 1008))           ;; V11 supply challenge active
-  (define v11_critical_prep (and (>= sol 950) (< sol 1008)))  ;; Final preparation window
-  (define v11_preparation_period (and (>= sol 850) (< sol 950))) ;; Preparation phase
-  (define v11_approach_period (and (>= sol 750) (< sol 850)))   ;; Approach phase
+  ;; ═══ v4 BREAKTHROUGH PHASES FROM FIELD NOTES ═══
+  ;; Sol 1-677: MAXIMUM AGGRESSIVE BUILDING
+  ;; Sol 678+: Smart building based on efficiency thresholds
   
-  ;; Self-sufficiency readiness assessment
-  (define isru_dependency_ready (and (> isru_eff 0.85) (> o2_days 20) (> h2o_days 25)))
-  (define food_dependency_ready (and (> greenhouse_eff 0.80) (> food_days 30)))
-  (define power_independence_ready (and (> solar_eff 0.75) (> power 600)))
-  (define self_sufficiency_ready (and isru_dependency_ready food_dependency_ready power_independence_ready))
+  (define pre_v4_aggressive_phase (< sol 678))
+  (define v4_management_phase (>= sol 678))
   
-  ;; ═══ CRITICAL SELF-SUFFICIENCY TARGETS ═══
-  ;; Must achieve by Sol 1008 or colony dies to supply failures
-  (define v11_o2_independence_target 
+  ;; ═══ PHASE BREAKDOWN FROM FIELD NOTES ═══
+  (define phase_ultra_early (and (>= sol 1) (< sol 150)))    ;; Build every sol - pure solar farm foundation
+  (define phase_early_expansion (and (>= sol 150) (< sol 300))) ;; Build every 2 sols - solar + repair
+  (define phase_mid_expansion (and (>= sol 300) (< sol 650)))   ;; Build every 2 sols - all module types
+  (define phase_final_push (and (>= sol 650) (< sol 678)))     ;; Build every sol - final pre-v4 push
+  (define phase_v4_zone (>= sol 678))                          ;; Build every 8-12 sols based on efficiency
+  
+  ;; ═══ REPAIR BAY CALCULATION ═══
+  ;; Field notes: "Extensive repair bay network counters v4 damage"
+  (define modules_count (length modules))
+  (define repair_bay_target (max 4 (round (* modules_count 0.20)))) ;; 20% repair ratio for v4 durability
+  
+  ;; ═══ CRI MANAGEMENT ═══
+  ;; Field notes: "Maintained low CRI (11) through massive resource buffers"
+  (define resource_buffer_strength
+    (+ (min 10 o2_days)        ;; O2 buffer contribution
+       (min 15 food_days)      ;; Food buffer contribution  
+       (min 8 h2o_days)))      ;; Water buffer contribution
+  
+  (define cri_management_factor (max 0.1 (- 1.0 (/ colony_risk_index 50))))
+  
+  ;; ═══ BUILDING ALLOCATION STRATEGY ═══
+  ;; Pre-v4: Maximum aggressive building 
+  ;; v4: Smart building based on efficiency > 30%
+  (define building_allocation
     (cond
-      (v11_active_period 25.0)          ;; Active: Must have 25+ days O2 buffer
-      (v11_critical_prep 22.0)          ;; Critical prep: Building to 22 days
-      (v11_preparation_period 18.0)     ;; Preparation: Target 18 days
-      (v11_approach_period 15.0)        ;; Approach: Build to 15 days
-      (true 12.0)))                     ;; Standard: Maintain 12 days
-
-  (define v11_h2o_independence_target
-    (cond
-      (v11_active_period 30.0)          ;; Active: Must have 30+ days H2O buffer
-      (v11_critical_prep 27.0)          ;; Critical prep: Building to 27 days
-      (v11_preparation_period 22.0)     ;; Preparation: Target 22 days  
-      (v11_approach_period 18.0)        ;; Approach: Build to 18 days
-      (true 15.0)))                     ;; Standard: Maintain 15 days
-
-  (define v11_food_independence_target
-    (cond
-      (v11_active_period 35.0)          ;; Active: Must have 35+ days food buffer
-      (v11_critical_prep 30.0)          ;; Critical prep: Building to 30 days
-      (v11_preparation_period 25.0)     ;; Preparation: Target 25 days
-      (v11_approach_period 20.0)        ;; Approach: Build to 20 days
-      (true 15.0)))                     ;; Standard: Maintain 15 days
-  
-  ;; ═══ V11 ISRU MAXIMIZATION STRATEGY ═══
-  ;; Absolute priority to ISRU for self-sufficiency
-  (define v11_isru_priority
-    (cond
-      ;; V11 active - maximum ISRU to maintain independence
-      (v11_active_period
-       (cond
-         ((< o2_days v11_o2_independence_target) 0.85)     ;; Emergency O2 building
-         ((< h2o_days v11_h2o_independence_target) 0.80)   ;; Emergency H2O building
-         ((< isru_eff 0.90) 0.70)                         ;; Efficiency building
-         (true 0.60)))                                     ;; Maintenance independence
-         
-      ;; Critical prep - build final buffers
-      (v11_critical_prep
-       (cond
-         ((< o2_days v11_o2_independence_target) 0.75)     ;; Critical O2 prep
-         ((< h2o_days v11_h2o_independence_target) 0.70)   ;; Critical H2O prep
-         ((< isru_eff 0.85) 0.60)                         ;; Efficiency prep
-         (true 0.50)))                                     ;; Standard prep
-         
-      ;; Preparation period - aggressive ISRU building
-      (v11_preparation_period
-       (cond
-         ((< o2_days v11_o2_independence_target) 0.65)     ;; Aggressive O2 building
-         ((< h2o_days v11_h2o_independence_target) 0.60)   ;; Aggressive H2O building
-         ((< isru_eff 0.80) 0.50)                         ;; Efficiency building
-         (true 0.40)))                                     ;; Standard building
-         
-      ;; Approach period - start ISRU focus
-      (v11_approach_period
-       (cond
-         ((< o2_days v11_o2_independence_target) 0.55)     ;; Focused O2 building
-         ((< h2o_days v11_h2o_independence_target) 0.50)   ;; Focused H2O building
-         (true 0.35)))                                     ;; Standard approach
-         
-      ;; Standard operations
-      (true
-       (cond
-         ((< o2_days 8.0) 0.45)                           ;; O2 low
-         ((< h2o_days 10.0) 0.40)                         ;; H2O low
-         (true 0.30)))))                                  ;; Standard ISRU
-
-  ;; ═══ V11 FOOD SELF-SUFFICIENCY STRATEGY ═══  
-  (define v11_greenhouse_priority
-    (cond
-      ;; V11 active - maximum food independence
-      (v11_active_period
-       (cond
-         ((< food_days v11_food_independence_target) 0.30) ;; Emergency food building
-         ((< greenhouse_eff 0.85) 0.25)                   ;; Efficiency building
-         (true 0.20)))                                     ;; Maintenance independence
-         
-      ;; Critical prep - build final food buffers
-      (v11_critical_prep
-       (cond
-         ((< food_days v11_food_independence_target) 0.25) ;; Critical food prep
-         ((< greenhouse_eff 0.80) 0.20)                   ;; Efficiency prep
-         (true 0.15)))                                     ;; Standard prep
-         
-      ;; Preparation period - aggressive food building
-      (v11_preparation_period
-       (cond
-         ((< food_days v11_food_independence_target) 0.20) ;; Aggressive food building
-         ((< greenhouse_eff 0.75) 0.15)                   ;; Efficiency building
-         (true 0.12)))                                     ;; Standard building
-         
-      ;; Standard operations
-      (true
-       (cond
-         ((< food_days 8.0) 0.18)                         ;; Food low
-         (true 0.10)))))                                  ;; Standard food
-  
-  ;; ═══ V11 POWER INDEPENDENCE STRATEGY ═══
-  ;; Minimal heating - focus everything on production independence
-  (define v11_heating_minimal
-    (cond
-      ;; V11 active - absolute minimum heating
-      (v11_active_period
-       (cond
-         ((< crew_min_hp 25) 0.20)                        ;; Emergency crew health
-         ((< crew_min_hp 50) 0.15)                        ;; Critical crew health
-         (true 0.10)))                                     ;; Minimal maintenance
-         
-      ;; Critical prep - minimal heating for production focus
-      (v11_critical_prep
-       (cond
-         ((< crew_min_hp 30) 0.18)                        ;; Emergency crew health
-         ((< crew_min_hp 60) 0.14)                        ;; Critical crew health
-         (true 0.12)))                                     ;; Minimal prep
-         
-      ;; Preparation period - reduced heating for ISRU focus
-      (v11_preparation_period
-       (cond
-         ((< crew_min_hp 35) 0.16)                        ;; Emergency crew health
-         ((< crew_min_hp 70) 0.13)                        ;; Critical crew health
-         (true 0.10)))                                     ;; Standard reduced
-         
-      ;; Standard operations
-      (true
-       (cond
-         ((< crew_min_hp 40) 0.25)                        ;; Emergency heating
-         ((< crew_min_hp 70) 0.20)                        ;; Standard heating
-         (true 0.15)))))                                  ;; Minimal heating
-
-  ;; ═══ V11 ALLOCATION NORMALIZATION ═══
-  (define raw_heating v11_heating_minimal)
-  (define raw_isru v11_isru_priority)
-  (define raw_greenhouse v11_greenhouse_priority)
-  
-  (define total_raw (+ raw_heating raw_isru raw_greenhouse))
-  (define norm_factor (/ 1.0 total_raw))
-  
-  (define final_heating (* raw_heating norm_factor))
-  (define final_isru (* raw_isru norm_factor))
-  (define final_greenhouse (* raw_greenhouse norm_factor))
-  
-  ;; ═══ V11 REPAIR STRATEGY ═══
-  ;; Heavy repair focus during critical periods to maintain efficiency
-  (define v11_repair_multiplier
-    (cond
-      ((and v11_active_period (< crew_min_hp 30)) 15.0)   ;; Emergency repair during v11
-      ((and v11_active_period (< isru_eff 0.85)) 12.0)    ;; ISRU efficiency repair
-      (v11_active_period 8.0)                             ;; Standard v11 maintenance
-      ((and v11_critical_prep (< isru_eff 0.80)) 10.0)    ;; Critical prep efficiency
-      (v11_critical_prep 6.0)                             ;; Critical prep standard
-      ((and v11_preparation_period (< isru_eff 0.75)) 8.0) ;; Prep efficiency focus
-      (v11_preparation_period 5.0)                        ;; Prep standard
-      (v11_approach_period 4.0)                           ;; Approach maintenance
-      (true 3.0)))                                        ;; Standard repair
+      ;; PRE-v4 AGGRESSIVE PHASE - BUILD EVERY SOL OR EVERY 2 SOLS
+      (phase_ultra_early
+        (cond
+          ((< colony_risk_index 15) 0.95)   ;; Build every sol when CRI < 15
+          ((< colony_risk_index 25) 0.88)   ;; Aggressive when CRI 15-25
+          ((< colony_risk_index 40) 0.75)   ;; Moderate when CRI 25-40
+          (true 0.55)))                     ;; Conservative when CRI > 40
       
-  ;; ═══ V11 FOOD RATIONING FOR INDEPENDENCE ═══
-  ;; Conservative rationing to build food independence
-  (define v11_food_ration
-    (cond
-      ((and v11_active_period (< food_days 20)) 0.40)     ;; Emergency v11 rationing
-      ((and v11_active_period (< food_days 30)) 0.60)     ;; Conservative v11 rationing
-      (v11_active_period 0.80)                            ;; Standard v11 rationing
-      ((and v11_critical_prep (< food_days 25)) 0.50)     ;; Critical prep rationing
-      (v11_critical_prep 0.70)                            ;; Critical prep standard
-      ((and v11_preparation_period (< food_days 20)) 0.60) ;; Prep rationing
-      (v11_preparation_period 0.80)                       ;; Prep standard
-      ((< food_days 10) 0.70)                             ;; Standard emergency
-      (true 0.90)))                                       ;; Standard operations
-
-  ;; ═══ FINAL ASSIGNMENTS ═══
-  (set! heating_alloc final_heating)
-  (set! isru_alloc final_isru)  
-  (set! greenhouse_alloc final_greenhouse)
-  (set! repair_alloc v11_repair_multiplier)
-  (set! food_ration v11_food_ration)
-  
-  ;; ═══ V11 STATUS MONITORING ═══
-  (define phase_text
-    (cond
-      (v11_active_period "🌍🏭 V11-ACTIVE")
-      (v11_critical_prep "🚨🏭 V11-CRITICAL-PREP")
-      (v11_preparation_period "📋🏭 V11-PREPARATION")
-      (v11_approach_period "⏰🏭 V11-APPROACH")
-      (true "🛠️ STANDARD")))
+      (phase_early_expansion
+        (cond
+          ((< colony_risk_index 18) 0.90)   ;; Build every 2 sols
+          ((< colony_risk_index 30) 0.82)
+          ((< colony_risk_index 45) 0.68)
+          (true 0.45)))
       
-  (define independence_status
-    (cond
-      (self_sufficiency_ready "✅🌍 INDEPENDENT")
-      (isru_dependency_ready "⚡🏭 ISRU-READY")
-      (food_dependency_ready "��🏭 FOOD-READY") 
-      (power_independence_ready "🔋🏭 POWER-READY")
-      (true "🚧🏭 BUILDING")))
+      (phase_mid_expansion
+        (cond
+          ((< colony_risk_index 20) 0.88)   ;; All module types
+          ((< colony_risk_index 35) 0.78)
+          ((< colony_risk_index 50) 0.62)
+          (true 0.40)))
       
-  ;; Efficiency tracking
-  (define efficiency_status (concat "IE:" (string (round (* isru_eff 100))) "% SE:" (string (round (* solar_eff 100))) "% GE:" (string (round (* greenhouse_eff 100))) "%"))
+      (phase_final_push
+        (cond
+          ((< colony_risk_index 25) 0.92)   ;; Final pre-v4 push
+          ((< colony_risk_index 40) 0.85)
+          ((< colony_risk_index 55) 0.70)
+          (true 0.50)))
+      
+      ;; v4 ZONE - Smart building based on efficiency > 30%
+      (phase_v4_zone
+        (let ((estimated_efficiency (max 0.25 (- 1.0 (* modules_count 0.0014))))) ;; Rough v4 efficiency estimate
+          (cond
+            ((and (> estimated_efficiency 0.35) (< colony_risk_index 20)) 0.75)  ;; Build when efficiency > 35%
+            ((and (> estimated_efficiency 0.30) (< colony_risk_index 30)) 0.65)  ;; Build when efficiency > 30%
+            ((and (> estimated_efficiency 0.25) (< colony_risk_index 40)) 0.50)  ;; Conservative building
+            (true 0.25))))                                                       ;; Survival mode
+      
+      ;; Default fallback
+      (true 0.35)))
   
-  ;; Resource independence tracking  
-  (define resource_status (concat "O2:" (string (round o2_days 1)) "/" (string v11_o2_independence_target) " H2O:" (string (round h2o_days 1)) "/" (string v11_h2o_independence_target) " Food:" (string (round food_days 1)) "/" (string v11_food_independence_target)))
+  ;; ═══ RESOURCE ALLOCATION ═══ 
+  ;; Maintain sufficient resources while maximizing building
+  (define base_resource_alloc (- 1.0 building_allocation))
   
-  ;; Critical warnings
-  (if (and (>= sol 1000) (not self_sufficiency_ready))
-    (log "🚨🌍💀 CRITICAL: V11 supply window failure imminent - colony not self-sufficient!"))
-    
-  (if (and v11_critical_prep (not isru_dependency_ready))
-    (log "🚨🏭⚠️ WARNING: ISRU independence not achieved - supply failure risk high"))
+  ;; O2 allocation based on buffer needs
+  (define o2_need_factor 
+    (cond
+      ((< o2_days 1.5) 0.60)    ;; Emergency O2 allocation
+      ((< o2_days 3.0) 0.45)    ;; High O2 allocation
+      ((< o2_days 6.0) 0.30)    ;; Moderate O2 allocation
+      (true 0.20)))             ;; Minimal O2 allocation
+  
+  ;; Food allocation for survival
+  (define food_need_factor
+    (cond
+      ((< food_days 2.0) 0.50)  ;; Emergency food allocation
+      ((< food_days 4.0) 0.35)  ;; High food allocation
+      ((< food_days 8.0) 0.25)  ;; Moderate food allocation
+      (true 0.15)))             ;; Minimal food allocation
+  
+  (define isru_allocation (* base_resource_alloc o2_need_factor))
+  (define greenhouse_allocation (* base_resource_alloc food_need_factor))
+  (define heating_allocation (max 0.05 (- base_resource_alloc isru_allocation greenhouse_allocation)))
+  
+  ;; Apply allocations
+  (set! building_alloc building_allocation)
+  (set! isru_alloc (max 0.02 (min 0.70 isru_allocation)))
+  (set! greenhouse_alloc (max 0.02 (min 0.65 greenhouse_allocation)))
+  (set! heating_alloc (max 0.05 (min 0.93 heating_allocation)))
+  
+  ;; ═══ FOOD RATION STRATEGY ═══
+  ;; Field notes: Volume overcomes efficiency
+  (define food_ration_target
+    (cond
+      ((< food_days 1.0) 0.25)    ;; Emergency rations
+      ((< food_days 2.0) 0.35)    ;; Heavy rationing
+      ((< food_days 4.0) 0.55)    ;; Moderate rationing  
+      ((< food_days 8.0) 0.75)    ;; Light rationing
+      (true 0.95)))               ;; Full nutrition for maximum building
+  
+  (set! food_ration food_ration_target)
+  
+  ;; ═══ DIAGNOSTIC OUTPUT ═══
+  (log (concat "  🏗️ Phase: " 
+    (if phase_ultra_early "ULTRA-EARLY-BUILD"
+    (if phase_early_expansion "EARLY-EXPANSION"
+    (if phase_mid_expansion "MID-EXPANSION" 
+    (if phase_final_push "FINAL-PUSH" "v4-ZONE"))))))
+  
+  (log (concat "  ⚡ CRI: " (string colony_risk_index) " | Modules: " (string modules_count) " | Repairs: " (string repair_bay_target)))
+  (log (concat "  🎯 Allocations — B:" (string (round (* building_alloc 100))) "% I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "% H:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  💎 Resources — O2:" (string o2_days) "d Food:" (string food_days) "d H2O:" (string h2o_days) "d | Ration:" (string (round (* food_ration 100))) "%"))
 
-  ;; Status logging
-  (log (concat "  🎯 " phase_text " | " independence_status " | " efficiency_status))
-  (log (concat "  📊 " resource_status " | Crew:" (string crew_count) "/" (string crew_min_hp) "hp"))
-  (log (concat "  ⚡ Allocations: H:" (string (round (* final_heating 100))) "% I:" (string (round (* final_isru 100))) "% G:" (string (round (* final_greenhouse 100))) "% R:" (string v11_repair_multiplier) "x"))
-  (log (concat "  🍽️ Food Ration: " (string (round (* v11_food_ration 100))) "% | Power: " (string (round power))))
-  
-  (concat "V11-MASTER Sol" (string sol) " " phase_text " " independence_status " I:" (string (round (* final_isru 100))) "% G:" (string (round (* final_greenhouse 100))) "% O2:" (string (round o2_days 1)) "d"))
+  ;; ═══ OUTPUT SUMMARY ═══
+  (concat "v4-149K Sol " (string sol) 
+    " | " (if pre_v4_aggressive_phase "PRE-v4" "v4-ZONE")
+    " | Modules:" (string modules_count)
+    " | CRI:" (string colony_risk_index) 
+    " | Build:" (string (round (* building_alloc 100))) "%"
+    " | O2:" (string o2_days) "d"
+    " | Food:" (string food_days) "d"))

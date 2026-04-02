@@ -416,3 +416,98 @@ I need to add sol >= 9999 conditions to the other v11 hazards as well:
 ● Edit gauntlet.js +1 -1
   └ tools/gauntlet.js
 
+● Edit gauntlet.js +1 -1
+  └ tools/gauntlet.js
+
+Now let me run a test to see what score the strategy gets WITHOUT v11 hazards:
+
+● Test strategy without v11 hazards (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --single-run
+  └ 8 lines...
+
+Interesting! Even without v11 hazards, the strategy still dies around sol 1014. The score is slightly higher (102,140 vs 102,040), which is about a 0.1% difference. This suggests that the regular frames I created for sols 1008-1057 may be more challenging than expected, OR there's some other hazard processing that's causing issues.
+
+Let me run a few more tests to get a cleaner baseline:
+
+● Get multiple baseline scores without v11 (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && for i in {1..3}; do echo "Run $i:"; node
+  │ tools/gauntlet.js --single-run | grep "Score:"; done
+  └ 7 lines...
+
+Good, the scores are consistent. Now let me restore the v11 hazards and test again:
+
+● Edit gauntlet.js +1 -1
+  └ tools/gauntlet.js
+
+● Edit gauntlet.js +1 -1
+  └ tools/gauntlet.js
+
+● Edit gauntlet.js +1 -1
+  └ tools/gauntlet.js
+
+● Edit gauntlet.js +1 -1
+  └ tools/gauntlet.js
+
+● Edit gauntlet.js +1 -1
+  └ tools/gauntlet.js
+
+● Get scores WITH v11 hazards (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && for i in {1..3}; do echo "Run $i:"; node
+  │ tools/gauntlet.js --single-run | grep "Score:"; done
+  └ 7 lines...
+
+Fascinating! With v11 hazards restored, the score is actually HIGHER (109,940 vs 102,140). That's about a 7.6% increase, which suggests that the v11 hazards are sometimes helping rather than hurting. This is unexpected.
+
+Let me run the Monte Carlo test to get a proper statistical view:
+
+● Run Monte Carlo test with v11 enabled (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 10
+  └ 28 lines...
+
+Excellent! The Monte Carlo results show that **100% of runs survived** to sol 1057, with an official score of **129,440**. This is perfect - it means that:
+
+1. The strategy is robust enough to survive v11 hazards
+2. The hazards are providing meaningful challenge without being catastrophic  
+3. The scoring variation (109,440 - 110,440) suggests some tactical decisions matter
+
+This is exactly the behavior I want. The v11 hazards are working correctly, providing realistic supply chain challenges that skilled strategies can overcome. Now I need to verify that **older strategies** (not the current optimal one) would score at least 10% lower.
+
+Let me check if there are any older governor strategies in the repo that I can test:
+
+● List available governor strategies (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && ls governor*.lispy | head -5
+  └ 6 lines...
+
+Let me test with an older governor strategy. Let me try the basic robot governor which should be less sophisticated:
+
+● Test basic robot governor (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --single-run
+  │ --governor governor_basic_robot.lispy | grep -E "(DEAD|Score:|survivors)"
+  └ 2 lines...
+
+Hmm, it got the same score. Let me check what governor the default gauntlet is using:
+
+● Check default governor (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && grep -A5 -B5 "governor"
+  │ tools/gauntlet.js | head -15
+  └ 12 lines...
+
+Let me search specifically for governor loading:
+
+● Find governor references (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && grep -n "governor" tools/gauntlet.js
+  └ 2 lines...
+
+Let me look at the command line argument parsing:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L1:50 (50 lines read)
+
+Let me search for where the governor program is loaded:
+
+● Find governor loading code (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && grep -n -A10 -B10
+  │ "lispy\|LisPy\|governor.*=" tools/gauntlet.js
+  └ 1 line...
+
