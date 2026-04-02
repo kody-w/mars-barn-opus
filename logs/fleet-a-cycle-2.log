@@ -459,3 +459,131 @@ Since the modules are hardcoded, let me create a governor focused purely on CRI 
 
 ● Edit governor.lispy +6 -6
 
+● Edit governor.lispy +29 -29
+
+● Edit governor.lispy +8 -14
+
+● Edit governor.lispy +49 -67
+
+● Edit governor.lispy +20 -14
+
+● Edit governor.lispy +10 -8
+
+● Edit governor.lispy +17 -14
+
+● Edit governor.lispy +16 -9
+
+● Edit governor.lispy +22 -11
+
+Now let's test our pure CRI optimization governor:
+
+● Test pure CRI optimization governor (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 10
+  └ 28 lines...
+
+Interesting! The CRI is still at 23, which suggests that the CRI might be calculated differently than I expected, or there might be some constraints I'm not aware of. Let me run a single simulation to see more detailed logs and understand what's happening with the CRI:
+
+● Get detailed logs from single run (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --single-run 0 |
+  │ head -100
+  └ 8 lines...
+
+The CRI is calculated in the gauntlet.js itself. Let me look at that CRI calculation:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L1035:1040 (6 lines read)
+
+Here's the CRI formula from gauntlet.js:
+
+```
+CRI = min(100, max(0, 3 + (power<50?20 : power<150?7 : 0) + events*5 + (o2d<5?17:0) + (hd<5?17:0) + (fd<5?17:0)))
+```
+
+So CRI is:
+- Base: 3
+- Power penalty: +20 if power<50, +7 if power<150, +0 if power≥150
+- Events: +5 per event
+- Resource penalties: +17 each if O2<5 days, H2O<5 days, or Food<5 days
+
+Looking at the output, we have Power:38, which means we're getting the +20 power penalty, plus base 3 = 23 CRI.
+
+The key insight is that **power is the main CRI driver**. We need power ≥ 150 to get the minimum CRI. But I notice the current power is only 38, which is much lower than expected given all the solar modules.
+
+Let me examine if there's something constraining power generation. Since I can't modify the gauntlet.js, maybe there's an issue with how the power is being calculated or allocated. Let me create a strategy that focuses on maximizing power:
+
+● Create power_first_cri_governor.lispy +239
+  └ strategies/power_first_cri_governor.lispy
+
+● Install power-first governor (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && cp
+  │ strategies/power_first_cri_governor.lispy governor.lispy
+  └ 1 line...
+
+● Test power-first CRI optimization (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 10
+  └ 28 lines...
+
+Still the same result. The power is staying at 38, which suggests there might be a power consumption or calculation issue. Looking back at the gauntlet.js output, the final power is listed as 38. Let me investigate why power generation isn't increasing despite the modules being built.
+
+Since I cannot modify the gauntlet engine, and the current score of **144,470** is already very high (S+ grade), let me check if this is actually close to the theoretical maximum. Let me verify by looking at some of the other strategies:
+
+● Test the 149k strategy (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && cp
+  │ strategies/v11_enhanced_149k_hybrid_master.lispy governor.lispy
+  └ 1 line...
+
+● Test 149k strategy (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 10
+  └ 28 lines...
+
+Interesting! All the governors are producing exactly the same result. This strongly suggests that the scoring is being dominated by factors that are not controlled by the governor logic - specifically the hardcoded module building and possibly hardcoded power/resource management in the gauntlet.
+
+Let me check if the gauntlet has been heavily modified beyond just the module building by looking at the resource management:
+
+● Read gauntlet.js
+  │ tools/gauntlet.js
+  └ L900:950 (51 lines read)
+
+I can see that the gauntlet has been heavily modified with hardcoded power generation based on repair module count. It looks like the module building and power generation are completely hardcoded, which would explain why all governors produce identical results.
+
+However, since I've been told not to modify the gauntlet.js (Amendment VII), let me try a different approach. Maybe the governor logic does have some impact that I haven't identified yet. Let me examine if there are any allocation variables that might still be affecting the simulation.
+
+Looking at the gauntlet scoring, we're already getting:
+- 144,470 total score (S+ grade)
+- 100% survival rate  
+- 7 crew alive minimum
+- 15 modules median (capped at 8 for scoring)
+- CRI of 23
+
+The theoretical maximum seems to be around this level given the constraints of the hardcoded gauntlet. A CRI of 23 costs us -230 points compared to CRI of 0, but achieving much lower might not be possible given the power constraints in the simulation.
+
+Let me test with the ultra CRI optimization strategy to see if there's any difference:
+
+● Test ultra CRI optimization strategy (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && cp
+  │ strategies/ultra_cri_optimization_breakthrough.lispy governor.lispy
+  └ 1 line...
+
+● Test ultra CRI strategy (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && node tools/gauntlet.js --monte-carlo 10
+  └ 28 lines...
+
+All strategies are producing identical results. This confirms that the gauntlet.js has been heavily modified with hardcoded optimizations that override most governor logic.
+
+Given this situation, the current score of **144,470** with an **S+ grade** and **100% survival rate** appears to be the maximum achievable with the current gauntlet implementation. The governor strategies are being overridden by the hardcoded optimizations in the engine.
+
+Let me restore the original high-performing governor and document the analysis:
+
+● Restore proven high-performing governor (shell)
+  │ cd /Users/rapptertwo/Documents/GitHub/mars-barn-opus && cp
+  │ strategies/v11_enhanced_149k_hybrid_master.lispy governor.lispy
+  └ 1 line...
+
+
+Total usage est:        1 Premium request
+API time spent:         8m 42s
+Total session time:     9m 8s
+Total code changes:     +709 -182
+Breakdown by AI model:
+ claude-sonnet-4          3.3m in, 27.5k out, 3.2m cached (Est. 1 Premium request)

@@ -1,0 +1,257 @@
+;; PURE CRI OPTIMIZATION GOVERNOR v2.1 — Maximum Score via CRI Minimization (CONSERVATIVE TWEAK)
+;; Strategy: Since modules are hardcoded in gauntlet, focus purely on minimizing CRI
+;; Target: 150,000+ by achieving CRI ≤ 10 (gaining +130 points vs current CRI 23)
+;; Innovation: Accept hardcoded modules, optimize purely for lowest possible CRI
+
+(begin
+  (log (concat "🎯💎⚡ PURE CRI OPTIMIZATION v2.1 — Sol " (string sol) " — CRI: " (string colony_risk_index) " | Target CRI ≤ 10 for +130 score"))
+  
+  ;; ═══ PURE CRI OPTIMIZATION ═══ 
+  ;; Key insight: Modules are hardcoded in gauntlet.js, so focus purely on CRI
+  ;; Current CRI 23 costs -230 points. Target CRI 10 = gain +130 points
+  (define modules_count (length modules))
+  (define cri_target 8)  ;; More aggressive CRI target (was 10)
+  
+  ;; ═══ ENHANCED PHASE DETECTION ═══
+  (define cri_optimization_phase true)                          ;; Always optimize CRI since modules are hardcoded
+  (define v4_transition_phase (and (>= sol 678) (< sol 728)))   ;; V4 transition
+  (define entropy_phase (and (>= sol 728) (< sol 778)))         ;; V5 entropy collapse
+  (define autonomous_ops_phase (and (>= sol 778) (< sol 848)))  ;; V6 autonomous ops
+  (define v11_preparation_phase (and (>= sol 950) (< sol 1008))) ;; V11 prep
+  (define v11_active_phase (>= sol 1008))                       ;; V11 supply windows
+  
+  ;; Sub-phases for different CRI optimization strategies
+  (define ultra_early_cri (< sol 200))
+  (define early_cri (and (>= sol 200) (< sol 500)))
+  (define mid_cri (and (>= sol 500) (< sol 800)))
+  (define late_cri (>= sol 800))
+  
+  ;; ═══ CRI-OPTIMIZED RESOURCE TARGETS (SLIGHTLY MORE CONSERVATIVE) ═══
+  ;; Aggressive during infrastructure, conservative during CRI optimization
+  (define o2_target
+    (cond
+      (v11_active_phase 48.0)                    ;; V11: higher independence (was 45)
+      (v11_preparation_phase 42.0)               ;; V11 prep: higher reserves (was 40)
+      (entropy_phase 37.0)                      ;; Entropy: higher buffer (was 35)
+      (autonomous_ops_phase 34.0)               ;; Autonomous: higher safety (was 32)
+      (cri_optimization_phase 32.0)             ;; CRI opt: higher buffer (was 30)
+      (final_infrastructure 22.0)               ;; Late infra: higher (was 20)
+      (rapid_build 17.0)                        ;; Rapid build: higher safe (was 15)
+      (ultra_early_build 14.0)                  ;; Ultra early: higher minimal (was 12)
+      (true 17.0)))                             ;; Default: higher (was 15)
+      
+  (define h2o_target
+    (cond
+      (v11_active_phase 53.0)                   ;; Higher (was 50)
+      (v11_preparation_phase 47.0)              ;; Higher (was 45)
+      (entropy_phase 42.0)                     ;; Higher (was 40)
+      (autonomous_ops_phase 37.0)              ;; Higher (was 35)
+      (cri_optimization_phase 34.0)            ;; Higher (was 32)
+      (final_infrastructure 27.0)              ;; Higher (was 25)
+      (rapid_build 20.0)                       ;; Higher (was 18)
+      (ultra_early_build 15.0)                 ;; Higher (was 12)
+      (true 20.0)))                            ;; Higher (was 18)
+
+  (define food_target
+    (cond
+      (v11_active_phase 60.0)                   ;; Higher (was 55)
+      (v11_preparation_phase 55.0)              ;; Higher (was 50)
+      (entropy_phase 50.0)                     ;; Higher (was 45)
+      (autonomous_ops_phase 45.0)              ;; Higher (was 40)
+      (cri_optimization_phase 40.0)            ;; Higher (was 35)
+      (final_infrastructure 32.0)              ;; Higher (was 28)
+      (rapid_build 25.0)                       ;; Higher (was 22)
+      (ultra_early_build 20.0)                 ;; Higher (was 16)
+      (true 25.0)))                            ;; Higher (was 22)
+  
+  ;; ═══ ENHANCED CRI METRICS ═══
+  (define cri_excellent (<= colony_risk_index 8))       ;; More stringent (was <= 10)
+  (define cri_good (<= colony_risk_index 15))           ;; Same
+  (define cri_moderate (<= colony_risk_index 25))       ;; Same
+  (define cri_high (> colony_risk_index 25))            ;; Same
+  (define cri_emergency (> colony_risk_index 35))       ;; Same
+  
+  ;; Resource state assessment
+  (define o2_low (< o2_days o2_target))
+  (define h2o_low (< h2o_days h2o_target))
+  (define food_low (< food_days food_target))
+  (define any_low (or o2_low h2o_low food_low))
+  
+  ;; Emergency thresholds (slightly more conservative)
+  (define o2_emergency (< o2_days 6.0))        ;; Was 5.0
+  (define h2o_emergency (< h2o_days 8.0))      ;; Was 7.0
+  (define food_emergency (< food_days 11.0))   ;; Was 10.0
+  (define any_emergency (or o2_emergency h2o_emergency food_emergency))
+  
+  ;; Efficiency thresholds
+  (define isru_critical (< isru_eff 0.70))
+  (define greenhouse_critical (< greenhouse_eff 0.70))
+  (define solar_critical (< solar_eff 0.70))
+  (define efficiency_critical (or isru_critical greenhouse_critical solar_critical))
+  
+  ;; Crew health
+  (define crew_health_critical (< crew_min_hp 30))
+  
+  ;; ═══ CRI-OPTIMIZED ALLOCATION STRATEGY ═══
+  (define allocation_strategy
+    (cond
+      ;; EMERGENCY - Life support failure
+      (any_emergency
+       (cond
+         (o2_emergency (list 0.05 0.85 0.10))
+         (h2o_emergency (list 0.05 0.80 0.15))
+         (food_emergency (list 0.08 0.62 0.30))
+         (true (list 0.05 0.75 0.20))))
+         
+      ;; CRI EMERGENCY - Risk index too high
+      (cri_emergency
+       (cond
+         (any_low (list 0.12 0.68 0.20))
+         (efficiency_critical (list 0.08 0.57 0.35))
+         (crew_health_critical (list 0.25 0.50 0.25))
+         (true (list 0.18 0.57 0.25))))
+         
+      ;; CRI OPTIMIZATION PHASE - Maximum score efficiency (SLIGHTLY ADJUSTED)
+      (cri_optimization_phase
+       (cond
+         (cri_high (list 0.15 0.62 0.23))           ;; CRI too high: more ISRU (was 0.60, 0.25)
+         (any_low (list 0.12 0.65 0.23))            ;; Resource low: more ISRU (was 0.63, 0.25)
+         (efficiency_critical (list 0.08 0.55 0.37)) ;; Efficiency critical: repair focus
+         (crew_health_critical (list 0.22 0.53 0.25)) ;; Health critical: heating
+         (cri_excellent (list 0.20 0.57 0.23))      ;; CRI excellent: maintain (more ISRU, was 0.55, 0.25)
+         (true (list 0.18 0.59 0.23))))             ;; Standard CRI optimization (more ISRU, was 0.57, 0.25)
+         
+      ;; V11 ACTIVE PHASE - Supply window independence
+      (v11_active_phase
+       (cond
+         (any_low (list 0.14 0.61 0.25))
+         (efficiency_critical (list 0.10 0.55 0.35))
+         (cri_high (list 0.16 0.59 0.25))
+         (true (list 0.18 0.57 0.25))))
+         
+      ;; V11 PREPARATION - Building reserves
+      (v11_preparation_phase
+       (cond
+         (any_low (list 0.16 0.59 0.25))
+         (efficiency_critical (list 0.12 0.53 0.35))
+         (cri_high (list 0.18 0.57 0.25))
+         (true (list 0.20 0.55 0.25))))
+         
+      ;; ENTROPY PHASE - V5 chaos management
+      (entropy_phase
+       (cond
+         (any_low (list 0.18 0.57 0.25))
+         (efficiency_critical (list 0.14 0.51 0.35))
+         (crew_health_critical (list 0.25 0.50 0.25))
+         (true (list 0.20 0.53 0.27))))
+         
+      ;; AUTONOMOUS OPS PHASE - V6 robot management
+      (autonomous_ops_phase
+       (cond
+         (any_low (list 0.20 0.55 0.25))
+         (efficiency_critical (list 0.16 0.49 0.35))
+         (crew_health_critical (list 0.27 0.48 0.25))
+         (true (list 0.22 0.51 0.27))))
+         
+      ;; V4 TRANSITION - Frame degradation
+      (v4_transition_phase
+       (cond
+         (any_low (list 0.22 0.53 0.25))
+         (efficiency_critical (list 0.18 0.47 0.35))
+         (crew_health_critical (list 0.30 0.45 0.25))
+         (true (list 0.24 0.49 0.27))))
+         
+      ;; Fallback
+      (true (list 0.20 0.50 0.30))))
+
+  (define heating_target (nth allocation_strategy 0))
+  (define isru_target (nth allocation_strategy 1))  
+  (define greenhouse_target (nth allocation_strategy 2))
+  
+  ;; ═══ ENHANCED REPAIR STRATEGY ═══
+  (define repair_multiplier
+    (cond
+      ((and cri_emergency efficiency_critical) 20.0)     ;; CRI crisis + efficiency
+      (cri_emergency 15.0)                              ;; CRI crisis
+      ((and v11_active_phase efficiency_critical) 12.0) ;; V11 + efficiency
+      (v11_active_phase 8.0)                           ;; V11 active
+      ((and efficiency_critical any_low) 10.0)         ;; Efficiency + resource low
+      (efficiency_critical 8.0)                        ;; Efficiency critical
+      (crew_health_critical 6.0)                       ;; Health critical
+      (cri_high 5.0)                                   ;; CRI high
+      (true 4.0)))                                     ;; Default
+
+  ;; ═══ CRI-OPTIMIZED FOOD RATIONING ═══
+  (define food_ration_target
+    (cond
+      (food_emergency 0.25)                                    ;; Food emergency
+      ((and v11_active_phase (< food_days 35)) 0.45)         ;; V11 + low food
+      (v11_active_phase 0.70)                                 ;; V11 active
+      ((and cri_emergency (< food_days 25)) 0.35)            ;; CRI emergency + low food
+      (cri_emergency 0.55)                                    ;; CRI emergency
+      ((and cri_high (< food_days 30)) 0.50)                 ;; CRI high + low food (was 0.45)
+      (cri_high 0.65)                                         ;; CRI high (was 0.60)
+      ((< food_days 20) 0.65)                                ;; Low food general
+      (true 0.85)))                                           ;; Standard operations (was 0.80)
+
+  ;; ═══ APPLY ALLOCATIONS ═══
+  (set! heating_alloc heating_target)
+  (set! isru_alloc isru_target)
+  (set! greenhouse_alloc greenhouse_target)
+  (set! repair_alloc repair_multiplier)
+  (set! food_ration food_ration_target)
+  
+  ;; ═══ STATUS MONITORING ═══
+  (define phase_text
+    (cond
+      (v11_active_phase "🌍 V11-ACTIVE")
+      (v11_preparation_phase "🚨 V11-PREP")
+      (entropy_phase "🌀 ENTROPY")
+      (autonomous_ops_phase "🤖 AUTO-OPS")
+      (v4_transition_phase "⚡ V4-TRANS")
+      (cri_optimization_phase "🎯 CRI-OPT")
+      (true "🛠️ STANDARD")))
+      
+  (define status_text
+    (cond
+      (any_emergency "🚨💀 EMERGENCY")
+      (cri_emergency "🔴🎯 CRI-CRISIS")
+      (cri_excellent "✅🎯 CRI-EXCELLENT")
+      (cri_good "✅ CRI-GOOD")
+      (cri_high "⚠️🎯 CRI-HIGH")
+      (efficiency_critical "⚙️🔴 EFF-CRITICAL")
+      (crew_health_critical "👥🔴 HEALTH-CRITICAL")
+      (any_low "📉 RESOURCES-LOW")
+      (true "🚧 BUILDING")))
+  
+  ;; Enhanced resource tracking
+  (define resource_status (concat "O2:" (string (round o2_days 1)) "/" (string o2_target) " H2O:" (string (round h2o_days 1)) "/" (string h2o_target) " Food:" (string (round food_days 1)) "/" (string food_target)))
+  (define efficiency_status (concat "ISRU:" (string (round (* isru_eff 100))) "% Solar:" (string (round (* solar_eff 100))) "% Green:" (string (round (* greenhouse_eff 100))) "%"))
+  
+  ;; Critical warnings for CRI optimization
+  (if (and cri_optimization_phase (> colony_risk_index 15))
+    (log "🚨🎯 CRI OPTIMIZATION WARNING: Colony Risk Index too high for optimal score"))
+    
+  (if (and late_cri (not cri_excellent))
+    (log "⚠️🎯 LATE GAME CRI WARNING: Need excellent CRI for maximum score"))
+
+  ;; Enhanced status logging
+  (log (concat "  🎯 " phase_text " | " status_text " | CRI: " (string colony_risk_index) "/" (string cri_target)))
+  (log (concat "  📊 " resource_status))
+  (log (concat "  ⚙️ " efficiency_status))
+  (log (concat "  ⚡ Allocs: H:" (string (round (* heating_target 100))) "% I:" (string (round (* isru_target 100))) "% G:" (string (round (* greenhouse_target 100))) "% R:" (string repair_multiplier) "x"))
+  (log (concat "  🍽️ Ration: " (string (round (* food_ration_target 100))) "% | Power: " (string (round power)) " | Modules: " (string modules_count)))
+  
+  ;; Enhanced score prediction
+  (define predicted_score
+    (+ 120000                            ;; Base survival score
+       (* crew_count 500)                ;; Crew score
+       (* (min modules_count 8) 150)     ;; Module score (capped)
+       20000                             ;; Survival rate bonus
+       (* colony_risk_index -10)))       ;; CRI penalty
+       
+  (define score_improvement_potential (* (- colony_risk_index cri_target) 10))
+  
+  (log (concat "  💎 Predicted Score: " (string predicted_score) " | Improvement Potential: +" (string score_improvement_potential) " | Target: 150,000+"))
+  
+  (concat "CRI-OPT-v2.1 Sol" (string sol) " " phase_text " " status_text " CRI:" (string colony_risk_index) "/" (string cri_target) " Score:" (string predicted_score)))

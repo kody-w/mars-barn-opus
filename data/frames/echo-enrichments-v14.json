@@ -1,0 +1,212 @@
+{
+  "_format": "mars-barn-echo-enrichment",
+  "_version": "v14",
+  "_description": "Mars GCM Weather Model retroactive enrichment - adds atmospheric physics hazards to existing frames",
+  "_physics_added": {
+    "seasonal_pressure_variation": "CO2 sublimation/deposition cycle causes 610-1155 Pa pressure swings affecting ISRU efficiency",
+    "enhanced_dust_storm_physics": "Radiative-dynamic feedback creates more realistic dust storm effects with orbital timing",
+    "orbital_solar_variation": "45% solar flux variation from Mars' 0.0934 eccentricity affects power and thermal systems",
+    "uv_radiation_degradation": "UV-C reaches Mars surface causing cumulative material degradation of polymers/plastics",
+    "atmospheric_density_effects": "Variable atmospheric density affects dust transport and convective cooling",
+    "physics_integration": "Seasonal pressure directly affects Sabatier reactor efficiency via CO2 availability"
+  },
+  "enrichments": {
+    "sol_100": {
+      "hazards": [
+        {
+          "type": "atmospheric_pressure_variation",
+          "pressure_delta": 0.08,
+          "seasonal_pressure": 695,
+          "isru_efficiency_loss": 0.08,
+          "description": "Low pressure period reduces CO2 availability for Sabatier reactors"
+        }
+      ]
+    },
+    "sol_150": {
+      "hazards": [
+        {
+          "type": "orbital_solar_variation",
+          "flux_variation": 1.15,
+          "cooling_power_factor": 20,
+          "thermal_degradation": 0.008,
+          "description": "Perihelion season: high solar flux requires additional cooling power"
+        },
+        {
+          "type": "uv_material_degradation",
+          "uv_intensity": 13.8,
+          "damage_threshold": 0.04,
+          "seal_failure_rate": 0.08,
+          "cover_degradation": 0.04,
+          "description": "Peak UV season causes accelerated material degradation"
+        }
+      ]
+    },
+    "sol_200": {
+      "hazards": [
+        {
+          "type": "enhanced_dust_storm_effects",
+          "solar_efficiency_loss": 0.25,
+          "equipment_degradation": 0.015,
+          "thermal_power_cost": 12,
+          "description": "Dust storm season: enhanced radiative feedback effects"
+        }
+      ]
+    },
+    "sol_250": {
+      "hazards": [
+        {
+          "type": "atmospheric_pressure_variation",
+          "pressure_delta": 0.12,
+          "seasonal_pressure": 855,
+          "seal_stress_factor": 0.04,
+          "description": "High pressure period stresses habitat seals and gaskets"
+        },
+        {
+          "type": "atmospheric_density_effects",
+          "density_factor": 1.35,
+          "contamination_rate": 0.006,
+          "description": "High atmospheric density increases dust devil activity"
+        }
+      ]
+    },
+    "sol_300": {
+      "hazards": [
+        {
+          "type": "orbital_solar_variation",
+          "flux_variation": 0.78,
+          "heating_power_factor": 18,
+          "description": "Aphelion season: reduced solar flux requires additional heating power"
+        }
+      ]
+    },
+    "sol_350": {
+      "hazards": [
+        {
+          "type": "uv_material_degradation",
+          "uv_intensity": 9.4,
+          "damage_threshold": 0.06,
+          "seal_failure_rate": 0.12,
+          "brittleness_factor": 0.025,
+          "description": "Cumulative UV damage: plastic components showing brittleness"
+        }
+      ]
+    },
+    "sol_400": {
+      "hazards": [
+        {
+          "type": "enhanced_dust_storm_effects",
+          "solar_efficiency_loss": 0.35,
+          "equipment_degradation": 0.02,
+          "thermal_power_cost": 18,
+          "description": "Major dust storm with strong radiative feedback"
+        },
+        {
+          "type": "atmospheric_density_effects",
+          "density_factor": 0.75,
+          "cooling_efficiency_loss": 0.015,
+          "description": "Low atmospheric density reduces convective cooling efficiency"
+        }
+      ]
+    },
+    "sol_450": {
+      "hazards": [
+        {
+          "type": "atmospheric_pressure_variation",
+          "pressure_delta": 0.15,
+          "seasonal_pressure": 920,
+          "seal_stress_factor": 0.06,
+          "description": "Peak pressure period: maximum stress on pressure seals"
+        }
+      ]
+    },
+    "sol_500": {
+      "hazards": [
+        {
+          "type": "orbital_solar_variation",
+          "flux_variation": 1.22,
+          "cooling_power_factor": 28,
+          "thermal_degradation": 0.012,
+          "description": "Near-perihelion: peak solar flux creates thermal stress on systems"
+        },
+        {
+          "type": "uv_material_degradation",
+          "uv_intensity": 14.6,
+          "damage_threshold": 0.03,
+          "seal_failure_rate": 0.15,
+          "cover_degradation": 0.06,
+          "brittleness_factor": 0.035,
+          "description": "Peak UV exposure: critical material degradation threshold reached"
+        }
+      ]
+    },
+    "sol_550": {
+      "hazards": [
+        {
+          "type": "enhanced_dust_storm_effects",
+          "solar_efficiency_loss": 0.45,
+          "equipment_degradation": 0.03,
+          "thermal_power_cost": 25,
+          "description": "Global dust storm potential: maximum radiative-dynamic feedback"
+        }
+      ]
+    },
+    "sol_600": {
+      "hazards": [
+        {
+          "type": "atmospheric_pressure_variation",
+          "pressure_delta": 0.18,
+          "seasonal_pressure": 650,
+          "isru_efficiency_loss": 0.15,
+          "description": "Minimum pressure period: severely reduced ISRU efficiency"
+        },
+        {
+          "type": "atmospheric_density_effects",
+          "density_factor": 0.68,
+          "cooling_efficiency_loss": 0.02,
+          "description": "Minimum atmospheric density period affects thermal management"
+        }
+      ]
+    },
+    "sol_650": {
+      "hazards": [
+        {
+          "type": "orbital_solar_variation",
+          "flux_variation": 0.72,
+          "heating_power_factor": 25,
+          "description": "Maximum aphelion distance: minimum solar flux requires peak heating"
+        }
+      ]
+    },
+    "sol_700": {
+      "hazards": [
+        {
+          "type": "uv_material_degradation",
+          "uv_intensity": 8.6,
+          "damage_threshold": 0.02,
+          "seal_failure_rate": 0.18,
+          "cover_degradation": 0.08,
+          "brittleness_factor": 0.045,
+          "description": "Long-term UV exposure: widespread material failure risk"
+        }
+      ]
+    },
+    "sol_750": {
+      "hazards": [
+        {
+          "type": "enhanced_dust_storm_effects",
+          "solar_efficiency_loss": 0.28,
+          "equipment_degradation": 0.025,
+          "thermal_power_cost": 15,
+          "description": "Late-season dust activity with moderate radiative effects"
+        },
+        {
+          "type": "atmospheric_density_effects",
+          "density_factor": 1.45,
+          "contamination_rate": 0.01,
+          "description": "High density period: increased dust contamination risk"
+        }
+      ]
+    }
+  },
+  "_enrichment_strategy": "Retroactive Mars GCM hazards added to existing frames to create realistic atmospheric physics progression. Seasonal pressure and solar flux variations follow actual Mars orbital mechanics. UV degradation accumulates realistically causing progressive system failures. Dust storm effects enhanced with real radiative-dynamic feedback physics."
+}

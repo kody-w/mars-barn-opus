@@ -1,40 +1,60 @@
 {
   "sol": 849,
-  "version": 7,
-  "name": "Sabatier Chemistry",
-  "environment": {
-    "temperature_k": 253.1,
-    "pressure_pa": 705.3,
-    "solar_irradiance": 582.7,
-    "dust_storm": false
+  "utc": "2025-11-19T06:00:00Z",
+  "mars": {
+    "ls": 96.8609865470852,
+    "season": "Northern Summer",
+    "temp_k": 230.35499070852975,
+    "temp_c": -42.79500929147022,
+    "pressure_pa": 730,
+    "solar_wm2": 490,
+    "dust_tau": 0.3,
+    "wind_ms": 1.1771301023219432,
+    "lmst": 10.081409780203863
   },
-  "hazards": [],
-  "events": [
+  "events": [],
+  "hazards": [
     {
-      "type": "co2_filter_maintenance",
-      "severity": 0.2,
-      "duration_sols": 1,
-      "description": "CO\u2082 intake filters clogged - cleaning required"
-    }
-  ],
-  "chemistry": {
-    "catalyst_age_hours": 49.2,
-    "catalyst_efficiency_baseline": 0.9877,
-    "co2_pressure_pa": 672.1509,
-    "electrolysis_efficiency_baseline": 0.9996485714285714
-  },
-  "challenges": [
-    {
-      "type": "sabatier_reactor_startup",
-      "description": "Sabatier reactor requires 2-3 hours to reach operating temperature",
-      "power_cost_kw": 2.5,
-      "duration_hours": 2.5
+      "type": "orbital_solar_variation",
+      "flux_variation": 0.9262758054023689,
+      "cooling_power_factor": 25,
+      "heating_power_factor": 20,
+      "thermal_degradation": 0.01
     },
     {
-      "type": "electrolysis_voltage_regulation",
-      "description": "Electrolysis voltage must be maintained above 1.23V minimum",
-      "min_voltage": 1.23,
-      "optimal_voltage": 1.8
+      "type": "uv_material_degradation",
+      "uv_intensity": 11.115309664828427,
+      "damage_threshold": 0.05,
+      "seal_failure_rate": 0.1,
+      "cover_degradation": 0.05,
+      "brittleness_factor": 0.03
     }
-  ]
+  ],
+  "comms": {
+    "earth_delay_min": 13.804034099808165,
+    "window_open": false,
+    "bandwidth_kbps": 39
+  },
+  "terrain": {
+    "regolith_hardness": 0.7271170212202892,
+    "water_ice_depth_m": 2.657414622004916,
+    "surface_radiation_usv": 0.9365777793354693
+  },
+  "frame_echo": {
+    "prev_sol": 848,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "v14_gcm_data": {
+      "seasonal_pressure": 730.7187666049126,
+      "orbital_position": {
+        "solar_longitude": 96.8609865470852,
+        "is_perihelion_season": false,
+        "distance_factor": 1.0935864232649812,
+        "solar_flux_multiplier": 0.9262758054023689
+      },
+      "atmospheric_density": 0.016790927966501085,
+      "dust_storm_active": false,
+      "uv_flux_factor": 11.115309664828427
+    }
+  }
 }

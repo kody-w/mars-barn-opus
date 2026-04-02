@@ -679,6 +679,97 @@ function tick(st, sol, frame, R){
           });
         }
       }
+
+      // ═══ v14 Mars GCM Weather hazards ═══
+      
+      if(h.type==='atmospheric_pressure_variation'){
+        // Seasonal atmospheric pressure variation affects ISRU efficiency and habitat seals
+        const pressure_deviation = h.pressure_deviation_pct || 0.15; // 15% deviation from baseline
+        const isru_impact = h.isru_efficiency_impact || 0.08; // 8% ISRU efficiency change per 10% pressure change
+        const seal_stress = h.seal_stress_factor || 0.02; // Power cost for seal maintenance
+        
+        // ISRU efficiency scales with atmospheric pressure (Sabatier CO2 availability)
+        const pressure_effect = pressure_deviation * isru_impact;
+        st.ie = Math.max(0.2, st.ie * (1 + pressure_effect)); // Can improve or worsen ISRU
+        
+        // Pressure seal stress requires maintenance power
+        if(Math.abs(pressure_deviation) > 0.1) { // >10% pressure deviation
+          st.power = Math.max(0, st.power - seal_stress * 100);
+        }
+      }
+
+      if(h.type==='enhanced_dust_storm_effects'){
+        // Radiative-dynamic feedback amplifies dust storm effects beyond normal dust accumulation
+        const radiative_feedback = h.radiative_feedback_factor || 1.8; // 80% amplification
+        const thermal_stress = h.thermal_stress_factor || 0.03; // Thermal management power cost
+        const equipment_degradation = h.equipment_degradation_rate || 0.015; // Enhanced abrasion
+        
+        // Enhanced solar efficiency loss from radiative feedback heating
+        const solar_loss = (h.solar_loss_base || 0.02) * radiative_feedback;
+        st.se = Math.max(0.05, st.se - solar_loss);
+        
+        // Thermal management power cost from dust heating atmosphere
+        st.power = Math.max(0, st.power - thermal_stress * 80);
+        
+        // Enhanced equipment degradation from dust infiltration + heating
+        st.ie = Math.max(0.1, st.ie - equipment_degradation);
+      }
+
+      if(h.type==='orbital_solar_variation'){
+        // Mars orbital eccentricity creates 45% solar flux variation perihelion to aphelion
+        const solar_flux_multiplier = h.solar_flux_multiplier || h.flux_variation || 1.0; // 0.78-1.22 range
+        const thermal_stress = h.thermal_stress_factor || 0.025; // Power for thermal management
+        
+        // Direct solar power scaling
+        st.se = Math.max(0.1, st.se * solar_flux_multiplier);
+        
+        // Thermal management power cost for extreme conditions
+        if(solar_flux_multiplier > 1.1 || solar_flux_multiplier < 0.9) {
+          // Perihelion (too hot) or aphelion (too cold) requires active thermal management
+          const extremeness = Math.abs(solar_flux_multiplier - 1.0) * 2; // 0-0.44 range
+          st.power = Math.max(0, st.power - thermal_stress * extremeness * 100);
+        }
+      }
+
+      if(h.type==='uv_material_degradation'){
+        // Mars lacks ozone protection - cumulative UV degradation of polymers and seals
+        const daily_degradation_rate = h.daily_degradation_rate || 0.001; // 0.1% per sol baseline
+        const dust_protection_factor = h.dust_protection_factor || 0.6; // 60% protection during dust storms
+        const cumulative_factor = h.cumulative_factor || 1.0; // Multiplier for long-term missions
+        const uv_intensity = h.uv_intensity || 10.0; // UV intensity factor from frame
+        
+        // Progressive degradation of solar panel covers - use UV intensity from frame
+        const uv_solar_degradation = (daily_degradation_rate * uv_intensity / 10.0) * cumulative_factor * (1 - dust_protection_factor);
+        st.se = Math.max(0.1, st.se - uv_solar_degradation);
+        
+        // Seal and component degradation requires maintenance power
+        if(sol > 365 && R() < daily_degradation_rate * uv_intensity / 5.0) { // UV intensity affects failure rate
+          st.power = Math.max(0, st.power - 5); // Repair/replacement power cost
+          if(R() < (h.seal_failure_rate || 0.02)) { // Use seal failure rate from frame
+            st.ie = Math.max(0.1, st.ie * 0.95); // 5% efficiency loss from emergency repairs
+          }
+        }
+      }
+
+      if(h.type==='atmospheric_density_effects'){
+        // Variable atmospheric density affects convective cooling and dust transport
+        const density_deviation_pct = h.density_deviation_pct || 0.2; // 20% density variation
+        const dust_transport_factor = h.dust_transport_factor || 0.02; // Dust contamination rate
+        const cooling_efficiency_factor = h.cooling_efficiency_factor || 0.01; // Thermal management impact
+        
+        // High density increases dust devil formation and contamination
+        if(density_deviation_pct > 0.15) { // >15% higher density
+          // More dust contamination
+          st.se = Math.max(0.1, st.se - dust_transport_factor);
+          st.ie = Math.max(0.1, st.ie - dust_transport_factor * 0.5);
+        }
+        
+        // Low density reduces convective cooling efficiency
+        if(density_deviation_pct < -0.15) { // >15% lower density  
+          // Higher thermal management power requirement
+          st.power = Math.max(0, st.power - cooling_efficiency_factor * 60);
+        }
+      }
     }
   }
   st.ev=st.ev.filter(e=>{e.r--;return e.r>0});

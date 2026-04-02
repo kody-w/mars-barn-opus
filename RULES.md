@@ -493,6 +493,135 @@ Human crews enable governance but create psychological vulnerability.
 Robots provide stability but limit colony growth and innovation.
 ```
 
+### v14 Mars GCM Weather Model (NEW):
+```
+# Real NASA/LMD/Ames Mars GCM atmospheric physics (Sol 801+)
+
+Seasonal Atmospheric Pressure Variation:
+  Mars atmospheric pressure driven by CO2 sublimation/deposition at polar caps
+  seasonal_pressure = baseline + amplitude * sin(ls_phase_shifted)
+  pressure_range = 610-1155 Pa (Hellas basin to polar minimum)
+  co2_mass_exchange = 25-30% of atmospheric mass per Mars year
+  mars_year_sols = 669 sols per complete orbital cycle
+
+Atmospheric Pressure Physics:
+  mars_pressure_baseline = 764 Pa (current frame average)
+  mars_pressure_min = 610 Pa (polar winter minimum)  
+  mars_pressure_max = 1155 Pa (Hellas basin perihelion maximum)
+  co2_mass_exchange_fraction = 0.28 (28% seasonal exchange)
+  
+  Pressure-ISRU Coupling:
+    sabatier_co2_pressure = seasonal_pressure * (1 + isru_plants * 0.1)
+    isru_efficiency = f(co2_availability, reactor_pressure)
+    low_pressure_periods → reduced Sabatier reactor efficiency
+    high_pressure_periods → stress on habitat pressure seals
+
+Orbital Solar Variation:
+  mars_eccentricity = 0.0934 (vs Earth's 0.0167)
+  perihelion_ls = 251° (southern summer)
+  aphelion_ls = 71° (southern winter)
+  solar_flux_variation = 45% from perihelion to aphelion
+  
+  Solar Flux Physics:
+    distance_factor = (1 - e*cos(true_anomaly)) / (1 - e²)
+    solar_flux_multiplier = 1 / distance_factor²
+    perihelion_flux = ~1.22 × average (22% above baseline)
+    aphelion_flux = ~0.78 × average (22% below baseline)
+    
+  System Impacts:
+    perihelion → excess heat → cooling power required → thermal stress
+    aphelion → reduced power → heating power required → power shortage risk
+    solar_power_output *= orbital_position.solar_flux_multiplier
+
+Dust Storm GCM Physics:
+  Radiative-Dynamic Feedback Loop:
+    dust_lifting → atmospheric_heating → stronger_circulation → more_dust_lifting
+    feedback_factor = 1.8 (dust amplifies storm intensity)
+    
+  Seasonal Dust Storm Probability:
+    base_probability = 0.001 per sol
+    perihelion_season_factor = 4.5× (Ls 180°-360°)
+    aphelion_season_factor = 0.3× (reduced activity)
+    pressure_factor = (current_pressure / baseline)^0.8
+    thermal_factor = solar_flux_multiplier^1.2
+    
+  Storm Types & Duration:
+    local_storms: frame-driven (existing system)
+    regional_storms: 5-20 sols, dust_tau ~2.0, moderate radiative feedback
+    global_storms: 30-90 sols, dust_tau ~8.0, maximum feedback, ~300 sol cooldown
+    
+  Enhanced Dust Effects:
+    solar_efficiency_loss = f(dust_tau, radiative_heating)
+    equipment_degradation = dust_infiltration × enhanced_abrasion
+    thermal_power_cost = dust_heating_atmospheric_effects
+
+UV Radiation & Material Degradation:
+  mars_surface_uv_multiplier = 12× (vs Earth's 0 UV-C at surface)
+  uv_flux_variation = orbital_position.solar_flux_multiplier × 12
+  dust_uv_protection = 1 - (dust_tau/(dust_tau + 1)) × 0.6
+  
+  Material Degradation Physics:
+    daily_uv_degradation = base_rate × uv_flux_factor × dust_protection_factor
+    material_degradation_base_rate = 0.001 per sol (polymer/plastic baseline)
+    cumulative_degradation → progressive system failures
+    
+  UV Degradation Effects:
+    solar_panel_covers → reduced efficiency over time
+    pressure_seals_gaskets → brittleness and failure risk  
+    plastic_components → mechanical property degradation
+    equipment_housings → UV-induced cracking and wear
+
+Atmospheric Density Variation:
+  atmospheric_density = pressure_pa / (R_specific_co2 × temperature_k)
+  R_specific_co2 = 188.92 J/(kg·K) (CO2 gas constant)
+  density_range = ~0.010-0.025 kg/m³ (seasonal + diurnal variation)
+  
+  Density Effects:
+    high_density → increased dust devil formation → contamination
+    low_density → reduced convective cooling → thermal management issues
+    dust_transport_efficiency = f(atmospheric_density, wind_speed)
+
+Mars GCM Hazards (Frame-Driven):
+  atmospheric_pressure_variation:
+    triggers: >10% pressure deviation from baseline
+    effects: ISRU efficiency change, seal stress, power for maintenance
+    
+  enhanced_dust_storm_effects:
+    triggers: radiative-dynamic feedback active during dust storms
+    effects: amplified solar loss, thermal stress, equipment degradation
+    
+  orbital_solar_variation:
+    triggers: >5% solar flux deviation from average
+    effects: thermal management power, equipment thermal stress
+    
+  uv_material_degradation:
+    triggers: cumulative UV exposure threshold exceeded
+    effects: seal failures, solar cover degradation, component brittleness
+    
+  atmospheric_density_effects:
+    triggers: >20% density deviation from normal
+    effects: dust contamination or cooling efficiency changes
+
+Data Sources:
+- NASA Mars Climate Database (MCD v6.1): atmospheric modeling and pressure data
+- LMD Mars GCM (Jussieu): CO2 cycle and seasonal pressure variations
+- NASA Ames Mars GCM: dust storm radiative-dynamic feedback physics  
+- Mars 2020 MEDA: real atmospheric measurements (pressure, temperature, winds)
+- Curiosity REMS: 10+ years continuous Mars surface environmental data
+- Mars orbital mechanics: JPL ephemeris for eccentricity and solar variation
+- UV environment studies: Cockell & Catling 2000, spacecraft material degradation
+- Dust storm statistics: 50+ years orbital observations, global storm patterns
+
+Real Physics Impact:
+Seasonal pressure cycles require ISRU planning around CO2 availability windows.
+Dust storm seasons demand enhanced power and equipment reserves for survival.
+Orbital solar variation creates predictable thermal and power management cycles.
+UV degradation accumulates over mission duration requiring component replacement.
+Atmospheric density affects thermal management and contamination strategies.
+Integration of all atmospheric physics creates complex multi-variable optimization.
+Mars weather becomes a strategic resource requiring prediction and adaptation.
+```
+
 ### Consumption per sol:
 ```
 O₂:    0.84 kg per HUMAN (robots don't breathe)

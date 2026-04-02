@@ -1,0 +1,232 @@
+;; OPTIMAL 8-MODULE PERFECTION GOVERNOR v1
+;; Strategy: Build exactly 8 modules with perfect efficiency and minimal CRI
+;; Target: Optimal score through precise module count + ultra-low CRI
+;; Innovation: No wasted module building + maximum resource buffer strategy
+
+(begin
+  (log (concat "🎯🏗️💎 8-MODULE PERFECTION — Sol " (string sol) " — Target: Optimal 8 modules + CRI ≤ 15"))
+  
+  ;; ═══ 8-MODULE OPTIMIZATION ANALYSIS ═══ 
+  ;; Current: 15 modules (only 8 count for score = 1,200 pts)
+  ;; Target: Build exactly 8 modules and focus all resources on perfection
+  ;; Benefit: No wasted construction, all energy goes to CRI minimization
+  
+  ;; ═══ ENHANCED PHASE DETECTION ═══
+  (define modules_count (length modules))
+  (define target_module_count 8)
+  (define modules_sufficient (>= modules_count target_module_count))
+  
+  (define foundation_phase (< sol 200))                               ;; Build first 4 modules
+  (define expansion_phase (and (>= sol 200) (< sol 500)))            ;; Build to 8 modules  
+  (define perfection_phase (and (>= sol 500) modules_sufficient))    ;; Perfect efficiency focus
+  (define maintenance_phase (and (>= sol 800) modules_sufficient))   ;; Perfect maintenance
+  
+  ;; ═══ PERFECTION RESOURCE TARGETS ═══
+  ;; Ultra-high buffer targets since we're not wasting resources on extra modules
+  (define perfect_o2_target 
+    (cond
+      (maintenance_phase 90.0)    ;; Maintenance: 90+ days O2 buffer
+      (perfection_phase 70.0)     ;; Perfection: 70+ days  
+      (expansion_phase 50.0)      ;; Expansion: 50+ days
+      (true 35.0)))               ;; Foundation: 35+ days
+
+  (define perfect_h2o_target
+    (cond
+      (maintenance_phase 95.0)    ;; Maintenance: 95+ days H2O buffer
+      (perfection_phase 75.0)     ;; Perfection: 75+ days
+      (expansion_phase 55.0)      ;; Expansion: 55+ days  
+      (true 40.0)))               ;; Foundation: 40+ days
+
+  (define perfect_food_target
+    (cond
+      (maintenance_phase 100.0)   ;; Maintenance: 100+ days food buffer
+      (perfection_phase 80.0)     ;; Perfection: 80+ days
+      (expansion_phase 60.0)      ;; Expansion: 60+ days
+      (true 45.0)))               ;; Foundation: 45+ days
+
+  ;; ═══ PERFECTION EFFICIENCY TARGETS ═══
+  (define efficiency_target_isru 0.96)       ;; Ultra-high ISRU efficiency target
+  (define efficiency_target_greenhouse 0.93) ;; Ultra-high greenhouse efficiency target  
+  (define efficiency_target_solar 0.89)      ;; Ultra-high solar efficiency target
+
+  ;; ═══ RESOURCE STATE ASSESSMENT ═══
+  (define o2_optimal (>= o2_days perfect_o2_target))
+  (define h2o_optimal (>= h2o_days perfect_h2o_target))
+  (define food_optimal (>= food_days perfect_food_target))
+  (define all_resources_optimal (and o2_optimal h2o_optimal food_optimal))
+  
+  (define efficiency_optimal (and (>= isru_eff efficiency_target_isru) 
+                                 (>= greenhouse_eff efficiency_target_greenhouse) 
+                                 (>= solar_eff efficiency_target_solar)))
+  
+  (define colony_perfected (and all_resources_optimal efficiency_optimal modules_sufficient))
+  
+  ;; ═══ RESOURCE URGENCY ASSESSMENT ═══
+  (define o2_urgent (< o2_days 12.0))      
+  (define h2o_urgent (< h2o_days 15.0))    
+  (define food_urgent (< food_days 20.0))  
+  (define any_resource_urgent (or o2_urgent h2o_urgent food_urgent))
+  
+  (define o2_low (< o2_days perfect_o2_target))
+  (define h2o_low (< h2o_days perfect_h2o_target))
+  (define food_low (< food_days perfect_food_target))
+  
+  (define efficiency_suboptimal (or (< isru_eff efficiency_target_isru) 
+                                   (< greenhouse_eff efficiency_target_greenhouse) 
+                                   (< solar_eff efficiency_target_solar)))
+  (define crew_health_critical (< crew_min_hp 50))
+
+  ;; ═══ 8-MODULE STRATEGY ═══
+  ;; Build modules aggressively early, then stop and perfect everything
+  (define module_building_priority
+    (cond
+      (modules_sufficient 0.0)              ;; No more modules needed
+      ((< modules_count 4) 1.0)             ;; High priority for first 4
+      ((< modules_count target_module_count) 0.8) ;; Medium priority for 5-8
+      (true 0.0)))                          ;; Stop at 8
+
+  ;; ═══ PERFECTION ALLOCATION STRATEGY ═══
+  (define allocation_strategy
+    (cond
+      ;; ULTRA-EMERGENCY - Always top priority
+      (any_resource_urgent
+       (cond
+         (o2_urgent (list 0.05 0.88 0.07))      ;; Ultra-emergency O2 focus
+         (h2o_urgent (list 0.05 0.83 0.12))     ;; Ultra-emergency H2O focus
+         (food_urgent (list 0.07 0.65 0.28))    ;; Ultra-emergency food focus
+         (true (list 0.05 0.78 0.17))))         ;; General ultra-emergency
+
+      ;; PERFECT MAINTENANCE - Colony perfected, maintain perfection
+      ((and maintenance_phase colony_perfected)
+       (list 0.12 0.65 0.23))                   ;; Perfect maintenance balance
+
+      ;; MAINTENANCE PHASE - Perfect efficiency maintenance
+      (maintenance_phase
+       (cond
+         ((or o2_low h2o_low) (list 0.08 0.72 0.20))    ;; ISRU perfection focus
+         (food_low (list 0.10 0.62 0.28))               ;; Food perfection focus
+         (efficiency_suboptimal (list 0.06 0.65 0.29))  ;; Efficiency perfection
+         (true (list 0.12 0.65 0.23))))                 ;; Standard maintenance
+
+      ;; PERFECTION PHASE - Build perfect resource buffers
+      (perfection_phase
+       (cond
+         ((or o2_low h2o_low) (list 0.10 0.70 0.20))    ;; ISRU buffer focus
+         (food_low (list 0.12 0.60 0.28))               ;; Food buffer focus
+         (efficiency_suboptimal (list 0.08 0.62 0.30))  ;; Efficiency focus
+         (true (list 0.14 0.62 0.24))))                 ;; Standard perfection
+
+      ;; EXPANSION PHASE - Build to 8 modules while maintaining resources
+      (expansion_phase
+       (cond
+         ((or o2_low h2o_low) (list 0.12 0.68 0.20))    ;; ISRU expansion focus
+         (food_low (list 0.14 0.58 0.28))               ;; Food expansion focus  
+         (efficiency_suboptimal (list 0.10 0.60 0.30))  ;; Efficiency building
+         (true (list 0.16 0.60 0.24))))                 ;; Standard expansion
+
+      ;; FOUNDATION PHASE - Build first modules
+      (foundation_phase
+       (cond
+         ((< power 250) (list 0.08 0.62 0.30))          ;; Power emergency
+         ((or o2_low h2o_low) (list 0.16 0.58 0.26))    ;; ISRU foundation focus
+         (food_low (list 0.18 0.52 0.30))               ;; Food foundation focus
+         (efficiency_suboptimal (list 0.14 0.56 0.30))  ;; Efficiency foundation
+         (crew_health_critical (list 0.20 0.50 0.30))   ;; Crew health priority
+         (true (list 0.18 0.56 0.26))))                 ;; Standard foundation
+
+      ;; Fallback
+      (true (list 0.15 0.60 0.25))))
+
+  (define heating_target (nth allocation_strategy 0))
+  (define isru_target (nth allocation_strategy 1))  
+  (define greenhouse_target (nth allocation_strategy 2))
+  
+  ;; ═══ ENHANCED REPAIR STRATEGY ═══
+  (define repair_multiplier
+    (cond
+      ((and maintenance_phase crew_health_critical) 35.0)     ;; Emergency maintenance repair
+      ((and maintenance_phase efficiency_suboptimal) 28.0)    ;; Efficiency maintenance repair
+      (maintenance_phase 22.0)                                ;; Standard maintenance repair
+      ((and perfection_phase efficiency_suboptimal) 22.0)     ;; Perfection efficiency repair
+      (perfection_phase 18.0)                                 ;; Perfection standard repair
+      ((and expansion_phase efficiency_suboptimal) 18.0)      ;; Expansion efficiency repair
+      (expansion_phase 15.0)                                  ;; Expansion standard repair
+      ((and foundation_phase crew_health_critical) 15.0)      ;; Foundation health crisis
+      ((and foundation_phase efficiency_suboptimal) 12.0)     ;; Foundation efficiency
+      (foundation_phase 10.0)                                 ;; Foundation standard
+      (true 8.0)))                                            ;; Default
+
+  ;; ═══ ENHANCED FOOD RATIONING STRATEGY ═══
+  (define food_ration_target
+    (cond
+      (food_urgent 0.15)                                      ;; Food ultra-crisis rationing
+      ((and maintenance_phase (< food_days 60)) 0.35)        ;; Conservative maintenance rationing
+      (maintenance_phase 0.60)                               ;; Standard maintenance rationing
+      ((and perfection_phase (< food_days 50)) 0.40)        ;; Conservative perfection rationing
+      (perfection_phase 0.65)                                ;; Standard perfection rationing
+      ((and expansion_phase (< food_days 40)) 0.45)         ;; Conservative expansion rationing
+      (expansion_phase 0.70)                                 ;; Standard expansion rationing
+      ((and foundation_phase (< food_days 30)) 0.55)        ;; Conservative foundation rationing
+      (foundation_phase 0.80)                                ;; Standard foundation rationing
+      ((< food_days 25) 0.65)                                ;; General low food
+      (true 0.85)))                                          ;; Standard operations
+
+  ;; ═══ APPLY ALLOCATIONS ═══
+  (set! heating_alloc heating_target)
+  (set! isru_alloc isru_target)
+  (set! greenhouse_alloc greenhouse_target)
+  (set! repair_alloc repair_multiplier)
+  (set! food_ration food_ration_target)
+  
+  ;; ═══ STATUS MONITORING ═══
+  (define phase_text
+    (cond
+      (maintenance_phase "🌍💎 MAINTENANCE")
+      (perfection_phase "🎯💎 PERFECTION")
+      (expansion_phase "🏗️💎 EXPANSION")
+      (foundation_phase "🏗️⚡ FOUNDATION")
+      (true "🛠️💎 STANDARD")))
+       
+  (define status_text
+    (cond
+      (any_resource_urgent "🚨💀 ULTRA-EMERGENCY")
+      (colony_perfected "✅🎯 COLONY-PERFECTED")
+      (all_resources_optimal "🎯⚡ RESOURCES-OPTIMAL")
+      (efficiency_suboptimal "⚙️🔴 EFFICIENCY-SUB")
+      (crew_health_critical "👥🔴 HEALTH-CRITICAL")
+      (true "🚧💎 OPTIMIZING")))
+  
+  ;; Enhanced resource tracking
+  (define resource_status (concat "O2:" (string (round o2_days 1)) "/" (string perfect_o2_target) " H2O:" (string (round h2o_days 1)) "/" (string perfect_h2o_target) " Food:" (string (round food_days 1)) "/" (string perfect_food_target)))
+  (define efficiency_status (concat "IE:" (string (round (* isru_eff 100))) "/" (string (round (* efficiency_target_isru 100))) "% SE:" (string (round (* solar_eff 100))) "/" (string (round (* efficiency_target_solar 100))) "% GE:" (string (round (* greenhouse_eff 100))) "/" (string (round (* efficiency_target_greenhouse 100))) "%"))
+  
+  ;; Critical warnings
+  (if (and maintenance_phase (not colony_perfected))
+    (log "🚨🎯💀 MAINTENANCE: Colony not perfected - CRITICAL"))
+    
+  (if (and (>= sol 400) (> modules_count target_module_count))
+    (log "⚠️🏗️ WARNING: Built more than 8 modules - no additional score benefit"))
+
+  ;; Module progress tracking
+  (if (< modules_count target_module_count)
+    (log (concat "🏗️🎯 MODULE PROGRESS: " (string modules_count) "/" (string target_module_count) " - " (string (- target_module_count modules_count)) " more needed")))
+
+  ;; Enhanced status logging
+  (log (concat "  🎯 " phase_text " | " status_text " | CRI: " (string colony_risk_index)))
+  (log (concat "  📊 " resource_status))
+  (log (concat "  ⚙️ " efficiency_status))
+  (log (concat "  🏗️ Modules: " (string modules_count) "/" (string target_module_count) " | Priority: " (string module_building_priority)))
+  (log (concat "  ⚡ Allocs: H:" (string (round (* heating_target 100))) "% I:" (string (round (* isru_target 100))) "% G:" (string (round (* greenhouse_target 100))) "% R:" (string repair_multiplier) "x"))
+  (log (concat "  🍽️ Ration: " (string (round (* food_ration_target 100))) "% | Power: " (string (round power))))
+  
+  ;; Enhanced score prediction
+  (define predicted_score_base 
+    (+ 120000                             ;; Base survival score (1200 sols)
+       (* crew_count 500)                 ;; Crew score
+       (* (min modules_count 8) 150)      ;; Module score (capped at 8)
+       20000                              ;; Survival rate bonus
+       (* colony_risk_index -10)))        ;; CRI benefit/penalty
+        
+  (log (concat "  💎 Predicted Score: " (string predicted_score_base) " | CRI: " (string colony_risk_index) " | Target: Perfect 8-module colony"))
+  
+  (concat "8-MOD-PERFECT Sol" (string sol) " " phase_text " " status_text " CRI:" (string colony_risk_index) " Mods:" (string modules_count) "/8" " Score:" (string predicted_score_base)))

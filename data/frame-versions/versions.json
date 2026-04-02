@@ -509,6 +509,54 @@
           "Long missions need psychological sustainability planning"
         ]
       }
+    },
+    {
+      "version": "v14",
+      "name": "Mars GCM Weather",
+      "release_date": "2026-04-02",
+      "physics_added": {
+        "seasonal_pressure_variation": "CO2 sublimation/deposition cycle: 610-1155 Pa range affects Sabatier reactor efficiency (NASA MCD)",
+        "dust_storm_gcm_physics": "Radiative-dynamic feedback cycles with seasonal probability patterns (perihelion season peak)",
+        "orbital_solar_variation": "Mars eccentricity (0.0934) creates 45% solar flux variation affecting power and thermal systems",
+        "uv_radiation_degradation": "UV-C reaches Mars surface causing progressive polymer/plastic degradation",
+        "atmospheric_density_effects": "Variable atmospheric density affects convective cooling and dust transport",
+        "physics_integration": "Seasonal atmospheric pressure directly modulates ISRU CO2 availability in real-time"
+      },
+      "new_hazards": [
+        "atmospheric_pressure_variation",
+        "enhanced_dust_storm_effects",
+        "orbital_solar_variation",
+        "uv_material_degradation",
+        "atmospheric_density_effects"
+      ],
+      "data_sources": [
+        "NASA Mars Climate Database (MCD v6.1)",
+        "LMD Mars General Circulation Model (Jussieu)",
+        "NASA Ames Mars GCM atmospheric simulations",
+        "Mars 2020 MEDA atmospheric measurements (Perseverance)",
+        "Curiosity REMS environmental data (2012-present)",
+        "Mars orbital mechanics (JPL ephemeris)",
+        "UV environment studies (Cockell & Catling 2000)",
+        "Materials degradation in Mars environment (NASA spaceflight studies)"
+      ],
+      "fidelity_improvements": {
+        "atmospheric_pressure_realism": "Real seasonal CO2 cycle affects ISRU efficiency based on atmospheric availability",
+        "dust_storm_physics": "Radiative-dynamic feedback loops create realistic dust storm intensification patterns",
+        "solar_flux_variation": "Orbital mechanics drive seasonal power/thermal variations requiring adaptive strategies",
+        "material_degradation_accumulation": "Cumulative UV damage creates progressive system failures over mission duration",
+        "integrated_atmospheric_physics": "All atmospheric effects (pressure, density, composition) interact realistically"
+      },
+      "validation": {
+        "monte_carlo_required": true,
+        "baseline_score_drop": "\u226510% (validates physics significance)",
+        "new_strategic_considerations": [
+          "Seasonal planning for pressure-dependent ISRU efficiency cycles",
+          "Dust storm season preparation requiring enhanced power/equipment reserves",
+          "Orbital position awareness for solar flux and UV exposure management",
+          "Long-term material replacement planning for UV-degraded components",
+          "Atmospheric density cycles affecting cooling and contamination strategies"
+        ]
+      }
     }
   ],
   "backtest_protocol": {

@@ -1,0 +1,66 @@
+{
+  "sol": 805,
+  "utc": "2025-09-35T06:00:00Z",
+  "mars": {
+    "ls": 73.18385650224215,
+    "season": "Northern Summer",
+    "temp_k": 219.00372151545264,
+    "temp_c": -54.14627848454734,
+    "pressure_pa": 761,
+    "solar_wm2": 521,
+    "dust_tau": 0.3,
+    "wind_ms": 3.2771573601851873,
+    "lmst": 8.526496805460516
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "orbital_solar_variation",
+      "flux_variation": 0.919911500925733,
+      "cooling_power_factor": 25,
+      "heating_power_factor": 20,
+      "thermal_degradation": 0.01
+    },
+    {
+      "type": "uv_material_degradation",
+      "uv_intensity": 11.038938011108797,
+      "damage_threshold": 0.05,
+      "seal_failure_rate": 0.1,
+      "cover_degradation": 0.05,
+      "brittleness_factor": 0.03
+    },
+    {
+      "type": "atmospheric_density_effects",
+      "density_factor": 1.2263565280897832,
+      "contamination_rate": 0.008,
+      "cooling_efficiency_loss": 0.02
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 17.403503487553866,
+    "window_open": false,
+    "bandwidth_kbps": 59
+  },
+  "terrain": {
+    "regolith_hardness": 0.7296070770493187,
+    "water_ice_depth_m": 2.2182620113339766,
+    "surface_radiation_usv": 0.4540247833782872
+  },
+  "frame_echo": {
+    "prev_sol": 804,
+    "global_dust_trend": "stable",
+    "solar_efficiency_trend": "stable",
+    "v14_gcm_data": {
+      "seasonal_pressure": 761.0924925102178,
+      "orbital_position": {
+        "solar_longitude": 73.18385650224215,
+        "is_perihelion_season": true,
+        "distance_factor": 1.1029538469675908,
+        "solar_flux_multiplier": 0.919911500925733
+      },
+      "atmospheric_density": 0.01839534792134675,
+      "dust_storm_active": false,
+      "uv_flux_factor": 11.038938011108797
+    }
+  }
+}
