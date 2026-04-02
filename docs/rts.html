@@ -6,19 +6,24 @@
 <title>MARS BARN — RTS Colony View</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { overflow: hidden; background: #1a0a05; font-family: 'Courier New', monospace; color: #e0d0c0; }
-  canvas { display: block; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body { background: #1a0a05; font-family: 'Courier New', monospace; color: #e0d0c0; }
+  canvas { display: block; width: 100% !important; height: 100% !important; }
 
-  /* CRT vignette overlay */
+  /* Subtle vignette — fullscreen friendly */
   #vignette {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none; z-index: 100;
-    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.6) 100%);
+    background: radial-gradient(ellipse at center, transparent 75%, rgba(0,0,0,0.3) 100%);
   }
   #scanlines {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none; z-index: 99;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+    background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.03) 3px, rgba(0,0,0,0.03) 6px);
+  }
+  /* Fullscreen API */
+  html:-webkit-full-screen, html:-moz-full-screen, html:fullscreen {
+    width: 100%; height: 100%;
   }
 
   /* HUD panels */
@@ -149,6 +154,11 @@
 <!-- Unit label container -->
 <div id="label-container"></div>
 
+<!-- Fullscreen hint -->
+<div id="fs-hint" style="position:fixed;bottom:12px;right:12px;z-index:50;pointer-events:none;font-size:11px;opacity:0.5;text-shadow:0 0 6px rgba(255,120,40,0.5);">
+  Press <b>F</b> or double-click for fullscreen
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function() {
@@ -157,18 +167,27 @@
   // ─── SCENE SETUP ──────────────────────────────────────────────
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x1a0a05);
-  scene.fog = new THREE.FogExp2(0x2a1008, 0.004);
+  scene.fog = new THREE.FogExp2(0x2a1008, 0.0025);
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.9;
+  renderer.toneMappingExposure = 1.0;
   document.body.appendChild(renderer.domElement);
 
-  const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.5, 600);
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.5, 800);
+
+  // ─── FULLSCREEN TOGGLE (F key or double-click) ────────────────
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen();
+    }
+  }
 
   // ─── LIGHTING ─────────────────────────────────────────────────
   const ambientLight = new THREE.AmbientLight(0x334466, 0.35);
@@ -651,8 +670,10 @@
     if (e.key === 'Escape' && (cameraMode === 'fps' || cameraMode === 'transition_fps')) {
       exitFPS();
     }
+    if (e.key === 'f' || e.key === 'F') toggleFullscreen();
   });
   window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+  window.addEventListener('dblclick', toggleFullscreen);
 
   // Mouse wheel zoom
   window.addEventListener('wheel', e => {
@@ -968,11 +989,21 @@
   animate();
 
   // ─── RESIZE ──────────────────────────────────────────────────
-  window.addEventListener('resize', () => {
+  function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-  });
+  }
+  window.addEventListener('resize', onResize);
+  document.addEventListener('fullscreenchange', onResize);
+
+  // Hide fullscreen hint after 5s
+  setTimeout(() => {
+    const hint = document.getElementById('fs-hint');
+    if (hint) hint.style.transition = 'opacity 1s';
+    if (hint) hint.style.opacity = '0';
+    setTimeout(() => { if (hint) hint.style.display = 'none'; }, 1000);
+  }, 5000);
 
   // Pointer lock change
   document.addEventListener('pointerlockchange', () => {
