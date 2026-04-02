@@ -1,0 +1,149 @@
+;; COPILOT ULTRA MODULE MAXIMIZER NEXUS v1
+;; Innovation: Extreme early building with ultra-minimal infrastructure 
+;; Target: Achieve 40+ modules to beat 90,400 Monte Carlo score
+;; Philosophy: Build hab modules from Sol 1, infrastructure only when absolutely critical
+
+(begin
+  (define _agent_name "Copilot Ultra Module Maximizer Nexus v1")
+  (define _agent_desc "Ultra-aggressive module maximization with emergency-only infrastructure")
+
+  (log (concat "🏗️💥⚡ ULTRA MODULE MAXIMIZER — Sol " (string sol) " — Maximum Building Efficiency"))
+
+  ;; ═══ ULTRA-AGGRESSIVE BUILDING PHILOSOPHY ═══
+  ;; Build hab modules first, infrastructure only when colony faces death
+  (define death_threshold_o2 (< o2_days 1.5))
+  (define death_threshold_food (< food_days 2.0))
+  (define death_threshold_power (< power 30))
+  (define colony_facing_death (or death_threshold_o2 death_threshold_food death_threshold_power))
+
+  ;; Mission phase for intelligent building timing
+  (define mission_phase
+    (cond
+      ((< sol 50) "GENESIS")          ;; Sol 1-49: Pure building focus
+      ((< sol 150) "EXPANSION")       ;; Sol 50-149: Building with minimal safety
+      ((< sol 350) "OPTIMIZATION")    ;; Sol 150-349: Efficient building
+      ((< sol 500) "MAXIMIZATION")    ;; Sol 350-499: Maximum module density
+      (true "PERFECTION")))           ;; Sol 500+: Final optimization
+
+  ;; ═══ DEATH-THRESHOLD INFRASTRUCTURE DEPLOYMENT ═══
+  ;; Only build infrastructure when colony is about to die
+  
+  ;; Emergency bot deployment (only when facing death)
+  (if (and (< sol 20) 
+           (< bot_count 2) 
+           (or colony_facing_death (< bot_count 1)))
+      (set! build_item "worker_bot"))
+
+  ;; Ultra-minimal solar (only when power crisis)
+  (if (and (< sol 30) 
+           (< solar_count 3) 
+           (or (< power 50) death_threshold_power))
+      (set! build_item "solar_array"))
+
+  ;; Emergency repair bay (only when damage is critical)
+  (if (and (>= sol 20) 
+           (< repair_count 1) 
+           (or (> colony_risk_index 75) colony_facing_death))
+      (set! build_item "repair_bay"))
+
+  ;; Second repair for compound damage (only when absolutely necessary)
+  (if (and (>= sol 100) 
+           (< repair_count 2) 
+           (> colony_risk_index 80))
+      (set! build_item "repair_bay"))
+
+  ;; Third repair for late-game survival (emergency only)
+  (if (and (>= sol 300) 
+           (< repair_count 3) 
+           (> colony_risk_index 85))
+      (set! build_item "repair_bay"))
+
+  ;; ═══ ULTRA-AGGRESSIVE HAB MODULE STRATEGY ═══
+  ;; Build hab modules whenever NOT building emergency infrastructure
+  
+  ;; Immediate module building from Sol 1
+  (if (and (< sol 600)                    ;; Build throughout mission
+           (< module_count 60)            ;; Target 60+ modules
+           (not colony_facing_death)      ;; Only when not facing death
+           (or (>= bot_count 1)           ;; Have at least 1 bot
+               (< sol 5)))                ;; Or in first 5 sols
+      (set! build_item "hab_module"))
+
+  ;; Late game module surge (when basic survival secured)
+  (if (and (>= sol 400) 
+           (< module_count 80)           ;; Ultra-high target
+           (> o2_days 1)                 ;; Minimal safety
+           (> food_days 2)
+           (< colony_risk_index 85))
+      (set! build_item "hab_module"))
+
+  ;; ═══ ULTRA-MINIMAL RESOURCE ALLOCATION ═══
+  ;; Absolute minimum for survival, everything else to building
+  (define allocation_matrix
+    (cond
+      ;; EMERGENCY - Colony facing death
+      ((or colony_facing_death (> colony_risk_index 90))
+       (list 0.50 0.45 0.05))
+       
+      ;; CRITICAL - High risk but not death
+      ((> colony_risk_index 70)
+       (list 0.25 0.70 0.05))
+       
+      ;; HIGH RISK - Need some safety
+      ((> colony_risk_index 50)
+       (list 0.15 0.80 0.05))
+       
+      ;; MODERATE RISK - Building focused
+      ((> colony_risk_index 30)
+       (list 0.08 0.87 0.05))
+       
+      ;; LOW RISK - Maximum building
+      (true (list 0.04 0.91 0.05))))  ;; Ultra minimal survival allocation
+
+  (define base_alloc (nth allocation_matrix 0))
+  (set! isru_alloc (nth base_alloc 0))
+  (set! greenhouse_alloc (nth base_alloc 1))
+  (set! heating_alloc (nth base_alloc 2))
+
+  ;; ═══ ULTRA-EFFICIENT FOOD RATIONING ═══
+  ;; Minimal food consumption to maximize building resources
+  (define ultra_rationing
+    (cond
+      ((< food_days 1) 0.25)      ;; Starvation prevention only
+      ((< food_days 3) 0.40)      ;; Crisis rationing
+      ((< food_days 7) 0.60)      ;; Conservative rationing
+      ((< food_days 15) 0.75)     ;; Standard rationing
+      ((< food_days 25) 0.85)     ;; Optimal rationing
+      (true 0.95)))               ;; Abundance rationing
+
+  ;; Health emergency boost
+  (define health_emergency_boost
+    (if (< (/ (+ crew_hp) (max 1 crew_alive)) 70)
+        1.4    ;; Major health boost
+        1.0))
+
+  (set! food_ration (max 0.20 (min 1.5 (* ultra_rationing health_emergency_boost))))
+
+  ;; ═══ ULTRA MODULE SCORE CALCULATION ═══
+  (define ultra_module_score
+    (let* ((module_density_bonus (* module_count 200))    ;; Higher weight for modules
+           (building_efficiency (* greenhouse_alloc 150)) ;; Reward building allocation
+           (resource_efficiency (* (+ o2_days food_days) 8))
+           (survival_bonus (if colony_facing_death 0 500))) ;; Bonus for not facing death
+      (+ module_density_bonus building_efficiency resource_efficiency survival_bonus)))
+
+  ;; ═══ ULTRA BUILDING STATUS DISPLAY ═══
+  (log (concat "  🏗️ Mission Phase: " mission_phase " | Death Threshold: " (if colony_facing_death "YES" "NO")))
+  (log (concat "  💥 Ultra Module Score: " (string (round ultra_module_score)) " | Modules: " (string module_count) "/60 | Target: 40+ for record"))
+  (log (concat "  ⚡ Ultra Allocation — ISRU:" (string (round (* isru_alloc 100))) "% | Green:" (string (round (* greenhouse_alloc 100))) "% | Heat:" (string (round (* heating_alloc 100))) "%"))
+  (log (concat "  🎯 Resources — O2:" (string o2_days) "d Food:" (string food_days) "d | Power:" (string power) " | CRI:" (string colony_risk_index)))
+  (log (concat "  🛡️ Minimal Infra — Repair:" (string repair_count) " Solar:" (string solar_count) " Bots:" (string bot_count) " | Crew:" (string crew_alive) "/" (string (round (/ (+ crew_hp) (max 1 crew_alive)))) "hp"))
+
+  ;; ═══ ULTRA BUILDING OUTPUT ═══
+  (concat "🏗️💥⚡ UltraMaximizer Sol " (string sol) " — " mission_phase
+    " | UMS:" (string (round ultra_module_score))
+    " | M:" (string module_count) "/60"
+    " | I:" (string (round (* isru_alloc 100)))
+    "% G:" (string (round (* greenhouse_alloc 100)))
+    "% | R:" (string (round (* food_ration 100)))
+    "% | O2:" (string o2_days) "d F:" (string food_days) "d"))
