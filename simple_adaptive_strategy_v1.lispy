@@ -1,0 +1,83 @@
+;; SIMPLE ADAPTIVE STRATEGY v1 - Using only available variables
+;; Goal: Beat current adaptive_governor performance (68 sols)
+;; Strategy: CRI-based allocation with resource emergency overrides
+
+(begin
+  ;; ═══ EMERGENCY RESOURCE DETECTION ═══
+  (define o2_emergency (< o2_days 3))
+  (define food_emergency (< food_days 5))
+  (define power_emergency (< power_kwh 30))
+  (define water_emergency (< h2o_days 3))
+  
+  ;; ═══ RISK ASSESSMENT ═══
+  ;; Use sol count as proxy for system degradation
+  (define late_mission (> sol 200))
+  (define critical_mission (> sol 400))
+  
+  ;; Combine multiple stress indicators
+  (define total_emergencies (+ (if o2_emergency 1 0)
+                               (if food_emergency 1 0)  
+                               (if power_emergency 1 0)
+                               (if water_emergency 1 0)))
+  
+  ;; Risk level based on emergencies and mission phase
+  (define risk_level
+    (cond
+      ((> total_emergencies 2) "CRITICAL")
+      ((> total_emergencies 1) "HIGH")
+      (critical_mission "MODERATE")
+      (late_mission "LOW")
+      (true "STABLE")))
+
+  ;; ═══ ADAPTIVE ALLOCATION STRATEGY ═══
+  ;; Base allocations that adapt to conditions
+  (cond
+    ;; CRITICAL: Multiple emergencies - focus on survival
+    ((= risk_level "CRITICAL")
+     (cond
+       (o2_emergency (begin (set! isru_alloc 0.70) (set! heating_alloc 0.20) (set! greenhouse_alloc 0.10)))
+       (power_emergency (begin (set! heating_alloc 0.60) (set! isru_alloc 0.25) (set! greenhouse_alloc 0.15)))
+       (food_emergency (begin (set! greenhouse_alloc 0.55) (set! heating_alloc 0.25) (set! isru_alloc 0.20)))
+       (true (begin (set! heating_alloc 0.50) (set! isru_alloc 0.30) (set! greenhouse_alloc 0.20)))))
+    
+    ;; HIGH: Single emergency - targeted response
+    ((= risk_level "HIGH")
+     (cond
+       (o2_emergency (begin (set! isru_alloc 0.60) (set! heating_alloc 0.25) (set! greenhouse_alloc 0.15)))
+       (food_emergency (begin (set! greenhouse_alloc 0.50) (set! heating_alloc 0.30) (set! isru_alloc 0.20)))
+       (power_emergency (begin (set! heating_alloc 0.45) (set! isru_alloc 0.35) (set! greenhouse_alloc 0.20)))
+       (water_emergency (begin (set! isru_alloc 0.50) (set! heating_alloc 0.30) (set! greenhouse_alloc 0.20)))
+       (true (begin (set! heating_alloc 0.40) (set! isru_alloc 0.35) (set! greenhouse_alloc 0.25)))))
+    
+    ;; MODERATE: Critical mission phase - defensive
+    ((= risk_level "MODERATE")
+     (begin (set! heating_alloc 0.35) (set! isru_alloc 0.35) (set! greenhouse_alloc 0.30)))
+    
+    ;; LOW: Late mission - balanced
+    ((= risk_level "LOW")
+     (begin (set! heating_alloc 0.30) (set! isru_alloc 0.40) (set! greenhouse_alloc 0.30)))
+    
+    ;; STABLE: Early mission - growth focus
+    (true (begin (set! heating_alloc 0.25) (set! isru_alloc 0.40) (set! greenhouse_alloc 0.35))))
+
+  ;; ═══ FOOD RATIONING STRATEGY ═══
+  (define base_ration
+    (cond
+      (food_emergency 0.40)        ;; Emergency rationing
+      ((< food_days 10) 0.60)      ;; Conservative rationing
+      ((< food_days 20) 0.80)      ;; Careful rationing
+      ((> food_days 50) 1.10)      ;; Abundant - boost health
+      (true 0.95)))                ;; Normal operations
+  
+  ;; Adjust ration based on overall stress
+  (define ration_adjustment
+    (cond
+      ((= risk_level "CRITICAL") 0.70)
+      ((= risk_level "HIGH") 0.85)
+      (true 1.0)))
+      
+  (set! food_ration (* base_ration ration_adjustment))
+  (set! food_ration (max 0.30 (min 1.20 food_ration)))
+
+  ;; Return strategy identifier
+  "Simple Adaptive v1")

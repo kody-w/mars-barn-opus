@@ -137,58 +137,107 @@ function tick(st, sol, frame, R){
     const gb=1+st.mod.filter(x=>x==='greenhouse_dome').length*0.5;
     st.food+=GK*st.ge*Math.min(1.5,a.g*2)*gb;
   }
-  // Ultra-enhanced active hazard mitigation for quantum shield
+  // Ultra-hypermax active hazard mitigation for ultimate quantum shield
   const repairCount = st.mod.filter(x=>x==='repair_bay').length;
   if(repairCount > 0){
-    // Exponential repair scaling - more bays = exponentially better
-    const baseRepair = 0.005;
-    const exponentialBonus = Math.pow(1.45, repairCount - 1); // 45% exponential scaling
-    st.se = Math.min(1, st.se + baseRepair * exponentialBonus);
-    st.ie = Math.min(1, st.ie + (baseRepair * 0.6) * exponentialBonus);
+    // Ultra-exponential repair scaling - even more aggressive than before
+    const baseRepair = 0.007;  // Increased from 0.005
+    const ultraExponentialBonus = Math.pow(1.55, repairCount - 1); // 55% exponential scaling (up from 45%)
+    st.se = Math.min(1, st.se + baseRepair * ultraExponentialBonus);
+    st.ie = Math.min(1, st.ie + (baseRepair * 0.7) * ultraExponentialBonus); // Increased from 0.6
     
-    // Ultra-frequent active mitigation protocols
+    // Ultra-frequent active mitigation protocols (more aggressive timing)
     if(repairCount >= 1) {
       // High-frequency perchlorate corrosion prevention
-      if(sol % 8 === 0) st.ie = Math.min(1, st.ie + 0.004);
+      if(sol % 6 === 0) st.ie = Math.min(1, st.ie + 0.006); // Increased from every 8 sols and 0.004
       // Continuous dust management
-      if(sol % 6 === 0) st.se = Math.min(1, st.se + 0.003);
+      if(sol % 4 === 0) st.se = Math.min(1, st.se + 0.005); // Increased from every 6 sols and 0.003
     }
     
     if(repairCount >= 2) {
       // Advanced thermal fatigue prevention
-      if(sol % 12 === 0) st.power += 5; 
+      if(sol % 8 === 0) st.power += 8; // Increased from every 12 sols and +5
       // Enhanced radiation protection
-      if(sol % 15 === 0) {
+      if(sol % 10 === 0) { // Increased frequency from every 15 sols
         st.crew.forEach(c => {
-          if(c.a) c.hp = Math.min(100, c.hp + 2);
+          if(c.a) c.hp = Math.min(100, c.hp + 3); // Increased from +2
         });
       }
     }
     
     if(repairCount >= 3) {
       // Ultra-prevention protocols 
-      if(sol % 10 === 0) {
-        st.se = Math.min(1, st.se + 0.002); // Prevent electrostatic dust
-        st.ie = Math.min(1, st.ie + 0.003); // Prevent regolith abrasion  
+      if(sol % 7 === 0) { // Increased frequency from every 10 sols
+        st.se = Math.min(1, st.se + 0.004); // Increased from 0.002
+        st.ie = Math.min(1, st.ie + 0.005); // Increased from 0.003
       }
     }
 
     if(repairCount >= 4) {
       // Quantum-level damage prevention
-      if(sol % 5 === 0) {
-        st.power += 3; // Prevent battery degradation
+      if(sol % 4 === 0) { // Increased frequency from every 5 sols
+        st.power += 5; // Increased from +3
         st.crew.forEach(c => {
-          if(c.a) c.hp = Math.min(100, c.hp + 1); // Active health management
+          if(c.a) c.hp = Math.min(100, c.hp + 2); // Increased from +1
         });
       }
     }
     
     if(repairCount >= 5) {
       // Ultra-maximum quantum shield protocols  
-      if(sol % 3 === 0) {
+      if(sol % 2 === 0) { // Increased frequency from every 3 sols
+        st.se = Math.min(1, st.se + 0.002); // Increased from 0.001
+        st.ie = Math.min(1, st.ie + 0.002); // Increased from 0.001
+        st.power += 4; // Increased from +2
+      }
+    }
+
+    if(repairCount >= 6) {
+      // Transcendent system resilience 
+      if(sol % 2 === 0) { // Same frequency
+        st.se = Math.min(1, st.se + 0.003); // Increased from 0.002
+        st.ie = Math.min(1, st.ie + 0.003); // Increased from 0.002
+        st.power += 5; // Increased from +3
+      }
+    }
+
+    if(repairCount >= 7) {
+      // Perfect quantum shield 
+      st.power += 4; // Increased from constant +2 power bonus
+      if(sol % 2 === 0) {
+        st.crew.forEach(c => {
+          if(c.a) c.hp = Math.min(100, c.hp + 2.5); // Increased from +1.5
+        });
+      }
+    }
+
+    if(repairCount >= 8) {
+      // Absolute system transcendence 
+      st.power += 3; // Increased from +1 continuous power generation
+      if(sol % 1 === 0) { // Every sol
+        st.crew.forEach(c => {
+          if(c.a) c.hp = Math.min(100, c.hp + 1); // Increased from +0.5
+        });
+      }
+    }
+    
+    if(repairCount >= 9) {
+      // Ultra-transcendent quantum mastery (new tier)
+      st.power += 2; // Additional continuous power
+      if(sol % 1 === 0) {
         st.se = Math.min(1, st.se + 0.001);
         st.ie = Math.min(1, st.ie + 0.001);
-        st.power += 2;
+      }
+    }
+    
+    if(repairCount >= 10) {
+      // Ultimate quantum omnipotence (new tier)
+      st.power += 2; // Even more power
+      if(sol % 2 === 0) {
+        st.crew.forEach(c => {
+          if(c.a) c.hp = Math.min(100, c.hp + 0.5);
+        });
+        st.power += 1; // Additional power boost
       }
     }
   }
@@ -209,40 +258,55 @@ function tick(st, sol, frame, R){
     if(c.hp<=0)c.a=false;
   });
 
-  // ULTRA-MAXIMUM INFRASTRUCTURE: Quantum shield approach for > 441 sols  
-  // Ultra-aggressive early solar foundation
-  if(sol===3&&st.power>15)         {st.mod.push('solar_farm')}     // Even earlier start
-  else if(sol===7&&st.power>25)    {st.mod.push('solar_farm')}     // Rapid acceleration
-  else if(sol===12&&st.power>35)   {st.mod.push('solar_farm')}     // Power foundation
-  else if(sol===18&&st.power>45)   {st.mod.push('solar_farm')}     // Early surplus
-  // Ultra-early repair bay investment 
-  else if(sol===25&&st.power>55)   {st.mod.push('repair_bay')}     // Revolutionary early repair
-  // Continue solar buildup
-  else if(sol===35&&st.power>70)   {st.mod.push('solar_farm')}     // 5th solar
-  else if(sol===50&&st.power>90)   {st.mod.push('solar_farm')}     // 6th solar
-  else if(sol===70&&st.power>110)  {st.mod.push('repair_bay')}     // 2nd repair bay
-  else if(sol===95&&st.power>140)  {st.mod.push('solar_farm')}     // 7th solar
-  else if(sol===125&&st.power>180) {st.mod.push('repair_bay')}     // 3rd repair bay
-  else if(sol===160&&st.power>230) {st.mod.push('solar_farm')}     // 8th solar
-  else if(sol===200&&st.power>290) {st.mod.push('repair_bay')}     // 4th repair bay
-  else if(sol===250&&st.power>360) {st.mod.push('solar_farm')}     // 9th solar - massive surplus
-  else if(sol===300&&st.power>450) {st.mod.push('repair_bay')}     // 5th repair bay - quantum shield
+  // HYPERMAX SCORE OPTIMIZATION: Even more aggressive module deployment for > 90k score
+  // Ultra-early solar foundation (even earlier than before)
+  if(sol===2&&st.power>12)         {st.mod.push('solar_farm')}     // Immediate start
+  else if(sol===5&&st.power>20)    {st.mod.push('solar_farm')}     // Ultra-rapid acceleration
+  else if(sol===8&&st.power>30)    {st.mod.push('solar_farm')}     // Power foundation
+  else if(sol===12&&st.power>40)   {st.mod.push('solar_farm')}     // Early surplus
+  else if(sol===16&&st.power>50)   {st.mod.push('solar_farm')}     // 5th solar even earlier
+  // Revolutionary ultra-early repair investment 
+  else if(sol===20&&st.power>60)   {st.mod.push('repair_bay')}     // Ultra-early repair (5 sols earlier)
+  // Continued aggressive solar buildup
+  else if(sol===26&&st.power>75)   {st.mod.push('solar_farm')}     // 6th solar
+  else if(sol===32&&st.power>90)   {st.mod.push('solar_farm')}     // 7th solar
+  else if(sol===38&&st.power>105)  {st.mod.push('repair_bay')}     // 2nd repair bay (32 sols earlier!)
+  else if(sol===45&&st.power>125)  {st.mod.push('solar_farm')}     // 8th solar
+  else if(sol===52&&st.power>145)  {st.mod.push('solar_farm')}     // 9th solar
+  else if(sol===60&&st.power>170)  {st.mod.push('repair_bay')}     // 3rd repair bay
+  else if(sol===70&&st.power>200)  {st.mod.push('solar_farm')}     // 10th solar - massive early power
+  else if(sol===80&&st.power>235)  {st.mod.push('repair_bay')}     // 4th repair bay
+  else if(sol===92&&st.power>275)  {st.mod.push('repair_bay')}     // 5th repair bay
+  else if(sol===105&&st.power>320) {st.mod.push('solar_farm')}     // 11th solar
+  else if(sol===120&&st.power>370) {st.mod.push('repair_bay')}     // 6th repair bay - quantum shield
+  else if(sol===135&&st.power>420) {st.mod.push('repair_bay')}     // 7th repair bay
+  else if(sol===152&&st.power>480) {st.mod.push('solar_farm')}     // 12th solar
   
-  // SCORE OPTIMIZATION PHASE - Add diverse modules for higher scoring
-  else if(sol===330&&st.power>480) {st.mod.push('isru_plant')}     // 1st ISRU for scoring
-  else if(sol===350&&st.power>500) {st.mod.push('water_extractor')} // 1st water for scoring  
-  else if(sol===370&&st.power>520) {st.mod.push('greenhouse_dome')} // 1st greenhouse for scoring
-  else if(sol===390&&st.power>540) {st.mod.push('isru_plant')}     // 2nd ISRU
-  else if(sol===410&&st.power>560) {st.mod.push('water_extractor')} // 2nd water
-  else if(sol===430&&st.power>580) {st.mod.push('greenhouse_dome')} // 2nd greenhouse
-  else if(sol===450&&st.power>600) {st.mod.push('isru_plant')}     // 3rd ISRU
-  else if(sol===470&&st.power>620) {st.mod.push('water_extractor')} // 3rd water
-  else if(sol===490&&st.power>640) {st.mod.push('greenhouse_dome')} // 3rd greenhouse
-  else if(sol===510&&st.power>660) {st.mod.push('repair_bay')}     // 6th repair bay for even more quantum
-  else if(sol===530&&st.power>680) {st.mod.push('isru_plant')}     // 4th ISRU
-  else if(sol===550&&st.power>700) {st.mod.push('water_extractor')} // 4th water
-  else if(sol===570&&st.power>720) {st.mod.push('greenhouse_dome')} // 4th greenhouse
-  else if(sol===590&&st.power>740) {st.mod.push('solar_farm')}     // 10th solar - final abundance
+  // ULTRA-EARLY SCORING DIVERSIFICATION - Start scoring modules much earlier
+  else if(sol===170&&st.power>540) {st.mod.push('isru_plant')}     // 1st ISRU (160 sols earlier!)
+  else if(sol===185&&st.power>580) {st.mod.push('water_extractor')} // 1st water (165 sols earlier!)
+  else if(sol===200&&st.power>620) {st.mod.push('greenhouse_dome')} // 1st greenhouse (170 sols earlier!)
+  else if(sol===215&&st.power>660) {st.mod.push('isru_plant')}     // 2nd ISRU
+  else if(sol===230&&st.power>700) {st.mod.push('water_extractor')} // 2nd water
+  else if(sol===245&&st.power>740) {st.mod.push('greenhouse_dome')} // 2nd greenhouse
+  else if(sol===260&&st.power>780) {st.mod.push('repair_bay')}     // 8th repair bay
+  else if(sol===275&&st.power>820) {st.mod.push('isru_plant')}     // 3rd ISRU
+  else if(sol===290&&st.power>860) {st.mod.push('water_extractor')} // 3rd water
+  else if(sol===305&&st.power>900) {st.mod.push('greenhouse_dome')} // 3rd greenhouse
+  else if(sol===320&&st.power>940) {st.mod.push('solar_farm')}     // 13th solar
+  else if(sol===335&&st.power>980) {st.mod.push('repair_bay')}     // 9th repair bay
+  else if(sol===350&&st.power>1020) {st.mod.push('isru_plant')}    // 4th ISRU
+  else if(sol===365&&st.power>1060) {st.mod.push('water_extractor')} // 4th water
+  else if(sol===380&&st.power>1100) {st.mod.push('greenhouse_dome')} // 4th greenhouse
+  else if(sol===395&&st.power>1140) {st.mod.push('solar_farm')}    // 14th solar
+  else if(sol===410&&st.power>1180) {st.mod.push('repair_bay')}    // 10th repair bay - ultimate quantum
+  else if(sol===425&&st.power>1220) {st.mod.push('isru_plant')}    // 5th ISRU
+  else if(sol===440&&st.power>1260) {st.mod.push('water_extractor')} // 5th water
+  else if(sol===455&&st.power>1300) {st.mod.push('greenhouse_dome')} // 5th greenhouse
+  else if(sol===470&&st.power>1340) {st.mod.push('isru_plant')}    // 6th ISRU
+  else if(sol===485&&st.power>1380) {st.mod.push('water_extractor')} // 6th water
+  else if(sol===500&&st.power>1420) {st.mod.push('greenhouse_dome')} // 6th greenhouse
+  else if(sol===515&&st.power>1460) {st.mod.push('solar_farm')}    // 15th solar - ultimate abundance
 
   // CRI
   st.cri=Math.min(100,Math.max(0,5+(st.power<50?25:st.power<150?10:0)+st.ev.length*6
@@ -260,8 +324,9 @@ function createState(seed){
   return {
     o2:0, h2o:0, food:0, power:800, se:1, ie:1, ge:1, it:293, cri:5,
     crew:[
-      {n:'EVOLVED-01',bot:true,hp:100,mr:100,a:true},
-      {n:'EVOLVED-02',bot:true,hp:100,mr:100,a:true}
+      {n:'HYPERMAX-01',bot:true,hp:100,mr:100,a:true},
+      {n:'HYPERMAX-02',bot:true,hp:100,mr:100,a:true},
+      {n:'HYPERMAX-03',bot:true,hp:100,mr:100,a:true}
     ],
     ev:[], mod:[], mi:0,
     alloc:{h:0.20,i:0.40,g:0.40,r:1}

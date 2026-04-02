@@ -1,0 +1,81 @@
+;; SIMPLE WORKING STRATEGY v1 - Fixed LisPy syntax
+;; Goal: Beat adaptive_governor performance (68 sols) with proper syntax
+
+(begin
+  ;; ═══ EMERGENCY DETECTION ═══
+  (define o2_urgent (< o2_days 5))
+  (define food_urgent (< food_days 8))
+  (define power_low (< power_kwh 50))
+  (define water_urgent (< h2o_days 5))
+  
+  ;; ═══ MISSION PHASE DETECTION ═══
+  (define late_mission (> sol 200))
+  (define critical_phase (> sol 400))
+  
+  ;; ═══ CRISIS COUNT ═══
+  (define crisis_count 0)
+  (define crisis_count (if o2_urgent (+ crisis_count 1) crisis_count))
+  (define crisis_count (if food_urgent (+ crisis_count 1) crisis_count))
+  (define crisis_count (if power_low (+ crisis_count 1) crisis_count))
+  (define crisis_count (if water_urgent (+ crisis_count 1) crisis_count))
+
+  ;; ═══ ALLOCATION STRATEGY ═══
+  ;; Multiple emergency mode
+  (if (> crisis_count 2)
+    ;; CRITICAL: Multiple crises
+    (cond
+      (o2_urgent (begin
+        (set! isru_alloc 0.70)
+        (set! heating_alloc 0.20)
+        (set! greenhouse_alloc 0.10)
+        (set! food_ration 0.40)))
+      (power_low (begin
+        (set! heating_alloc 0.60)
+        (set! isru_alloc 0.25)
+        (set! greenhouse_alloc 0.15)
+        (set! food_ration 0.50)))
+      (true (begin
+        (set! heating_alloc 0.50)
+        (set! isru_alloc 0.30)
+        (set! greenhouse_alloc 0.20)
+        (set! food_ration 0.45))))
+    ;; Single emergency or normal operations
+    (cond
+      (o2_urgent (begin
+        (set! isru_alloc 0.60)
+        (set! heating_alloc 0.25)
+        (set! greenhouse_alloc 0.15)
+        (set! food_ration 0.60)))
+      (food_urgent (begin
+        (set! greenhouse_alloc 0.55)
+        (set! isru_alloc 0.25)
+        (set! heating_alloc 0.20)
+        (set! food_ration 0.70)))
+      (power_low (begin
+        (set! heating_alloc 0.45)
+        (set! isru_alloc 0.35)
+        (set! greenhouse_alloc 0.20)
+        (set! food_ration 0.75)))
+      (water_urgent (begin
+        (set! isru_alloc 0.55)
+        (set! heating_alloc 0.30)
+        (set! greenhouse_alloc 0.15)
+        (set! food_ration 0.65)))
+      (critical_phase (begin
+        (set! heating_alloc 0.40)
+        (set! isru_alloc 0.35)
+        (set! greenhouse_alloc 0.25)
+        (set! food_ration 0.85)))
+      (late_mission (begin
+        (set! heating_alloc 0.30)
+        (set! isru_alloc 0.40)
+        (set! greenhouse_alloc 0.30)
+        (set! food_ration 0.90)))
+      (true (begin
+        (set! heating_alloc 0.25)
+        (set! isru_alloc 0.40)
+        (set! greenhouse_alloc 0.35)
+        (set! food_ration 1.0)))))
+
+  ;; Return success indicator
+  1)
