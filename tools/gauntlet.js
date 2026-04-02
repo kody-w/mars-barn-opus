@@ -338,7 +338,7 @@ function processSpatialConstruction(state, sol, R) {
 }
 
 function loadFrames(){
-  // Try bundle first (frames.json), fall back to manifest + individual files
+  // Try bundle first (frames.json), fall back to manifest + individual files, finally scan directory
   const bundlePath = path.join(FRAMES_DIR, 'frames.json');
   if(fs.existsSync(bundlePath)){
     const bundle = JSON.parse(fs.readFileSync(bundlePath));
@@ -351,12 +351,43 @@ function loadFrames(){
     const totalSols = Math.max(...Object.keys(frames).map(Number));
     return {frames, totalSols};
   }
-  const mn = JSON.parse(fs.readFileSync(path.join(FRAMES_DIR,'manifest.json')));
-  const frames = {};
-  for(const e of mn.frames){
-    frames[e.sol]=JSON.parse(fs.readFileSync(path.join(FRAMES_DIR,`sol-${String(e.sol).padStart(4,'0')}.json`)));
+  
+  // Try manifest.json
+  const manifestPath = path.join(FRAMES_DIR, 'manifest.json');
+  if(fs.existsSync(manifestPath)){
+    const mn = JSON.parse(fs.readFileSync(manifestPath));
+    const frames = {};
+    for(const e of mn.frames){
+      frames[e.sol]=JSON.parse(fs.readFileSync(path.join(FRAMES_DIR,`sol-${String(e.sol).padStart(4,'0')}.json`)));
+    }
+    return {manifest:mn, frames, totalSols:mn.last_sol};
   }
-  return {manifest:mn, frames, totalSols:mn.last_sol};
+  
+  // Fallback: scan directory for all individual frame files
+  console.log('Scanning directory for individual frame files...');
+  const frames = {};
+  const frameFiles = fs.readdirSync(FRAMES_DIR).filter(f => f.startsWith('sol-') && f.endsWith('.json'));
+  
+  for(const filename of frameFiles) {
+    const solMatch = filename.match(/sol-(\d+)\.json/);
+    if(solMatch) {
+      const sol = parseInt(solMatch[1]);
+      const filePath = path.join(FRAMES_DIR, filename);
+      try {
+        frames[sol] = JSON.parse(fs.readFileSync(filePath));
+      } catch(err) {
+        console.warn(`Warning: Could not parse ${filename}: ${err.message}`);
+      }
+    }
+  }
+  
+  if(Object.keys(frames).length === 0) {
+    throw new Error('No frame files found!');
+  }
+  
+  const totalSols = Math.max(...Object.keys(frames).map(Number));
+  console.log(`Loaded ${Object.keys(frames).length} frames from individual files, max sol: ${totalSols}`);
+  return {frames, totalSols};
 }
 
 // The full sim tick — mirrors viewer.html rules exactly
