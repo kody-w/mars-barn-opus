@@ -171,25 +171,16 @@
   ;; ═══ ANNIHILATOR REPAIR OPTIMIZATION ═══
   (define annihilator_repair_multiplier
     (cond
-      ;; V6 ACTIVE PERIOD - Ultra-aggressive repair
-      ((and v6_active_period robot_health_emergency) 12.0)   ;; V6 maximum emergency (increased)
-      ((and v6_active_period robot_health_critical) 8.5)     ;; V6 critical (increased)  
-      ((and v6_active_period robot_health_concerning) 6.0)   ;; V6 concerning (increased)
-      ((and v6_active_period (not robot_health_good)) 4.5)   ;; V6 general protection
-      (v6_active_period 3.8)                                 ;; V6 baseline (increased)
-      ;; V6 PREPARATION - Early intervention
-      (v6_preparation_period 4.0)                            ;; V6 preparation (increased)
-      ;; CREW COUNT CRISIS - Prioritize survival target
-      ((< current_crew_count 3) 9.0)                         ;; Below 3 robots = CRISIS
-      ;; GENERAL HEALTH RESPONSES - More aggressive
-      (robot_health_emergency 9.0)                           ;; General emergency (increased)
-      (robot_health_critical 6.0)                            ;; General critical (increased)
-      (robot_health_concerning 4.0)                          ;; General concerning (increased)
-      ((not robot_health_good) 3.2)                          ;; Moderate concern (increased)
-      ;; CREW SECURED STATES
-      (crew_target_met 2.5)                                  ;; Crew secured (increased)
-      (robot_health_good 3.0)                                ;; Good health maintenance (increased)
-      (true 2.8)))                                           ;; Standard operation (increased)
+      ((and v6_active_period robot_health_emergency) 10.0)   ;; V6 maximum emergency
+      ((and v6_active_period robot_health_critical) 7.0)     ;; V6 critical
+      ((and v6_active_period (not robot_health_good)) 5.0)   ;; V6 concerning
+      (v6_preparation_period 3.5)                            ;; V6 preparation
+      (robot_health_emergency 8.0)                           ;; General emergency
+      (robot_health_critical 5.5)                            ;; General critical
+      ((not robot_health_good) 3.5)                          ;; General concerning
+      (crew_target_met 2.2)                                  ;; Crew secured
+      (robot_health_good 2.8)                                ;; Good health maintenance
+      (true 2.5)))                                           ;; Standard operation
 
   ;; ═══ ANNIHILATOR EMERGENCY OVERRIDES ═══
   (define power_crisis (< power 120))
