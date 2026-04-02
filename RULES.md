@@ -78,6 +78,7 @@ runs ALL versions sequentially. State carries forward. Damage accumulates.
 | v4 Module Overload | 678-727 | Cascade failures, power grid overload, dust infiltration |
 | v5 Entropy Collapse | 728-777 | Complacency drift, resource decay, maintenance avalanche, crew isolation, solar degradation, habitat entropy |
 | v6 Autonomous Ops | 778-847 | Wheel degradation, navigation error, watchdog trip, actuator seizure, comm delay, power brownout, sensor blindness, thermal shock, regolith entrapment, cable wear, autonomous logic failure, dust storm immobilization |
+| v7 Sabatier Chemistry | 848-897 | Catalyst poisoning, reactor fouling, membrane degradation, CO₂ compressor failure, water separator malfunction |
 
 ### Retroactive echo enrichment:
 - Past frames get richer data layers WITHOUT changing (additive overlay files)
@@ -85,6 +86,7 @@ runs ALL versions sequentially. State carries forward. Damage accumulates.
 - v4 enrichment: module maintenance debt, grid complexity, seal degradation from Sol 1
 - v5 enrichment: cumulative food decay, solar degradation, crew isolation index, system entropy, maintenance debt from Sol 1
 - v6 enrichment: cumulative wheel wear, joint stiffness, battery degradation, sensor drift, cable fatigue, autonomous decision count, unrecoverable errors from Sol 1
+- v7 enrichment: cumulative catalyst age, catalyst efficiency degradation, electrode wear from Sol 1
 - These are ALWAYS applied — you can't opt out of enrichment
 
 ### v5 Entropy Collapse — what it counters:
@@ -140,9 +142,38 @@ This is not optional. This is the mission architecture. Robots go first. Always.
 ### Production per sol:
 ```
 Solar power = solIrr(sol, dustStorm) × 15m² × 0.22 × 12.3h / 1000 × solar_eff × solar_bonus
-ISRU O₂    = 2.8 kg × isru_eff × min(1.5, isru_alloc×2) × isru_bonus  (if power > 15 kWh)
-ISRU H₂O   = 1.2 L  × isru_eff × min(1.5, isru_alloc×2) × isru_bonus  (if power > 15 kWh)
+
+# v7 Sabatier Reaction Chemistry (replaces simple constants)
+ISRU O₂ Production = Sabatier reaction + Electrolysis (if power > 15 kWh):
+  Step 1: CO₂ + 4H₂ → CH₄ + 2H₂O (Sabatier reaction)
+    H₂O rate = 0.5 kg/hr × temp_factor × pressure_factor × power_factor × catalyst_efficiency
+    temp_factor = (catalyst_temp - 300°C) / (350°C - 300°C), clamped 0.1-1.0
+    pressure_factor = min(1.0, co2_pressure / 606 Pa)
+    power_factor = min(1.0, max(0, (power_kw - 1.5) / 2.0))
+    catalyst_efficiency = max(0.2, 1.0 - operating_hours / 2000)
+  
+  Step 2: 2H₂O → 2H₂ + O₂ (Electrolysis)
+    O₂ rate = min(power_kw / 5.0, available_h2o * 0.444) × electrode_efficiency × 0.70
+    electrode_efficiency = max(0.3, 1.0 - operating_hours / 70000)
+    
+  Daily production = rate × 24.6 hours × isru_plants × isru_eff
+  
+# v1-v6 Legacy (simple constants for comparison):
+# ISRU O₂    = 2.8 kg × isru_eff × min(1.5, isru_alloc×2) × isru_bonus  (if power > 15 kWh)
+# ISRU H₂O   = 1.2 L  × isru_eff × min(1.5, isru_alloc×2) × isru_bonus  (if power > 15 kWh)
+
 Greenhouse  = 3500 kcal × greenhouse_eff × min(1.5, greenhouse_alloc×2) × greenhouse_bonus  (if power > 15 AND h2o > 5)
+```
+
+### v7 Catalyst Degradation (NEW):
+```
+Catalyst age increases by 24.6 hours per sol when ISRU is active
+Catalyst efficiency = max(0.2, 1.0 - (age_hours / 2000))
+Electrode efficiency = max(0.3, 1.0 - (age_hours / 70000))
+
+At Sol 400: Catalyst ~50% efficient (needs replacement planning)
+At Sol 700: Catalyst at minimum 20% efficiency  
+Electrodes remain >95% efficient throughout typical mission duration
 ```
 
 ### Consumption per sol:
