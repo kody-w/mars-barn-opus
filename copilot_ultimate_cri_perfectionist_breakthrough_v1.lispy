@@ -1,0 +1,216 @@
+;; COPILOT ULTIMATE CRI PERFECTIONIST BREAKTHROUGH V1
+;; Target: 110,000+ by achieving P75 CRI ≤ 20 through mathematical resource perfection
+;; Strategy: Extreme resource buffering prioritization for CRI elimination + V6 survival
+
+(begin
+  (define _agent_name "Copilot Ultimate CRI Perfectionist Breakthrough v1")
+  (define _agent_desc "Mathematical CRI elimination for 110K+ breakthrough")
+  
+  (log (concat "🎯🧮💎 CRI PERFECTIONIST — Sol " (string sol) " — CRI:" (string colony_risk_index) " — Target: ≤20"))
+  
+  ;; ═══ CRI MATHEMATICAL ANALYSIS ═══
+  ;; CRI = 5 + power_penalty + events*6 + resource_penalties
+  ;; Power penalty: 0 if >150kWh, 10 if 50-150kWh, 25 if <50kWh
+  ;; Resource penalties: 20 each if O2<5d, H2O<5d, Food<5d
+  ;; Event penalty: 6 per event (cannot control)
+  ;; Target: P75 CRI ≤ 20, which means 75% of runs must have very few penalties
+  
+  ;; ═══ MATHEMATICAL RESOURCE PERFECTION TARGETS ═══
+  ;; NEVER allow resource penalties - build massive buffers immediately
+  (define perfect_o2_target 20.0)     ;; Massive O2 buffer (4x safety)
+  (define perfect_h2o_target 20.0)    ;; Massive H2O buffer (4x safety)
+  (define perfect_food_target 25.0)   ;; Massive food buffer (5x safety)
+  (define perfect_power_target 400)   ;; Massive power buffer (2.7x safety)
+  
+  ;; Emergency thresholds - much higher than standard
+  (define o2_crisis_threshold 8.0)    ;; Crisis if below 8 days (vs standard 3)
+  (define h2o_crisis_threshold 8.0)   ;; Crisis if below 8 days (vs standard 3)
+  (define food_crisis_threshold 10.0) ;; Crisis if below 10 days (vs standard 5)
+  (define power_crisis_threshold 200) ;; Crisis if below 200 kWh (vs standard 150)
+  
+  ;; ═══ V6 ROBOT DEGRADATION PROTECTION ═══
+  ;; Maintain V6 survival capabilities
+  (define degradation_factor (/ sol 1000.0))
+  (define critical_degradation_period (> sol 200))
+  (define emergency_degradation_period (> sol 230))
+  (define battery_degradation_loss (* sol 0.0004))
+  
+  ;; ═══ EXTREME RESOURCE-FIRST ALLOCATION ═══
+  ;; Prioritize resource security above everything for CRI elimination
+  
+  ;; O2 allocation - extreme prioritization
+  (define extreme_o2_need
+    (cond
+      ((< o2_days o2_crisis_threshold) 0.95)      ;; Crisis - nearly maximum
+      ((< o2_days 12.0) 0.85)                     ;; High urgency
+      ((< o2_days 16.0) 0.70)                     ;; Medium urgency
+      ((< o2_days perfect_o2_target) 0.55)        ;; Build to perfect target
+      ((< o2_days 25.0) 0.35)                     ;; Maintain perfect buffer
+      (true 0.20)))                               ;; Minimal when perfect
+  
+  ;; Food allocation - extreme prioritization
+  (define extreme_food_need
+    (cond
+      ((< food_days food_crisis_threshold) 0.90)  ;; Crisis - nearly maximum
+      ((< food_days 15.0) 0.78)                   ;; High urgency
+      ((< food_days 20.0) 0.65)                   ;; Medium urgency
+      ((< food_days perfect_food_target) 0.50)    ;; Build to perfect target
+      ((< food_days 30.0) 0.30)                   ;; Maintain perfect buffer
+      (true 0.15)))                               ;; Minimal when perfect
+  
+  ;; ═══ CRI RESPONSE MULTIPLIER SYSTEM ═══
+  ;; Massive response to any CRI elevation for immediate correction
+  (define cri_perfectionist_multiplier
+    (cond
+      ((< colony_risk_index 8) 1.0)       ;; Perfect CRI - maintain
+      ((< colony_risk_index 12) 1.6)      ;; Good CRI - strong boost
+      ((< colony_risk_index 16) 2.2)      ;; Warning CRI - ultra boost
+      ((< colony_risk_index 20) 2.8)      ;; High CRI - maximum boost
+      ((< colony_risk_index 25) 3.5)      ;; Critical CRI - emergency
+      (true 4.0)))                        ;; Crisis CRI - absolute maximum
+  
+  ;; ═══ EVENT DAMAGE MITIGATION ═══
+  ;; Enhanced response to events since they're the main uncontrollable CRI factor
+  (define event_count (length events))
+  (define event_penalty (* event_count 6))
+  
+  (define event_mitigation_multiplier
+    (cond
+      ((>= event_count 4) 3.0)     ;; 4+ events - maximum mitigation
+      ((>= event_count 3) 2.5)     ;; 3 events - ultra mitigation
+      ((>= event_count 2) 2.0)     ;; 2 events - strong mitigation
+      ((>= event_count 1) 1.5)     ;; 1 event - enhanced mitigation
+      (true 1.0)))                 ;; No events - normal
+  
+  ;; ═══ POWER CRISIS PREVENTION ═══
+  ;; Ensure power never causes CRI penalty
+  (define power_crisis (< power power_crisis_threshold))
+  (define power_emergency (< power 150))  ;; Standard threshold
+  (define power_perfect (>= power perfect_power_target))
+  
+  (define power_allocation_boost
+    (cond
+      (power_emergency 2.5)        ;; Emergency - maximum heating
+      (power_crisis 1.8)           ;; Crisis - ultra heating
+      ((not power_perfect) 1.3)    ;; Below perfect - enhanced heating
+      (true 1.0)))                 ;; Perfect - normal
+  
+  ;; ═══ ENHANCED REPAIR FOR V6 + CRI ═══
+  ;; Higher repair for both V6 degradation and equipment CRI factors
+  (define base_repair_for_degradation
+    (cond
+      (emergency_degradation_period 6.0)    ;; Emergency V6 repair
+      (critical_degradation_period 4.0)     ;; High V6 repair
+      ((> sol 150) 3.0)                     ;; Proactive V6 repair
+      (true 2.5)))                          ;; Enhanced baseline
+  
+  ;; Additional CRI-focused repair
+  (define cri_repair_boost
+    (cond
+      ((> colony_risk_index 20) 2.0)        ;; High CRI - emergency repair
+      ((> colony_risk_index 15) 1.5)        ;; Moderate CRI - enhanced repair
+      (true 1.0)))                          ;; Normal CRI - standard repair
+  
+  (define total_repair_multiplier (* base_repair_for_degradation cri_repair_boost))
+  
+  ;; ═══ FINAL ALLOCATION CALCULATION ═══
+  ;; Apply all multipliers for extreme resource prioritization
+  (define final_isru_allocation 
+    (* extreme_o2_need 
+       cri_perfectionist_multiplier 
+       event_mitigation_multiplier))
+  
+  (define final_greenhouse_allocation 
+    (* extreme_food_need 
+       cri_perfectionist_multiplier 
+       event_mitigation_multiplier))
+  
+  ;; Heating gets remainder but with power boost
+  (define base_heating_allocation (max 0.10 (- 1.0 final_isru_allocation final_greenhouse_allocation)))
+  (define final_heating_allocation (* base_heating_allocation power_allocation_boost))
+  
+  ;; Renormalize if total > 1.0
+  (define total_allocation (+ final_heating_allocation final_isru_allocation final_greenhouse_allocation))
+  (define normalization_factor (min 1.0 (/ 1.0 total_allocation)))
+  
+  (define normalized_heating (* final_heating_allocation normalization_factor))
+  (define normalized_isru (* final_isru_allocation normalization_factor))
+  (define normalized_greenhouse (* final_greenhouse_allocation normalization_factor))
+  
+  ;; ═══ ALLOCATION VARIANCE FOR V5 COMPLACENCY ═══
+  ;; Small variance to prevent V5 complacency drift
+  (define allocation_cycle (mod sol 31))  ;; Prime number for true randomness
+  (define cycle_phase (/ (* 2.0 3.14159 allocation_cycle) 31.0))
+  
+  (define heating_variance (* 0.01 (sin cycle_phase)))    ;; Small variance
+  (define isru_variance (* 0.008 (cos cycle_phase)))      ;; Small variance
+  (define greenhouse_variance (* -0.5 (+ heating_variance isru_variance)))
+  
+  (define varied_heating (+ normalized_heating heating_variance))
+  (define varied_isru (+ normalized_isru isru_variance))
+  (define varied_greenhouse (+ normalized_greenhouse greenhouse_variance))
+  
+  ;; Apply bounds
+  (set-heating (max 0.08 (min 0.85 varied_heating)))
+  (set-isru (max 0.15 (min 0.90 varied_isru)))
+  (set-greenhouse (max 0.10 (min 0.85 varied_greenhouse)))
+  (set-repair total_repair_multiplier)
+  
+  ;; ═══ CRI ANALYSIS AND TRACKING ═══
+  (define power_penalty_calc 
+    (cond
+      ((< power 50) 25)
+      ((< power 150) 10)
+      (true 0)))
+      
+  (define resource_penalty_calc
+    (+ (if (< o2_days 5) 20 0)
+       (if (< h2o_days 5) 20 0)
+       (if (< food_days 5) 20 0)))
+  
+  (define calculated_cri_total (+ 5 power_penalty_calc event_penalty resource_penalty_calc))
+  (define cri_perfection_achieved (<= colony_risk_index 20))
+  (define resource_perfection_achieved 
+    (and (>= o2_days 15) (>= h2o_days 15) (>= food_days 20) (>= power 350)))
+  
+  ;; ═══ STATUS REPORTING ═══
+  (log (concat "🧮 CRI Math: " (string colony_risk_index) " = 5+" (string power_penalty_calc) 
+               "+" (string event_penalty) "+" (string resource_penalty_calc) 
+               " | Target≤20:" (if cri_perfection_achieved "✅" "❌")))
+  
+  (log (concat "🛡️ Perfect Buffers: O2:" (string o2_days) "d/" (string perfect_o2_target) 
+               " H2O:" (string h2o_days) "d/" (string perfect_h2o_target)
+               " Food:" (string food_days) "d/" (string perfect_food_target)))
+  
+  (log (concat "⚡ Power Status: " (string power) "kWh/" (string perfect_power_target)
+               (if power_emergency " ❌EMERGENCY" 
+               (if power_crisis " ⚠️CRISIS"
+               (if power_perfect " ✅PERFECT" " 🔶BUILDING")))))
+  
+  (log (concat "🎯 Events: " (string event_count) " (+" (string event_penalty) " CRI)"
+               " | Mitigation: " (string (round (* event_mitigation_multiplier 100))) "%"
+               " | CRI Response: " (string (round (* cri_perfectionist_multiplier 100))) "%"))
+  
+  (log (concat "🔧 V6 Status: Sol " (string sol) 
+               " | Degradation:" (string degradation_factor)
+               " | Battery Loss:" (string battery_degradation_loss)
+               " | Repair:" (string total_repair_multiplier)))
+  
+  (log (concat "📊 Final Allocs: H:" (string (round (* (get-heating) 100))) "%" 
+               " I:" (string (round (* (get-isru) 100))) "%" 
+               " G:" (string (round (* (get-greenhouse) 100))) "%" 
+               " R:" (string total_repair_multiplier)))
+  
+  ;; ═══ SCORE PROJECTION ═══
+  (if (> sol 400)
+    (let ((projected_sols 870)
+          (projected_cri (if resource_perfection_achieved 15 (max 20 (min colony_risk_index 25))))
+          (projected_score (+ (* projected_sols 100) 1000 1200 20000 (* projected_cri -10))))
+      (log (concat "🏆 CRI Perfect Score: " (string projected_score) 
+                   " (sols:" (string projected_sols) " cri:" (string projected_cri) 
+                   ") | Current: 108,840 | Target: 110,000+"))))
+  
+  (log (concat "💎 Perfect Status: Resources:" (if resource_perfection_achieved "PERFECT" "BUILDING")
+               " | CRI:" (if cri_perfection_achieved "TARGET" "WORKING")
+               " | Mode: MATHEMATICAL_PERFECTION"))
+)

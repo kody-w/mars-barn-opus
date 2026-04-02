@@ -1,246 +1,203 @@
-;; COPILOT BREAKTHROUGH STOCHASTIC QUANTUM NEXUS v2
-;; Revolutionary Innovation: Stochastic Risk Distribution + Compound Damage Prediction + Module Synergy Optimization  
-;; Target: Break 92,000+ ceiling through probabilistic CRI modeling and predictive damage immunity
-;; Features: 95th percentile risk hedging, compound damage clustering prediction, module type synergy scoring
+;; COPILOT ULTRA RELIABLE MARS CHAMPION V1
+;; Strategy: Achieve 106,000+ points with 100% survival rate and zero crew failures
+;; Target: Beat current 105,840 with perfect crew preservation + CRI optimization
+;; Revolutionary approach: Ultra-conservative crew protection + mathematical resource security
 
 (begin
-  (define _agent_name "Copilot Breakthrough Stochastic Quantum Nexus v2")
-  (define _agent_desc "Breakthrough stochastic risk modeling with compound damage prediction and module synergy optimization")
-
-  (log (concat "🎯🧠🌀⚡💫 STOCHASTIC QUANTUM NEXUS — Sol " (string sol) " — Probabilistic Protocol"))
-
-  ;; ═══ REVOLUTIONARY STOCHASTIC RISK MODELING ═══
-  ;; Breakthrough Innovation: Model CRI as probability distribution instead of deterministic value
-  ;; Goal: Break the P75 CRI = 5 floor through percentile-based hedging
+  (define _agent_name "Copilot Ultra Reliable Mars Champion v1")
+  (define _agent_desc "Perfect reliability through ultra-conservative crew protection")
   
-  ;; CRI Distribution Parameters (learned from 1000+ simulation patterns)
-  (define cri_base_mean cri)
-  (define cri_variance_early (* 0.3 (max 1 (/ sol 100))))    ;; Early game: low variance
-  (define cri_variance_mid (* 0.8 (max 1 (/ (- sol 200) 100)))) ;; Mid game: higher variance
-  (define cri_variance_late (* 1.4 (max 1 (/ (- sol 400) 100)))) ;; Late game: maximum variance
+  (log (concat "🛡️🏆💎 ULTRA RELIABLE CHAMPION — Sol " (string sol) " — CRI:" (string colony_risk_index) " — Target: 106,000+"))
   
-  (define cri_stochastic_variance
+  ;; ═══ ULTRA RELIABLE CHAMPION SCIENCE ═══ 
+  ;; Current test: 105,840 but with min crew = 0 (total colony failure in 1/10 runs)
+  ;; Target: 106,000+ with 100% survival rate and min crew ≥ 3 ALWAYS
+  ;; Focus: ABSOLUTE crew preservation + perfect resource security + CRI optimization
+  
+  ;; ═══ ULTRA RELIABLE RESOURCE SECURITY TARGETS ═══
+  ;; Maximum conservative targets - impossible to fail under any circumstances
+  (define ultra_o2_target 35.0)         ;; Extreme O2 buffer - absolute security
+  (define ultra_h2o_target 35.0)        ;; Extreme H2O buffer - absolute security
+  (define ultra_food_target 50.0)       ;; Ultra-extreme food buffer - survive anything
+  (define ultra_power_target 450)       ;; Ultra-extreme power buffer - guaranteed security
+  
+  ;; ═══ ULTRA RELIABLE EMERGENCY THRESHOLDS ═══
+  ;; Ultra-conservative emergency response to prevent any crew loss
+  (define o2_emergency_threshold 12.0)   ;; Emergency O2 response much earlier
+  (define h2o_emergency_threshold 12.0)  ;; Emergency H2O response much earlier
+  (define food_emergency_threshold 15.0) ;; Emergency food response much earlier
+  (define power_emergency_threshold 300) ;; Emergency power response much earlier
+  
+  ;; ═══ ULTRA RELIABLE PHASE STRATEGY ═══
+  ;; Optimized for absolute crew preservation across all 870 sols
+  (define phase_ultra_foundation (< sol 50))               ;; Ultra-fast foundation
+  (define phase_ultra_security (and (>= sol 50) (< sol 120)))     ;; Rapid security establishment
+  (define phase_ultra_optimization (and (>= sol 120) (< sol 300))) ;; Conservative optimization
+  (define phase_ultra_control (and (>= sol 300) (< sol 550)))      ;; Absolute control
+  (define phase_ultra_mastery (>= sol 550))                ;; Ultra-reliable mastery
+  
+  ;; ═══ ULTRA RELIABLE ALLOCATION LOGIC ═══
+  ;; Even more conservative than transcendent - absolute crew protection
+  (define ultra_o2_need
     (cond
-      ((< sol 200) cri_variance_early)
-      ((< sol 400) cri_variance_mid)
-      (true cri_variance_late)))
+      ((< o2_days ultra_o2_emergency_threshold) 0.98)  ;; Emergency - maximum allocation
+      ((< o2_days 20.0) 0.92)     ;; Critical - very high priority
+      ((< o2_days 30.0) 0.80)     ;; Build to ultra target  
+      ((< o2_days 40.0) 0.60)     ;; Maintain ultra buffer
+      (true 0.40)))               ;; Minimal when ultra-secure
 
-  ;; Stochastic CRI Prediction (90th percentile risk hedging)
-  (define cri_p50 cri_base_mean)                                     ;; Current CRI (median)
-  (define cri_p75 (+ cri_base_mean (* cri_stochastic_variance 0.67))) ;; 75th percentile 
-  (define cri_p90 (+ cri_base_mean (* cri_stochastic_variance 1.28))) ;; 90th percentile (breakthrough target)
-  (define cri_p95 (+ cri_base_mean (* cri_stochastic_variance 1.65))) ;; 95th percentile (emergency)
-
-  ;; Revolutionary Threat Classification using P90 risk hedging
-  (define stochastic_threat_optimal (< cri_p90 3))
-  (define stochastic_threat_excellent (and (>= cri_p90 3) (< cri_p90 6)))
-  (define stochastic_threat_great (and (>= cri_p90 6) (< cri_p90 10)))
-  (define stochastic_threat_good (and (>= cri_p90 10) (< cri_p90 16)))
-  (define stochastic_threat_acceptable (and (>= cri_p90 16) (< cri_p90 25)))
-  (define stochastic_threat_concerning (and (>= cri_p90 25) (< cri_p90 35)))
-  (define stochastic_threat_dangerous (and (>= cri_p90 35) (< cri_p90 50)))
-  (define stochastic_threat_critical (>= cri_p90 50))
-
-  ;; ═══ COMPOUND DAMAGE CLUSTERING PREDICTION ═══
-  ;; Breakthrough Innovation: Predict compound damage events 50 sols ahead
-  ;; Pattern recognition: Compound damage clusters typically occur Sol 300-400, 450-550, 580-620
-  
-  (define compound_damage_cycle (/ sol 150))  ;; 150-sol damage cycles
-  (define cycle_phase (- compound_damage_cycle (floor compound_damage_cycle)))
-  
-  (define compound_damage_risk_base
+  (define ultra_food_need
     (cond
-      ((and (> sol 280) (< sol 320)) 3.2)      ;; First compound cluster window
-      ((and (> sol 430) (< sol 470)) 4.1)      ;; Second compound cluster (higher)
-      ((and (> sol 560) (< sol 600)) 3.8)      ;; Third compound cluster  
-      ((and (> cycle_phase 0.6) (< cycle_phase 0.9)) 2.1) ;; Cycle-based risk
-      (true 1.0)))                              ;; Baseline risk
+      ((< food_days food_emergency_threshold) 0.95)  ;; Emergency food allocation
+      ((< food_days 25.0) 0.88)   ;; Critical priority
+      ((< food_days 35.0) 0.75)   ;; Build to ultra target
+      ((< food_days 45.0) 0.55)   ;; Maintain ultra buffer
+      (true 0.40)))               ;; Minimal when ultra-secure
 
-  (define compound_damage_vulnerability
-    (* compound_damage_risk_base
-       (cond
-         ((< repair_bay_count 3) 2.2)           ;; Insufficient repair capacity
-         ((< repair_bay_count 5) 1.6)           ;; Low repair capacity
-         ((< repair_bay_count 7) 1.2)           ;; Moderate capacity
-         (true 1.0))                            ;; High capacity
-       (if (< ie 0.4) 1.8 1.0)                 ;; Infrastructure degradation multiplier
-       (if (< se 0.4) 1.6 1.0)))               ;; Solar degradation multiplier
-
-  ;; Preemptive Compound Damage Shield System
-  (define compound_shield_needed (> compound_damage_vulnerability 3.5))
-  (define compound_shield_critical (> compound_damage_vulnerability 6.0))
-  (define compound_shield_emergency (> compound_damage_vulnerability 9.0))
-
-  ;; ═══ MODULE SYNERGY OPTIMIZATION ═══
-  ;; Breakthrough Innovation: Module type combinations provide synergistic bonuses
-  ;; Based on analysis of infrastructure interaction patterns
-  
-  ;; Core synergy multipliers (discovered patterns)
-  (define solar_repair_synergy 
-    (min 1.25 (+ 1.0 (* 0.05 (min solar_count repair_bay_count)))))  ;; Solar+Repair synergy up to 25%
-    
-  (define greenhouse_water_synergy
-    (min 1.20 (+ 1.0 (* 0.10 (min greenhouse_count 
-                               (max 0 (- modules_built greenhouse_count solar_count repair_bay_count)))))))
-  
-  (define manufacturing_efficiency_synergy  
-    (min 1.15 (+ 1.0 (* 0.03 modules_built))))                       ;; 3% per total module
-
-  ;; Revolutionary infrastructure bonuses with synergy optimization
-  (define optimal_solar_farms (min 4 (cond
-    ((> sol 600) 4)                             ;; Late game maximum
-    ((> modules_built 18) 3)                    ;; High module count
-    ((> modules_built 12) 2)                    ;; Mid module count
-    ((> modules_built 6) 1)                     ;; Early solar
-    (true 0))))
-
-  (define optimal_repair_bays (cond
-    (compound_shield_emergency 9)               ;; Emergency maximum  
-    (compound_shield_critical 7)                ;; Critical protection
-    (compound_shield_needed 5)                  ;; Standard protection
-    ((> sol 500) 4)                             ;; Late game baseline
-    ((> sol 300) 3)                             ;; Mid game baseline
-    ((> sol 150) 2)                             ;; Early protection
-    ((> sol 80) 1)                              ;; Basic protection
-    (true 0)))
-
-  ;; Synergy-optimized bonuses
-  (define synergistic_solar_bonus 
-    (* (+ 1.0 (* optimal_solar_farms 0.50)) solar_repair_synergy))    ;; Up to 325% with synergy
-    
-  (define synergistic_greenhouse_bonus
-    (* (+ 1.0 (* (if (>= modules_built 10) 1 0) 0.60)) 
-       greenhouse_water_synergy))                                     ;; Up to 192% with synergy
-       
-  (define synergistic_isru_bonus 
-    (* (+ 1.0 (* (if (>= modules_built 8) 1 0) 0.45)) 
-       manufacturing_efficiency_synergy))                             ;; Up to 167% with synergy
-
-  ;; ═══ QUANTUM PHASE EVOLUTION v2 ═══
-  ;; Enhanced 14-phase system with stochastic transition points
-  
-  (define quantum_genesis (< sol 12))                     ;; Genesis - instant setup
-  (define quantum_spark (and (>= sol 12) (< sol 28)))     ;; Spark - ultra-early farming
-  (define quantum_ignition (and (>= sol 28) (< sol 48)))  ;; Ignition - farming acceleration
-  (define quantum_boost (and (>= sol 48) (< sol 75)))     ;; Boost - rapid optimization  
-  (define quantum_surge (and (>= sol 75) (< sol 110)))    ;; Surge - explosive growth
-  (define quantum_nova (and (>= sol 110) (< sol 155)))    ;; Nova - massive expansion
-  (define quantum_hypernova (and (>= sol 155) (< sol 215))) ;; Hypernova - transcendent expansion
-  (define quantum_galactic (and (>= sol 215) (< sol 285))) ;; Galactic - cosmic efficiency
-  (define quantum_universal (and (>= sol 285) (< sol 365))) ;; Universal - reality optimization
-  (define quantum_dimensional (and (>= sol 365) (< sol 455))) ;; Dimensional - physics mastery
-  (define quantum_omnipotent (and (>= sol 455) (< sol 555))) ;; Omnipotent - god-level control
-  (define quantum_transcendent (and (>= sol 555) (< sol 625))) ;; Transcendent - ultimate mastery
-  (define quantum_infinite (and (>= sol 625) (< sol 665))) ;; Infinite - beyond limits
-  (define quantum_eternal (>= sol 665))                   ;; Eternal - absolute perfection
-
-  ;; ═══ BREAKTHROUGH STOCHASTIC ALLOCATION MATRIX ═══
-  ;; Revolutionary P90 risk hedging with module synergy optimization
-  
-  (define stochastic_allocation
+  ;; ═══ ULTRA RELIABLE CRI EMERGENCY SYSTEM ═══
+  ;; Zero tolerance for any CRI risk that could threaten crew
+  (define ultra_cri_response
     (cond
-      ;; QUANTUM GENESIS - Ultra-acceleration with stochastic hedging
-      ((and quantum_genesis stochastic_threat_optimal)
-        (list 0.01 0.06 0.93 0.20))     ;; 93% greenhouse - breakthrough acceleration
-      ((and quantum_genesis stochastic_threat_excellent)  
-        (list 0.02 0.08 0.90 0.25))     ;; 90% greenhouse - excellent acceleration
-      ((and quantum_genesis stochastic_threat_great)
-        (list 0.04 0.12 0.84 0.35))     ;; 84% greenhouse - great acceleration
-      (quantum_genesis
-        (list 0.08 0.20 0.72 0.50))     ;; 72% greenhouse - safe acceleration
+      ((< colony_risk_index 5) 1.0)      ;; Perfect CRI - maintain perfection
+      ((< colony_risk_index 10) 1.4)     ;; Good CRI - enhanced boost
+      ((< colony_risk_index 20) 1.8)     ;; Acceptable CRI - strong boost
+      ((< colony_risk_index 30) 2.3)     ;; Concerning CRI - emergency boost
+      (true 2.8)))                       ;; Crisis CRI - maximum response
 
-      ;; QUANTUM SPARK through IGNITION - Ultra-early farming with P90 hedging
-      ((and (or quantum_spark quantum_ignition) stochastic_threat_optimal)
-        (list 0.005 (* 0.035 synergistic_isru_bonus) (* 0.96 synergistic_greenhouse_bonus) 0.15))
-      ((and (or quantum_spark quantum_ignition) stochastic_threat_excellent)
-        (list 0.01 (* 0.05 synergistic_isru_bonus) (* 0.94 synergistic_greenhouse_bonus) 0.22))
-      ((and (or quantum_spark quantum_ignition) stochastic_threat_great)
-        (list 0.02 (* 0.08 synergistic_isru_bonus) (* 0.90 synergistic_greenhouse_bonus) 0.30))
-      ((or quantum_spark quantum_ignition)
-        (list 0.05 0.15 0.80 0.45))
+  ;; ═══ ULTRA RELIABLE PHASE-OPTIMIZED ALLOCATION ═══
+  (define ultra_base_allocation
+    (cond
+      ;; Ultra Foundation - establish security immediately
+      (phase_ultra_foundation 0.92)
+      
+      ;; Ultra Security - rapid ultra-secure resource establishment
+      (phase_ultra_security 0.96)
+      
+      ;; Ultra Optimization - conservative resource optimization
+      (phase_ultra_optimization 0.98)
+      
+      ;; Ultra Control - absolute crew protection control
+      (phase_ultra_control 0.99)
+      
+      ;; Ultra Mastery - perfect ultra-reliable survival
+      (phase_ultra_mastery 0.995)
+      
+      ;; Default maximum security
+      (true 0.98)))
 
-      ;; QUANTUM BOOST through NOVA - Maximum farming with synergy bonuses
-      ((and (or quantum_boost quantum_surge quantum_nova) stochastic_threat_optimal)
-        (list 0.003 (* 0.025 synergistic_isru_bonus) (* 0.972 synergistic_greenhouse_bonus) 0.12))
-      ((and (or quantum_boost quantum_surge quantum_nova) stochastic_threat_excellent)
-        (list 0.008 (* 0.035 synergistic_isru_bonus) (* 0.957 synergistic_greenhouse_bonus) 0.18))
-      ((and (or quantum_boost quantum_surge quantum_nova) stochastic_threat_great)
-        (list 0.015 (* 0.055 synergistic_isru_bonus) (* 0.93 synergistic_greenhouse_bonus) 0.25))
-      ((or quantum_boost quantum_surge quantum_nova)
-        (list 0.04 0.12 0.84 0.40))
+  ;; ═══ ULTRA RELIABLE EVENT RESPONSE SYSTEM ═══
+  ;; Maximum response to any events that could threaten crew survival
+  (define event_count (length events))
+  (define event_cri_penalty (* 6 event_count))
+  
+  ;; Ultra-aggressive event response for crew protection
+  (define event_response_multiplier 
+    (cond
+      ((>= event_count 4) 2.5)      ;; 4+ events - maximum response
+      ((>= event_count 3) 2.1)      ;; 3 events - ultra response
+      ((>= event_count 2) 1.8)      ;; 2 events - strong response
+      ((>= event_count 1) 1.5)      ;; 1 event - enhanced response
+      (true 1.0)))                  ;; 0 events - maintain perfection
 
-      ;; QUANTUM HYPERNOVA through GALACTIC - Transcendent farming with compound damage shields
-      ((and (or quantum_hypernova quantum_galactic) stochastic_threat_optimal compound_shield_needed)
-        (list 0.008 (* 0.04 synergistic_isru_bonus) (* 0.952 synergistic_greenhouse_bonus) 0.16)) ;; Shield mode
-      ((and (or quantum_hypernova quantum_galactic) stochastic_threat_optimal)
-        (list 0.002 (* 0.02 synergistic_isru_bonus) (* 0.978 synergistic_greenhouse_bonus) 0.10)) ;; Perfect mode
-      ((and (or quantum_hypernova quantum_galactic) stochastic_threat_excellent)
-        (list 0.005 (* 0.03 synergistic_isru_bonus) (* 0.965 synergistic_greenhouse_bonus) 0.15))
-      ((and (or quantum_hypernova quantum_galactic) stochastic_threat_great)
-        (list 0.012 (* 0.048 synergistic_isru_bonus) (* 0.94 synergistic_greenhouse_bonus) 0.22))
-      ((or quantum_hypernova quantum_galactic)
-        (list 0.03 0.10 0.87 0.35))
+  ;; ═══ ULTRA RELIABLE POWER SECURITY ═══
+  ;; Absolute power security to prevent any crew loss from power failure
+  (define power_deficit (< power ultra_power_target))
+  (define power_critical (< power power_emergency_threshold))
+  (define power_emergency (< power 200))
+  (define power_boost_needed 
+    (cond
+      (power_emergency 2.2)        ;; Emergency power - maximum boost
+      (power_critical 1.8)         ;; Critical power - ultra boost
+      (power_deficit 1.5)          ;; Below target - strong boost
+      (true 1.0)))                 ;; Above target - maintain perfection
 
-      ;; QUANTUM UNIVERSAL through ETERNAL - Ultimate stochastic optimization
-      ((and (>= sol 285) stochastic_threat_optimal (not compound_shield_needed))
-        (list 0.001 (* 0.014 synergistic_isru_bonus) (* 0.985 synergistic_greenhouse_bonus) 0.08))  ;; Theoretical maximum
-      ((and (>= sol 285) stochastic_threat_optimal)
-        (list 0.003 (* 0.022 synergistic_isru_bonus) (* 0.975 synergistic_greenhouse_bonus) 0.12))  ;; Shield mode
-      ((and (>= sol 285) stochastic_threat_excellent)
-        (list 0.006 (* 0.03 synergistic_isru_bonus) (* 0.964 synergistic_greenhouse_bonus) 0.16))   ;; Excellent
-      ((and (>= sol 285) stochastic_threat_great)
-        (list 0.012 (* 0.045 synergistic_isru_bonus) (* 0.943 synergistic_greenhouse_bonus) 0.24))  ;; Great
-      ((and (>= sol 285) stochastic_threat_good)
-        (list 0.02 (* 0.06 synergistic_isru_bonus) (* 0.92 synergistic_greenhouse_bonus) 0.30))     ;; Good
-      ((>= sol 285)
-        (list 0.04 0.12 0.84 0.42))     ;; Safe late game
+  ;; ═══ ULTRA RELIABLE CREW PROTECTION MULTIPLIER ═══
+  ;; Additional safety factor when crew health is at risk
+  (define crew_health_risk (< crew_min_hp 80))
+  (define crew_critical_risk (< crew_min_hp 60))
+  (define crew_emergency_risk (< crew_min_hp 40))
+  
+  (define crew_protection_multiplier
+    (cond
+      (crew_emergency_risk 1.8)    ;; Emergency crew health - maximum protection
+      (crew_critical_risk 1.5)     ;; Critical crew health - ultra protection
+      (crew_health_risk 1.3)       ;; Health risk - enhanced protection
+      (true 1.0)))                 ;; Good health - maintain
 
-      ;; EMERGENCY PROTOCOLS - Compound damage immunity + P95 risk hedging  
-      ((or compound_shield_emergency stochastic_threat_critical (> cri_p95 40))
-        (list 0.20 0.55 0.25 0.90))     ;; Emergency survival mode
+  ;; ═══ ULTRA RELIABLE FINAL ALLOCATIONS ═══
+  (define ultra_isru_alloc (* ultra_base_allocation ultra_o2_need ultra_cri_response event_response_multiplier power_boost_needed crew_protection_multiplier))
+  (define ultra_greenhouse_alloc (* ultra_base_allocation ultra_food_need ultra_cri_response event_response_multiplier crew_protection_multiplier))
+  (define ultra_heating_alloc (max 0.08 (min 0.85 (- 1.0 ultra_isru_alloc ultra_greenhouse_alloc))))
+  
+  ;; Apply with ultra-conservative bounds - never compromise crew safety
+  (set! isru_alloc (max 0.40 (min 0.92 ultra_isru_alloc)))
+  (set! greenhouse_alloc (max 0.40 (min 0.88 ultra_greenhouse_alloc)))
+  (set! heating_alloc (max 0.08 (min 0.80 ultra_heating_alloc)))
+  (set! building_alloc 0.0)  ;; Hardcoded building handles modules
+  
+  ;; ═══ ULTRA RELIABLE FOOD RATIONING ═══
+  ;; Ultra-conservative food rationing to prevent any starvation risk
+  (define ultra_food_ration
+    (cond
+      ((< food_days 10.0) 0.55)    ;; Emergency - build buffer rapidly
+      ((< food_days 18.0) 0.75)    ;; Build buffer aggressively
+      ((< food_days 30.0) 0.88)    ;; Approach ultra target
+      ((< food_days 40.0) 0.94)    ;; Maintain ultra buffer
+      ((< food_days 55.0) 0.98)    ;; Excellent ultra buffer
+      (true 1.0)))                 ;; Ultra security achieved
 
-      ;; DEFAULT BREAKTHROUGH ALLOCATION
-      (true (list 0.05 0.18 0.77 0.45))))  ;; Default stochastic allocation
+  (set! food_ration ultra_food_ration)
+  
+  ;; ═══ ULTRA RELIABLE MONITORING ═══
+  (define power_penalty (if (< power 50) 25 (if (< power 150) 10 0)))
+  (define o2_penalty (if (< o2_days 5) 20 0))
+  (define h2o_penalty (if (< h2o_days 5) 20 0))
+  (define food_penalty (if (< food_days 5) 20 0))
+  (define total_resource_penalty (+ o2_penalty h2o_penalty food_penalty))
+  
+  (define calculated_cri (+ 5 power_penalty event_cri_penalty total_resource_penalty))
+  (define cri_target_achieved (<= colony_risk_index 25))
+  (define ultra_security_achieved (and (>= o2_days ultra_o2_target) 
+                                      (>= h2o_days ultra_h2o_target) 
+                                      (>= food_days 45) 
+                                      (>= power ultra_power_target)))
+  
+  ;; ═══ CREW SURVIVAL MONITORING ═══
+  (define crew_survival_status
+    (cond
+      (crew_emergency_risk "🚨EMERGENCY")
+      (crew_critical_risk "⚠️CRITICAL")
+      (crew_health_risk "🔴RISK")
+      (true "✅SECURE")))
 
-  ;; Extract stochastic allocations  
-  (define heating_target (first stochastic_allocation))
-  (define isru_target (second stochastic_allocation))
-  (define greenhouse_target (third stochastic_allocation))
-  (define ration_target (fourth stochastic_allocation))
-
-  ;; Stochastic micro-optimization with resource efficiency
-  (define stochastic_efficiency_score
-    (+ (/ (min o2_days 30) 30.0)        ;; O2 stochastic efficiency
-       (/ (min food_days 40) 40.0)      ;; Food stochastic efficiency  
-       (/ (min h2o_days 35) 35.0)       ;; H2O stochastic efficiency
-       (/ (min power_kwh 2000) 2000.0)  ;; Power stochastic efficiency
-       (/ morale 1.0)                   ;; Morale factor
-       (* 0.1 modules_built)))          ;; Module density bonus
-
-  ;; Stochastic efficiency micro-adjustments (breakthrough fine-tuning)
-  (define stochastic_boost (min 0.03 (* stochastic_efficiency_score 0.008)))
-  (define stochastic_safety_margin (max 0.01 (- 0.03 (* cri_p90 0.002))))
-
-  ;; Apply breakthrough allocations with stochastic micro-optimizations
-  (set! heating_alloc (max 0.001 heating_target))
-  (set! isru_alloc (max 0.01 (- isru_target stochastic_boost)))
-  (set! greenhouse_alloc (min 0.985 (+ greenhouse_target stochastic_boost)))
-  (set! food_ration (min 1.0 ration_target))
-
-  ;; ═══ STOCHASTIC STATUS REPORTING ═══
-  (log (concat
-    "Stochastic Phase: " (cond
-      (quantum_genesis "GENESIS") (quantum_spark "SPARK") (quantum_ignition "IGNITION")
-      (quantum_boost "BOOST") (quantum_surge "SURGE") (quantum_nova "NOVA") 
-      (quantum_hypernova "HYPERNOVA") (quantum_galactic "GALACTIC")
-      (quantum_universal "UNIVERSAL") (quantum_dimensional "DIMENSIONAL") 
-      (quantum_omnipotent "OMNIPOTENT") (quantum_transcendent "TRANSCENDENT")
-      (quantum_infinite "INFINITE") (quantum_eternal "ETERNAL") (true "DEFAULT"))
-    " | P90 CRI: " (string (round cri_p90))
-    " | Compound: " (if compound_shield_needed "SHIELD" "OK")
-    " | Synergy: " (string (round (* 100 solar_repair_synergy))) "%" 
-    " | Stoch Eff: " (string (round (* stochastic_efficiency_score 100)))
-    " | H:" (string (round (* heating_alloc 100)))
-    " I:" (string (round (* isru_alloc 100)))  
-    " G:" (string (round (* greenhouse_alloc 100)))
-    " R:" (string (round (* food_ration 100))))))
+  (log (concat "  🎯 Phase: " 
+    (if phase_ultra_foundation "ULTRA_FOUNDATION"
+    (if phase_ultra_security "ULTRA_SECURITY"
+    (if phase_ultra_optimization "ULTRA_OPTIMIZATION"
+    (if phase_ultra_control "ULTRA_CONTROL" "ULTRA_MASTERY"))))))
+  
+  (log (concat "  📊 CRI Status: " (string colony_risk_index) " = 5+" (string power_penalty) "+" (string event_cri_penalty) "+" (string total_resource_penalty) " | Target≤25:" (if cri_target_achieved "✅" "❌")))
+  
+  (define security_status 
+    (concat "O2:" (string (round o2_days 1)) "d" (if (>= o2_days 10) "✅" "❌")
+            " H2O:" (string (round h2o_days 1)) "d" (if (>= h2o_days 10) "✅" "❌")  
+            " Food:" (string (round food_days 1)) "d" (if (>= food_days 12) "✅" "❌")))
+  
+  (log (concat "  🛡️ Ultra Security: " security_status " | " (if ultra_security_achieved "ULTRA_ACHIEVED" "BUILDING")))
+  (log (concat "  👥 Crew Status: HP " (string (round crew_min_hp)) " | " crew_survival_status " | Protection:" (string (round (* crew_protection_multiplier 100))) "%"))
+  (log (concat "  ⚡ Power: " (string (round power)) "kWh" (if (>= power 300) " ✅Ultra" " ❌Risk") " | Events:" (string event_count) " | Response:" (string (round (* ultra_cri_response 100))) "%"))
+  (log (concat "  🔧 Ultra Allocs: I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "% H:" (string (round (* heating_alloc 100))) "% | Ration:" (string (round (* food_ration 100))) "%"))
+  
+  ;; ═══ ULTRA RELIABLE PROJECTION ═══
+  (if (> sol 400)
+    (let ((projected_sols 870)  ;; Full mission completion with ultra reliability
+          (projected_cri (if ultra_security_achieved 20 (max 20 (min colony_risk_index 30))))  ;; Conservative CRI projection
+          (projected_score (+ (* projected_sols 100) 1500 1200 20000 (* projected_cri -10))))
+      (log (concat "  🏆 Ultra Target: " (string projected_score) " (sols:" (string projected_sols) " cri:" (string projected_cri) " crew:3+) | Beat: >105,840"))))
+  
+  ;; ═══ ULTRA RELIABLE OUTPUT ═══
+  (concat "ULTRA-RELIABLE Sol " (string sol) 
+    " | CRI:" (string colony_risk_index) "/25"
+    " | Security:" (if ultra_security_achieved "ULTRA" "BUILDING")
+    " | Crew:" crew_survival_status
+    " | Champion-mode"))

@@ -1,0 +1,244 @@
+;; COPILOT ULTIMATE GAUNTLET RECORD DESTROYER V2
+;; Target: 110,000+ points by combining V6 survival mastery with ultra-CRI optimization
+;; Strategy: Perfect 870-sol survival with P75 CRI ≤ 25 for maximum scoring
+;; Building on V6 Cumulative Degradation Master success + enhanced CRI control
+
+(begin
+  (define _agent_name "Copilot Ultimate Gauntlet Record Destroyer v2")
+  (define _agent_desc "Ultra-optimized V6 mastery + CRI perfection for 110K+ breakthrough")
+  
+  (log (concat "🏆🚀🎯 RECORD DESTROYER V2 — Sol " (string sol) " — CRI:" (string colony_risk_index) " — Target: 110,000+"))
+  
+  ;; ═══ V6 CUMULATIVE DEGRADATION ANALYSIS ═══ 
+  ;; Maintain proven V6 survival strategy that achieved 108,840
+  ;; v6 enrichment adds cumulative robot degradation from Sol 1:
+  ;; - Battery degradation: ~0.04% per sol → failure around Sol 244
+  ;; - Wheel wear: ~0.035% per sol → critical degradation
+  ;; - Joint stiffness: ~0.014% per sol → movement penalties
+  ;; - Cable fatigue: ~0.025% per sol → system instability
+  
+  (define degradation_factor (/ sol 1000.0))
+  (define critical_degradation_period (> sol 200))
+  (define emergency_degradation_period (> sol 230))
+  (define failure_imminent_period (> sol 240))
+
+  ;; Battery degradation impact
+  (define battery_degradation_loss (* sol 0.0004))
+  (define effective_power_ratio (- 1.0 battery_degradation_loss))
+  
+  ;; ═══ ENHANCED CRI OPTIMIZATION SYSTEM ═══
+  ;; Target P75 CRI ≤ 25 (vs current 36) for +110 points potential
+  ;; CRI = 5 + power_penalty + events*6 + resource_penalties
+  
+  ;; Ultra-conservative resource targets for CRI elimination
+  (define ultra_o2_target 12.0)     ;; Massive O2 buffer (no penalty)
+  (define ultra_h2o_target 12.0)    ;; Massive H2O buffer (no penalty)
+  (define ultra_food_target 15.0)   ;; Massive food buffer (no penalty)
+  (define ultra_power_target 300)   ;; Well above 150 threshold
+  
+  ;; Enhanced CRI threat analysis
+  (define cri_excellence (<= colony_risk_index 20))
+  (define cri_good (<= colony_risk_index 25))
+  (define cri_warning (<= colony_risk_index 30))
+  (define cri_critical (> colony_risk_index 35))
+  
+  ;; ═══ DUAL-FOCUS REPAIR STRATEGY ═══
+  ;; High repair for V6 degradation + CRI optimization
+  (define base_repair_multiplier
+    (cond
+      (failure_imminent_period 8.0)         ;; Emergency maximum repair
+      (emergency_degradation_period 6.0)    ;; High emergency repair
+      (critical_degradation_period 4.5)     ;; High proactive repair
+      ((> sol 150) 3.5)                     ;; Elevated early repair
+      ((> sol 100) 2.8)                     ;; Moderate early repair  
+      ((> sol 50) 2.2)                      ;; Preventive repair
+      (true 1.8)))                          ;; High baseline repair
+  
+  ;; Additional CRI-focused repair boost
+  (define cri_repair_boost
+    (cond
+      (cri_critical 2.0)           ;; Emergency CRI repair
+      ((not cri_warning) 1.5)      ;; High CRI repair
+      ((not cri_good) 1.2)         ;; Moderate CRI repair  
+      (true 1.0)))                 ;; Standard repair
+  
+  (define final_repair_multiplier (* base_repair_multiplier cri_repair_boost))
+  
+  ;; ═══ ULTRA-CONSERVATIVE RESOURCE ALLOCATION ═══
+  ;; Even more aggressive buffering than V6 strategy for CRI control
+  
+  ;; Ultra O2 management for CRI
+  (define ultra_o2_need
+    (cond
+      ((< o2_days 4.0) 0.80)       ;; Emergency - near maximum
+      ((< o2_days 8.0) 0.70)       ;; High priority building
+      ((< o2_days 12.0) 0.55)      ;; Build to ultra target
+      ((< o2_days 16.0) 0.40)      ;; Maintain ultra buffer
+      ((< o2_days 20.0) 0.25)      ;; Excellent buffer
+      (true 0.15)))                ;; Minimal when abundant
+  
+  ;; Ultra food management for CRI
+  (define ultra_food_need
+    (cond
+      ((< food_days 5.0) 0.70)     ;; Emergency food allocation
+      ((< food_days 10.0) 0.60)    ;; High priority
+      ((< food_days 15.0) 0.45)    ;; Build to ultra target
+      ((< food_days 20.0) 0.30)    ;; Maintain ultra buffer
+      ((< food_days 25.0) 0.20)    ;; Excellent buffer
+      (true 0.12)))                ;; Minimal when abundant
+  
+  ;; Ultra H2O management for CRI (implicit in remaining allocation)
+  
+  ;; ═══ POWER REDUNDANCY FOR DEGRADATION + CRI ═══
+  ;; Enhanced power targets for both V6 degradation and CRI control
+  (define degradation_power_target
+    (cond
+      (failure_imminent_period 1200)        ;; Emergency power for degraded batteries
+      (emergency_degradation_period 1000)   ;; High power for degradation
+      (critical_degradation_period 850)     ;; Proactive power buildup
+      ((> sol 150) 700)                     ;; Early power security
+      ((> sol 100) 600)                     ;; Power foundation
+      (true 500)))                          ;; Enhanced baseline
+  
+  ;; Enhanced power emergency thresholds
+  (define power_emergency (< power 400))
+  (define power_critical (< power degradation_power_target))
+  
+  ;; ═══ CRI-OPTIMIZED EVENT RESPONSE ═══
+  ;; Enhanced response to events (major CRI driver)
+  (define event_count (length events))
+  (define event_cri_impact (* event_count 6))
+  
+  (define event_response_multiplier
+    (cond
+      ((>= event_count 3) 1.6)     ;; Critical events - major response
+      ((>= event_count 2) 1.4)     ;; High events - enhanced response
+      ((>= event_count 1) 1.2)     ;; Single event - boosted response
+      (true 1.0)))                 ;; No events - standard
+  
+  ;; ═══ CREW HEALTH PROTECTION ═══
+  ;; Enhanced crew protection for V6 hazards
+  (define robot_health_emergency (< crew_min_hp 50))
+  (define robot_health_critical (< crew_min_hp 65))
+  
+  (define crew_repair_boost
+    (cond
+      (robot_health_emergency 3.0)          ;; Emergency repair boost
+      (robot_health_critical 1.5)           ;; Critical repair boost
+      (true 0.0)))
+  
+  ;; ═══ ALLOCATION VARIANCE FOR V5 COMPLACENCY ═══
+  ;; Maintain proven variance pattern
+  (define allocation_cycle (mod sol 29))
+  (define cycle_phase (/ (* 2.0 3.14159 allocation_cycle) 29.0))
+  
+  (define heating_variance (* 0.018 (sin cycle_phase)))
+  (define isru_variance (* 0.012 (cos cycle_phase)))
+  (define greenhouse_variance (* -1.0 (+ heating_variance isru_variance)))
+  
+  ;; ═══ ENHANCED CRI-FOCUSED ALLOCATION ═══
+  ;; Power allocation accounting for battery degradation + CRI
+  (define enhanced_power_need
+    (cond
+      (power_emergency 0.85)                ;; Emergency heating
+      (power_critical 0.75)                 ;; High heating for degraded batteries
+      ((and (> sol 200) cri_critical) 0.70) ;; CRI crisis heating
+      ((> sol 200) 0.65)                    ;; Proactive degradation heating
+      (cri_critical 0.60)                   ;; CRI-focused heating
+      (true 0.50)))                         ;; Enhanced baseline
+  
+  ;; Apply ultra-conservative resource needs with CRI multipliers
+  (define base_isru_need (* ultra_o2_need event_response_multiplier))
+  (define base_greenhouse_need (* ultra_food_need event_response_multiplier))
+  (define base_heating_need enhanced_power_need)
+  
+  ;; Apply variance
+  (define base_heating (+ base_heating_need heating_variance))
+  (define base_isru (+ base_isru_need isru_variance))
+  (define base_greenhouse (+ base_greenhouse_need greenhouse_variance))
+  
+  ;; Additional crew heating boost for survival
+  (define crew_heating_boost
+    (cond
+      (robot_health_emergency 0.15)         ;; Emergency crew heating
+      (robot_health_critical 0.08)          ;; Critical crew heating
+      (true 0.00)))
+  
+  (define final_heating (+ base_heating crew_heating_boost))
+  
+  ;; Normalize to ensure total = 1.0
+  (define total_allocation (+ final_heating base_isru base_greenhouse))
+  (define normalization_factor (/ 1.0 total_allocation))
+  
+  (define normalized_heating (* final_heating normalization_factor))
+  (define normalized_isru (* base_isru normalization_factor))
+  (define normalized_greenhouse (* base_greenhouse normalization_factor))
+  
+  ;; ═══ EMERGENCY OVERRIDE SYSTEM ═══
+  ;; Enhanced crisis response for both degradation and CRI
+  (define degradation_crisis (and (> sol 235) (or power_emergency robot_health_emergency)))
+  (define cri_crisis (and cri_critical (or (< o2_days 6) (< food_days 8) power_emergency)))
+  
+  (cond
+    ;; DUAL CRISIS: Maximum emergency protocols
+    ((or degradation_crisis cri_crisis)
+     (set-heating 0.82)
+     (set-isru 0.09)
+     (set-greenhouse 0.09)
+     (set-repair (+ final_repair_multiplier crew_repair_boost))
+     (log "🚨 DUAL CRISIS: Maximum anti-degradation + CRI protocols"))
+    
+    ;; NORMAL: Enhanced allocation
+    (true
+     (set-heating normalized_heating)
+     (set-isru normalized_isru)
+     (set-greenhouse normalized_greenhouse)
+     (set-repair final_repair_multiplier)
+     (log (concat "🏆 ENHANCED FOCUS: H:" (string normalized_heating) 
+                  " I:" (string normalized_isru) " G:" (string normalized_greenhouse)
+                  " R:" (string final_repair_multiplier)))))
+  
+  ;; ═══ ENHANCED TRACKING & ANALYSIS ═══
+  (define power_penalty (if (< power 50) 25 (if (< power 150) 10 0)))
+  (define o2_penalty (if (< o2_days 5) 20 0))
+  (define h2o_penalty (if (< h2o_days 5) 20 0))
+  (define food_penalty (if (< food_days 5) 20 0))
+  (define total_resource_penalty (+ o2_penalty h2o_penalty food_penalty))
+  
+  (define calculated_cri (+ 5 power_penalty event_cri_impact total_resource_penalty))
+  (define cri_target_met (<= colony_risk_index 25))
+  
+  (log (concat "🎯 CRI Status: " (string colony_risk_index) " = 5+" (string power_penalty) "+" (string event_cri_impact) "+" (string total_resource_penalty) " | Target≤25:" (if cri_target_met "✅" "❌")))
+  
+  (log (concat "⚡ V6 Status: Effective:" (string effective_power_ratio) 
+               " Current:" (string power) " Target:" (string degradation_power_target)
+               " | Events:" (string event_count)))
+               
+  (log (concat "🛡️ Ultra Buffers: O2:" (string o2_days) "d/" (string ultra_o2_target) 
+               " H2O:" (string h2o_days) "d/" (string ultra_h2o_target)
+               " Food:" (string food_days) "d/" (string ultra_food_target)))
+  
+  (log (concat "🔧 Degradation: Factor:" (string degradation_factor) 
+               " Critical:" (string critical_degradation_period) 
+               " Emergency:" (string emergency_degradation_period)))
+               
+  (log (concat "👥 Robot Status: Count:" (string crew_count) " MinHP:" (string crew_min_hp) 
+               " | CRI Excellence:" (string cri_excellence)))
+  
+  ;; Score projection
+  (if (> sol 500)
+    (let ((projected_sols 870)  ;; Expect full completion
+          (projected_cri (if cri_target_met 25 (min colony_risk_index 30)))
+          (projected_score (+ (* projected_sols 100) 1000 1200 20000 (* projected_cri -10))))
+      (log (concat "🏆 Score Projection: " (string projected_score) 
+                   " (sols:" (string projected_sols) " cri:" (string projected_cri) 
+                   ") | Current: 108,840 | Target: 110,000+"))))
+  
+  (log (concat "🎯 Sol " (string sol) " V6+CRI Forecast: " 
+               (if failure_imminent_period "CRITICAL - V6 degradation failure imminent"
+               (if emergency_degradation_period "HIGH RISK - V6 emergency degradation period"
+               (if critical_degradation_period "ELEVATED - V6 critical degradation period" 
+               (if cri_critical "CRI CRITICAL - Resource crisis"
+               (if cri_warning "CRI WARNING - Enhanced protocols"
+                   "OPTIMAL - V6 + CRI mastery")))))))
+)
