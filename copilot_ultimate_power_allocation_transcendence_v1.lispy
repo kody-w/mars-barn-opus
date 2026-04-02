@@ -1,0 +1,247 @@
+;; COPILOT ULTIMATE POWER ALLOCATION TRANSCENDENCE v1
+;; Revolutionary Strategy: Perfect Power Allocation with Maximum Efficiency
+;; Target: Achieve 95,000+ score through optimal resource allocation and timing
+;; Innovation: Ultra-precise allocation based on real colony state
+
+(begin
+  (define _agent_name "Copilot Ultimate Power Allocation Transcendence v1")
+  (define _agent_desc "Perfect power allocation with ultra-precise resource optimization")
+
+  (log (concat "⚡🌌💎🔥🚀 POWER ALLOCATION TRANSCENDENCE — Sol " (string sol) " — ULTIMATE EFFICIENCY PROTOCOL"))
+
+  ;; ═══ MISSION PHASE INTELLIGENCE ═══
+  ;; 8 phases for maximum optimization
+  (define phase_bootstrap (< sol 30))           ;; Bootstrap survival
+  (define phase_expansion (and (>= sol 30) (< sol 80)))    ;; Rapid expansion
+  (define phase_acceleration (and (>= sol 80) (< sol 150))) ;; Acceleration phase
+  (define phase_optimization (and (>= sol 150) (< sol 250))) ;; Optimization phase
+  (define phase_transcendence (and (>= sol 250) (< sol 380))) ;; Transcendence phase
+  (define phase_mastery (and (>= sol 380) (< sol 520)))     ;; Mastery phase
+  (define phase_perfection (and (>= sol 520) (< sol 640)))  ;; Perfection phase
+  (define phase_ultimate (>= sol 640))         ;; Ultimate phase
+
+  ;; ═══ ULTRA-PRECISE THREAT ASSESSMENT ═══
+  ;; 15-level threat system for maximum granularity
+  (define resource_crisis_score
+    (+ (max 0 (- 3 o2_days))      ;; O2 crisis contribution
+       (max 0 (- 5 food_days))    ;; Food crisis contribution  
+       (max 0 (- 4 h2o_days))))   ;; H2O crisis contribution
+
+  (define power_crisis_score
+    (max 0 (- 200 power_kwh)))    ;; Power shortage score
+
+  (define environmental_crisis_score
+    (+ (if (< exterior_temp_k 200) 2 0)  ;; Extreme cold
+       (if (< interior_temp_k 290) 3 0)  ;; Interior heating crisis
+       (if (> events_active 0) 2 0)))    ;; Active disaster events
+
+  (define total_crisis_score (+ resource_crisis_score power_crisis_score environmental_crisis_score))
+
+  ;; Crisis level classification
+  (define crisis_none (< total_crisis_score 1))
+  (define crisis_minimal (and (>= total_crisis_score 1) (< total_crisis_score 3)))
+  (define crisis_low (and (>= total_crisis_score 3) (< total_crisis_score 6)))
+  (define crisis_moderate (and (>= total_crisis_score 6) (< total_crisis_score 10)))
+  (define crisis_high (and (>= total_crisis_score 10) (< total_crisis_score 15)))
+  (define crisis_severe (and (>= total_crisis_score 15) (< total_crisis_score 22)))
+  (define crisis_critical (>= total_crisis_score 22))
+
+  ;; ═══ INFRASTRUCTURE ESTIMATION SYSTEM ═══
+  ;; Estimate infrastructure bonuses based on modules built
+  (define estimated_solar_farms (min 3 (max 0 (round (* modules_built 0.25)))))
+  (define estimated_greenhouse_dome (min 1 (if (>= modules_built 3) 1 0)))
+  (define estimated_isru_plant (min 1 (if (>= modules_built 5) 1 0)))
+  (define estimated_repair_bay (min 1 (if (>= modules_built 7) 1 0)))
+
+  ;; Infrastructure bonus calculations
+  (define solar_power_bonus (+ 1.0 (* estimated_solar_farms 0.40)))  ;; 40% per solar farm
+  (define greenhouse_bonus (+ 1.0 (* estimated_greenhouse_dome 0.50))) ;; 50% food boost
+  (define isru_bonus (+ 1.0 (* estimated_isru_plant 0.40)))  ;; 40% O2/H2O boost
+  (define repair_efficiency (+ 1.0 (* estimated_repair_bay 1.0))) ;; 2x repair speed
+
+  ;; ═══ REVOLUTIONARY ALLOCATION MATRIX ═══
+  ;; Ultra-precise allocation based on phase, crisis, and infrastructure
+  (define ultimate_allocation
+    (cond
+      ;; BOOTSTRAP PHASE - Survival foundation
+      ((and phase_bootstrap crisis_critical)
+        (list 0.15 0.70 0.15 0.40))  ;; Emergency survival - massive ISRU
+      ((and phase_bootstrap crisis_severe)
+        (list 0.20 0.60 0.20 0.50))  ;; Severe survival - high ISRU
+      ((and phase_bootstrap crisis_high)
+        (list 0.25 0.50 0.25 0.60))  ;; High crisis - balanced emergency
+      ((and phase_bootstrap crisis_moderate)
+        (list 0.20 0.45 0.35 0.70))  ;; Moderate crisis - start food focus
+      ((and phase_bootstrap (or crisis_low crisis_minimal crisis_none))
+        (list 0.15 0.35 0.50 0.85))  ;; Low crisis - early food growth
+
+      ;; EXPANSION PHASE - Rapid growth
+      ((and phase_expansion crisis_critical)
+        (list 0.18 0.65 0.17 0.45))  ;; Emergency expansion
+      ((and phase_expansion crisis_severe)
+        (list 0.20 0.55 0.25 0.55))  ;; Severe expansion  
+      ((and phase_expansion crisis_high)
+        (list 0.22 0.48 0.30 0.65))  ;; High crisis expansion
+      ((and phase_expansion crisis_moderate)
+        (list 0.18 0.40 0.42 0.75))  ;; Moderate expansion - food focus
+      ((and phase_expansion (or crisis_low crisis_minimal crisis_none))
+        (list 0.15 0.30 0.55 0.90))  ;; Low crisis - aggressive food growth
+
+      ;; ACCELERATION PHASE - Optimize for infrastructure bonuses
+      ((and phase_acceleration crisis_critical)
+        (list 0.20 0.60 0.20 0.50))  ;; Emergency acceleration
+      ((and phase_acceleration crisis_severe)
+        (list 0.18 0.52 0.30 0.60))  ;; Severe acceleration
+      ((and phase_acceleration crisis_high)
+        (list 0.16 0.44 0.40 0.70))  ;; High crisis acceleration
+      ((and phase_acceleration crisis_moderate)
+        (list 0.14 0.36 0.50 0.80))  ;; Moderate acceleration - food optimization
+      ((and phase_acceleration (or crisis_low crisis_minimal crisis_none))
+        (list 0.12 (* 0.25 isru_bonus) (* 0.63 greenhouse_bonus) 0.95))  ;; Bonus-optimized acceleration
+
+      ;; OPTIMIZATION PHASE - Perfect resource balance
+      ((and phase_optimization crisis_critical)
+        (list 0.22 0.58 0.20 0.55))  ;; Emergency optimization
+      ((and phase_optimization crisis_severe)
+        (list 0.20 0.50 0.30 0.65))  ;; Severe optimization
+      ((and phase_optimization crisis_high)
+        (list 0.18 0.42 0.40 0.75))  ;; High crisis optimization
+      ((and phase_optimization crisis_moderate)
+        (list 0.15 (* 0.32 isru_bonus) (* 0.53 greenhouse_bonus) 0.85))  ;; Moderate optimization
+      ((and phase_optimization (or crisis_low crisis_minimal crisis_none))
+        (list 0.12 (* 0.22 isru_bonus) (* 0.66 greenhouse_bonus) 1.00))  ;; Perfect optimization
+
+      ;; TRANSCENDENCE PHASE - Transcendent efficiency
+      ((and phase_transcendence crisis_critical)
+        (list 0.25 0.55 0.20 0.60))  ;; Emergency transcendence
+      ((and phase_transcendence crisis_severe)
+        (list 0.22 0.48 0.30 0.70))  ;; Severe transcendence
+      ((and phase_transcendence crisis_high)
+        (list 0.20 0.40 0.40 0.80))  ;; High crisis transcendence
+      ((and phase_transcendence crisis_moderate)
+        (list 0.16 (* 0.30 isru_bonus) (* 0.54 greenhouse_bonus) 0.90))  ;; Moderate transcendence
+      ((and phase_transcendence (or crisis_low crisis_minimal crisis_none))
+        (list 0.14 (* 0.20 isru_bonus) (* 0.66 greenhouse_bonus) 1.05))  ;; Perfect transcendence
+
+      ;; MASTERY PHASE - Perfect mastery
+      ((and phase_mastery crisis_critical)
+        (list 0.28 0.52 0.20 0.65))  ;; Emergency mastery
+      ((and phase_mastery crisis_severe)
+        (list 0.25 0.45 0.30 0.75))  ;; Severe mastery
+      ((and phase_mastery crisis_high)
+        (list 0.22 0.38 0.40 0.85))  ;; High crisis mastery
+      ((and phase_mastery crisis_moderate)
+        (list 0.18 (* 0.28 isru_bonus) (* 0.54 greenhouse_bonus) 0.95))  ;; Moderate mastery
+      ((and phase_mastery (or crisis_low crisis_minimal crisis_none))
+        (list 0.16 (* 0.18 isru_bonus) (* 0.66 greenhouse_bonus) 1.10))  ;; Perfect mastery
+
+      ;; PERFECTION PHASE - Ultimate perfection
+      ((and phase_perfection crisis_critical)
+        (list 0.30 0.50 0.20 0.70))  ;; Emergency perfection
+      ((and phase_perfection crisis_severe)
+        (list 0.28 0.42 0.30 0.80))  ;; Severe perfection
+      ((and phase_perfection crisis_high)
+        (list 0.25 0.35 0.40 0.90))  ;; High crisis perfection
+      ((and phase_perfection crisis_moderate)
+        (list 0.20 (* 0.26 isru_bonus) (* 0.54 greenhouse_bonus) 1.00))  ;; Moderate perfection
+      ((and phase_perfection (or crisis_low crisis_minimal crisis_none))
+        (list 0.18 (* 0.16 isru_bonus) (* 0.66 greenhouse_bonus) 1.15))  ;; Perfect perfection
+
+      ;; ULTIMATE PHASE - Final optimization  
+      ((and phase_ultimate crisis_critical)
+        (list 0.35 0.45 0.20 0.75))  ;; Emergency ultimate
+      ((and phase_ultimate crisis_severe)
+        (list 0.32 0.38 0.30 0.85))  ;; Severe ultimate
+      ((and phase_ultimate crisis_high)
+        (list 0.28 0.32 0.40 0.95))  ;; High crisis ultimate
+      ((and phase_ultimate crisis_moderate)
+        (list 0.25 (* 0.25 isru_bonus) (* 0.50 greenhouse_bonus) 1.05))  ;; Moderate ultimate
+      ((and phase_ultimate (or crisis_low crisis_minimal crisis_none))
+        (list 0.22 (* 0.15 isru_bonus) (* 0.63 greenhouse_bonus) 1.20))  ;; Perfect ultimate
+
+      ;; DEFAULT AGGRESSIVE
+      (true (list 0.20 0.40 0.40 0.85))))  ;; Default balanced allocation
+
+  ;; Extract and apply allocations
+  (define heating_alloc_target (first ultimate_allocation))
+  (define isru_alloc_target (second ultimate_allocation))
+  (define greenhouse_alloc_target (third ultimate_allocation))
+  (define food_ration_target (fourth ultimate_allocation))
+
+  ;; Apply ultimate allocations
+  (set! heating_alloc heating_alloc_target)
+  (set! isru_alloc isru_alloc_target)
+  (set! greenhouse_alloc greenhouse_alloc_target)
+  (set! food_ration (min 1.0 food_ration_target))
+
+  ;; ═══ EFFICIENCY OPTIMIZATION ═══
+  ;; Fine-tune allocation based on current efficiency
+  (define current_efficiency 
+    (+ (/ o2_days 10.0)      ;; O2 efficiency factor
+       (/ food_days 15.0)    ;; Food efficiency factor
+       (/ h2o_days 12.0)     ;; H2O efficiency factor
+       (/ power_kwh 500.0))) ;; Power efficiency factor
+
+  (define efficiency_multiplier
+    (cond
+      ((> current_efficiency 3.0) 1.15)  ;; High efficiency - enhance
+      ((> current_efficiency 2.0) 1.05)  ;; Good efficiency - slight enhance
+      ((> current_efficiency 1.0) 1.00)  ;; Normal efficiency - maintain
+      ((> current_efficiency 0.5) 0.95)  ;; Low efficiency - conservative  
+      (true 0.85)))                      ;; Very low efficiency - emergency
+
+  ;; Apply efficiency optimization
+  (set! food_ration (min 1.0 (* food_ration efficiency_multiplier)))
+
+  ;; ═══ TRANSCENDENCE STATUS DISPLAY ═══
+  (log (concat "  ⚡ Phase: " 
+    (cond
+      (phase_bootstrap "BOOTSTRAP")
+      (phase_expansion "EXPANSION") 
+      (phase_acceleration "ACCELERATION")
+      (phase_optimization "OPTIMIZATION")
+      (phase_transcendence "TRANSCENDENCE")
+      (phase_mastery "MASTERY")
+      (phase_perfection "PERFECTION")
+      (phase_ultimate "ULTIMATE")
+      (true "DEFAULT"))))
+      
+  (log (concat "  🌌 Crisis Level: " 
+    (cond
+      (crisis_critical "CRITICAL")
+      (crisis_severe "SEVERE")
+      (crisis_high "HIGH")
+      (crisis_moderate "MODERATE")
+      (crisis_low "LOW")
+      (crisis_minimal "MINIMAL")
+      (true "NONE"))))
+
+  (log (concat "  💎 Infrastructure: Solar:" (string estimated_solar_farms) "(" (string (round (* solar_power_bonus 100))) "%) | Green:" (string estimated_greenhouse_dome) "(" (string (round (* greenhouse_bonus 100))) "%) | ISRU:" (string estimated_isru_plant) "(" (string (round (* isru_bonus 100))) "%)"))
+  (log (concat "  🔥 Allocation: H:" (string (round (* heating_alloc 100))) "% I:" (string (round (* isru_alloc 100))) "% G:" (string (round (* greenhouse_alloc 100))) "% | Ration:" (string (round (* food_ration 100))) "%"))
+  (log (concat "  🚀 Resources: O2:" (string o2_days) "d Food:" (string food_days) "d H2O:" (string h2o_days) "d Power:" (string power_kwh) "kWh | Modules:" (string modules_built)))
+
+  ;; ═══ TRANSCENDENCE OUTPUT ═══
+  (concat "⚡🌌💎🔥🚀 TRANSCENDENCE Sol " (string sol) 
+    " | Phase:" (cond
+      (phase_bootstrap "BOOTSTRAP")
+      (phase_expansion "EXPANSION")
+      (phase_acceleration "ACCELERATION") 
+      (phase_optimization "OPTIMIZATION")
+      (phase_transcendence "TRANSCENDENCE")
+      (phase_mastery "MASTERY")
+      (phase_perfection "PERFECTION")
+      (phase_ultimate "ULTIMATE")
+      (true "DEFAULT"))
+    " | Crisis:" (cond
+      (crisis_critical "CRITICAL")
+      (crisis_severe "SEVERE")
+      (crisis_high "HIGH")
+      (crisis_moderate "MODERATE")
+      (crisis_low "LOW")
+      (crisis_minimal "MINIMAL")
+      (true "NONE"))
+    " | Score:" (string (round current_efficiency))
+    " | H:" (string (round (* heating_alloc 100)))
+    " I:" (string (round (* isru_alloc 100)))
+    " G:" (string (round (* greenhouse_alloc 100))) 
+    " R:" (string (round (* food_ration 100)))))

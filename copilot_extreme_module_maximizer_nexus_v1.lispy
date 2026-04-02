@@ -1,0 +1,233 @@
+;; COPILOT EXTREME MODULE MAXIMIZER NEXUS v1
+;; Revolutionary Strategy: 98% Module Focus + Ultra-Minimal Infrastructure + Maximum Density
+;; Target: Achieve 95,000+ score by breaking module density limits through extreme focus
+;; Innovation: Build 90% modules, only essential infrastructure for survival
+
+(begin
+  (define _agent_name "Copilot Extreme Module Maximizer Nexus v1")
+  (define _agent_desc "98% module focus with ultra-minimal infrastructure for maximum density breakthrough")
+
+  (log (concat "🏗️⚡💎🌌🚀 MODULE MAXIMIZER — Sol " (string sol) " — EXTREME DENSITY PROTOCOL"))
+
+  ;; ═══ ULTRA-MINIMAL INFRASTRUCTURE PHILOSOPHY ═══
+  ;; Build ONLY what's absolutely essential for survival, rest is modules
+  (define absolute_survival_threshold 0.8)  ;; Ultra-tight survival margins
+  
+  ;; Phase-based mission intelligence for module optimization
+  (define phase_instant (< sol 20))              ;; Instant module start
+  (define phase_burst (and (>= sol 20) (< sol 60)))    ;; Module burst
+  (define phase_explosion (and (>= sol 60) (< sol 120)))  ;; Module explosion
+  (define phase_supernova (and (>= sol 120) (< sol 200))) ;; Module supernova
+  (define phase_hypernova (and (>= sol 200) (< sol 320))) ;; Module hypernova
+  (define phase_transcendent (and (>= sol 320) (< sol 480))) ;; Module transcendence
+  (define phase_ultimate (>= sol 480))           ;; Ultimate module density
+
+  ;; ═══ EXTREME MODULE-FIRST RESOURCE ALLOCATION ═══
+  ;; Allocate minimum resources, maximum building power
+  (define ultra_minimal_o2 (+ 0.7 (* (/ crew_hp (max 1 (* crew_alive 100))) 0.1)))
+  (define ultra_minimal_food (+ 0.7 (* (/ crew_hp (max 1 (* crew_alive 100))) 0.1)))
+  (define ultra_minimal_water (+ 0.7 (* (/ crew_hp (max 1 (* crew_alive 100))) 0.1)))
+  
+  (define critical_deficit
+    (+ (max 0 (- ultra_minimal_o2 o2_days))
+       (max 0 (- ultra_minimal_food food_days))
+       (max 0 (- ultra_minimal_water water_days))))
+
+  ;; ═══ MODULE-OPTIMIZED THREAT ASSESSMENT ═══
+  (define threat_perfect (< colony_risk_index 8))
+  (define threat_good (and (>= colony_risk_index 8) (< colony_risk_index 20)))
+  (define threat_acceptable (and (>= colony_risk_index 20) (< colony_risk_index 40)))
+  (define threat_concerning (and (>= colony_risk_index 40) (< colony_risk_index 65)))
+  (define threat_critical (>= colony_risk_index 65))
+
+  ;; ═══ EXTREME MODULE-FOCUSED ALLOCATION MATRIX ═══
+  ;; Push building allocation to theoretical maximum
+  (define module_allocation
+    (cond
+      ;; INSTANT PHASE - Absolute module focus
+      ((and phase_instant (< critical_deficit 0.1) (or threat_perfect threat_good))
+        (list 0.005 0.005 0.990 0.6))   ;; 99% building - instant domination
+      ((and phase_instant (< critical_deficit 0.3))
+        (list 0.01 0.02 0.97 0.7))      ;; 97% building - instant burst
+      ((and phase_instant (< critical_deficit 0.6))
+        (list 0.02 0.05 0.93 0.8))      ;; 93% building - instant standard
+
+      ;; BURST PHASE - Module burst
+      ((and phase_burst (< critical_deficit 0.2) (or threat_perfect threat_good threat_acceptable))
+        (list 0.008 0.012 0.980 0.55))  ;; 98% building - module burst
+      ((and phase_burst (< critical_deficit 0.4))
+        (list 0.015 0.03 0.955 0.65))   ;; 95.5% building - burst standard
+      ((and phase_burst (< critical_deficit 0.7))
+        (list 0.03 0.06 0.91 0.75))     ;; 91% building - burst conservative
+
+      ;; EXPLOSION PHASE - Module explosion  
+      ((and phase_explosion (< critical_deficit 0.3) (or threat_perfect threat_good threat_acceptable))
+        (list 0.01 0.02 0.97 0.50))     ;; 97% building - module explosion
+      ((and phase_explosion (< critical_deficit 0.5))
+        (list 0.02 0.04 0.94 0.60))     ;; 94% building - explosion standard
+      ((and phase_explosion (< critical_deficit 0.8))
+        (list 0.04 0.08 0.88 0.70))     ;; 88% building - explosion conservative
+
+      ;; SUPERNOVA PHASE - Module supernova
+      ((and phase_supernova (< critical_deficit 0.4) (or threat_perfect threat_good threat_acceptable))
+        (list 0.015 0.025 0.96 0.45))   ;; 96% building - module supernova
+      ((and phase_supernova (< critical_deficit 0.6))
+        (list 0.025 0.05 0.925 0.55))   ;; 92.5% building - supernova standard
+      ((and phase_supernova (< critical_deficit 1.0))
+        (list 0.05 0.10 0.85 0.65))     ;; 85% building - supernova conservative
+
+      ;; HYPERNOVA PHASE - Module hypernova
+      ((and phase_hypernova (< critical_deficit 0.5) (or threat_perfect threat_good threat_acceptable))
+        (list 0.02 0.03 0.95 0.40))     ;; 95% building - module hypernova
+      ((and phase_hypernova (< critical_deficit 0.8))
+        (list 0.03 0.06 0.91 0.50))     ;; 91% building - hypernova standard
+      ((and phase_hypernova (< critical_deficit 1.2))
+        (list 0.06 0.12 0.82 0.60))     ;; 82% building - hypernova conservative
+
+      ;; TRANSCENDENT PHASE - Module transcendence
+      ((and phase_transcendent (< critical_deficit 0.6) (or threat_perfect threat_good threat_acceptable))
+        (list 0.025 0.035 0.94 0.35))   ;; 94% building - module transcendence
+      ((and phase_transcendent (< critical_deficit 1.0))
+        (list 0.04 0.08 0.88 0.45))     ;; 88% building - transcendent standard
+      ((and phase_transcendent (< critical_deficit 1.5))
+        (list 0.08 0.15 0.77 0.55))     ;; 77% building - transcendent conservative
+
+      ;; ULTIMATE PHASE - Ultimate module density
+      ((and phase_ultimate (< critical_deficit 0.8))
+        (list 0.03 0.05 0.92 0.30))     ;; 92% building - ultimate density
+      ((and phase_ultimate (< critical_deficit 1.2))
+        (list 0.05 0.10 0.85 0.40))     ;; 85% building - ultimate standard
+      ((and phase_ultimate (< critical_deficit 2.0))
+        (list 0.10 0.18 0.72 0.50))     ;; 72% building - ultimate conservative
+
+      ;; EMERGENCY PROTOCOLS
+      ((> critical_deficit 3.0)
+        (list 0.55 0.30 0.15 1.2))      ;; 15% building - emergency survival
+      ((> critical_deficit 2.0)
+        (list 0.45 0.40 0.15 1.1))      ;; 15% building - crisis survival
+      ((> critical_deficit 1.5)
+        (list 0.35 0.50 0.15 1.0))      ;; 15% building - survival mode
+
+      ;; DEFAULT AGGRESSIVE MODULE FOCUS
+      (true (list 0.05 0.10 0.85 0.9))))   ;; 85% building - aggressive default
+
+  ;; Apply module-focused allocations
+  (define isru_alloc (first module_allocation))
+  (define greenhouse_alloc (second module_allocation))
+  (define building_alloc (third module_allocation))
+  (define food_ration (min 1.0 (fourth module_allocation)))
+
+  ;; ═══ ULTRA-MINIMAL INFRASTRUCTURE STRATEGY ═══
+  ;; Build ONLY essential infrastructure, rest is pure modules
+
+  ;; Count total modules for module density tracking
+  (define total_modules (+ hab_count greenhouse_count solar_count repair_count bot_count isru_count))
+  (define hab_percentage (if (> total_modules 0) (/ hab_count total_modules) 0))
+
+  ;; Ultra-minimal infrastructure deployment
+  (cond
+    ;; ABSOLUTE ESSENTIALS ONLY (ultra-minimal quantities)
+    ((and (= sol 1) (< worker_bots_built 1))  ;; Essential bot 1 - MUST HAVE
+      (set! build_item "worker_bot"))
+    ((and (= sol 8) (< solar_panels_built 1)) ;; Essential power 1 - MUST HAVE  
+      (set! build_item "solar_panel"))
+    ((and (= sol 15) (< greenhouse_count 1))  ;; Essential food 1 - MUST HAVE
+      (set! build_item "greenhouse"))
+    ((and (= sol 25) (< repair_bays_built 1)) ;; Essential repair 1 - MUST HAVE
+      (set! build_item "repair_bay"))
+
+    ;; EMERGENCY INFRASTRUCTURE (only when absolutely critical)
+    ((and (< worker_bots_built 1) (> sol 20))  ;; Emergency bot if missed
+      (set! build_item "worker_bot"))
+    ((and (< solar_panels_built 1) (> sol 30)) ;; Emergency power if missed
+      (set! build_item "solar_panel"))
+    ((and (< greenhouse_count 1) (> sol 40))   ;; Emergency food if missed
+      (set! build_item "greenhouse"))
+    ((and (< repair_bays_built 1) (> sol 50))  ;; Emergency repair if missed
+      (set! build_item "repair_bay"))
+
+    ;; SECONDARY ESSENTIALS (only if absolutely needed)
+    ((and (= sol 50) (< worker_bots_built 2) (< total_modules 8))  ;; Second bot if low modules
+      (set! build_item "worker_bot"))
+    ((and (= sol 80) (< solar_panels_built 2) (< power_ratio 0.5)) ;; Second power if critical
+      (set! build_item "solar_panel"))
+    ((and (= sol 120) (< greenhouse_count 2) (< food_days 3))      ;; Second food if critical
+      (set! build_item "greenhouse"))
+    ((and (= sol 180) (< repair_bays_built 2) threat_critical)     ;; Second repair if critical
+      (set! build_item "repair_bay"))
+
+    ;; LATE EMERGENCY INFRASTRUCTURE (minimal additions)
+    ((and (>= sol 300) (< worker_bots_built 2) (< total_modules 25))
+      (set! build_item "worker_bot"))     ;; Third bot only if very low density
+    ((and (>= sol 400) (< solar_panels_built 2) (< power_ratio 0.4))
+      (set! build_item "solar_panel"))   ;; Third power only if critical
+    ((and (>= sol 500) (< greenhouse_count 2) (< food_days 2))
+      (set! build_item "greenhouse"))    ;; Third food only if crisis
+    ((and (>= sol 600) (< repair_bays_built 2) (>= colony_risk_index 80))
+      (set! build_item "repair_bay"))    ;; Third repair only if extreme danger
+
+    ;; DEFAULT: PURE MODULE BUILDING
+    (true (set! build_item "hab_module")))  ;; Build modules 95%+ of the time!
+
+  ;; ═══ MODULE DENSITY NUTRITION OPTIMIZATION ═══
+  ;; Reduce food ration to absolute minimum to maximize building power
+  (define density_nutrition_multiplier
+    (cond
+      (phase_instant 0.70)          ;; Ultra-minimal nutrition for maximum modules
+      (phase_burst 0.75)            ;; Minimal nutrition 
+      (phase_explosion 0.80)        ;; Low nutrition
+      (phase_supernova 0.85)        ;; Reduced nutrition
+      (phase_hypernova 0.90)        ;; Slightly reduced nutrition
+      (phase_transcendent 0.95)     ;; Near normal nutrition
+      (true 1.05)))                 ;; Enhanced nutrition for late safety
+
+  ;; Apply density-optimized nutrition
+  (set! food_ration (min 1.0 (* food_ration density_nutrition_multiplier)))
+
+  ;; ═══ MODULE DENSITY STATUS TRACKING ═══
+  (define modules_per_sol (if (> sol 0) (/ total_modules sol) 0))
+  (define target_modules_per_sol
+    (cond
+      (phase_instant 0.8)       ;; Target 0.8 modules/sol in instant phase
+      (phase_burst 1.2)         ;; Target 1.2 modules/sol in burst phase  
+      (phase_explosion 1.5)     ;; Target 1.5 modules/sol in explosion phase
+      (phase_supernova 1.8)     ;; Target 1.8 modules/sol in supernova phase
+      (phase_hypernova 2.0)     ;; Target 2.0 modules/sol in hypernova phase
+      (phase_transcendent 2.2)  ;; Target 2.2 modules/sol in transcendent phase
+      (true 2.5)))              ;; Target 2.5 modules/sol in ultimate phase
+
+  (define density_performance (if (> target_modules_per_sol 0) (/ modules_per_sol target_modules_per_sol) 0))
+
+  ;; ═══ MODULE MAXIMIZER STATUS DISPLAY ═══
+  (log (concat "  🏗️ Phase: " 
+    (cond
+      (phase_instant "INSTANT")
+      (phase_burst "BURST") 
+      (phase_explosion "EXPLOSION")
+      (phase_supernova "SUPERNOVA")
+      (phase_hypernova "HYPERNOVA")
+      (phase_transcendent "TRANSCENDENT")
+      (phase_ultimate "ULTIMATE")
+      (true "DEFAULT"))))
+      
+  (log (concat "  ⚡ Module Stats: Total:" (string total_modules) " | Habs:" (string hab_count) " | Density:" (string (round modules_per_sol)) "/sol (Target:" (string target_modules_per_sol) ")"))
+  (log (concat "  💎 Performance: " (string (round (* density_performance 100))) "% | Hab%:" (string (round (* hab_percentage 100))) "% | CRI:" (string (round colony_risk_index)) " | Deficit:" (string (round (* critical_deficit 100))) "%"))
+  (log (concat "  🌌 Allocation: I:" (string (round (* isru_alloc 1000))) "‰ G:" (string (round (* greenhouse_alloc 1000))) "‰ B:" (string (round (* building_alloc 1000))) "‰ R:" (string (round (* food_ration 100))) "%"))
+  (log (concat "  🚀 Infrastructure: Bots:" (string worker_bots_built) " Solar:" (string solar_panels_built) " Green:" (string greenhouse_count) " Repair:" (string repair_bays_built)))
+
+  ;; ═══ MODULE MAXIMIZER OUTPUT ═══
+  (concat "🏗️⚡💎🌌🚀 MODULE MAXIMIZER Sol " (string sol) 
+    " | Phase:" (cond
+      (phase_instant "INSTANT")
+      (phase_burst "BURST")
+      (phase_explosion "EXPLOSION") 
+      (phase_supernova "SUPERNOVA")
+      (phase_hypernova "HYPERNOVA")
+      (phase_transcendent "TRANSCENDENT")
+      (phase_ultimate "ULTIMATE")
+      (true "DEFAULT"))
+    " | TM:" (string total_modules)
+    " | H:" (string hab_count) "(" (string (round (* hab_percentage 100))) "%)"
+    " | Rate:" (string (round modules_per_sol))
+    " | Perf:" (string (round (* density_performance 100))) "%"
+    " | B:" (string (round (* building_alloc 1000))) "‰"))
