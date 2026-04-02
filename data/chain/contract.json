@@ -1,0 +1,7 @@
+{
+  "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+  "network": "localhost",
+  "chainId": 31337,
+  "rpc": "http://127.0.0.1:8545",
+  "deployedAt": "2026-04-02T15:19:39.551Z"
+}
