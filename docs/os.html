@@ -1254,7 +1254,9 @@ window.os = {
           if (!resp.ok) continue;
           this._status = resp.status;
           this._html = await resp.text();
-          if (!this._html || this._html.length < 50) continue;
+          if (!this._html || this._html.length < 100) continue;
+          // Reject proxy error responses
+          if (this._html.includes('error code:') || this._html.includes('"error"')) continue;
 
           // Rewrite relative URLs to absolute so images/css load
           const base = new URL(url);
@@ -1274,12 +1276,19 @@ window.os = {
         }
       }
 
-      // All proxies failed — show error
-      this._html = '<html><head><title>Cannot Load</title></head><body style="background:#0d1117;color:#c9d1d9;font-family:monospace;padding:40px;text-align:center"><h1 style="color:#f0883e">🌐 Cannot Load Page</h1><p style="color:#8b949e">' + url + '</p><p style="color:#58a6ff;margin-top:20px"><a href="' + url + '" target="_blank" style="color:#58a6ff">Open in new tab ↗</a></p><p style="color:#484f58;margin-top:10px;font-size:11px">All proxy servers unreachable. The page may block automated access.</p></body></html>';
+      // All proxies failed — show friendly error with open-in-new-tab link
+      this._html = `<html><head><title>Cannot Load</title></head>
+        <body style="background:#0d1117;color:#c9d1d9;font-family:'Courier New',monospace;padding:60px;text-align:center">
+          <div style="font-size:48px;margin-bottom:16px">🌐</div>
+          <h1 style="color:#f0883e;font-size:20px">Page Unavailable</h1>
+          <p style="color:#8b949e;margin:16px 0">${url}</p>
+          <p style="color:#484f58;font-size:12px;max-width:400px;margin:0 auto">This site blocks proxy access. Some sites (like Hacker News) actively reject requests from intermediary servers.</p>
+          <a href="${url}" target="_blank" style="display:inline-block;margin-top:24px;padding:10px 24px;background:#238636;color:#fff;text-decoration:none;border-radius:6px;font-family:inherit;font-size:13px">Open in new tab ↗</a>
+        </body></html>`;
       const parser = new DOMParser();
       this._doc = parser.parseFromString(this._html, 'text/html');
       this._renderToGUI(url);
-      return 'Failed: all proxies unavailable';
+      return 'Unavailable: ' + url + ' (site blocks proxy access)';
     },
 
     _renderToGUI(url, directLoad) {
