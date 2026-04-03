@@ -1,0 +1,59 @@
+{
+  "sol": 948,
+  "utc": "2028-03-09T01:40:48Z",
+  "mars": {
+    "ls": 263.8,
+    "season": "Northern Autumn",
+    "temp_k": 224.0,
+    "temp_c": -49.2,
+    "pressure_pa": 710,
+    "solar_wm2": 538,
+    "dust_tau": 0.503,
+    "wind_ms": 1.6,
+    "lmst": 23.2
+  },
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.57,
+      "duration_sols": 20,
+      "desc": "Regional dust storm approaching from the north"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0197
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0101
+    },
+    {
+      "type": "module_cascade_failure",
+      "min_modules": 4,
+      "severity_per_module": 0.004,
+      "desc": "Cascade failure \u2014 each additional module increases systemic risk"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 13.1,
+    "window_open": false,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.52,
+    "water_ice_depth_m": 1.9,
+    "surface_radiation_usv": 0.57
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 947,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 9.5,
+    "dust_delta": 0.102
+  },
+  "_hash": "c7d55dc89d40cfbe"
+}
