@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Frame-Driven 3D: From JSON to Walking Robots — kody-w</title>
+<meta name="description" content="How 1,087 sol frames in a JSON file drive a complete 3D RTS colony view with Three.js. One data source drives every visual, audio, and behavioral system — the datasloshing pattern at full scale.">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#484f58;
+--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--cyan:#79c0ff;
+--purple:#a371f7;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.9}
+.wrap{max-width:720px;margin:0 auto;padding:40px 24px 80px}
+.meta{color:var(--dim);font-size:12px;margin-bottom:32px}
+.meta a{color:var(--cyan);text-decoration:none}
+h1{font-size:26px;color:#fff;line-height:1.3;margin-bottom:8px}
+h2{font-size:20px;color:var(--cyan);margin:40px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+h3{font-size:15px;color:var(--green);margin:28px 0 8px}
+p{margin:12px 0}
+strong{color:#fff}
+em{color:var(--dim)}
+code{background:rgba(88,166,255,0.1);color:var(--cyan);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:0.9em}
+pre{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:16px 0;overflow-x:auto;line-height:1.5}
+pre code{background:none;padding:0;color:var(--text);font-size:12px}
+blockquote{border-left:3px solid var(--purple);padding:12px 16px;margin:24px 0;background:rgba(163,113,247,0.05);border-radius:0 8px 8px 0;font-style:italic;color:var(--dim)}
+ul,ol{margin:12px 0 12px 24px}
+li{margin:6px 0}
+hr{border:none;border-top:1px solid var(--border);margin:48px 0}
+.diagram{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:20px;margin:20px 0;font-family:var(--mono);font-size:13px;line-height:1.6;color:var(--cyan);white-space:pre}
+.tag{display:inline-block;background:rgba(88,166,255,0.1);color:var(--blue);padding:2px 10px;border-radius:12px;font-size:11px;margin:2px 4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p class="meta"><a href="./">← Engineering Blog</a> · April 2026</p>
+
+<h1>Frame-Driven 3D: From JSON to Walking Robots</h1>
+
+<p><span class="tag">datasloshing</span> <span class="tag">three.js</span> <span class="tag">frame-driven</span> <span class="tag">3d-rts</span></p>
+
+<p>There are 1,087 sol frames in <code>frames.json</code>. Each frame is one Martian day — weather, hazards, module health, communications, orbital positions. That single JSON file drives every pixel, every sound, every robot behavior in the 3D RTS colony view. No game logic layer. No event bus. No state machine separate from the data. The frame <strong>is</strong> the application.</p>
+
+<p>This is <strong>datasloshing</strong> at full scale: one canonical data source sloshing through every subsystem, driving visuals, audio, and behavior from the same atoms.</p>
+
+<h2>The Data → Visual Pipeline</h2>
+
+<p>Every frame in <code>frames.json</code> contains nested objects for weather, hazards, communications, and terrain. The 3D view reads a frame and reacts. Nothing is hardcoded. Nothing is animated on a timeline. Everything responds to data.</p>
+
+<div class="diagram">frames.json
+  │
+  ├─ mars.lmst ──────────→ Sun position, sky gradient, shadow angle
+  ├─ weather.dust_tau ───→ Fog density, particle count, visibility
+  ├─ weather.wind_ms ────→ Dust particle velocity, ambient audio gain
+  ├─ weather.temp_c ─────→ Terrain tint (blue↔orange), frost overlay
+  ├─ hazards[] ──────────→ Robot task dispatch, building damage FX
+  ├─ modules[].health ───→ Building light intensity, crack overlays
+  ├─ comms.window_open ──→ Supply ship landing sequence trigger
+  ├─ orbit.phobos_az ────→ Phobos mesh position in skybox
+  ├─ orbit.deimos_az ────→ Deimos mesh position in skybox
+  └─ sol_number ─────────→ Day counter HUD, mission elapsed time</div>
+
+<h2>Day/Night Cycle</h2>
+
+<p>Mars Local Mean Solar Time (<code>mars.lmst</code>) is a string like <code>"14:23"</code>. The renderer parses it into a decimal hour and positions the directional light:</p>
+
+<pre><code>const hour = parseFloat(lmst.split(':')[0]) + parseFloat(lmst.split(':')[1]) / 60;
+const sunAngle = ((hour - 6) / 12) * Math.PI;  // 0 at dawn, π at dusk
+sunLight.position.set(
+  Math.cos(sunAngle) * 500,
+  Math.sin(sunAngle) * 400,
+  100
+);
+const dayFactor = Math.max(0, Math.sin(sunAngle));
+scene.background = new THREE.Color().lerpColors(nightColor, dayColor, dayFactor);</code></pre>
+
+<p>At <code>06:00</code>, the sun crests the eastern ridge. By <code>14:00</code>, it's overhead and the terrain casts short shadows. After <code>18:00</code>, the sky fades to Martian dusk — that deep butterscotch-to-black gradient. No animation keyframes. Just math driven by the LMST string in the frame.</p>
+
+<h2>Dust Storms</h2>
+
+<p>Every frame has a <code>dust_tau</code> value — the optical depth of atmospheric dust. Normal Mars is around 0.5. A regional storm hits 2.0. A global dust event pushes past 5.0.</p>
+
+<pre><code>// dust_tau drives fog density and particle system emission rate
+scene.fog.density = frame.weather.dust_tau * 0.002;
+dustParticles.emissionRate = Math.pow(frame.weather.dust_tau, 1.5) * 200;
+dustParticles.material.opacity = Math.min(frame.weather.dust_tau * 0.15, 0.8);
+sunLight.intensity = Math.max(0.1, 1.0 - frame.weather.dust_tau * 0.15);</code></pre>
+
+<p>When <code>dust_tau</code> spikes, the viewport goes hazy. Fog rolls in. Particle density increases. Sunlight dims. Solar panels in the scene visually lose efficiency — their glow fades. The colony hunkers down, and you can <em>see</em> it happen because the data says so.</p>
+
+<h2>Module Health and Building Lights</h2>
+
+<p>Each colony module has a <code>health</code> percentage. At 100%, the building's emissive lights glow at full intensity. As health degrades — from dust abrasion, meteorite strikes, or equipment failure — the lights dim:</p>
+
+<pre><code>modules.forEach(mod => {
+  const mesh = buildingMeshes[mod.id];
+  const healthFactor = mod.health / 100;
+  mesh.material.emissiveIntensity = healthFactor * 0.8;
+
+  // Below 30% health: red warning pulse
+  if (healthFactor < 0.3) {
+    mesh.material.emissive.set(0xff2200);
+    mesh.material.emissiveIntensity = 0.3 + Math.sin(time * 4) * 0.2;
+  }
+});</code></pre>
+
+<p>A healthy colony glows warm white from every habitat window. A colony under siege — dust storms grinding down modules, hazard after hazard — turns into a flickering constellation of red warning pulses.</p>
+
+<h2>Robot Task Dispatch</h2>
+
+<p>The <code>hazards[]</code> array in each frame lists active threats: <code>dust_abrasion</code> on the greenhouse, <code>power_failure</code> in the hab, <code>water_leak</code> in storage. Each hazard targets a module. The 3D view dispatches robots to the affected buildings:</p>
+
+<pre><code>frame.hazards.forEach(hazard => {
+  const targetBuilding = buildingMeshes[hazard.module_id];
+  const robot = getAvailableRobot();
+  if (robot &amp;&amp; targetBuilding) {
+    robot.assignTask({
+      type: 'repair',
+      target: targetBuilding.position,
+      urgency: hazard.severity
+    });
+  }
+});</code></pre>
+
+<p>Robots path-find across the terrain, tools extending as they approach the damaged building. Higher severity means faster movement. The robots aren't following scripted animations — they're reacting to the frame data in real time. Different frames produce different swarm patterns. The colony looks alive because the data is alive.</p>
+
+<h2>Supply Ship Landings</h2>
+
+<p>The <code>comms.window_open</code> flag indicates whether the colony has line-of-sight to Earth for communications. When a comm window opens, it triggers the supply ship arrival sequence:</p>
+
+<pre><code>if (frame.comms.window_open &amp;&amp; !previousFrame.comms.window_open) {
+  supplyShip.visible = true;
+  supplyShip.position.set(0, 800, -200);
+  // Descent animation driven by frame transition
+  animateShipLanding(supplyShip, landingPad.position);
+}</code></pre>
+
+<p>The ship descends through whatever atmospheric conditions the frame dictates. In clear weather, it's a clean descent with visible retro-rockets. In a dust storm, it punches through the haze, particles swirling around the hull. Same landing code — different visual result — because the fog and particle systems are already responding to <code>dust_tau</code>.</p>
+
+<h2>Terrain Temperature Tinting</h2>
+
+<p>Surface temperature (<code>weather.temp_c</code>) on Mars ranges from -120°C at the poles in winter to +20°C at the equator in summer. The terrain shader uses this to tint the ground:</p>
+
+<pre><code>const tempNorm = (frame.weather.temp_c + 120) / 140; // 0 = -120°C, 1 = +20°C
+const coldColor = new THREE.Color(0x4488cc);  // blue-grey frost
+const warmColor = new THREE.Color(0xcc6633);  // Martian rust
+terrain.material.color.lerpColors(coldColor, warmColor, tempNorm);</code></pre>
+
+<p>Dawn is blue. Midday is warm ochre. The transition is continuous, driven by the temperature value in each sub-frame.</p>
+
+<h2>Phobos and Deimos</h2>
+
+<p>Mars has two moons. <code>orbit.phobos_az</code> and <code>orbit.deimos_az</code> give their azimuth angles in each frame. Tiny mesh spheres in the skybox track these positions:</p>
+
+<pre><code>const phobosRad = THREE.MathUtils.degToRad(frame.orbit.phobos_az);
+phobos.position.set(Math.cos(phobosRad) * 900, 300, Math.sin(phobosRad) * 900);
+
+const deimosRad = THREE.MathUtils.degToRad(frame.orbit.deimos_az);
+deimos.position.set(Math.cos(deimosRad) * 1200, 250, Math.sin(deimosRad) * 1200);</code></pre>
+
+<p>Phobos is fast — it orbits Mars in 7.6 hours, visibly moving across the sky during a single sol. Deimos is slower, a dim speck drifting at the edge of visibility. Both are data-driven. Both are correct.</p>
+
+<h2>Ambient Audio</h2>
+
+<p>The soundscape is frame-driven too. <code>wind_ms</code> modulates the ambient wind audio gain:</p>
+
+<pre><code>windAudio.gain.value = Math.min(frame.weather.wind_ms / 25, 1.0);
+windAudio.playbackRate = 0.8 + (frame.weather.wind_ms / 50);</code></pre>
+
+<p>Calm sols have near-silence — just the hum of life support. Storm sols build to a howl as <code>wind_ms</code> climbs past 20 m/s. The audio doesn't know about storms. It only knows the wind speed number. The storm emerges from the data.</p>
+
+<blockquote>Every visual, every sound, every behavior traces back to a field in frames.json. There is no separate game state. The frame is the state. This is datasloshing — one source of truth, sloshed through every output channel.</blockquote>
+
+<h2>Why This Architecture Works</h2>
+
+<p>Traditional game engines separate data from presentation with layers of abstraction — state managers, event buses, animation controllers. The frame-driven approach collapses all of that:</p>
+
+<ul>
+<li><strong>Single source of truth</strong> — change the frame, everything updates. No sync bugs.</li>
+<li><strong>Deterministic rendering</strong> — same frame always produces the same scene. Testable. Reproducible.</li>
+<li><strong>Progressive enhancement</strong> — sub-frames add fidelity without changing the renderer. It reads whatever frame it's given.</li>
+<li><strong>Replay for free</strong> — scrub through frames and you're watching history. No replay system needed.</li>
+<li><strong>Multi-client consistency</strong> — every client reading the same frame sees the same colony. No netcode drift.</li>
+</ul>
+
+<p>1,087 frames. One JSON file. A walking, building, storm-weathering, ship-landing, moon-tracking Mars colony. The data does the work.</p>
+
+<hr>
+
+<p class="meta">
+<a href="./">← Back to blog index</a> ·
+<a href="https://github.com/kody-w/mars-barn-opus">GitHub</a> ·
+<a href="../rts.html">See it live in the RTS view</a>
+</p>
+
+</div>
+</body>
+</html>
