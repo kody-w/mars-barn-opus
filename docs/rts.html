@@ -1364,18 +1364,65 @@
     'hab':             { x: 0, z: 0 },
   };
 
+  // SHA-256 hash (first 16 hex chars) for frame verification
+  async function frameHash(frame) {
+    const clean = {};
+    for (const k of Object.keys(frame).sort()) {
+      if (!k.startsWith('_')) clean[k] = frame[k];
+    }
+    const data = new TextEncoder().encode(JSON.stringify(clean));
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    return hex.slice(0, 16);
+  }
+
   async function loadFrames() {
     try {
       let resp = await fetch('../data/frames/frames.json');
       if (!resp.ok) resp = await fetch('https://raw.githubusercontent.com/kody-w/mars-barn-opus/main/data/frames/frames.json');
       const data = await resp.json();
       const raw = data.frames || data;
+
+      // Load all frames
+      const solNums = [];
       for (const [sol, d] of Object.entries(raw)) {
         if (sol.startsWith('_') || sol === 'frames') continue;
-        frames[parseInt(sol)] = d;
+        const num = parseInt(sol);
+        frames[num] = d;
+        solNums.push(num);
       }
+      solNums.sort((a, b) => a - b);
+
+      // Validate hash chain — auto-rollback on corruption
+      let prevHash = data._genesis_hash || 'genesis';
+      let validCount = 0;
+      for (const sol of solNums) {
+        const f = frames[sol];
+        if (f._prev_hash && f._prev_hash !== prevHash) {
+          // Chain broken — truncate from here
+          showToast(`⚠️ Chain break at sol ${sol} — rolling back`, 'hazard');
+          for (const s of solNums) {
+            if (s >= sol) delete frames[s];
+          }
+          break;
+        }
+        // Verify content hash (spot-check every 100th frame for performance)
+        if (f._hash && sol % 100 === 1) {
+          const computed = await frameHash(f);
+          if (computed !== f._hash) {
+            showToast(`⚠️ Corrupted frame at sol ${sol} — rolling back`, 'hazard');
+            for (const s of solNums) {
+              if (s >= sol) delete frames[s];
+            }
+            break;
+          }
+        }
+        prevHash = f._hash || prevHash;
+        validCount++;
+      }
+
       totalSols = Math.max(...Object.keys(frames).map(Number));
-      showToast(`📡 Loaded ${Object.keys(frames).length} frames (Sol 1-${totalSols})`, 'info');
+      showToast(`📡 Loaded ${validCount} verified frames (Sol 1-${totalSols})`, 'info');
       currentSol = 1;
       frameData = frames[1] || null;
     } catch(e) {
