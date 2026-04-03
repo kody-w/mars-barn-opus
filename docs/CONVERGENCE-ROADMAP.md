@@ -236,6 +236,80 @@ Candidate sites (real, being studied):
 
 ---
 
+## v16.5: Twin Calibration (Physical Sensors → Frame Influence)
+
+**Gap closed:** One-way rendering → bidirectional digital twin
+
+### The Pattern: Sensor Datasloshing
+
+The sim currently flows one direction: frames → RTS view → visual output. Twin Calibration closes the loop: **real sensors influence the next sub-frame.**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    TWIN CALIBRATION LOOP                        │
+│                                                                 │
+│  Sol Frame (immutable keyframe)                                 │
+│       │                                                         │
+│       ▼                                                         │
+│  Sub-Frame Generator (datasloshing)                             │
+│       │                    ▲                                    │
+│       ▼                    │                                    │
+│  RTS View / Physical Model │                                   │
+│       │                    │                                    │
+│       ▼                    │                                    │
+│  ESP32 Sensors ────────────┘                                    │
+│  (temp, humidity, light, CO₂)                                   │
+│                                                                 │
+│  Constraint: sensor data can ONLY influence sub-frames.         │
+│  Sol keyframes are NEVER modified. The timeline is sacred.      │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### How It Works
+
+1. **ESP32** reads physical sensors (temperature, humidity, light level, CO₂ ppm)
+2. **WebSocket bridge** sends sensor JSON to the browser
+3. **Sub-frame generator** blends sensor data as a calibration layer:
+   - Real temperature biases the diurnal curve (if your room is cold, Mars gets colder)
+   - Real light level modulates solar_wm2 (cover the sensor = dust storm)
+   - Real CO₂ level influences ISRU efficiency
+4. **Calibrated sub-frame** feeds into RTS view AND back to the ESP32 for actuator response
+5. **Sol keyframe boundary** is NEVER violated — sensor influence decays to zero at keyframe edges
+
+### The Constraint That Makes It Safe
+
+Sensor data is treated as a **sub-frame harmonic** — it adds a perturbation layer within the sol, but the perturbation MUST decay to zero by the next keyframe. The standing wave analogy holds: sensors add overtones, but the fundamental frequency (sol keyframes) is untouched.
+
+```
+Sol N keyframe → [sensor-influenced sub-frames] → Sol N+1 keyframe
+                  ↑ real sensor data adds here     ↑ must converge here
+                  (influence decays toward edges)   (keyframe is sacred)
+```
+
+This means:
+- **Delete the sensor layer** → sim plays normally from keyframes
+- **Corrupt sensor data** → sub-frame hash chain detects it, falls back to interpolated sub-frames
+- **No sensor connected** → sub-frames use pure physics interpolation (current behavior)
+
+### Hardware Spec (from RAPPTER-BIBLE)
+
+| Sensor | ESP32 Pin | Sim Variable | Influence |
+|--------|-----------|-------------|-----------|
+| BME280 (temp) | I2C SDA/SCL | mars.temp_c | Biases diurnal curve ±5°C |
+| BME280 (humidity) | I2C SDA/SCL | h2o extraction rate | Scales water yield |
+| TSL2591 (light) | I2C | mars.solar_wm2 | Modulates solar flux |
+| SCD40 (CO₂) | I2C | ISRU efficiency | Scales Sabatier output |
+| Servo (heating) | GPIO 18 | alloc.heating | Actuator output |
+| NeoPixel strip | GPIO 5 | CRI / status | Visual output |
+
+### Why This Matters
+
+This is the bridge between v16 (pure sim) and v17 (analog habitat). Before connecting to CHAPEA or HI-SEAS, you calibrate with desktop sensors. A BME280 on your desk becomes a Mars weather station. A light sensor becomes a solar panel. The sim learns to trust physical data before it depends on it for life support.
+
+**The game trains the AI. The AI runs on hardware. The hardware runs in an analog. The analog validates for Mars.** Twin Calibration is where the digital world first touches the physical one.
+
+---
+
 ## v17–v18: Earth Analog
 
 **Gap closed:** Pure simulation → physical testbed integration
