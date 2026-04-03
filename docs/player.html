@@ -406,6 +406,33 @@ let animFrame = null;
 let lastTick = 0;
 let deathCause = null;
 
+// BroadcastChannel for live twin (drives RTS/overhead views)
+let twinBC = null;
+try { twinBC = new BroadcastChannel('mars-barn-twin'); } catch(e) {}
+
+function broadcastState() {
+  if (!twinBC || !STATE) return;
+  const ac = STATE.crew.filter(c => c.a);
+  const frame = FRAMES ? FRAMES[currentSol] : null;
+  twinBC.postMessage({
+    sol: currentSol,
+    hour: (currentSol % 1) * 24.66,
+    cri: STATE.cri / 100,
+    crew_alive: ac.length,
+    modules: STATE.mod ? STATE.mod.length : 8,
+    power: STATE.power ? Math.min(100, STATE.power / 10) : 50,
+    o2: STATE.o2 ? Math.min(100, STATE.o2 / 5) : 80,
+    h2o: STATE.h2o ? Math.min(100, STATE.h2o / 5) : 70,
+    food: STATE.food ? Math.min(100, STATE.food / 5) : 60,
+    crew: ac.map(c => ({ name: c.n, hp: c.hp, alive: c.a, bot: c.bot })),
+    weather: frame && frame.mars ? {
+      dust: frame.mars.dust_tau || 0.15,
+      temp: frame.mars.temp_c || -47,
+      windSpeed: frame.mars.wind_ms || 7,
+    } : undefined,
+  });
+}
+
 const FRAMES_URL = 'https://raw.githubusercontent.com/kody-w/mars-barn-opus/main/data/frames/frames.json';
 
 async function loadFrameData(){
@@ -484,6 +511,7 @@ function gameLoop(){
       }
     }
     updateUI();
+    broadcastState();
   }
   if(playing) animFrame = requestAnimationFrame(gameLoop);
 }
