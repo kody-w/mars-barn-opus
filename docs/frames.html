@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📊 Frame Explorer — Mars Barn</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;
+  --text:#c9d1d9;--text2:#8b949e;--green:#3fb950;--cyan:#79c0ff;
+  --purple:#a371f7;--orange:#d29922;--red:#f85149;--pink:#db61a2;
+  --mono:'JetBrains Mono','Fira Code','Cascadia Code','SF Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow-x:hidden;min-height:100vh}
+h1,h2,h3{font-family:var(--mono);font-weight:600}
+h1{font-size:1.4em;color:var(--green)}
+h2{font-size:1.1em;color:var(--cyan);margin:0 0 8px}
+h3{font-size:.9em;color:var(--purple);margin:0 0 6px}
+a{color:var(--cyan);text-decoration:none}
+code,pre,.mono{font-family:var(--mono);font-size:.85em}
+.tag{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.75em;font-family:var(--mono);margin:2px}
+.tag-green{background:#3fb95022;color:var(--green);border:1px solid #3fb95044}
+.tag-cyan{background:#79c0ff22;color:var(--cyan);border:1px solid #79c0ff44}
+.tag-orange{background:#d2992222;color:var(--orange);border:1px solid #d2992244}
+.tag-red{background:#f8514922;color:var(--red);border:1px solid #f8514944}
+.tag-purple{background:#a371f722;color:var(--purple);border:1px solid #a371f744}
+.tag-pink{background:#db61a222;color:var(--pink);border:1px solid #db61a244}
+
+/* Header */
+#header{display:flex;align-items:center;gap:16px;padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+#header h1{white-space:nowrap}
+#sol-display{font-family:var(--mono);font-size:2em;color:var(--green);min-width:160px;text-align:center}
+#sol-display small{font-size:.4em;color:var(--text2);display:block}
+#stats-bar{display:flex;gap:16px;font-size:.8em;color:var(--text2);font-family:var(--mono);flex-wrap:wrap;margin-left:auto}
+#stats-bar span{white-space:nowrap}
+.stat-val{color:var(--green)}
+
+/* Scrubber */
+#scrubber{padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--border)}
+#scrubber-controls{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+#scrubber input[type=range]{flex:1;accent-color:var(--green);height:6px}
+.btn{background:var(--bg3);color:var(--green);border:1px solid var(--border);padding:4px 14px;border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:.85em;transition:.2s}
+.btn:hover{background:var(--green);color:var(--bg)}
+.btn.active{background:var(--green);color:var(--bg)}
+#speed-select{background:var(--bg3);color:var(--text);border:1px solid var(--border);padding:4px 8px;border-radius:4px;font-family:var(--mono);font-size:.82em}
+
+/* Main grid */
+#main{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+#main>div{background:var(--bg);padding:16px;overflow-y:auto;max-height:calc(100vh - 280px)}
+@media(max-width:900px){#main{grid-template-columns:1fr}}
+
+/* Panels */
+.panel{margin-bottom:16px}
+.panel-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.data-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px}
+.data-item{background:var(--bg2);padding:8px 10px;border-radius:6px;border:1px solid var(--border)}
+.data-item .label{font-size:.7em;color:var(--text2);text-transform:uppercase;font-family:var(--mono);letter-spacing:.5px}
+.data-item .value{font-family:var(--mono);color:var(--green);font-size:1em;margin-top:2px}
+.data-item .unit{font-size:.75em;color:var(--text2)}
+
+.event-card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:6px;border-left:3px solid var(--cyan)}
+.event-card.hazard{border-left-color:var(--orange)}
+.event-card.challenge{border-left-color:var(--purple)}
+.event-card .ev-type{font-family:var(--mono);font-size:.85em;color:var(--cyan)}
+.event-card.hazard .ev-type{color:var(--orange)}
+.event-card .ev-detail{font-size:.8em;color:var(--text2);margin-top:2px}
+
+/* Enrichment panel */
+.enrich-version{margin-bottom:10px;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.enrich-header{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg2);cursor:pointer;font-family:var(--mono);font-size:.85em}
+.enrich-header .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.enrich-body{padding:8px 12px;font-size:.82em;display:none}
+.enrich-body.open{display:block}
+.enrich-field{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border)}
+.enrich-field:last-child{border-bottom:none}
+.enrich-field .ef-key{color:var(--text2);font-family:var(--mono)}
+.enrich-field .ef-val{color:var(--green);font-family:var(--mono)}
+
+/* Sub-frame panel */
+.subframe-row{display:grid;grid-template-columns:80px 1fr;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:.85em}
+.subframe-row:last-child{border-bottom:none}
+.sf-sol{font-family:var(--mono);color:var(--cyan)}
+.sf-data{display:flex;flex-wrap:wrap;gap:8px}
+.sf-pill{font-family:var(--mono);font-size:.8em;color:var(--text2)}
+.sf-pill b{color:var(--green)}
+
+/* Hash display */
+.hash-val{font-family:var(--mono);font-size:.8em;color:var(--purple);word-break:break-all}
+.chain-ok{color:var(--green)}
+.chain-break{color:var(--red)}
+
+/* Timeline canvas */
+#timeline-section{padding:0 20px 16px;background:var(--bg)}
+#timeline-header{display:flex;align-items:center;gap:12px;padding:12px 0}
+#timeline-canvas{width:100%;height:200px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);cursor:crosshair}
+#timeline-tooltip{position:fixed;background:var(--bg2);border:1px solid var(--border);padding:6px 10px;border-radius:4px;font-family:var(--mono);font-size:.78em;color:var(--text);pointer-events:none;z-index:200;display:none}
+
+/* Loading */
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999}
+#loading h1{font-size:2em;margin-bottom:12px}
+#loading .progress{width:300px;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+#loading .progress-bar{height:100%;background:var(--green);transition:width .3s;width:0%}
+#loading .status{margin-top:10px;font-family:var(--mono);font-size:.85em;color:var(--text2)}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--border)}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <h1>📊 Frame Explorer</h1>
+  <div class="progress"><div class="progress-bar" id="load-bar"></div></div>
+  <div class="status" id="load-status">Initializing…</div>
+</div>
+
+<div id="app" style="display:none">
+
+<!-- Header -->
+<div id="header">
+  <h1>📊 Frame Explorer</h1>
+  <div id="sol-display"><small>SOL</small>—</div>
+  <div id="stats-bar">
+    <span>Frames: <span class="stat-val" id="st-frames">—</span></span>
+    <span>Sub-frames: <span class="stat-val" id="st-subframes">—</span></span>
+    <span>Enrichments: <span class="stat-val" id="st-enrich">—</span></span>
+    <span>Chain: <span class="stat-val" id="st-chain">—</span></span>
+    <span>Coverage: <span class="stat-val" id="st-coverage">—</span></span>
+  </div>
+</div>
+
+<!-- Scrubber -->
+<div id="scrubber">
+  <div id="scrubber-controls">
+    <button class="btn" id="btn-prev" title="Previous sol (←)">◀</button>
+    <button class="btn" id="btn-play" title="Play/Pause (Space)">▶ Play</button>
+    <button class="btn" id="btn-next" title="Next sol (→)">▶</button>
+    <input type="range" id="sol-slider" min="1" max="1117" value="1">
+    <select id="speed-select" title="Playback speed">
+      <option value="2000">0.5×</option>
+      <option value="1000" selected>1×</option>
+      <option value="500">2×</option>
+      <option value="200">5×</option>
+      <option value="100">10×</option>
+      <option value="30">30×</option>
+    </select>
+    <button class="btn" id="btn-verify" title="Verify hash chain">🔗 Verify Chain</button>
+  </div>
+</div>
+
+<!-- Main panels -->
+<div id="main">
+  <div id="left-panel">
+    <!-- Frame detail -->
+    <div class="panel" id="panel-mars">
+      <div class="panel-header"><h2>🔴 Mars Environment</h2><span class="tag tag-green" id="mars-season"></span></div>
+      <div class="data-grid" id="mars-grid"></div>
+    </div>
+    <div class="panel" id="panel-events">
+      <div class="panel-header"><h2>⚡ Events & Hazards</h2><span class="tag tag-cyan" id="ev-count"></span></div>
+      <div id="events-list"></div>
+    </div>
+    <div class="panel" id="panel-comms">
+      <div class="panel-header"><h2>📡 Communications</h2></div>
+      <div class="data-grid" id="comms-grid"></div>
+    </div>
+    <div class="panel" id="panel-terrain">
+      <div class="panel-header"><h2>🏔️ Terrain</h2></div>
+      <div class="data-grid" id="terrain-grid"></div>
+    </div>
+    <div class="panel" id="panel-challenge">
+      <div class="panel-header"><h2>🎯 Challenge</h2></div>
+      <div id="challenge-content"></div>
+    </div>
+    <div class="panel" id="panel-echo">
+      <div class="panel-header"><h2>🔄 Frame Echo</h2></div>
+      <div class="data-grid" id="echo-grid"></div>
+    </div>
+    <div class="panel" id="panel-hash">
+      <div class="panel-header"><h2>🔗 Hash Chain</h2></div>
+      <div id="hash-content"></div>
+    </div>
+  </div>
+  <div id="right-panel">
+    <!-- Enrichments -->
+    <div class="panel" id="panel-enrichments">
+      <div class="panel-header"><h2>🌈 Echo Enrichments</h2><span class="tag tag-purple" id="enrich-count"></span></div>
+      <div id="enrichments-list"></div>
+    </div>
+    <!-- Sub-frames -->
+    <div class="panel" id="panel-subframes">
+      <div class="panel-header"><h2>⏱️ Sub-Frames</h2><span class="tag tag-cyan" id="sf-count"></span></div>
+      <div id="subframes-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Timeline visualization -->
+<div id="timeline-section">
+  <div id="timeline-header">
+    <h2>📈 Timeline Visualization</h2>
+    <button class="btn" id="btn-tl-dust">Dust τ</button>
+    <button class="btn active" id="btn-tl-temp">Temp °C</button>
+    <button class="btn" id="btn-tl-events">Events</button>
+    <button class="btn" id="btn-tl-enrichments">Enrichments</button>
+  </div>
+  <canvas id="timeline-canvas"></canvas>
+</div>
+<div id="timeline-tooltip"></div>
+
+</div><!-- /app -->
+
+<script>
+(function(){
+'use strict';
+
+// ── State ──
+let frames = {};
+let frameSols = [];
+let subFrames = {};
+let enrichments = {};
+let enrichMeta = {};
+let currentSol = 1;
+let playing = false;
+let playTimer = null;
+let tlLayers = { dust: false, temp: true, events: false, enrichments: false };
+
+const ENRICH_VERSIONS = [3,4,5,6,7,8,10,12,13,14,15];
+const ENRICH_COLORS = {
+  3:'#3fb950', 4:'#79c0ff', 5:'#a371f7', 6:'#d29922',
+  7:'#f85149', 8:'#db61a2', 10:'#f0883e', 12:'#56d364',
+  13:'#e3b341', 14:'#79c0ff', 15:'#bc8cff'
+};
+
+// ── Loading ──
+const $loadBar = document.getElementById('load-bar');
+const $loadStatus = document.getElementById('load-status');
+
+function setLoadProgress(pct, msg) {
+  $loadBar.style.width = pct + '%';
+  $loadStatus.textContent = msg;
+}
+
+async function loadJSON(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`Failed to load ${url}: ${r.status}`);
+  return r.json();
+}
+
+async function loadAll() {
+  try {
+    setLoadProgress(5, 'Loading frames.json…');
+    const fd = await loadJSON('../data/frames/frames.json');
+    frames = fd.frames || {};
+    frameSols = Object.keys(frames).map(Number).sort((a,b)=>a-b);
+    setLoadProgress(20, `Loaded ${frameSols.length} frames`);
+
+    setLoadProgress(25, 'Loading sub-frames…');
+    const sf = await loadJSON('../data/frames/sub-frames-d2.json');
+    subFrames = sf.sub_frames || {};
+    setLoadProgress(35, `Loaded ${Object.keys(subFrames).length} sub-frames`);
+
+    let loaded = 0;
+    for (const v of ENRICH_VERSIONS) {
+      setLoadProgress(35 + (loaded/ENRICH_VERSIONS.length)*55,
+        `Loading echo-enrichments-v${v}.json…`);
+      try {
+        const ed = await loadJSON(`../data/frames/echo-enrichments-v${v}.json`);
+        enrichMeta[v] = {
+          description: ed.description || ed._description || ed.name || ed.title || `v${v}`,
+          fields: ed.fields_added || [],
+          dataSources: ed.data_sources || ed._data_sources || [],
+          solsEnriched: ed.sols_enriched || 0
+        };
+        enrichments[v] = normalizeEnrichments(v, ed.enrichments);
+      } catch(e) {
+        console.warn(`v${v} load failed:`, e.message);
+      }
+      loaded++;
+    }
+    setLoadProgress(95, 'Rendering…');
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display = '';
+    init();
+    setLoadProgress(100, 'Done');
+  } catch(e) {
+    setLoadProgress(0, 'Error: ' + e.message);
+    console.error(e);
+  }
+}
+
+function normalizeEnrichments(version, raw) {
+  const result = {};
+  if (!raw) return result;
+  if (Array.isArray(raw)) {
+    for (const item of raw) {
+      if (item.sol !== undefined) {
+        result[String(item.sol)] = item;
+      } else if (item.sol_range) {
+        const key = `range_${item.sol_range[0]}_${item.sol_range[1]}`;
+        result[key] = item;
+      }
+    }
+  } else {
+    for (const [k, v] of Object.entries(raw)) {
+      const m = k.match(/^sol[_]?(\d+)$/);
+      if (m) {
+        result[m[1]] = v;
+      } else if (/^\d+$/.test(k)) {
+        result[k] = v;
+      } else {
+        result[k] = v;
+      }
+    }
+  }
+  return result;
+}
+
+// ── Init ──
+function init() {
+  updateStats();
+  setupScrubber();
+  setupKeyboard();
+  setupTimeline();
+  selectSol(1);
+}
+
+// ── Stats ──
+function updateStats() {
+  document.getElementById('st-frames').textContent = frameSols.length.toLocaleString();
+  document.getElementById('st-subframes').textContent = Object.keys(subFrames).length.toLocaleString();
+  document.getElementById('st-enrich').textContent = Object.keys(enrichments).length;
+  document.getElementById('st-chain').textContent = '…';
+  const coverPct = ((frameSols.length / (frameSols[frameSols.length-1] || 1)) * 100).toFixed(1);
+  document.getElementById('st-coverage').textContent = coverPct + '%';
+}
+
+// ── Scrubber ──
+function setupScrubber() {
+  const slider = document.getElementById('sol-slider');
+  slider.min = frameSols[0] || 1;
+  slider.max = frameSols[frameSols.length - 1] || 1117;
+  slider.value = frameSols[0] || 1;
+
+  slider.addEventListener('input', () => selectSol(nearestSol(+slider.value)));
+  document.getElementById('btn-prev').addEventListener('click', stepSol(-1));
+  document.getElementById('btn-next').addEventListener('click', stepSol(1));
+  document.getElementById('btn-play').addEventListener('click', togglePlay);
+  document.getElementById('btn-verify').addEventListener('click', verifyChain);
+  document.getElementById('speed-select').addEventListener('change', () => {
+    if (playing) { stopPlay(); startPlay(); }
+  });
+}
+
+function nearestSol(val) {
+  let best = frameSols[0];
+  for (const s of frameSols) {
+    if (Math.abs(s - val) < Math.abs(best - val)) best = s;
+  }
+  return best;
+}
+
+function stepSol(dir) {
+  return () => {
+    const idx = frameSols.indexOf(currentSol);
+    const next = frameSols[Math.max(0, Math.min(frameSols.length-1, idx+dir))];
+    if (next !== undefined) selectSol(next);
+  };
+}
+
+function togglePlay() {
+  playing ? stopPlay() : startPlay();
+}
+
+function startPlay() {
+  playing = true;
+  document.getElementById('btn-play').textContent = '⏸ Pause';
+  document.getElementById('btn-play').classList.add('active');
+  const speed = +document.getElementById('speed-select').value;
+  playTimer = setInterval(() => {
+    const idx = frameSols.indexOf(currentSol);
+    if (idx >= frameSols.length - 1) { stopPlay(); return; }
+    selectSol(frameSols[idx + 1]);
+  }, speed);
+}
+
+function stopPlay() {
+  playing = false;
+  clearInterval(playTimer);
+  document.getElementById('btn-play').textContent = '▶ Play';
+  document.getElementById('btn-play').classList.remove('active');
+}
+
+function setupKeyboard() {
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); stepSol(-1)(); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); stepSol(1)(); }
+    else if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+  });
+}
+
+// ── Select Sol ──
+function selectSol(sol) {
+  currentSol = sol;
+  document.getElementById('sol-slider').value = sol;
+  document.getElementById('sol-display').innerHTML = `<small>SOL</small>${sol}`;
+
+  const f = frames[String(sol)];
+  if (!f) return;
+
+  renderMars(f);
+  renderEvents(f);
+  renderComms(f);
+  renderTerrain(f);
+  renderChallenge(f);
+  renderEcho(f);
+  renderHash(f);
+  renderEnrichments(sol);
+  renderSubFrames(sol);
+  drawTimeline();
+}
+
+// ── Render helpers ──
+function dataItem(label, value, unit) {
+  return `<div class="data-item"><div class="label">${label}</div><div class="value">${value} <span class="unit">${unit||''}</span></div></div>`;
+}
+
+function renderMars(f) {
+  const m = f.mars || {};
+  document.getElementById('mars-season').textContent = m.season || '—';
+  document.getElementById('mars-grid').innerHTML = [
+    dataItem('Temperature', m.temp_c != null ? m.temp_c.toFixed(1) : '—', '°C'),
+    dataItem('Temp (K)', m.temp_k != null ? m.temp_k.toFixed(1) : '—', 'K'),
+    dataItem('Pressure', m.pressure_pa || '—', 'Pa'),
+    dataItem('Solar Flux', m.solar_wm2 || '—', 'W/m²'),
+    dataItem('Dust τ', m.dust_tau != null ? m.dust_tau.toFixed(3) : '—', ''),
+    dataItem('Wind', m.wind_ms != null ? m.wind_ms.toFixed(1) : '—', 'm/s'),
+    dataItem('Ls', m.ls != null ? m.ls.toFixed(1) : '—', '°'),
+    dataItem('LMST', m.lmst != null ? m.lmst.toFixed(1) : '—', 'h'),
+  ].join('');
+}
+
+function renderEvents(f) {
+  const events = f.events || [];
+  const hazards = f.hazards || [];
+  const total = events.length + hazards.length;
+  document.getElementById('ev-count').textContent = total + ' items';
+
+  let html = '';
+  for (const ev of events) {
+    html += `<div class="event-card"><div class="ev-type">${ev.type || 'event'}</div>`;
+    html += `<div class="ev-detail">${formatObj(ev, ['type'])}</div></div>`;
+  }
+  for (const h of hazards) {
+    html += `<div class="event-card hazard"><div class="ev-type">⚠ ${h.type || 'hazard'}</div>`;
+    const details = [];
+    if (h.probability != null) details.push(`prob: ${h.probability}`);
+    if (h.target) details.push(`target: ${h.target}`);
+    if (h.degradation != null) details.push(`degradation: ${h.degradation}`);
+    if (h.severity != null) details.push(`severity: ${h.severity}`);
+    if (h.description) details.push(h.description);
+    html += `<div class="ev-detail">${details.join(' · ')}</div></div>`;
+  }
+  if (!html) html = '<div style="color:var(--text2);font-size:.85em">No events or hazards this sol</div>';
+  document.getElementById('events-list').innerHTML = html;
+}
+
+function renderComms(f) {
+  const c = f.comms || {};
+  document.getElementById('comms-grid').innerHTML = [
+    dataItem('Earth Delay', c.earth_delay_min != null ? c.earth_delay_min.toFixed(1) : '—', 'min'),
+    dataItem('Window', c.window_open ? '🟢 OPEN' : '🔴 CLOSED', ''),
+    dataItem('Bandwidth', c.bandwidth_kbps || '—', 'kbps'),
+  ].join('');
+}
+
+function renderTerrain(f) {
+  const t = f.terrain || {};
+  document.getElementById('terrain-grid').innerHTML = [
+    dataItem('Regolith Hardness', t.regolith_hardness != null ? t.regolith_hardness.toFixed(2) : '—', ''),
+    dataItem('Water Ice Depth', t.water_ice_depth_m != null ? t.water_ice_depth_m.toFixed(1) : '—', 'm'),
+    dataItem('Surface Radiation', t.surface_radiation_usv != null ? t.surface_radiation_usv.toFixed(2) : '—', 'μSv/h'),
+  ].join('');
+}
+
+function renderChallenge(f) {
+  const ch = f.challenge;
+  if (!ch) {
+    document.getElementById('challenge-content').innerHTML =
+      '<div style="color:var(--text2);font-size:.85em">No active challenge</div>';
+    return;
+  }
+  let html = `<div class="event-card challenge"><div class="ev-type">🎯 ${ch.id || ch.type || 'Challenge'}</div>`;
+  html += `<div class="ev-detail">${formatObj(ch, ['id'])}</div></div>`;
+  document.getElementById('challenge-content').innerHTML = html;
+}
+
+function renderEcho(f) {
+  const e = f.frame_echo || {};
+  document.getElementById('echo-grid').innerHTML = [
+    dataItem('Prev Sol', e.prev_sol != null ? e.prev_sol : 'genesis', ''),
+    dataItem('Dust Trend', e.global_dust_trend || '—', ''),
+    dataItem('Solar Eff. Trend', e.solar_efficiency_trend || '—', ''),
+    dataItem('Temp Δ', e.temp_delta != null ? (e.temp_delta > 0 ? '+' : '') + e.temp_delta.toFixed(2) : '—', '°C'),
+    dataItem('Dust Δ', e.dust_delta != null ? (e.dust_delta > 0 ? '+' : '') + e.dust_delta.toFixed(4) : '—', ''),
+  ].join('');
+}
+
+function renderHash(f) {
+  const prevFrame = f.frame_echo && f.frame_echo.prev_sol != null
+    ? frames[String(f.frame_echo.prev_sol)] : null;
+  let chainStatus = '';
+  if (f._prev_hash === 'genesis') {
+    chainStatus = '<span class="chain-ok">✓ Genesis block</span>';
+  } else if (prevFrame && prevFrame._hash === f._prev_hash) {
+    chainStatus = '<span class="chain-ok">✓ Valid link</span>';
+  } else if (prevFrame) {
+    chainStatus = '<span class="chain-break">✗ Chain break!</span>';
+  } else {
+    chainStatus = '<span style="color:var(--text2)">? Previous frame not found</span>';
+  }
+  document.getElementById('hash-content').innerHTML = `
+    <div class="data-grid">
+      ${dataItem('Hash', `<span class="hash-val">${f._hash || '—'}</span>`, '')}
+      ${dataItem('Prev Hash', `<span class="hash-val">${f._prev_hash || '—'}</span>`, '')}
+      ${dataItem('Chain Status', chainStatus, '')}
+    </div>`;
+}
+
+function renderEnrichments(sol) {
+  let html = '';
+  let count = 0;
+  for (const v of ENRICH_VERSIONS) {
+    const data = enrichments[v];
+    if (!data) continue;
+    const solData = findEnrichmentForSol(v, data, sol);
+    const meta = enrichMeta[v] || {};
+    const color = ENRICH_COLORS[v] || '#888';
+    const hasData = solData !== null;
+    if (hasData) count++;
+
+    html += `<div class="enrich-version" style="border-color:${hasData ? color : 'var(--border)'}">`;
+    html += `<div class="enrich-header" onclick="this.nextElementSibling.classList.toggle('open')" style="opacity:${hasData ? 1 : 0.4}">`;
+    html += `<span class="dot" style="background:${color}"></span>`;
+    html += `<span>v${v}</span>`;
+    html += `<span style="flex:1;color:var(--text2);font-size:.8em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(meta.description||'').slice(0,60)}</span>`;
+    html += hasData ? '<span class="tag tag-green">HAS DATA</span>' : '<span class="tag" style="color:var(--text2)">—</span>';
+    html += '</div>';
+    html += `<div class="enrich-body${hasData ? ' open' : ''}">`;
+    if (hasData && typeof solData === 'object') {
+      for (const [k, val] of Object.entries(solData)) {
+        if (k === 'type' || k === 'sol_range' || k === 'sol') continue;
+        const displayVal = typeof val === 'object' ? JSON.stringify(val).slice(0, 120) : String(val);
+        html += `<div class="enrich-field"><span class="ef-key">${k}</span><span class="ef-val" style="color:${color}">${displayVal}</span></div>`;
+      }
+    } else if (hasData) {
+      html += `<div class="enrich-field"><span class="ef-val" style="color:${color}">${String(solData)}</span></div>`;
+    }
+    if (meta.dataSources && meta.dataSources.length) {
+      html += '<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:.75em;color:var(--text2)">';
+      html += '<b>Sources:</b> ' + meta.dataSources.slice(0,3).join('; ');
+      html += '</div>';
+    }
+    html += '</div></div>';
+  }
+  document.getElementById('enrich-count').textContent = count + '/' + ENRICH_VERSIONS.length + ' versions';
+  document.getElementById('enrichments-list').innerHTML = html || '<div style="color:var(--text2);font-size:.85em">No enrichments for this sol</div>';
+}
+
+function findEnrichmentForSol(version, data, sol) {
+  const key = String(sol);
+  if (data[key]) return data[key];
+  for (const [k, v] of Object.entries(data)) {
+    if (k.startsWith('range_')) {
+      const parts = k.replace('range_','').split('_').map(Number);
+      if (sol >= parts[0] && sol <= parts[1]) return v;
+    }
+  }
+  return null;
+}
+
+function renderSubFrames(sol) {
+  const subs = [];
+  for (const frac of [0.25, 0.5, 0.75]) {
+    const key = (sol + frac).toFixed(2);
+    const alt = sol + frac;
+    const sf = subFrames[key] || subFrames[String(alt)];
+    if (sf) subs.push(sf);
+  }
+  document.getElementById('sf-count').textContent = subs.length + ' sub-frames';
+  if (!subs.length) {
+    document.getElementById('subframes-list').innerHTML =
+      '<div style="color:var(--text2);font-size:.85em">No sub-frames for this sol</div>';
+    return;
+  }
+  let html = '';
+  for (const sf of subs) {
+    const m = sf.mars || {};
+    html += `<div class="subframe-row">
+      <div class="sf-sol">◈ ${sf.sol}</div>
+      <div class="sf-data">
+        <span class="sf-pill">T: <b>${m.temp_c != null ? m.temp_c.toFixed(1) : '—'}°C</b></span>
+        <span class="sf-pill">P: <b>${m.pressure_pa || '—'} Pa</b></span>
+        <span class="sf-pill">☀ <b>${m.solar_wm2 != null ? Math.round(m.solar_wm2) : '—'} W/m²</b></span>
+        <span class="sf-pill">τ: <b>${m.dust_tau != null ? m.dust_tau.toFixed(3) : '—'}</b></span>
+        <span class="sf-pill">💨 <b>${m.wind_ms != null ? m.wind_ms.toFixed(1) : '—'} m/s</b></span>
+        <span class="sf-pill">Ls: <b>${m.ls != null ? m.ls.toFixed(1) : '—'}°</b></span>
+      </div>
+    </div>`;
+  }
+  document.getElementById('subframes-list').innerHTML = html;
+}
+
+function formatObj(obj, skip) {
+  return Object.entries(obj)
+    .filter(([k]) => !skip || !skip.includes(k))
+    .map(([k,v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
+    .join(' · ');
+}
+
+// ── Hash chain verification ──
+function verifyChain() {
+  const btn = document.getElementById('btn-verify');
+  btn.textContent = '🔗 Verifying…';
+  btn.disabled = true;
+  setTimeout(() => {
+    let valid = 0, broken = 0, total = frameSols.length;
+    const breaks = [];
+    for (let i = 0; i < frameSols.length; i++) {
+      const sol = frameSols[i];
+      const f = frames[String(sol)];
+      if (f._prev_hash === 'genesis') { valid++; continue; }
+      const prevSol = f.frame_echo && f.frame_echo.prev_sol;
+      if (prevSol != null) {
+        const pf = frames[String(prevSol)];
+        if (pf && pf._hash === f._prev_hash) { valid++; }
+        else { broken++; breaks.push(sol); }
+      } else { valid++; }
+    }
+    const status = broken === 0 ? '✓ VALID' : `✗ ${broken} BREAKS`;
+    document.getElementById('st-chain').innerHTML =
+      broken === 0
+        ? `<span class="chain-ok">${status} (${valid}/${total})</span>`
+        : `<span class="chain-break">${status} at sols: ${breaks.slice(0,10).join(', ')}${breaks.length>10?'…':''}</span>`;
+    btn.textContent = broken === 0 ? '🔗 ✓ Valid' : `🔗 ✗ ${broken} breaks`;
+    btn.disabled = false;
+    if (broken === 0) btn.classList.add('active');
+  }, 50);
+}
+
+// ── Timeline visualization ──
+const canvas = document.getElementById('timeline-canvas');
+const ctx = canvas.getContext('2d');
+const tooltip = document.getElementById('timeline-tooltip');
+
+function setupTimeline() {
+  const btns = {
+    'btn-tl-dust': 'dust', 'btn-tl-temp': 'temp',
+    'btn-tl-events': 'events', 'btn-tl-enrichments': 'enrichments'
+  };
+  for (const [id, key] of Object.entries(btns)) {
+    document.getElementById(id).addEventListener('click', function() {
+      tlLayers[key] = !tlLayers[key];
+      this.classList.toggle('active', tlLayers[key]);
+      drawTimeline();
+    });
+  }
+  canvas.addEventListener('mousemove', onTimelineHover);
+  canvas.addEventListener('mouseleave', () => tooltip.style.display = 'none');
+  canvas.addEventListener('click', onTimelineClick);
+  window.addEventListener('resize', drawTimeline);
+  drawTimeline();
+}
+
+function drawTimeline() {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  const W = rect.width, H = rect.height;
+  ctx.clearRect(0, 0, W, H);
+
+  if (!frameSols.length) return;
+  const minSol = frameSols[0], maxSol = frameSols[frameSols.length-1];
+  const range = maxSol - minSol || 1;
+  const pad = { l:40, r:10, t:10, b:30 };
+  const pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
+
+  function solToX(s) { return pad.l + ((s - minSol) / range) * pw; }
+
+  // Grid lines
+  ctx.strokeStyle = '#21262d';
+  ctx.lineWidth = 1;
+  const gridStep = Math.ceil(range / 10 / 100) * 100;
+  for (let s = Math.ceil(minSol/gridStep)*gridStep; s <= maxSol; s += gridStep) {
+    const x = solToX(s);
+    ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, H-pad.b); ctx.stroke();
+    ctx.fillStyle = '#8b949e'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Sol ' + s, x, H - pad.b + 14);
+  }
+
+  // Current sol marker
+  const cx = solToX(currentSol);
+  ctx.fillStyle = '#3fb95033';
+  ctx.fillRect(cx-1, pad.t, 3, ph);
+  ctx.fillStyle = '#3fb950';
+  ctx.fillRect(cx-1, pad.t, 3, 6);
+
+  // Enrichment bands
+  if (tlLayers.enrichments) {
+    const bandH = 6;
+    let bandY = pad.t + 2;
+    for (const v of ENRICH_VERSIONS) {
+      const data = enrichments[v];
+      if (!data) continue;
+      const color = ENRICH_COLORS[v] || '#888';
+      ctx.fillStyle = color + '44';
+      for (const sol of frameSols) {
+        if (findEnrichmentForSol(v, data, sol) !== null) {
+          const x = solToX(sol);
+          ctx.fillRect(x, bandY, Math.max(pw/range, 1), bandH);
+        }
+      }
+      bandY += bandH + 1;
+    }
+  }
+
+  // Collect data for lines
+  const temps = [], dusts = [], eventDensity = [];
+  let tempMin=Infinity, tempMax=-Infinity, dustMin=Infinity, dustMax=-Infinity, evMax=0;
+  for (const sol of frameSols) {
+    const f = frames[String(sol)];
+    const m = f.mars || {};
+    const t = m.temp_c != null ? m.temp_c : null;
+    const d = m.dust_tau != null ? m.dust_tau : null;
+    const evCount = (f.events||[]).length + (f.hazards||[]).length;
+    temps.push({sol, v:t});
+    dusts.push({sol, v:d});
+    eventDensity.push({sol, v:evCount});
+    if (t!=null) { tempMin=Math.min(tempMin,t); tempMax=Math.max(tempMax,t); }
+    if (d!=null) { dustMin=Math.min(dustMin,d); dustMax=Math.max(dustMax,d); }
+    evMax = Math.max(evMax, evCount);
+  }
+
+  // Event bars
+  if (tlLayers.events && evMax > 0) {
+    for (const {sol, v} of eventDensity) {
+      if (v === 0) continue;
+      const x = solToX(sol);
+      const h = (v / evMax) * ph * 0.5;
+      const f = frames[String(sol)];
+      const hasChallenge = f.challenge != null;
+      ctx.fillStyle = hasChallenge ? '#a371f766' : (v > 3 ? '#f8514966' : '#d2992244');
+      ctx.fillRect(x-1, pad.t + ph - h, Math.max(pw/range, 2), h);
+    }
+  }
+
+  // Dust line
+  if (tlLayers.dust && dustMax > dustMin) {
+    ctx.beginPath();
+    ctx.strokeStyle = '#d29922';
+    ctx.lineWidth = 1.5;
+    let started = false;
+    for (const {sol, v} of dusts) {
+      if (v == null) continue;
+      const x = solToX(sol);
+      const y = pad.t + ph - ((v - dustMin) / (dustMax - dustMin)) * ph;
+      started ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      started = true;
+    }
+    ctx.stroke();
+    // Label
+    ctx.fillStyle = '#d29922'; ctx.font = '10px monospace'; ctx.textAlign = 'left';
+    ctx.fillText(`Dust τ [${dustMin.toFixed(2)}–${dustMax.toFixed(2)}]`, pad.l + 4, pad.t + 12);
+  }
+
+  // Temp line
+  if (tlLayers.temp && tempMax > tempMin) {
+    ctx.beginPath();
+    ctx.strokeStyle = '#79c0ff';
+    ctx.lineWidth = 1.5;
+    let started = false;
+    for (const {sol, v} of temps) {
+      if (v == null) continue;
+      const x = solToX(sol);
+      const y = pad.t + ph - ((v - tempMin) / (tempMax - tempMin)) * ph;
+      started ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      started = true;
+    }
+    ctx.stroke();
+    ctx.fillStyle = '#79c0ff'; ctx.font = '10px monospace'; ctx.textAlign = 'right';
+    ctx.fillText(`Temp [${tempMin.toFixed(0)}–${tempMax.toFixed(0)}°C]`, W - pad.r - 4, pad.t + 12);
+  }
+
+  // Y-axis label
+  ctx.fillStyle = '#8b949e'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+  ctx.save(); ctx.translate(12, H/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('Value', 0, 0); ctx.restore();
+}
+
+function solFromMouse(e) {
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const pad = { l:40, r:10 };
+  const pw = rect.width - pad.l - pad.r;
+  const minSol = frameSols[0], maxSol = frameSols[frameSols.length-1];
+  const sol = minSol + ((x - pad.l) / pw) * (maxSol - minSol);
+  return nearestSol(Math.round(sol));
+}
+
+function onTimelineHover(e) {
+  const sol = solFromMouse(e);
+  const f = frames[String(sol)];
+  if (!f) { tooltip.style.display = 'none'; return; }
+  const m = f.mars || {};
+  tooltip.innerHTML = `<b>Sol ${sol}</b><br>Temp: ${m.temp_c?.toFixed(1) ?? '—'}°C · Dust: ${m.dust_tau?.toFixed(3) ?? '—'} · Events: ${(f.events||[]).length + (f.hazards||[]).length}`;
+  tooltip.style.display = 'block';
+  tooltip.style.left = (e.clientX + 12) + 'px';
+  tooltip.style.top = (e.clientY - 30) + 'px';
+}
+
+function onTimelineClick(e) {
+  const sol = solFromMouse(e);
+  selectSol(sol);
+  tooltip.style.display = 'none';
+}
+
+// ── Start ──
+loadAll();
+
+})();
+</script>
+</body>
+</html>
