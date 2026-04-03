@@ -1344,12 +1344,13 @@
 
   // ─── FRAME-DRIVEN SIMULATION ───────────────────────────────
   let frames = {};
+  let subFrames = {};  // quarter-day sub-frames
   let totalSols = 0;
   let currentSol = 0;
   let solHour = 6;         // 0-24.66 (Mars sol = 24h 39m)
   const SOL_HOURS = 24.66;
   let solSpeed = 1;        // real-time: 1 sol = ~25s
-  let frameData = null;    // current frame
+  let frameData = null;    // current frame (sol or sub-frame)
   let prevFrameData = null;
 
   // Task assignments: which building each unit is heading to
@@ -1432,6 +1433,33 @@
   }
   loadFrames();
 
+  // Load sub-frames for intra-day fidelity
+  async function loadSubFrames() {
+    try {
+      let resp = await fetch('../data/frames/sub-frames-d2.json');
+      if (!resp.ok) return;
+      const data = await resp.json();
+      const raw = data.sub_frames || {};
+      let count = 0;
+      for (const [key, sf] of Object.entries(raw)) {
+        subFrames[key] = sf;
+        count++;
+      }
+      if (count > 0) showToast(`🔬 Loaded ${count} sub-frames (${data._divisions || 4} per sol)`, 'info');
+    } catch(e) { /* sub-frames optional */ }
+  }
+  loadSubFrames();
+
+  // Get the best frame for current time (sub-frame if available)
+  function getFrameForTime(sol, hour) {
+    // Try sub-frame first (quarter-day resolution)
+    const quarter = Math.floor((hour / SOL_HOURS) * 4);
+    const subKey = (sol + quarter * 0.25).toFixed(2);
+    if (subFrames[subKey]) return subFrames[subKey];
+    // Fall back to sol keyframe
+    return frames[sol] || null;
+  }
+
   // ─── BROADCAST CHANNEL ───────────────────────────────────────
   let twinConnected = false;
   let twinState = null;
@@ -1485,16 +1513,22 @@
       onNewSol();
     }
 
-    // Update sim state from frame data
-    if (frameData && frameData.mars) {
-      const m = frameData.mars;
+    // Use sub-frame if available for intra-day fidelity
+    const activeFrame = getFrameForTime(currentSol, solHour) || frameData;
+
+    // Update sim state from frame/sub-frame data
+    if (activeFrame && activeFrame.mars) {
+      const m = activeFrame.mars;
       simState.dust_tau = m.dust_tau || 0.15;
-      simState.temp_c = m.temp_c || -47;
       simState.wind_ms = m.wind_ms || 7;
-      // Diurnal temperature swing based on hour
-      const hourFrac = solHour / SOL_HOURS;
-      const diurnal = Math.sin((hourFrac - 0.25) * Math.PI * 2);
-      simState.temp_c = (m.temp_c || -47) + diurnal * 15;
+      // Sub-frames have built-in diurnal temp; sol frames need manual swing
+      if (activeFrame.sub_index !== undefined) {
+        simState.temp_c = m.temp_c || -47;
+      } else {
+        const hourFrac = solHour / SOL_HOURS;
+        const diurnal = Math.sin((hourFrac - 0.25) * Math.PI * 2);
+        simState.temp_c = (m.temp_c || -47) + diurnal * 15;
+      }
     }
 
     simState.sol = currentSol;

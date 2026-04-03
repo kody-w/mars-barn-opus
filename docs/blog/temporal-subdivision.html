@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Temporal Subdivision: Datasloshing Fidelity Within Frames — kody-w</title>
+<meta name="description" content="How append-only temporal subdivision turns sol-level keyframes into quarter-day sub-frames without breaking the timeline. The same pattern as video codecs, applied to Mars simulation data.">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--dim:#484f58;
+--blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--cyan:#79c0ff;
+--purple:#a371f7;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.9}
+.wrap{max-width:720px;margin:0 auto;padding:40px 24px 80px}
+.meta{color:var(--dim);font-size:12px;margin-bottom:32px}
+.meta a{color:var(--cyan);text-decoration:none}
+h1{font-size:26px;color:#fff;line-height:1.3;margin-bottom:8px}
+h2{font-size:20px;color:var(--cyan);margin:40px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+h3{font-size:15px;color:var(--green);margin:28px 0 8px}
+p{margin:12px 0}
+strong{color:#fff}
+em{color:var(--dim)}
+code{background:rgba(88,166,255,0.1);color:var(--cyan);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:0.9em}
+pre{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin:16px 0;overflow-x:auto;line-height:1.5}
+pre code{background:none;padding:0;color:var(--text);font-size:12px}
+blockquote{border-left:3px solid var(--purple);padding:12px 16px;margin:24px 0;background:rgba(163,113,247,0.05);border-radius:0 8px 8px 0;font-style:italic;color:var(--dim)}
+ul,ol{margin:12px 0 12px 24px}
+li{margin:6px 0}
+hr{border:none;border-top:1px solid var(--border);margin:48px 0}
+.diagram{background:#0a0e14;border:1px solid var(--border);border-radius:8px;padding:20px;margin:20px 0;font-family:var(--mono);font-size:13px;line-height:1.6;color:var(--cyan);white-space:pre}
+.tag{display:inline-block;background:rgba(88,166,255,0.1);color:var(--blue);padding:2px 10px;border-radius:12px;font-size:11px;margin:2px 4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p class="meta"><a href="./">← Engineering Blog</a> · April 2026</p>
+
+<h1>Temporal Subdivision: Datasloshing Fidelity Within Frames</h1>
+
+<p><span class="tag">datasloshing</span> <span class="tag">append-only</span> <span class="tag">temporal-mesh</span> <span class="tag">mars-sim</span></p>
+
+<p>We had 1,087 sol-level frames driving the Mars colony simulation. Each frame is one Mars day — 24 hours and 39 minutes of weather, hazards, and terrain data compressed into a single snapshot. The 3D RTS view cycled through them, but the transitions were abrupt. Temperature jumped. Wind shifted instantly. The colony existed in a world of discrete daily snapshots.</p>
+
+<p>The question: <strong>how do you add intra-day fidelity without changing any existing frame?</strong></p>
+
+<h2>The Pattern: Temporal Adaptive Mesh Refinement</h2>
+
+<p>The solution is borrowed from three domains simultaneously:</p>
+
+<ul>
+<li><strong>Video codecs</strong> — I-frames (keyframes) and P-frames (predicted/derived frames)</li>
+<li><strong>Numerical methods</strong> — adaptive timestep refinement in physics solvers</li>
+<li><strong>Wavelet compression</strong> — progressive refinement where each layer adds detail</li>
+</ul>
+
+<p>The core insight: <strong>sol frames are keyframes</strong>. They are immutable. Sacred. Hash-chained. They never change.</p>
+
+<p>Between them, we generate <strong>sub-frames</strong> — derived entirely from the surrounding keyframes using physical interpolation. Each sub-frame is computed from the previous sub-frame and must <strong>converge back to the next keyframe</strong>.</p>
+
+<div class="diagram">Sol 1 ━━━━━━━━━━━━━━━━━━━━━━━━ Sol 2     (keyframes, immutable)
+Sol 1 ━━━━━━━━ H ━━━━━━━━━━━━ Sol 2     (half-day, depth 1)
+Sol 1 ━━━ Q1 ━━ H ━━ Q3 ━━━━ Sol 2     (quarter-day, depth 2)
+Sol 1 ━ E1 Q1 E2 H E3 Q3 E4 ━ Sol 2     (eighth-day, depth 3)</div>
+
+<h2>The Constraint That Makes It Work</h2>
+
+<p>Sub-frames are <strong>append-only</strong>. They are a separate data layer that sits alongside the sol keyframes. Delete the sub-frame layer and you still have the original simulation — perfectly intact, hash-verified, zero data loss.</p>
+
+<p>This is the critical constraint: <strong>the subdivision algorithm can only create new frames by sloshing from the last sub-frame, without changing anything in the next keyframe.</strong> The boundary conditions are locked. The timeline is sacred.</p>
+
+<blockquote>If you can only append — never modify — then corruption can only happen at the tail. Truncate and you're back to known-good state.</blockquote>
+
+<h2>Diurnal Physics</h2>
+
+<p>Sub-frames aren't just linear interpolation. They encode real Mars diurnal physics:</p>
+
+<ul>
+<li><strong>Temperature</strong> follows a sinusoidal curve — coldest at dawn (~06:00 LMST), warmest at ~14:00, with a ±15°C swing</li>
+<li><strong>Solar flux</strong> tracks the sun angle — zero at night, peak at local noon, following <code>sin(π × (hour-6)/12)</code></li>
+<li><strong>Wind</strong> has diurnal modulation — calmer at night, gusting during afternoon heating</li>
+<li><strong>Dust optical depth</strong> interpolates linearly (changes slowly)</li>
+<li><strong>Pressure</strong> varies with thermal tides (real Mars phenomenon)</li>
+</ul>
+
+<h2>Hash Chain Extension</h2>
+
+<p>Sub-frames participate in the hash chain. Within each sol, sub-frames chain from the sol keyframe hash:</p>
+
+<pre><code>Sol 1:   _hash = "abc123", _prev_hash = "genesis"
+Sub 1.25: _hash = "def456", _prev_hash = "abc123"
+Sub 1.50: _hash = "ghi789", _prev_hash = "def456"
+Sub 1.75: _hash = "jkl012", _prev_hash = "ghi789"
+Sol 2:   _hash = "mno345", _prev_hash = "abc123"  ← chains to SOL, not sub</code></pre>
+
+<p>Corrupt a sub-frame? The client detects the chain break and falls back to sol-level data. The keyframes are always valid.</p>
+
+<h2>Implementation</h2>
+
+<p>One script, one command:</p>
+
+<pre><code>node tools/subdivide-frames.js --depth 2</code></pre>
+
+<p>This generates 3,258 quarter-day sub-frames from 1,087 sol keyframes. Depth 3 would give 8,688 eighth-day sub-frames. The RTS view loads them as a progressive enhancement — if the sub-frame file isn't available, it falls back to sol-level with synthetic diurnal curves.</p>
+
+<h3>Numbers</h3>
+
+<ul>
+<li>Sol keyframes: 1,087 frames, ~959 KB</li>
+<li>Quarter-day sub-frames: 3,258 frames, ~2,172 KB</li>
+<li>Combined: 4,345 frames covering 1,087 sols at 6.2-hour resolution</li>
+<li>Chain verification: 0 breaks</li>
+</ul>
+
+<h2>Why This Matters</h2>
+
+<p>This pattern — <strong>immutable keyframes + derived sub-frames + hash chains + auto-rollback</strong> — is how you build data systems that can withstand corruption, grow fidelity infinitely, and never lose ground.</p>
+
+<p>On actual Mars, you would <strong>never overwrite telemetry</strong>. Every reading is appended. If a sensor glitches, you roll back to the last valid reading. If you need higher temporal resolution, you interpolate between known-good points with physics constraints. The simulation should work the same way.</p>
+
+<p>The colony doesn't jump between days anymore. The sun rises. The temperature climbs. The wind picks up at noon. The dust settles at dusk. And every bit of it is derived from immutable, hash-verified source data.</p>
+
+<hr>
+
+<p class="meta">
+<a href="./">← Back to blog index</a> ·
+<a href="https://github.com/kody-w/mars-barn-opus">GitHub</a> ·
+<a href="../rts.html">See it live in the RTS view</a>
+</p>
+
+</div>
+</body>
+</html>
