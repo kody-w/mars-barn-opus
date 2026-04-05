@@ -1,0 +1,62 @@
+{
+  "sol": 950,
+  "utc": "2028-03-11T03:00:00Z",
+  "mars": {
+    "ls": 264.8,
+    "season": "Northern Autumn",
+    "temp_k": 219.2,
+    "temp_c": -54.0,
+    "pressure_pa": 710,
+    "solar_wm2": 492,
+    "dust_tau": 0.414,
+    "wind_ms": 3.3,
+    "lmst": 21.9
+  },
+  "events": [
+    {
+      "type": "workload_overload",
+      "severity": 0.55,
+      "duration_sols": 19,
+      "min_crew": 3,
+      "desc": "Maintenance backlog \u2014 insufficient crew for concurrent tasks"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0137
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0083
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 13.1,
+    "window_open": false,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.63,
+    "water_ice_depth_m": 1.7,
+    "surface_radiation_usv": 0.47
+  },
+  "challenge": {
+    "id": "sol950_software_watchdog_reset",
+    "type": "software_watchdog_reset",
+    "params": {
+      "subsystem": "thermal",
+      "reboot_count": 1,
+      "memory_errors": 12
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 949,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -2.8,
+    "dust_delta": -0.01
+  },
+  "_hash": "4590f712ccf42f60"
+}
