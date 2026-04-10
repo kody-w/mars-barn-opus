@@ -60,6 +60,21 @@ const WORKLOAD_STRESS_MULTIPLIER = 1.5; // stress amplifier under high workload
 const CREW_MIN_STABLE = 4; // minimum crew for psychological stability (small group dynamics research)
 const MORALE_PRODUCTIVITY_FACTOR = 0.8; // productivity loss coefficient from low morale
 
+// v15 Site-Specific Geology Physics - Real NASA geological site characterization data
+// Data sources: Phoenix WCL (0.4-0.6 wt% perchlorate), NASA SWIM ice mapping, Mars Reconnaissance Orbiter SHARAD radar
+// Arcadia Planitia: 10-30m ice depth, 300-400 kPa bearing strength
+// Jezero Crater: ancient lakebed, minimal surface ice, varied regolith composition
+// Hellas Basin: thickest atmosphere, lowest elevation, different resource profile
+
+// Physical constants (NASA mission data & geological surveys)
+const PERCHLORATE_BASELINE_WT_PCT = 0.5; // 0.4-0.6 wt% (Phoenix/Curiosity baseline)
+const ICE_DEPTH_NOMINAL_M = 1.5; // meters to water ice (nominal frame value)
+const REGOLITH_BEARING_STRENGTH_KPA = 350; // 300-400 kPa baseline (Phoenix mechanical analysis)
+const REGOLITH_HARDNESS_BASELINE = 0.75; // dimensionless hardness factor (0-1 scale)
+const SLOPE_STABILITY_THRESHOLD = 7; // degrees maximum safe slope for construction (NASA landing site criteria)
+const FOUNDATION_DEPTH_REQUIREMENT_M = 0.8; // meters depth required for stable foundation
+const ISRU_REGOLITH_EFFICIENCY_FACTOR = 0.15; // efficiency modifier per geological parameter deviation
+
 function rng32(s){let t=s&0xFFFFFFFF;return()=>{t=(t*1664525+1013904223)&0xFFFFFFFF;return(t>>>0)/0xFFFFFFFF}}
 function solIrr(sol,dust){const y=sol%669,a=2*Math.PI*(y-445)/669;return 589*(1+0.09*Math.cos(a))*Math.max(0.3,Math.cos(2*Math.PI*y/669)*0.5+0.5)*(dust?0.25:1)}
 
@@ -84,6 +99,82 @@ function sabatierReactionRate(catalyst_temp, co2_pressure, catalyst_efficiency, 
   const base_h2o_rate = 0.26; // kg/hr (reduced from 0.5 to match legacy)
   
   return base_h2o_rate * temp_factor * pressure_factor * power_factor * catalyst_efficiency;
+}
+
+// v15 Site-Specific Geology Functions
+function calculateSiteGeologyEffects(frame, st, R) {
+  // Site-specific geological parameters from frame.terrain data
+  const regolith_hardness = frame.terrain?.regolith_hardness ?? REGOLITH_HARDNESS_BASELINE;
+  const ice_depth_m = frame.terrain?.water_ice_depth_m ?? ICE_DEPTH_NOMINAL_M;
+  const slope_degrees = frame.terrain?.slope_degrees ?? 2.0; // Most frames don't have slope, assume safe
+  const perchlorate_wt_pct = frame.terrain?.perchlorate_wt_pct ?? PERCHLORATE_BASELINE_WT_PCT;
+  
+  let site_efficiency_modifier = 1.0;
+  let construction_penalty = 0.0;
+  let isru_geology_modifier = 1.0;
+  
+  // Regolith hardness affects excavation and foundation work
+  // Harder regolith = more power for excavation, but better foundation stability
+  const hardness_deviation = regolith_hardness - REGOLITH_HARDNESS_BASELINE;
+  if (Math.abs(hardness_deviation) > 0.1) {
+    // Power cost for harder excavation (>0.85 hardness), savings for easier (<0.65 hardness)
+    const excavation_power_cost = hardness_deviation * 15; // ±15 power per 0.1 hardness deviation
+    st.power = Math.max(0, st.power - excavation_power_cost);
+    
+    // Foundation stability bonus for harder regolith
+    if (regolith_hardness > 0.85) {
+      construction_penalty -= 0.02; // 2% construction efficiency bonus for hard regolith
+    } else if (regolith_hardness < 0.65) {
+      construction_penalty += 0.03; // 3% construction penalty for soft regolith
+    }
+  }
+  
+  // Ice depth affects water extraction efficiency and foundation challenges
+  // Shallow ice (< 1m) = easy ISRU but foundation instability
+  // Deep ice (> 3m) = harder ISRU but stable foundations
+  if (ice_depth_m < 1.0) {
+    // Easy water access, but ground ice creates foundation instability
+    isru_geology_modifier += 0.15; // 15% water extraction bonus
+    construction_penalty += 0.05; // 5% construction penalty from unstable ice-rich ground
+  } else if (ice_depth_m > 3.0) {
+    // Difficult water access, but stable deep foundations
+    isru_geology_modifier -= 0.1; // 10% water extraction penalty
+    construction_penalty -= 0.03; // 3% construction bonus from stable ground
+  }
+  
+  // Slope stability affects construction safety and equipment placement
+  if (slope_degrees > SLOPE_STABILITY_THRESHOLD) {
+    // Unsafe slopes require additional foundation work and equipment stability measures
+    const slope_excess = slope_degrees - SLOPE_STABILITY_THRESHOLD;
+    construction_penalty += slope_excess * 0.02; // 2% penalty per degree above safe threshold
+    
+    // Risk of equipment sliding/tipping
+    if (R() < slope_excess * 0.01) { // 1% probability per excess degree
+      st.power = Math.max(0, st.power - 10); // Power lost to securing/recovering equipment
+      site_efficiency_modifier *= 0.95; // 5% efficiency loss from difficult terrain
+    }
+  }
+  
+  // Perchlorate concentration affects equipment corrosion and ISRU chemistry
+  const perchlorate_deviation = Math.abs(perchlorate_wt_pct - PERCHLORATE_BASELINE_WT_PCT);
+  if (perchlorate_deviation > 0.1) { // >0.1 wt% deviation from nominal
+    // High perchlorates = more corrosion, but potential for ISRU oxidant extraction
+    if (perchlorate_wt_pct > PERCHLORATE_BASELINE_WT_PCT) {
+      // High perchlorate sites
+      st.ie = Math.max(0.3, st.ie - perchlorate_deviation * 0.05); // Corrosion damage to infrastructure
+      isru_geology_modifier += perchlorate_deviation * 0.1; // Oxidant availability bonus for advanced ISRU
+    } else {
+      // Low perchlorate sites (rare on Mars)
+      st.ie = Math.max(0.3, st.ie + perchlorate_deviation * 0.02); // Reduced corrosion
+      isru_geology_modifier -= perchlorate_deviation * 0.05; // Reduced oxidant availability
+    }
+  }
+  
+  return {
+    site_efficiency_modifier,
+    construction_penalty,
+    isru_geology_modifier
+  };
 }
 
 function electrolysisRate(h2o_available_kg, power_kw, electrode_efficiency, electrode_temp) {
@@ -770,9 +861,177 @@ function tick(st, sol, frame, R){
           st.power = Math.max(0, st.power - cooling_efficiency_factor * 60);
         }
       }
+      
+      // ═══ v15 Site-Specific Geology hazards ═══
+      
+      if(h.type==='regolith_bearing_failure'){
+        // Regolith bearing capacity insufficient for infrastructure load - foundation failure
+        const bearing_stress_kpa = h.bearing_stress_kpa || 280; // Stress level from frame
+        const safety_factor = REGOLITH_BEARING_STRENGTH_KPA / bearing_stress_kpa; // 350 kPa baseline strength
+        
+        if(safety_factor < 1.5) { // Insufficient safety factor for Mars engineering standards
+          // Infrastructure damage from foundation settling/failure
+          const damage_severity = Math.max(0.1, 2.0 - safety_factor); // 1.0 = 100% damage when safety factor = 1.0
+          st.ie = Math.max(0.1, st.ie * (1 - damage_severity * 0.2)); // Up to 20% infrastructure efficiency loss
+          st.power = Math.max(0, st.power - damage_severity * 25); // Power cost for emergency repairs
+          
+          // Risk of catastrophic module failure
+          if(R() < (h.failure_probability || damage_severity * 0.05)) {
+            // Module foundation collapse
+            if(st.mod.length > 2) { // Don't destroy last modules
+              st.mod.splice(Math.floor(R() * st.mod.length), 1); // Remove one module
+              st.power = Math.max(0, st.power - 50); // Major power cost for cleanup/reconstruction
+            }
+          }
+        }
+      }
+      
+      if(h.type==='subsurface_ice_instability'){
+        // Ground ice thaw/freeze cycles create foundation instability and construction challenges
+        const ice_depth_m = h.ice_depth_m || 1.5; // Ice depth from frame terrain data
+        const thermal_variation_k = h.thermal_variation_k || 15; // Daily thermal variation
+        
+        if(ice_depth_m < 2.0 && thermal_variation_k > 10) { // Shallow ice + high thermal stress
+          // Foundation instability from ice volume changes
+          const instability_factor = (2.0 - ice_depth_m) * (thermal_variation_k / 10.0);
+          st.ie = Math.max(0.2, st.ie - instability_factor * 0.03); // 3% efficiency loss per instability factor
+          
+          // Construction delays and power costs for stabilization
+          st.power = Math.max(0, st.power - instability_factor * 8); // Power for thermal management and foundation work
+          
+          // Risk of water extraction equipment damage from ground shifting
+          if(R() < instability_factor * 0.02) {
+            st.h2o = Math.max(0, st.h2o * 0.9); // 10% water production loss from damaged ISRU
+            st.ie = Math.max(0.1, st.ie * 0.95); // 5% infrastructure damage
+          }
+        }
+      }
+      
+      if(h.type==='enhanced_perchlorate_corrosion'){
+        // Site-specific perchlorate concentration creates enhanced corrosion beyond baseline levels
+        const perchlorate_wt_pct = h.perchlorate_wt_pct || PERCHLORATE_BASELINE_WT_PCT;
+        const humidity_factor = h.humidity_factor || 1.0; // Enhanced corrosion in humid conditions
+        
+        // Enhanced corrosion rate for sites with >0.6 wt% perchlorate (above Phoenix baseline)
+        if(perchlorate_wt_pct > 0.6) {
+          const corrosion_enhancement = (perchlorate_wt_pct - 0.6) * humidity_factor;
+          
+          // Accelerated degradation of seals, electronics, and metal components
+          st.ie = Math.max(0.2, st.ie - corrosion_enhancement * 0.04); // 4% efficiency loss per 0.1 wt% excess
+          st.se = Math.max(0.2, st.se - corrosion_enhancement * 0.02); // 2% solar efficiency loss from corrosion
+          
+          // Maintenance power cost for corrosion protection and replacement
+          st.power = Math.max(0, st.power - corrosion_enhancement * 12); // Power for maintenance and protective measures
+          
+          // Risk of critical system failure from corrosion
+          if(R() < corrosion_enhancement * 0.03) {
+            // Random system failure from corrosion damage
+            const failure_type = Math.floor(R() * 3);
+            if(failure_type === 0) {
+              // Life support seal failure
+              st.o2 = Math.max(0, st.o2 * 0.8); // 20% O₂ loss from seal breach
+            } else if(failure_type === 1) {
+              // Power system corrosion
+              st.power = Math.max(0, st.power * 0.85); // 15% power system damage
+            } else {
+              // ISRU system corrosion
+              st.h2o = Math.max(0, st.h2o * 0.85); // 15% water production loss
+            }
+          }
+        }
+      }
+      
+      if(h.type==='slope_instability_hazard'){
+        // Construction and operations on unstable slopes create safety and efficiency challenges
+        const slope_degrees = h.slope_degrees || 5; // Slope angle from terrain data
+        const regolith_cohesion = h.regolith_cohesion || 0.7; // Soil cohesion factor
+        
+        if(slope_degrees > SLOPE_STABILITY_THRESHOLD) { // >7 degrees unsafe
+          const slope_hazard_factor = (slope_degrees - SLOPE_STABILITY_THRESHOLD) * (1.0 - regolith_cohesion + 0.5);
+          
+          // Reduced construction and operational efficiency on unstable terrain
+          st.se = Math.max(0.2, st.se - slope_hazard_factor * 0.025); // 2.5% efficiency loss per hazard factor
+          st.ie = Math.max(0.2, st.ie - slope_hazard_factor * 0.02); // 2% infrastructure efficiency loss
+          
+          // Power cost for slope stabilization and safety measures
+          st.power = Math.max(0, st.power - slope_hazard_factor * 6); // Power for slope engineering
+          
+          // Risk of equipment damage or loss from slope failure
+          if(R() < slope_hazard_factor * 0.02) {
+            // Slope failure damages or destroys equipment
+            const damage_type = Math.floor(R() * 4);
+            if(damage_type === 0) {
+              // Solar array damaged by sliding equipment
+              st.se = Math.max(0.1, st.se * 0.9); // 10% solar efficiency loss
+            } else if(damage_type === 1) {
+              // ISRU equipment damaged
+              st.ie = Math.max(0.1, st.ie * 0.9); // 10% infrastructure efficiency loss
+            } else if(damage_type === 2) {
+              // Power cable severed by slope movement
+              st.power = Math.max(0, st.power - 20); // Power loss from damaged systems
+            } else {
+              // Crew/robot equipment loss
+              const robots = st.crew.filter(c=>c.a&&c.bot&&c.hp>0);
+              if(robots.length > 3) { // Only damage if sufficient robots
+                robots[Math.floor(R()*robots.length)].hp -= 15; // Robot damaged by slope hazard
+              }
+            }
+          }
+        }
+      }
+      
+      if(h.type==='geological_isru_inefficiency'){
+        // Site-specific geology reduces ISRU efficiency below optimal laboratory conditions
+        const geology_factor = h.geology_efficiency_factor || 0.85; // Site geology efficiency (0.8-1.0 typical range)
+        const mineral_content_variation = h.mineral_content_variation || 0.1; // Geological variation factor
+        
+        // Reduced ISRU efficiency from non-optimal geological conditions
+        if(geology_factor < 0.95) { // Below near-optimal geology
+          const efficiency_reduction = (0.95 - geology_factor) * (1 + mineral_content_variation);
+          
+          // Direct ISRU production penalties
+          st.ie = Math.max(0.3, st.ie * (1 - efficiency_reduction)); // Direct ISRU efficiency impact
+          st.h2o = Math.max(0, st.h2o * (1 - efficiency_reduction * 0.5)); // Water extraction penalty
+          st.o2 = Math.max(0, st.o2 * (1 - efficiency_reduction * 0.3)); // O₂ production penalty from reduced feedstock quality
+          
+          // Power cost for additional processing and purification
+          st.power = Math.max(0, st.power - efficiency_reduction * 20); // Extra power for geological challenges
+        }
+        
+        // Unexpected geological variations can cause temporary ISRU shutdowns
+        if(R() < mineral_content_variation * 0.05) { // 5% base probability per 0.1 variation factor
+          st.ie = Math.max(0.1, st.ie * 0.8); // 20% temporary efficiency loss
+          st.power = Math.max(0, st.power - 15); // Power cost for ISRU system reconfiguration
+        }
+      }
     }
   }
   st.ev=st.ev.filter(e=>{e.r--;return e.r>0});
+
+  // ═══ v15 Site-Specific Geology Effects ═══
+  // Apply ongoing geological effects based on terrain data in frame
+  if(frame && frame.terrain) {
+    const geology_effects = calculateSiteGeologyEffects(frame, st, R);
+    
+    // Apply site efficiency modifier
+    st.se = Math.max(0.1, st.se * geology_effects.site_efficiency_modifier);
+    st.ie = Math.max(0.1, st.ie * geology_effects.site_efficiency_modifier);
+    
+    // Apply construction penalty/bonus
+    if(geology_effects.construction_penalty !== 0) {
+      st.ie = Math.max(0.1, st.ie * (1 - geology_effects.construction_penalty));
+      
+      // Power cost/savings from geological construction challenges/advantages
+      const geology_power_cost = geology_effects.construction_penalty * 100;
+      st.power = Math.max(0, st.power - geology_power_cost);
+    }
+    
+    // Apply ISRU geology modifier to water and oxygen production
+    if(geology_effects.isru_geology_modifier !== 1.0) {
+      st.h2o = Math.max(0, st.h2o * geology_effects.isru_geology_modifier);
+      st.o2 = Math.max(0, st.o2 * geology_effects.isru_geology_modifier);
+    }
+  }
 
   // Random equipment events (CRI-weighted)
   if(R()<0.012*(1+st.cri/80)){st.ie*=(1-0.02);st.power=Math.max(0,st.power-2)}
