@@ -1,0 +1,80 @@
+{
+  "sol": 959,
+  "utc": "2028-03-20T08:56:24Z",
+  "mars": {
+    "ls": 269.5,
+    "season": "Northern Autumn",
+    "temp_k": 222.5,
+    "temp_c": -50.7,
+    "pressure_pa": 710,
+    "solar_wm2": 537,
+    "dust_tau": 0.5,
+    "wind_ms": 3.3,
+    "lmst": 16.2
+  },
+  "events": [
+    {
+      "type": "dust_devil",
+      "severity": 0.39,
+      "duration_sols": 1,
+      "desc": "Dust devil spotted near habitat perimeter"
+    },
+    {
+      "type": "mandatory_eva",
+      "severity": 0.21,
+      "duration_sols": 2,
+      "min_crew": 2,
+      "buddy_required": true,
+      "desc": "External repair requires buddy system (2 crew minimum on EVA)"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0097
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.01
+    },
+    {
+      "type": "electrostatic_dust",
+      "target": "thermal_radiator",
+      "degradation": 0.0031,
+      "desc": "Electrostatic dust adhesion \u2014 charged particles cling to surfaces"
+    },
+    {
+      "type": "workload_wear",
+      "target": "actuator_joint",
+      "degradation_per_missing_crew": 0.0041,
+      "baseline_crew": 4,
+      "desc": "Accelerated wear from understaffing \u2014 fewer crew = more cycles per robot"
+    },
+    {
+      "type": "dust_infiltration",
+      "targets_all_modules": true,
+      "degradation_per_module": 0.003,
+      "desc": "Regolith dust infiltration through module seals \u2014 affects ALL modules"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 12.7,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.63,
+    "water_ice_depth_m": 1.1,
+    "surface_radiation_usv": 0.62
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 958,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -0.6,
+    "dust_delta": 0.064
+  },
+  "_hash": "6349455bc253b541"
+}
