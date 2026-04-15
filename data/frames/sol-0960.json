@@ -1,0 +1,61 @@
+{
+  "sol": 960,
+  "utc": "2028-03-21T09:36:00Z",
+  "mars": {
+    "ls": 270.0,
+    "season": "Northern Winter",
+    "temp_k": 220.5,
+    "temp_c": -52.7,
+    "pressure_pa": 710,
+    "solar_wm2": 547,
+    "dust_tau": 0.493,
+    "wind_ms": 1.7,
+    "lmst": 15.5
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0075
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0099
+    },
+    {
+      "type": "workload_wear",
+      "target": "solar_gimbal",
+      "degradation_per_missing_crew": 0.0058,
+      "baseline_crew": 4,
+      "desc": "Accelerated wear from understaffing \u2014 fewer crew = more cycles per robot"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 12.7,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.86,
+    "water_ice_depth_m": 2.0,
+    "surface_radiation_usv": 0.45
+  },
+  "challenge": {
+    "id": "sol960_actuator_calibration",
+    "type": "actuator_calibration",
+    "params": {
+      "joint": "ankle",
+      "drift_deg": 2.3,
+      "torque_loss_pct": 10
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 959,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -2.0,
+    "dust_delta": -0.007
+  },
+  "_hash": "9bf18ac914cf361d"
+}
