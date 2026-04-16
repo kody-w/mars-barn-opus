@@ -1,0 +1,60 @@
+{
+  "sol": 961,
+  "utc": "2028-03-22T10:15:36Z",
+  "mars": {
+    "ls": 270.6,
+    "season": "Northern Winter",
+    "temp_k": 217.7,
+    "temp_c": -55.4,
+    "pressure_pa": 710,
+    "solar_wm2": 555,
+    "dust_tau": 0.425,
+    "wind_ms": 2.3,
+    "lmst": 14.9
+  },
+  "events": [
+    {
+      "type": "mandatory_eva",
+      "severity": 0.2,
+      "duration_sols": 1,
+      "min_crew": 2,
+      "buddy_required": true,
+      "desc": "External repair requires buddy system (2 crew minimum on EVA)"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.018
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "wheel_assembly",
+      "degradation": 0.0025
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0085
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 12.6,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.72,
+    "water_ice_depth_m": 1.0,
+    "surface_radiation_usv": 0.83
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 960,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -2.8,
+    "dust_delta": -0.068
+  },
+  "_hash": "a9dbb4e1b33c368e"
+}

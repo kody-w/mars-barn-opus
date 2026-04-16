@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "generated": "2026-04-15T07:45:10.918348Z",
-  "total_frames": 863,
+  "generated": "2026-04-16T07:45:36.384069Z",
+  "total_frames": 864,
   "first_sol": 1,
-  "last_sol": 960,
+  "last_sol": 961,
   "frames": [
     {
       "sol": 1,
@@ -4319,6 +4319,11 @@
       "sol": 960,
       "hash": "9bf18ac914cf361d",
       "size": 1080
+    },
+    {
+      "sol": 961,
+      "hash": "a9dbb4e1b33c368e",
+      "size": 997
     }
   ]
 }
