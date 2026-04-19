@@ -1,0 +1,65 @@
+{
+  "sol": 964,
+  "utc": "2028-03-25T12:14:24Z",
+  "mars": {
+    "ls": 272.1,
+    "season": "Northern Winter",
+    "temp_k": 212.7,
+    "temp_c": -60.5,
+    "pressure_pa": 710,
+    "solar_wm2": 569,
+    "dust_tau": 0.462,
+    "wind_ms": 3.6,
+    "lmst": 13.0
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.014
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0092
+    },
+    {
+      "type": "workload_wear",
+      "target": "solar_gimbal",
+      "degradation_per_missing_crew": 0.0056,
+      "baseline_crew": 4,
+      "desc": "Accelerated wear from understaffing \u2014 fewer crew = more cycles per robot"
+    },
+    {
+      "type": "module_cascade_failure",
+      "min_modules": 4,
+      "severity_per_module": 0.0054,
+      "desc": "Cascade failure \u2014 each additional module increases systemic risk"
+    },
+    {
+      "type": "power_grid_overload",
+      "min_modules": 5,
+      "power_drain_per_module": 3.9,
+      "desc": "Power grid strain \u2014 too many modules for available power capacity"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 12.5,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.86,
+    "water_ice_depth_m": 1.3,
+    "surface_radiation_usv": 0.37
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 963,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -0.4,
+    "dust_delta": -0.071
+  },
+  "_hash": "4a7f1a25f991a5a7"
+}
