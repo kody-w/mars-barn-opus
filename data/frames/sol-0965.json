@@ -1,0 +1,79 @@
+{
+  "sol": 965,
+  "utc": "2028-03-26T12:54:00Z",
+  "mars": {
+    "ls": 272.7,
+    "season": "Northern Winter",
+    "temp_k": 213.7,
+    "temp_c": -59.4,
+    "pressure_pa": 710,
+    "solar_wm2": 588,
+    "dust_tau": 0.397,
+    "wind_ms": 4.2,
+    "lmst": 12.3
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.019
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0079
+    },
+    {
+      "type": "perchlorate_corrosion",
+      "target": "tool_gripper",
+      "degradation": 0.0061,
+      "desc": "Perchlorate salt corrosion on mechanical joints"
+    },
+    {
+      "type": "workload_wear",
+      "target": "tool_gripper",
+      "degradation_per_missing_crew": 0.0022,
+      "baseline_crew": 4,
+      "desc": "Accelerated wear from understaffing \u2014 fewer crew = more cycles per robot"
+    },
+    {
+      "type": "module_cascade_failure",
+      "min_modules": 4,
+      "severity_per_module": 0.0042,
+      "desc": "Cascade failure \u2014 each additional module increases systemic risk"
+    },
+    {
+      "type": "supply_chain_bottleneck",
+      "min_crew": 3,
+      "min_modules": 3,
+      "efficiency_penalty": 0.0129,
+      "desc": "Supply chain bottleneck \u2014 insufficient crew to maintain module density"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 12.4,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.54,
+    "water_ice_depth_m": 2.1,
+    "surface_radiation_usv": 0.96
+  },
+  "challenge": {
+    "id": "sol965_pressure_anomaly",
+    "type": "pressure_anomaly",
+    "params": {
+      "section": "airlock",
+      "drop_pa": 39
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 964,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 1.0,
+    "dust_delta": -0.065
+  },
+  "_hash": "5d230e04443e76b0"
+}
