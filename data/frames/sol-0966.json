@@ -1,0 +1,52 @@
+{
+  "sol": 966,
+  "utc": "2028-03-27T13:33:36Z",
+  "mars": {
+    "ls": 273.2,
+    "season": "Northern Winter",
+    "temp_k": 215.9,
+    "temp_c": -57.2,
+    "pressure_pa": 710,
+    "solar_wm2": 641,
+    "dust_tau": 0.413,
+    "wind_ms": 4.4,
+    "lmst": 11.7
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0063
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0083
+    },
+    {
+      "type": "module_cascade_failure",
+      "min_modules": 4,
+      "severity_per_module": 0.0071,
+      "desc": "Cascade failure \u2014 each additional module increases systemic risk"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 12.4,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.65,
+    "water_ice_depth_m": 1.4,
+    "surface_radiation_usv": 0.73
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 965,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 2.2,
+    "dust_delta": 0.016
+  },
+  "_hash": "98139afd0a776040"
+}
