@@ -1,0 +1,59 @@
+{
+  "sol": 969,
+  "utc": "2028-03-30T15:32:24Z",
+  "mars": {
+    "ls": 274.8,
+    "season": "Northern Winter",
+    "temp_k": 221.5,
+    "temp_c": -51.6,
+    "pressure_pa": 710,
+    "solar_wm2": 604,
+    "dust_tau": 0.362,
+    "wind_ms": 5.9,
+    "lmst": 9.8
+  },
+  "events": [],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0132
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0072
+    },
+    {
+      "type": "battery_degradation",
+      "target": "battery_pack",
+      "degradation": 0.0042,
+      "capacity_loss_pct": 0.32,
+      "desc": "Battery capacity loss from cold cycling at -51.6\u00b0C"
+    },
+    {
+      "type": "module_cascade_failure",
+      "min_modules": 4,
+      "severity_per_module": 0.0041,
+      "desc": "Cascade failure \u2014 each additional module increases systemic risk"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 12.2,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.61,
+    "water_ice_depth_m": 1.5,
+    "surface_radiation_usv": 0.82
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 968,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 0.9,
+    "dust_delta": -0.107
+  },
+  "_hash": "d5a24589c6bd67d0"
+}
