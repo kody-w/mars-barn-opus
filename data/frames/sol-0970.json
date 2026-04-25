@@ -1,0 +1,87 @@
+{
+  "sol": 970,
+  "utc": "2028-03-31T16:12:00Z",
+  "mars": {
+    "ls": 275.3,
+    "season": "Northern Winter",
+    "temp_k": 221.0,
+    "temp_c": -52.2,
+    "pressure_pa": 710,
+    "solar_wm2": 560,
+    "dust_tau": 0.438,
+    "wind_ms": 4.2,
+    "lmst": 9.1
+  },
+  "events": [
+    {
+      "type": "workload_overload",
+      "severity": 0.34,
+      "duration_sols": 8,
+      "min_crew": 3,
+      "desc": "Maintenance backlog \u2014 insufficient crew for concurrent tasks"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0133
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "antenna",
+      "degradation": 0.003
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0088
+    },
+    {
+      "type": "critical_solo_failure",
+      "severity": 0.84,
+      "affects": "weakest_crew_member",
+      "hp_damage": 40,
+      "desc": "Major actuator failure \u2014 crew member immobilized. No backup available with small crew."
+    },
+    {
+      "type": "concurrent_maintenance",
+      "min_crew_required": 3,
+      "penalty_if_understaffed": 0.0055,
+      "target": "solar_array",
+      "desc": "Multi-point maintenance \u2014 requires 3-4 crew working simultaneously"
+    },
+    {
+      "type": "supply_chain_bottleneck",
+      "min_crew": 3,
+      "min_modules": 3,
+      "efficiency_penalty": 0.0141,
+      "desc": "Supply chain bottleneck \u2014 insufficient crew to maintain module density"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 12.2,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.53,
+    "water_ice_depth_m": 1.2,
+    "surface_radiation_usv": 0.48
+  },
+  "challenge": {
+    "id": "sol970_radiation_dosimetry",
+    "type": "radiation_dosimetry",
+    "params": {
+      "cumulative_msv": 128,
+      "rate_usv_h": 1.84
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 969,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -0.5,
+    "dust_delta": 0.076
+  },
+  "_hash": "861031a6d54088a4"
+}
