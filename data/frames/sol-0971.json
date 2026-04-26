@@ -1,0 +1,54 @@
+{
+  "sol": 971,
+  "utc": "2028-04-01T16:51:36Z",
+  "mars": {
+    "ls": 275.8,
+    "season": "Northern Winter",
+    "temp_k": 219.0,
+    "temp_c": -54.1,
+    "pressure_pa": 710,
+    "solar_wm2": 564,
+    "dust_tau": 0.501,
+    "wind_ms": 3.8,
+    "lmst": 8.5
+  },
+  "events": [
+    {
+      "type": "workload_overload",
+      "severity": 0.45,
+      "duration_sols": 15,
+      "min_crew": 3,
+      "desc": "Maintenance backlog \u2014 insufficient crew for concurrent tasks"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0177
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.01
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 12.1,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.58,
+    "water_ice_depth_m": 1.8,
+    "surface_radiation_usv": 0.67
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 970,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -2.0,
+    "dust_delta": 0.063
+  },
+  "_hash": "e32475e225df5c0a"
+}
