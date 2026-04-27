@@ -1,0 +1,73 @@
+{
+  "sol": 972,
+  "utc": "2028-04-02T17:31:12Z",
+  "mars": {
+    "ls": 276.3,
+    "season": "Northern Winter",
+    "temp_k": 216.3,
+    "temp_c": -56.9,
+    "pressure_pa": 710,
+    "solar_wm2": 562,
+    "dust_tau": 0.475,
+    "wind_ms": 2.5,
+    "lmst": 7.9
+  },
+  "events": [
+    {
+      "type": "workload_overload",
+      "severity": 0.57,
+      "duration_sols": 7,
+      "min_crew": 3,
+      "desc": "Maintenance backlog \u2014 insufficient crew for concurrent tasks"
+    },
+    {
+      "type": "mandatory_eva",
+      "severity": 0.49,
+      "duration_sols": 1,
+      "min_crew": 2,
+      "buddy_required": true,
+      "desc": "External repair requires buddy system (2 crew minimum on EVA)"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0093
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "solar_array",
+      "degradation": 0.0097
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0095
+    },
+    {
+      "type": "perchlorate_corrosion",
+      "target": "wheel_bearing",
+      "degradation": 0.0079,
+      "desc": "Perchlorate salt corrosion on mechanical joints"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 12.1,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.5,
+    "water_ice_depth_m": 1.0,
+    "surface_radiation_usv": 0.99
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 971,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -2.7,
+    "dust_delta": -0.026
+  },
+  "_hash": "eefd7d563b2b0dcb"
+}
