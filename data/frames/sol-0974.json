@@ -1,0 +1,61 @@
+{
+  "sol": 974,
+  "utc": "2028-04-04T18:50:24Z",
+  "mars": {
+    "ls": 277.4,
+    "season": "Northern Winter",
+    "temp_k": 211.7,
+    "temp_c": -61.5,
+    "pressure_pa": 710,
+    "solar_wm2": 537,
+    "dust_tau": 0.429,
+    "wind_ms": 1.7,
+    "lmst": 6.6
+  },
+  "events": [
+    {
+      "type": "mandatory_eva",
+      "severity": 0.32,
+      "duration_sols": 3,
+      "min_crew": 2,
+      "buddy_required": true,
+      "desc": "External repair requires buddy system (2 crew minimum on EVA)"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0142
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0086
+    },
+    {
+      "type": "electrostatic_dust",
+      "target": "antenna_feed",
+      "degradation": 0.0016,
+      "desc": "Electrostatic dust adhesion \u2014 charged particles cling to surfaces"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 12.0,
+    "window_open": true,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.56,
+    "water_ice_depth_m": 2.1,
+    "surface_radiation_usv": 0.53
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 973,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -1.9,
+    "dust_delta": 0.011
+  },
+  "_hash": "03b8507716bd4dc1"
+}
