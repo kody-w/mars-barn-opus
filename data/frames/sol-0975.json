@@ -1,0 +1,73 @@
+{
+  "sol": 975,
+  "utc": "2028-04-05T19:30:00Z",
+  "mars": {
+    "ls": 277.9,
+    "season": "Northern Winter",
+    "temp_k": 211.2,
+    "temp_c": -62.0,
+    "pressure_pa": 710,
+    "solar_wm2": 521,
+    "dust_tau": 0.533,
+    "wind_ms": 3.2,
+    "lmst": 5.9
+  },
+  "events": [
+    {
+      "type": "dust_devil",
+      "severity": 0.17,
+      "duration_sols": 1,
+      "desc": "Dust devil spotted near habitat perimeter"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0057
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0107
+    },
+    {
+      "type": "electrostatic_dust",
+      "target": "solar_array",
+      "degradation": 0.0026,
+      "desc": "Electrostatic dust adhesion \u2014 charged particles cling to surfaces"
+    },
+    {
+      "type": "supply_chain_bottleneck",
+      "min_crew": 3,
+      "min_modules": 3,
+      "efficiency_penalty": 0.0116,
+      "desc": "Supply chain bottleneck \u2014 insufficient crew to maintain module density"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 11.9,
+    "window_open": false,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.78,
+    "water_ice_depth_m": 1.7,
+    "surface_radiation_usv": 0.43
+  },
+  "challenge": {
+    "id": "sol975_solar_tracking_fault",
+    "type": "solar_tracking_fault",
+    "params": {
+      "misalignment_deg": 19.9,
+      "dust_factor": 1.1
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 974,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -0.5,
+    "dust_delta": 0.104
+  },
+  "_hash": "0fa24f918d026bb6"
+}
