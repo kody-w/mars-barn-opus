@@ -1,0 +1,64 @@
+{
+  "sol": 977,
+  "utc": "2028-04-07T20:49:12Z",
+  "mars": {
+    "ls": 278.9,
+    "season": "Northern Winter",
+    "temp_k": 214.3,
+    "temp_c": -58.8,
+    "pressure_pa": 710,
+    "solar_wm2": 517,
+    "dust_tau": 0.387,
+    "wind_ms": 4.6,
+    "lmst": 4.7
+  },
+  "events": [
+    {
+      "type": "comms_blackout",
+      "severity": 0.69,
+      "duration_sols": 10,
+      "desc": "Solar conjunction \u2014 Earth comms degraded or lost"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0146
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "wheel_assembly",
+      "degradation": 0.0025
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0077
+    },
+    {
+      "type": "module_cascade_failure",
+      "min_modules": 4,
+      "severity_per_module": 0.0035,
+      "desc": "Cascade failure \u2014 each additional module increases systemic risk"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 11.8,
+    "window_open": false,
+    "bandwidth_kbps": 16
+  },
+  "terrain": {
+    "regolith_hardness": 0.86,
+    "water_ice_depth_m": 1.5,
+    "surface_radiation_usv": 0.85
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 976,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 2.1,
+    "dust_delta": -0.064
+  },
+  "_hash": "54dd2a7f4fa27a38"
+}
