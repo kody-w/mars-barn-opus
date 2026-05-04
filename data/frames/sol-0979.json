@@ -1,58 +1,52 @@
 {
   "sol": 979,
-  "version": 10,
-  "name": "System Dependency Graph",
-  "environment": {
-    "temperature_k": 226.8,
-    "temperature_c": -46.3,
-    "pressure_pa": 644.8,
-    "solar_irradiance": 575.2,
-    "dust_storm": false,
-    "solar_longitude": 166.8,
-    "season": "Northern Summer",
-    "wind_speed_ms": 4.914498656094916
+  "utc": "2028-04-09T22:08:24Z",
+  "mars": {
+    "ls": 280.0,
+    "season": "Northern Winter",
+    "temp_k": 219.0,
+    "temp_c": -54.1,
+    "pressure_pa": 710,
+    "solar_wm2": 529,
+    "dust_tau": 0.469,
+    "wind_ms": 6.1,
+    "lmst": 3.4
   },
-  "hazards": [],
   "events": [],
-  "challenges": [],
-  "system_dependencies": {
-    "description": "v10 implements real system interdependencies based on ISS ECLSS",
-    "dependency_graph": {
-      "water_recycler": [
-        "humidity_control",
-        "greenhouse_irrigation"
-      ],
-      "humidity_control": [
-        "greenhouse_transpiration",
-        "crew_comfort"
-      ],
-      "greenhouse": [
-        "o2_production_biological",
-        "food_production"
-      ],
-      "power_grid": [
-        "all_systems"
-      ],
-      "isru": [
-        "o2_production_chemical",
-        "h2o_production"
-      ],
-      "thermal": [
-        "crew_life_support",
-        "equipment_efficiency"
-      ]
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0062
     },
-    "data_sources": [
-      "ISS Environmental Control and Life Support System (ECLSS)",
-      "NASA FMEA database for space systems",
-      "Apollo 13 failure cascade timeline",
-      "ISS maintenance logs and failure reports"
-    ]
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0094
+    },
+    {
+      "type": "regolith_abrasion",
+      "target": "nav_camera",
+      "degradation": 0.0067,
+      "desc": "Fine regolith abrasion on optical surfaces"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 11.7,
+    "window_open": false,
+    "bandwidth_kbps": 16
   },
-  "physics_constants": {
-    "cascade_propagation_delay": "1-3 sols (realistic system response time)",
-    "micro_failure_threshold": "1.0 accumulated stress units",
-    "system_interdependency": "Binary dependency graph with severity multipliers",
-    "repair_complexity": "Scales with number of affected systems"
-  }
+  "terrain": {
+    "regolith_hardness": 0.66,
+    "water_ice_depth_m": 2.2,
+    "surface_radiation_usv": 0.65
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 978,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 2.1,
+    "dust_delta": 0.048
+  },
+  "_hash": "d8a413ccaa53964e"
 }
