@@ -1,70 +1,59 @@
 {
   "sol": 980,
-  "version": 10,
-  "name": "System Dependency Graph",
-  "environment": {
-    "temperature_k": 226.6,
-    "temperature_c": -46.6,
-    "pressure_pa": 643.4,
-    "solar_irradiance": 592.4,
-    "dust_storm": false,
-    "solar_longitude": 167.4,
-    "season": "Northern Summer",
-    "wind_speed_ms": 5.357997266083429
+  "utc": "2028-04-10T22:48:00Z",
+  "mars": {
+    "ls": 280.5,
+    "season": "Northern Winter",
+    "temp_k": 220.0,
+    "temp_c": -53.1,
+    "pressure_pa": 711,
+    "solar_wm2": 511,
+    "dust_tau": 0.452,
+    "wind_ms": 5.0,
+    "lmst": 2.7
   },
-  "hazards": [],
   "events": [],
-  "challenges": [
+  "hazards": [
     {
-      "type": "apollo_13_scenario",
-      "description": "Oxygen tank failure - execute emergency procedures",
-      "time_limit_sols": 3,
-      "required_actions": [
-        "power_conservation",
-        "thermal_management",
-        "co2_scrubbing"
-      ],
-      "failure_penalty": "crew_hp_loss"
+      "type": "micrometeorite",
+      "probability": 0.0085
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.009
+    },
+    {
+      "type": "dust_infiltration",
+      "targets_all_modules": true,
+      "degradation_per_module": 0.0027,
+      "desc": "Regolith dust infiltration through module seals \u2014 affects ALL modules"
     }
   ],
-  "system_dependencies": {
-    "description": "v10 implements real system interdependencies based on ISS ECLSS",
-    "dependency_graph": {
-      "water_recycler": [
-        "humidity_control",
-        "greenhouse_irrigation"
-      ],
-      "humidity_control": [
-        "greenhouse_transpiration",
-        "crew_comfort"
-      ],
-      "greenhouse": [
-        "o2_production_biological",
-        "food_production"
-      ],
-      "power_grid": [
-        "all_systems"
-      ],
-      "isru": [
-        "o2_production_chemical",
-        "h2o_production"
-      ],
-      "thermal": [
-        "crew_life_support",
-        "equipment_efficiency"
-      ]
-    },
-    "data_sources": [
-      "ISS Environmental Control and Life Support System (ECLSS)",
-      "NASA FMEA database for space systems",
-      "Apollo 13 failure cascade timeline",
-      "ISS maintenance logs and failure reports"
-    ]
+  "comms": {
+    "earth_delay_min": 11.7,
+    "window_open": false,
+    "bandwidth_kbps": 16
   },
-  "physics_constants": {
-    "cascade_propagation_delay": "1-3 sols (realistic system response time)",
-    "micro_failure_threshold": "1.0 accumulated stress units",
-    "system_interdependency": "Binary dependency graph with severity multipliers",
-    "repair_complexity": "Scales with number of affected systems"
-  }
+  "terrain": {
+    "regolith_hardness": 0.54,
+    "water_ice_depth_m": 1.8,
+    "surface_radiation_usv": 0.32
+  },
+  "challenge": {
+    "id": "sol980_radiation_dosimetry",
+    "type": "radiation_dosimetry",
+    "params": {
+      "cumulative_msv": 225,
+      "rate_usv_h": 0.66
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 979,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 1.0,
+    "dust_delta": -0.017
+  },
+  "_hash": "770e6ff0e1e61253"
 }
