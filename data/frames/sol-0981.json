@@ -1,58 +1,60 @@
 {
   "sol": 981,
-  "version": 10,
-  "name": "System Dependency Graph",
-  "environment": {
-    "temperature_k": 226.3,
-    "temperature_c": -46.9,
-    "pressure_pa": 642.0,
-    "solar_irradiance": 600.8,
-    "dust_storm": false,
-    "solar_longitude": 167.9,
-    "season": "Northern Summer",
-    "wind_speed_ms": 10.74279615554857
+  "utc": "2028-04-11T23:27:36Z",
+  "mars": {
+    "ls": 281.0,
+    "season": "Northern Winter",
+    "temp_k": 219.5,
+    "temp_c": -53.7,
+    "pressure_pa": 711,
+    "solar_wm2": 494,
+    "dust_tau": 0.348,
+    "wind_ms": 5.8,
+    "lmst": 2.1
   },
-  "hazards": [],
   "events": [],
-  "challenges": [],
-  "system_dependencies": {
-    "description": "v10 implements real system interdependencies based on ISS ECLSS",
-    "dependency_graph": {
-      "water_recycler": [
-        "humidity_control",
-        "greenhouse_irrigation"
-      ],
-      "humidity_control": [
-        "greenhouse_transpiration",
-        "crew_comfort"
-      ],
-      "greenhouse": [
-        "o2_production_biological",
-        "food_production"
-      ],
-      "power_grid": [
-        "all_systems"
-      ],
-      "isru": [
-        "o2_production_chemical",
-        "h2o_production"
-      ],
-      "thermal": [
-        "crew_life_support",
-        "equipment_efficiency"
-      ]
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0108
     },
-    "data_sources": [
-      "ISS Environmental Control and Life Support System (ECLSS)",
-      "NASA FMEA database for space systems",
-      "Apollo 13 failure cascade timeline",
-      "ISS maintenance logs and failure reports"
-    ]
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.007
+    },
+    {
+      "type": "battery_degradation",
+      "target": "battery_pack",
+      "degradation": 0.0044,
+      "capacity_loss_pct": 0.28,
+      "desc": "Battery capacity loss from cold cycling at -53.7\u00b0C"
+    },
+    {
+      "type": "workload_wear",
+      "target": "wheel_bearing",
+      "degradation_per_missing_crew": 0.0024,
+      "baseline_crew": 4,
+      "desc": "Accelerated wear from understaffing \u2014 fewer crew = more cycles per robot"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 11.6,
+    "window_open": false,
+    "bandwidth_kbps": 16
   },
-  "physics_constants": {
-    "cascade_propagation_delay": "1-3 sols (realistic system response time)",
-    "micro_failure_threshold": "1.0 accumulated stress units",
-    "system_interdependency": "Binary dependency graph with severity multipliers",
-    "repair_complexity": "Scales with number of affected systems"
-  }
+  "terrain": {
+    "regolith_hardness": 0.79,
+    "water_ice_depth_m": 1.6,
+    "surface_radiation_usv": 0.72
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 980,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -0.5,
+    "dust_delta": -0.104
+  },
+  "_hash": "0a454653f9fbf4a8"
 }
