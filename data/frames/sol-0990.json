@@ -1,65 +1,54 @@
 {
   "sol": 990,
-  "version": 10,
-  "name": "System Dependency Graph",
-  "environment": {
-    "temperature_k": 223.8,
-    "temperature_c": -49.4,
-    "pressure_pa": 629.3,
-    "solar_irradiance": 567.0,
-    "dust_storm": false,
-    "solar_longitude": 172.7,
-    "season": "Northern Summer",
-    "wind_speed_ms": 13.632318519256687
+  "utc": "2028-04-21T05:24:00Z",
+  "mars": {
+    "ls": 285.8,
+    "season": "Northern Winter",
+    "temp_k": 217.5,
+    "temp_c": -55.7,
+    "pressure_pa": 711,
+    "solar_wm2": 565,
+    "dust_tau": 0.422,
+    "wind_ms": 6.7,
+    "lmst": 20.3
   },
+  "events": [],
   "hazards": [
     {
-      "type": "micro_failure_accumulation",
-      "stress_factor": 0.08891995891998489,
-      "description": "Small system failures accumulate toward major cascade",
-      "data_source": "Apollo 13 precursor events analysis"
+      "type": "micrometeorite",
+      "probability": 0.0164
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0084
     }
   ],
-  "events": [],
-  "challenges": [],
-  "system_dependencies": {
-    "description": "v10 implements real system interdependencies based on ISS ECLSS",
-    "dependency_graph": {
-      "water_recycler": [
-        "humidity_control",
-        "greenhouse_irrigation"
-      ],
-      "humidity_control": [
-        "greenhouse_transpiration",
-        "crew_comfort"
-      ],
-      "greenhouse": [
-        "o2_production_biological",
-        "food_production"
-      ],
-      "power_grid": [
-        "all_systems"
-      ],
-      "isru": [
-        "o2_production_chemical",
-        "h2o_production"
-      ],
-      "thermal": [
-        "crew_life_support",
-        "equipment_efficiency"
-      ]
-    },
-    "data_sources": [
-      "ISS Environmental Control and Life Support System (ECLSS)",
-      "NASA FMEA database for space systems",
-      "Apollo 13 failure cascade timeline",
-      "ISS maintenance logs and failure reports"
-    ]
+  "comms": {
+    "earth_delay_min": 11.1,
+    "window_open": false,
+    "bandwidth_kbps": 16
   },
-  "physics_constants": {
-    "cascade_propagation_delay": "1-3 sols (realistic system response time)",
-    "micro_failure_threshold": "1.0 accumulated stress units",
-    "system_interdependency": "Binary dependency graph with severity multipliers",
-    "repair_complexity": "Scales with number of affected systems"
-  }
+  "terrain": {
+    "regolith_hardness": 0.53,
+    "water_ice_depth_m": 2.2,
+    "surface_radiation_usv": 0.72
+  },
+  "challenge": {
+    "id": "sol990_nav_sensor_degradation",
+    "type": "nav_sensor_degradation",
+    "params": {
+      "sensor": "front_hazcam",
+      "obscuration_pct": 35,
+      "cause": "dust"
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 989,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 2.1,
+    "dust_delta": 0.051
+  },
+  "_hash": "c7bddad801165efd"
 }
