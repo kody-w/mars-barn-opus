@@ -1,58 +1,71 @@
 {
   "sol": 993,
-  "version": 10,
-  "name": "System Dependency Graph",
-  "environment": {
-    "temperature_k": 223.0,
-    "temperature_c": -50.2,
-    "pressure_pa": 625.0,
-    "solar_irradiance": 614.6,
-    "dust_storm": false,
-    "solar_longitude": 174.3,
-    "season": "Northern Summer",
-    "wind_speed_ms": 5.225811762679137
+  "utc": "2028-04-24T07:22:48Z",
+  "mars": {
+    "ls": 287.3,
+    "season": "Northern Winter",
+    "temp_k": 216.2,
+    "temp_c": -57.0,
+    "pressure_pa": 711,
+    "solar_wm2": 573,
+    "dust_tau": 0.33,
+    "wind_ms": 5.8,
+    "lmst": 18.4
   },
-  "hazards": [],
-  "events": [],
-  "challenges": [],
-  "system_dependencies": {
-    "description": "v10 implements real system interdependencies based on ISS ECLSS",
-    "dependency_graph": {
-      "water_recycler": [
-        "humidity_control",
-        "greenhouse_irrigation"
-      ],
-      "humidity_control": [
-        "greenhouse_transpiration",
-        "crew_comfort"
-      ],
-      "greenhouse": [
-        "o2_production_biological",
-        "food_production"
-      ],
-      "power_grid": [
-        "all_systems"
-      ],
-      "isru": [
-        "o2_production_chemical",
-        "h2o_production"
-      ],
-      "thermal": [
-        "crew_life_support",
-        "equipment_efficiency"
-      ]
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.32,
+      "duration_sols": 10,
+      "desc": "Regional dust storm approaching from the north"
     },
-    "data_sources": [
-      "ISS Environmental Control and Life Support System (ECLSS)",
-      "NASA FMEA database for space systems",
-      "Apollo 13 failure cascade timeline",
-      "ISS maintenance logs and failure reports"
-    ]
+    {
+      "type": "thermal_cycle",
+      "severity": 0.33,
+      "delta_k": 3,
+      "desc": "Extreme thermal cycling \u2014 structural stress warning"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.006
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "hab_seal",
+      "degradation": 0.0062
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0066
+    },
+    {
+      "type": "battery_degradation",
+      "target": "battery_pack",
+      "degradation": 0.0047,
+      "capacity_loss_pct": 0.25,
+      "desc": "Battery capacity loss from cold cycling at -57.0\u00b0C"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 10.9,
+    "window_open": true,
+    "bandwidth_kbps": 16
   },
-  "physics_constants": {
-    "cascade_propagation_delay": "1-3 sols (realistic system response time)",
-    "micro_failure_threshold": "1.0 accumulated stress units",
-    "system_interdependency": "Binary dependency graph with severity multipliers",
-    "repair_complexity": "Scales with number of affected systems"
-  }
+  "terrain": {
+    "regolith_hardness": 0.85,
+    "water_ice_depth_m": 1.1,
+    "surface_radiation_usv": 0.55
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 992,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -1.8,
+    "dust_delta": -0.097
+  },
+  "_hash": "fa6c0ce28d1c3acc"
 }
