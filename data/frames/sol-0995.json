@@ -1,65 +1,75 @@
 {
   "sol": 995,
-  "version": 10,
-  "name": "System Dependency Graph",
-  "environment": {
-    "temperature_k": 222.4,
-    "temperature_c": -50.8,
-    "pressure_pa": 622.2,
-    "solar_irradiance": 552.3,
-    "dust_storm": false,
-    "solar_longitude": 175.4,
-    "season": "Northern Summer",
-    "wind_speed_ms": 13.468880206280868
+  "utc": "2028-04-26T08:42:00Z",
+  "mars": {
+    "ls": 288.4,
+    "season": "Northern Winter",
+    "temp_k": 210.8,
+    "temp_c": -62.4,
+    "pressure_pa": 712,
+    "solar_wm2": 552,
+    "dust_tau": 0.478,
+    "wind_ms": 3.9,
+    "lmst": 17.1
   },
-  "hazards": [
+  "events": [
     {
-      "type": "micro_failure_accumulation",
-      "stress_factor": 0.13441864465765177,
-      "description": "Small system failures accumulate toward major cascade",
-      "data_source": "Apollo 13 precursor events analysis"
+      "type": "dust_storm",
+      "severity": 0.39,
+      "duration_sols": 8,
+      "desc": "Regional dust storm approaching from the north"
+    },
+    {
+      "type": "mandatory_eva",
+      "severity": 0.21,
+      "duration_sols": 1,
+      "min_crew": 2,
+      "buddy_required": true,
+      "desc": "External repair requires buddy system (2 crew minimum on EVA)"
     }
   ],
-  "events": [],
-  "challenges": [],
-  "system_dependencies": {
-    "description": "v10 implements real system interdependencies based on ISS ECLSS",
-    "dependency_graph": {
-      "water_recycler": [
-        "humidity_control",
-        "greenhouse_irrigation"
-      ],
-      "humidity_control": [
-        "greenhouse_transpiration",
-        "crew_comfort"
-      ],
-      "greenhouse": [
-        "o2_production_biological",
-        "food_production"
-      ],
-      "power_grid": [
-        "all_systems"
-      ],
-      "isru": [
-        "o2_production_chemical",
-        "h2o_production"
-      ],
-      "thermal": [
-        "crew_life_support",
-        "equipment_efficiency"
-      ]
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0079
     },
-    "data_sources": [
-      "ISS Environmental Control and Life Support System (ECLSS)",
-      "NASA FMEA database for space systems",
-      "Apollo 13 failure cascade timeline",
-      "ISS maintenance logs and failure reports"
-    ]
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0096
+    },
+    {
+      "type": "dust_infiltration",
+      "targets_all_modules": true,
+      "degradation_per_module": 0.002,
+      "desc": "Regolith dust infiltration through module seals \u2014 affects ALL modules"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 10.8,
+    "window_open": true,
+    "bandwidth_kbps": 16
   },
-  "physics_constants": {
-    "cascade_propagation_delay": "1-3 sols (realistic system response time)",
-    "micro_failure_threshold": "1.0 accumulated stress units",
-    "system_interdependency": "Binary dependency graph with severity multipliers",
-    "repair_complexity": "Scales with number of affected systems"
-  }
+  "terrain": {
+    "regolith_hardness": 0.7,
+    "water_ice_depth_m": 2.0,
+    "surface_radiation_usv": 0.74
+  },
+  "challenge": {
+    "id": "sol995_battery_reconditioning",
+    "type": "battery_reconditioning",
+    "params": {
+      "cells_affected": 3,
+      "capacity_remaining_pct": 77,
+      "temp_at_failure": -62
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 994,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -2.7,
+    "dust_delta": 0.056
+  },
+  "_hash": "331dc19a6710d574"
 }
