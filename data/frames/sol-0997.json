@@ -1,70 +1,53 @@
 {
   "sol": 997,
-  "version": 10,
-  "name": "System Dependency Graph",
-  "environment": {
-    "temperature_k": 221.8,
-    "temperature_c": -51.3,
-    "pressure_pa": 619.3,
-    "solar_irradiance": 547.0,
-    "dust_storm": false,
-    "solar_longitude": 176.5,
-    "season": "Northern Summer",
-    "wind_speed_ms": 11.580598555973316
+  "utc": "2028-04-28T10:01:12Z",
+  "mars": {
+    "ls": 289.4,
+    "season": "Northern Winter",
+    "temp_k": 208.3,
+    "temp_c": -64.8,
+    "pressure_pa": 712,
+    "solar_wm2": 572,
+    "dust_tau": 0.388,
+    "wind_ms": 2.1,
+    "lmst": 15.9
   },
-  "hazards": [],
-  "events": [],
-  "challenges": [
+  "events": [
     {
-      "type": "apollo_13_scenario",
-      "description": "Oxygen tank failure - execute emergency procedures",
-      "time_limit_sols": 3,
-      "required_actions": [
-        "power_conservation",
-        "thermal_management",
-        "co2_scrubbing"
-      ],
-      "failure_penalty": "crew_hp_loss"
+      "type": "dust_storm",
+      "severity": 0.46,
+      "duration_sols": 6,
+      "desc": "Regional dust storm approaching from the north"
     }
   ],
-  "system_dependencies": {
-    "description": "v10 implements real system interdependencies based on ISS ECLSS",
-    "dependency_graph": {
-      "water_recycler": [
-        "humidity_control",
-        "greenhouse_irrigation"
-      ],
-      "humidity_control": [
-        "greenhouse_transpiration",
-        "crew_comfort"
-      ],
-      "greenhouse": [
-        "o2_production_biological",
-        "food_production"
-      ],
-      "power_grid": [
-        "all_systems"
-      ],
-      "isru": [
-        "o2_production_chemical",
-        "h2o_production"
-      ],
-      "thermal": [
-        "crew_life_support",
-        "equipment_efficiency"
-      ]
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0051
     },
-    "data_sources": [
-      "ISS Environmental Control and Life Support System (ECLSS)",
-      "NASA FMEA database for space systems",
-      "Apollo 13 failure cascade timeline",
-      "ISS maintenance logs and failure reports"
-    ]
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0078
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 10.6,
+    "window_open": true,
+    "bandwidth_kbps": 16
   },
-  "physics_constants": {
-    "cascade_propagation_delay": "1-3 sols (realistic system response time)",
-    "micro_failure_threshold": "1.0 accumulated stress units",
-    "system_interdependency": "Binary dependency graph with severity multipliers",
-    "repair_complexity": "Scales with number of affected systems"
-  }
+  "terrain": {
+    "regolith_hardness": 0.67,
+    "water_ice_depth_m": 2.1,
+    "surface_radiation_usv": 0.55
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 996,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -0.6,
+    "dust_delta": -0.028
+  },
+  "_hash": "feb66a9059df6706"
 }
