@@ -1,58 +1,72 @@
 {
   "sol": 999,
-  "version": 10,
-  "name": "System Dependency Graph",
-  "environment": {
-    "temperature_k": 221.3,
-    "temperature_c": -51.9,
-    "pressure_pa": 616.4,
-    "solar_irradiance": 592.5,
-    "dust_storm": false,
-    "solar_longitude": 177.6,
-    "season": "Northern Summer",
-    "wind_speed_ms": 4.5750778076507554
+  "utc": "2028-04-30T11:20:24Z",
+  "mars": {
+    "ls": 290.5,
+    "season": "Northern Winter",
+    "temp_k": 211.3,
+    "temp_c": -61.8,
+    "pressure_pa": 712,
+    "solar_wm2": 545,
+    "dust_tau": 0.506,
+    "wind_ms": 2.6,
+    "lmst": 14.6
   },
-  "hazards": [],
-  "events": [],
-  "challenges": [],
-  "system_dependencies": {
-    "description": "v10 implements real system interdependencies based on ISS ECLSS",
-    "dependency_graph": {
-      "water_recycler": [
-        "humidity_control",
-        "greenhouse_irrigation"
-      ],
-      "humidity_control": [
-        "greenhouse_transpiration",
-        "crew_comfort"
-      ],
-      "greenhouse": [
-        "o2_production_biological",
-        "food_production"
-      ],
-      "power_grid": [
-        "all_systems"
-      ],
-      "isru": [
-        "o2_production_chemical",
-        "h2o_production"
-      ],
-      "thermal": [
-        "crew_life_support",
-        "equipment_efficiency"
-      ]
+  "events": [
+    {
+      "type": "dust_storm",
+      "severity": 0.53,
+      "duration_sols": 5,
+      "desc": "Regional dust storm approaching from the north"
     },
-    "data_sources": [
-      "ISS Environmental Control and Life Support System (ECLSS)",
-      "NASA FMEA database for space systems",
-      "Apollo 13 failure cascade timeline",
-      "ISS maintenance logs and failure reports"
-    ]
+    {
+      "type": "workload_overload",
+      "severity": 0.37,
+      "duration_sols": 8,
+      "min_crew": 3,
+      "desc": "Maintenance backlog \u2014 insufficient crew for concurrent tasks"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0117
+    },
+    {
+      "type": "equipment_fatigue",
+      "target": "antenna",
+      "degradation": 0.0038
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0101
+    },
+    {
+      "type": "workload_wear",
+      "target": "tool_gripper",
+      "degradation_per_missing_crew": 0.0027,
+      "baseline_crew": 4,
+      "desc": "Accelerated wear from understaffing \u2014 fewer crew = more cycles per robot"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 10.5,
+    "window_open": true,
+    "bandwidth_kbps": 16
   },
-  "physics_constants": {
-    "cascade_propagation_delay": "1-3 sols (realistic system response time)",
-    "micro_failure_threshold": "1.0 accumulated stress units",
-    "system_interdependency": "Binary dependency graph with severity multipliers",
-    "repair_complexity": "Scales with number of affected systems"
-  }
+  "terrain": {
+    "regolith_hardness": 0.54,
+    "water_ice_depth_m": 1.9,
+    "surface_radiation_usv": 0.43
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 998,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 2.1,
+    "dust_delta": 0.088
+  },
+  "_hash": "f9737026e90393eb"
 }
