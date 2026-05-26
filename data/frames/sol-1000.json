@@ -1,58 +1,64 @@
 {
   "sol": 1000,
-  "version": 10,
-  "name": "System Dependency Graph",
-  "environment": {
-    "temperature_k": 221.0,
-    "temperature_c": -52.2,
-    "pressure_pa": 615.0,
-    "solar_irradiance": 624.3,
-    "dust_storm": false,
-    "solar_longitude": 178.1,
-    "season": "Northern Summer",
-    "wind_speed_ms": 13.113651930996685
+  "utc": "2028-05-01T12:00:00Z",
+  "mars": {
+    "ls": 291.0,
+    "season": "Northern Winter",
+    "temp_k": 213.9,
+    "temp_c": -59.3,
+    "pressure_pa": 712,
+    "solar_wm2": 539,
+    "dust_tau": 0.409,
+    "wind_ms": 4.6,
+    "lmst": 13.9
   },
-  "hazards": [],
   "events": [],
-  "challenges": [],
-  "system_dependencies": {
-    "description": "v10 implements real system interdependencies based on ISS ECLSS",
-    "dependency_graph": {
-      "water_recycler": [
-        "humidity_control",
-        "greenhouse_irrigation"
-      ],
-      "humidity_control": [
-        "greenhouse_transpiration",
-        "crew_comfort"
-      ],
-      "greenhouse": [
-        "o2_production_biological",
-        "food_production"
-      ],
-      "power_grid": [
-        "all_systems"
-      ],
-      "isru": [
-        "o2_production_chemical",
-        "h2o_production"
-      ],
-      "thermal": [
-        "crew_life_support",
-        "equipment_efficiency"
-      ]
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0094
     },
-    "data_sources": [
-      "ISS Environmental Control and Life Support System (ECLSS)",
-      "NASA FMEA database for space systems",
-      "Apollo 13 failure cascade timeline",
-      "ISS maintenance logs and failure reports"
-    ]
+    {
+      "type": "equipment_fatigue",
+      "target": "hab_seal",
+      "degradation": 0.0074
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0082
+    },
+    {
+      "type": "regolith_abrasion",
+      "target": "spectrometer",
+      "degradation": 0.0061,
+      "desc": "Fine regolith abrasion on optical surfaces"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 10.4,
+    "window_open": true,
+    "bandwidth_kbps": 16
   },
-  "physics_constants": {
-    "cascade_propagation_delay": "1-3 sols (realistic system response time)",
-    "micro_failure_threshold": "1.0 accumulated stress units",
-    "system_interdependency": "Binary dependency graph with severity multipliers",
-    "repair_complexity": "Scales with number of affected systems"
-  }
+  "terrain": {
+    "regolith_hardness": 0.56,
+    "water_ice_depth_m": 1.8,
+    "surface_radiation_usv": 0.41
+  },
+  "challenge": {
+    "id": "sol1000_water_recycler_fault",
+    "type": "water_recycler_fault",
+    "params": {
+      "efficiency_drop": 0.12,
+      "filter_age_sols": 52
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 999,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 2.6,
+    "dust_delta": -0.097
+  },
+  "_hash": "dada6d5bbc57b91f"
 }
