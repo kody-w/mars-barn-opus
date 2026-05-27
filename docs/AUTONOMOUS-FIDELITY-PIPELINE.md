@@ -1,6 +1,6 @@
 # AUTONOMOUS FIDELITY PIPELINE
 
-### How Unlimited Copilot Fleet Drives the Sim Toward Reality — Forever
+### How Copilot CLI Fleet Drives the Sim Toward Reality — Forever
 
 > One fleet competes. One fleet builds. Both run 24/7.
 > The competition fleet finds what's fake. The builder fleet makes it real.
