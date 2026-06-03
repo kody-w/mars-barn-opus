@@ -1,52 +1,52 @@
 {
   "sol": 1008,
-  "version": 11,
-  "name": "Earth-Mars Transfer Windows",
-  "environment": {
-    "temperature_k": 209.1,
-    "temperature_c": -64.0,
-    "pressure_pa": 600.8,
-    "solar_irradiance": 495.8,
-    "dust_storm": false,
-    "solar_longitude": 182.4,
-    "season": "Northern Autumn",
-    "wind_speed_ms": 16.3
+  "utc": "2028-05-09T17:16:48Z",
+  "mars": {
+    "ls": 295.2,
+    "season": "Northern Winter",
+    "temp_k": 206.9,
+    "temp_c": -66.2,
+    "pressure_pa": 713,
+    "solar_wm2": 511,
+    "dust_tau": 0.377,
+    "wind_ms": 4.6,
+    "lmst": 8.8
   },
+  "events": [],
   "hazards": [
     {
-      "type": "isru_dependency_crisis",
-      "severity": 0.6799933777181248,
-      "dependency_ratio": 0.5722846348883048,
-      "isru_capacity_gap": 0.5304549681100199,
-      "description": "Colony ISRU systems cannot meet needs - too dependent on Earth supplies",
-      "data_source": "NASA ISRU technology readiness assessment"
+      "type": "micrometeorite",
+      "probability": 0.0091
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0075
+    },
+    {
+      "type": "module_cascade_failure",
+      "min_modules": 4,
+      "severity_per_module": 0.007,
+      "desc": "Cascade failure \u2014 each additional module increases systemic risk"
     }
   ],
-  "events": [],
-  "challenges": [],
-  "supply_chain": {
-    "description": "v11 implements real Earth-Mars orbital mechanics and cargo logistics",
-    "window_phase": "inter_window_period",
-    "transfer_window_physics": {
-      "synodic_period_days": 779.9,
-      "transit_time_range_days": "180-270",
-      "cargo_capacity_tons": 100,
-      "landing_accuracy_km": "\u00b110",
-      "edl_success_rate": 0.5
-    },
-    "data_sources": [
-      "NASA Mars Design Reference Architecture 5.0",
-      "SpaceX Starship payload specifications",
-      "NASA Mars mission orbital mechanics studies",
-      "Historical Mars EDL success/failure rates",
-      "Hohmann transfer orbit calculations"
-    ]
+  "comms": {
+    "earth_delay_min": 9.9,
+    "window_open": true,
+    "bandwidth_kbps": 32
   },
-  "physics_constants": {
-    "earth_mars_synodic_period": "779.9 days (26 months)",
-    "hohmann_transfer_window": "Every 779.9 days when planets align for efficient transfer",
-    "cargo_transit_time": "180-270 days depending on trajectory optimization",
-    "landing_accuracy": "\u00b110km (requires rover retrieval operations)",
-    "supply_dependency": "Colony must plan 2-3 years ahead for Earth supplies"
-  }
+  "terrain": {
+    "regolith_hardness": 0.84,
+    "water_ice_depth_m": 0.9,
+    "surface_radiation_usv": 0.46
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 1007,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -0.6,
+    "dust_delta": -0.078
+  },
+  "_hash": "8a1141c602d16b26"
 }
