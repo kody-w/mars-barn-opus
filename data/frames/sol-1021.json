@@ -1,51 +1,65 @@
 {
   "sol": 1021,
-  "version": 11,
-  "name": "Earth-Mars Transfer Windows",
-  "environment": {
-    "temperature_k": 186.9,
-    "temperature_c": -86.3,
-    "pressure_pa": 588.6,
-    "solar_irradiance": 496.9,
-    "dust_storm": false,
-    "solar_longitude": 189.4,
-    "season": "Northern Autumn",
-    "wind_speed_ms": 16.8
+  "utc": "2028-05-23T01:51:36Z",
+  "mars": {
+    "ls": 302.0,
+    "season": "Northern Winter",
+    "temp_k": 208.5,
+    "temp_c": -64.6,
+    "pressure_pa": 715,
+    "solar_wm2": 554,
+    "dust_tau": 0.338,
+    "wind_ms": 3.6,
+    "lmst": 0.5
   },
-  "hazards": [
+  "events": [
     {
-      "type": "cargo_retrieval_mission",
-      "severity": 0.3639825111141704,
-      "landing_distance": 5.243922996390522,
-      "description": "Cargo landed off-target - rover retrieval mission required",
-      "data_source": "NASA Mars EDL accuracy specifications (\u00b110km)"
+      "type": "comms_blackout",
+      "severity": 0.63,
+      "duration_sols": 11,
+      "desc": "Solar conjunction \u2014 Earth comms degraded or lost"
     }
   ],
-  "events": [],
-  "challenges": [],
-  "supply_chain": {
-    "description": "v11 implements real Earth-Mars orbital mechanics and cargo logistics",
-    "window_phase": "inter_window_period",
-    "transfer_window_physics": {
-      "synodic_period_days": 779.9,
-      "transit_time_range_days": "180-270",
-      "cargo_capacity_tons": 100,
-      "landing_accuracy_km": "\u00b110",
-      "edl_success_rate": 0.5
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0094
     },
-    "data_sources": [
-      "NASA Mars Design Reference Architecture 5.0",
-      "SpaceX Starship payload specifications",
-      "NASA Mars mission orbital mechanics studies",
-      "Historical Mars EDL success/failure rates",
-      "Hohmann transfer orbit calculations"
-    ]
+    {
+      "type": "equipment_fatigue",
+      "target": "antenna",
+      "degradation": 0.0089
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0068
+    },
+    {
+      "type": "battery_degradation",
+      "target": "battery_pack",
+      "degradation": 0.0055,
+      "capacity_loss_pct": 0.2,
+      "desc": "Battery capacity loss from cold cycling at -64.6\u00b0C"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 8.9,
+    "window_open": false,
+    "bandwidth_kbps": 32
   },
-  "physics_constants": {
-    "earth_mars_synodic_period": "779.9 days (26 months)",
-    "hohmann_transfer_window": "Every 779.9 days when planets align for efficient transfer",
-    "cargo_transit_time": "180-270 days depending on trajectory optimization",
-    "landing_accuracy": "\u00b110km (requires rover retrieval operations)",
-    "supply_dependency": "Colony must plan 2-3 years ahead for Earth supplies"
-  }
+  "terrain": {
+    "regolith_hardness": 0.56,
+    "water_ice_depth_m": 2.2,
+    "surface_radiation_usv": 0.32
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 1020,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 2.0,
+    "dust_delta": 0.004
+  },
+  "_hash": "8b48ca6a688827ba"
 }
