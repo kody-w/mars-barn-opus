@@ -1,43 +1,65 @@
 {
   "sol": 1031,
-  "version": 11,
-  "name": "Earth-Mars Transfer Windows",
-  "environment": {
-    "temperature_k": 195.2,
-    "temperature_c": -78.0,
-    "pressure_pa": 579.5,
-    "solar_irradiance": 498.5,
-    "dust_storm": false,
-    "solar_longitude": 194.8,
-    "season": "Northern Autumn",
-    "wind_speed_ms": 14.8
+  "utc": "2028-06-02T08:27:36Z",
+  "mars": {
+    "ls": 307.2,
+    "season": "Northern Winter",
+    "temp_k": 205.2,
+    "temp_c": -67.9,
+    "pressure_pa": 716,
+    "solar_wm2": 496,
+    "dust_tau": 0.391,
+    "wind_ms": 5.0,
+    "lmst": 18.1
   },
-  "hazards": [],
-  "events": [],
-  "challenges": [],
-  "supply_chain": {
-    "description": "v11 implements real Earth-Mars orbital mechanics and cargo logistics",
-    "window_phase": "inter_window_period",
-    "transfer_window_physics": {
-      "synodic_period_days": 779.9,
-      "transit_time_range_days": "180-270",
-      "cargo_capacity_tons": 100,
-      "landing_accuracy_km": "\u00b110",
-      "edl_success_rate": 0.5
+  "events": [
+    {
+      "type": "workload_overload",
+      "severity": 0.62,
+      "duration_sols": 5,
+      "min_crew": 3,
+      "desc": "Maintenance backlog \u2014 insufficient crew for concurrent tasks"
+    }
+  ],
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0074
     },
-    "data_sources": [
-      "NASA Mars Design Reference Architecture 5.0",
-      "SpaceX Starship payload specifications",
-      "NASA Mars mission orbital mechanics studies",
-      "Historical Mars EDL success/failure rates",
-      "Hohmann transfer orbit calculations"
-    ]
+    {
+      "type": "equipment_fatigue",
+      "target": "hab_seal",
+      "degradation": 0.0065
+    },
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0078
+    },
+    {
+      "type": "power_grid_overload",
+      "min_modules": 5,
+      "power_drain_per_module": 2.1,
+      "desc": "Power grid strain \u2014 too many modules for available power capacity"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 8.1,
+    "window_open": true,
+    "bandwidth_kbps": 32
   },
-  "physics_constants": {
-    "earth_mars_synodic_period": "779.9 days (26 months)",
-    "hohmann_transfer_window": "Every 779.9 days when planets align for efficient transfer",
-    "cargo_transit_time": "180-270 days depending on trajectory optimization",
-    "landing_accuracy": "\u00b110km (requires rover retrieval operations)",
-    "supply_dependency": "Colony must plan 2-3 years ahead for Earth supplies"
-  }
+  "terrain": {
+    "regolith_hardness": 0.79,
+    "water_ice_depth_m": 1.1,
+    "surface_radiation_usv": 0.31
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 1030,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 0.8,
+    "dust_delta": 0.033
+  },
+  "_hash": "95d2b0270bef2a10"
 }
