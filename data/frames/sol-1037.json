@@ -1,43 +1,41 @@
 {
   "sol": 1037,
-  "version": 11,
-  "name": "Earth-Mars Transfer Windows",
-  "environment": {
-    "temperature_k": 212.7,
-    "temperature_c": -60.5,
-    "pressure_pa": 574.1,
-    "solar_irradiance": 499.8,
-    "dust_storm": false,
-    "solar_longitude": 198.0,
-    "season": "Northern Autumn",
-    "wind_speed_ms": 18.1
+  "utc": "2028-06-08T12:25:12Z",
+  "mars": {
+    "ls": 310.4,
+    "season": "Northern Winter",
+    "temp_k": 211.0,
+    "temp_c": -62.1,
+    "pressure_pa": 717,
+    "solar_wm2": 497,
+    "dust_tau": 0.276,
+    "wind_ms": 6.4,
+    "lmst": 14.3
   },
-  "hazards": [],
   "events": [],
-  "challenges": [],
-  "supply_chain": {
-    "description": "v11 implements real Earth-Mars orbital mechanics and cargo logistics",
-    "window_phase": "inter_window_period",
-    "transfer_window_physics": {
-      "synodic_period_days": 779.9,
-      "transit_time_range_days": "180-270",
-      "cargo_capacity_tons": 100,
-      "landing_accuracy_km": "\u00b110",
-      "edl_success_rate": 0.5
-    },
-    "data_sources": [
-      "NASA Mars Design Reference Architecture 5.0",
-      "SpaceX Starship payload specifications",
-      "NASA Mars mission orbital mechanics studies",
-      "Historical Mars EDL success/failure rates",
-      "Hohmann transfer orbit calculations"
-    ]
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0157
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 7.7,
+    "window_open": true,
+    "bandwidth_kbps": 32
   },
-  "physics_constants": {
-    "earth_mars_synodic_period": "779.9 days (26 months)",
-    "hohmann_transfer_window": "Every 779.9 days when planets align for efficient transfer",
-    "cargo_transit_time": "180-270 days depending on trajectory optimization",
-    "landing_accuracy": "\u00b110km (requires rover retrieval operations)",
-    "supply_dependency": "Colony must plan 2-3 years ahead for Earth supplies"
-  }
+  "terrain": {
+    "regolith_hardness": 0.66,
+    "water_ice_depth_m": 2.0,
+    "surface_radiation_usv": 0.77
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 1036,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -1.7,
+    "dust_delta": -0.034
+  },
+  "_hash": "e3d9d4db0cf797aa"
 }
