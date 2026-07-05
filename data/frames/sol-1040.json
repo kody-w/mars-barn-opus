@@ -1,65 +1,87 @@
 {
   "sol": 1040,
-  "version": 12,
-  "name": "Individual Crew Physiology",
-  "environment": {
-    "temperature_k": 225.0,
-    "temperature_c": -48.1,
-    "pressure_pa": 576.4,
-    "solar_irradiance": 609.1,
-    "dust_storm": false,
-    "solar_longitude": 199.6,
-    "season": "Northern Autumn",
-    "wind_speed_ms": 17.2
+  "utc": "2028-06-11T14:24:00Z",
+  "mars": {
+    "ls": 312.0,
+    "season": "Northern Winter",
+    "temp_k": 203.9,
+    "temp_c": -69.2,
+    "pressure_pa": 718,
+    "solar_wm2": 513,
+    "dust_tau": 0.28,
+    "wind_ms": 6.5,
+    "lmst": 12.3
   },
-  "hazards": [
+  "events": [
     {
-      "type": "muscle_weakness_incident",
-      "severity": 0.703,
-      "muscle_mass_threshold": 0.7,
-      "description": "Work injury or reduced EVA capacity due to muscle atrophy",
-      "data_source": "ISS crew muscle mass studies, Mars analog data"
+      "type": "workload_overload",
+      "severity": 0.71,
+      "duration_sols": 11,
+      "min_crew": 3,
+      "desc": "Maintenance backlog \u2014 insufficient crew for concurrent tasks"
     }
   ],
-  "events": [],
-  "challenges": [],
-  "physiology": {
-    "description": "v12 implements real NASA crew physiology tracking and health hazards",
-    "radiation_physics": {
-      "mars_surface_dose_rate": "0.67 mSv/day",
-      "career_limit": "1.0 Sv (NASA STD-3001)",
-      "solar_particle_events": "10-200 mSv per event",
-      "cumulative_tracking": "Individual crew member dose accumulation"
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0071
     },
-    "bone_muscle_physics": {
-      "mars_gravity": "0.38g (3.71 m/s\u00b2)",
-      "bone_loss_rate": "1.5% per month without countermeasures",
-      "muscle_loss_rate": "2.0% per month without exercise",
-      "exercise_protection": "Exercise reduces loss by 60-70% (ISS data)",
-      "fracture_risk": "Increased with bone density <70% of baseline"
+    {
+      "type": "equipment_fatigue",
+      "target": "hab_seal",
+      "degradation": 0.0067
     },
-    "circadian_physics": {
-      "sol_length": "24.65 hours (37 minutes longer than Earth day)",
-      "daily_drift": "0.027 phase shift per sol",
-      "sleep_disruption": "Accumulates over mission duration without countermeasures",
-      "cognitive_impact": "Performance degradation and error rate increase"
+    {
+      "type": "regolith_abrasion",
+      "target": "lidar_sensor",
+      "degradation": 0.0048,
+      "desc": "Fine regolith abrasion on optical surfaces"
     },
-    "data_sources": [
-      "NASA OCHMO Technical Brief: Bone Loss (NASA/TB-2022-030)",
-      "Curiosity Mars Science Laboratory Radiation Assessment Detector (RAD)",
-      "ISS crew health and countermeasures database",
-      "Mars-500 isolation study psychological and physiological data",
-      "HI-SEAS analog mission crew health monitoring",
-      "NASA Fatigue Countermeasures Laboratory circadian research"
-    ]
+    {
+      "type": "workload_wear",
+      "target": "actuator_joint",
+      "degradation_per_missing_crew": 0.0055,
+      "baseline_crew": 4,
+      "desc": "Accelerated wear from understaffing \u2014 fewer crew = more cycles per robot"
+    },
+    {
+      "type": "power_grid_overload",
+      "min_modules": 5,
+      "power_drain_per_module": 3.7,
+      "desc": "Power grid strain \u2014 too many modules for available power capacity"
+    },
+    {
+      "type": "dust_infiltration",
+      "targets_all_modules": true,
+      "degradation_per_module": 0.0012,
+      "desc": "Regolith dust infiltration through module seals \u2014 affects ALL modules"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 7.4,
+    "window_open": true,
+    "bandwidth_kbps": 32
   },
-  "physics_constants": {
-    "mars_radiation_daily": "0.67 mSv/day",
-    "nasa_career_limit": "1.0 Sv",
-    "bone_loss_mars_gravity": "0.015 fraction per month",
-    "muscle_loss_mars_gravity": "0.020 fraction per month",
-    "circadian_drift_daily": "0.027000 phase hours per sol",
-    "exercise_bone_protection": "0.60 (60% reduction in bone loss)",
-    "exercise_muscle_protection": "0.70 (70% reduction in muscle loss)"
-  }
+  "terrain": {
+    "regolith_hardness": 0.71,
+    "water_ice_depth_m": 1.1,
+    "surface_radiation_usv": 0.75
+  },
+  "challenge": {
+    "id": "sol1040_nav_sensor_degradation",
+    "type": "nav_sensor_degradation",
+    "params": {
+      "sensor": "navcam",
+      "obscuration_pct": 13,
+      "cause": "dust"
+    }
+  },
+  "frame_echo": {
+    "prev_sol": 1039,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": -2.0,
+    "dust_delta": -0.063
+  },
+  "_hash": "4ef23436e643afaf"
 }
