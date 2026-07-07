@@ -1,57 +1,51 @@
 {
   "sol": 1042,
-  "version": 12,
-  "name": "Individual Crew Physiology",
-  "environment": {
-    "temperature_k": 225.3,
-    "temperature_c": -47.8,
-    "pressure_pa": 574.6,
-    "solar_irradiance": 608.4,
-    "dust_storm": false,
-    "solar_longitude": 200.7,
-    "season": "Northern Autumn",
-    "wind_speed_ms": 22.3
+  "utc": "2028-06-13T15:43:12Z",
+  "mars": {
+    "ls": 313.0,
+    "season": "Northern Winter",
+    "temp_k": 204.1,
+    "temp_c": -69.1,
+    "pressure_pa": 718,
+    "solar_wm2": 538,
+    "dust_tau": 0.33,
+    "wind_ms": 5.5,
+    "lmst": 11.1
   },
-  "hazards": [],
   "events": [],
-  "challenges": [],
-  "physiology": {
-    "description": "v12 implements real NASA crew physiology tracking and health hazards",
-    "radiation_physics": {
-      "mars_surface_dose_rate": "0.67 mSv/day",
-      "career_limit": "1.0 Sv (NASA STD-3001)",
-      "solar_particle_events": "10-200 mSv per event",
-      "cumulative_tracking": "Individual crew member dose accumulation"
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0168
     },
-    "bone_muscle_physics": {
-      "mars_gravity": "0.38g (3.71 m/s\u00b2)",
-      "bone_loss_rate": "1.5% per month without countermeasures",
-      "muscle_loss_rate": "2.0% per month without exercise",
-      "exercise_protection": "Exercise reduces loss by 60-70% (ISS data)",
-      "fracture_risk": "Increased with bone density <70% of baseline"
+    {
+      "type": "equipment_fatigue",
+      "target": "antenna",
+      "degradation": 0.0073
     },
-    "circadian_physics": {
-      "sol_length": "24.65 hours (37 minutes longer than Earth day)",
-      "daily_drift": "0.027 phase shift per sol",
-      "sleep_disruption": "Accumulates over mission duration without countermeasures",
-      "cognitive_impact": "Performance degradation and error rate increase"
-    },
-    "data_sources": [
-      "NASA OCHMO Technical Brief: Bone Loss (NASA/TB-2022-030)",
-      "Curiosity Mars Science Laboratory Radiation Assessment Detector (RAD)",
-      "ISS crew health and countermeasures database",
-      "Mars-500 isolation study psychological and physiological data",
-      "HI-SEAS analog mission crew health monitoring",
-      "NASA Fatigue Countermeasures Laboratory circadian research"
-    ]
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0066
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 7.3,
+    "window_open": true,
+    "bandwidth_kbps": 32
   },
-  "physics_constants": {
-    "mars_radiation_daily": "0.67 mSv/day",
-    "nasa_career_limit": "1.0 Sv",
-    "bone_loss_mars_gravity": "0.015 fraction per month",
-    "muscle_loss_mars_gravity": "0.020 fraction per month",
-    "circadian_drift_daily": "0.027000 phase hours per sol",
-    "exercise_bone_protection": "0.60 (60% reduction in bone loss)",
-    "exercise_muscle_protection": "0.70 (70% reduction in muscle loss)"
-  }
+  "terrain": {
+    "regolith_hardness": 0.78,
+    "water_ice_depth_m": 1.9,
+    "surface_radiation_usv": 0.92
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 1041,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 0.8,
+    "dust_delta": 0.091
+  },
+  "_hash": "60ccec0a2664c049"
 }
