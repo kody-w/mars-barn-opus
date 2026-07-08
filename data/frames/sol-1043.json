@@ -1,57 +1,59 @@
 {
   "sol": 1043,
-  "version": 12,
-  "name": "Individual Crew Physiology",
-  "environment": {
-    "temperature_k": 225.4,
-    "temperature_c": -47.7,
-    "pressure_pa": 573.7,
-    "solar_irradiance": 608.0,
-    "dust_storm": false,
-    "solar_longitude": 201.3,
-    "season": "Northern Autumn",
-    "wind_speed_ms": 23.6
+  "utc": "2028-06-14T16:22:48Z",
+  "mars": {
+    "ls": 313.5,
+    "season": "Northern Winter",
+    "temp_k": 206.0,
+    "temp_c": -67.1,
+    "pressure_pa": 718,
+    "solar_wm2": 528,
+    "dust_tau": 0.353,
+    "wind_ms": 3.4,
+    "lmst": 10.4
   },
-  "hazards": [],
   "events": [],
-  "challenges": [],
-  "physiology": {
-    "description": "v12 implements real NASA crew physiology tracking and health hazards",
-    "radiation_physics": {
-      "mars_surface_dose_rate": "0.67 mSv/day",
-      "career_limit": "1.0 Sv (NASA STD-3001)",
-      "solar_particle_events": "10-200 mSv per event",
-      "cumulative_tracking": "Individual crew member dose accumulation"
+  "hazards": [
+    {
+      "type": "micrometeorite",
+      "probability": 0.0171
     },
-    "bone_muscle_physics": {
-      "mars_gravity": "0.38g (3.71 m/s\u00b2)",
-      "bone_loss_rate": "1.5% per month without countermeasures",
-      "muscle_loss_rate": "2.0% per month without exercise",
-      "exercise_protection": "Exercise reduces loss by 60-70% (ISS data)",
-      "fracture_risk": "Increased with bone density <70% of baseline"
+    {
+      "type": "dust_accumulation",
+      "target": "solar_array",
+      "degradation": 0.0071
     },
-    "circadian_physics": {
-      "sol_length": "24.65 hours (37 minutes longer than Earth day)",
-      "daily_drift": "0.027 phase shift per sol",
-      "sleep_disruption": "Accumulates over mission duration without countermeasures",
-      "cognitive_impact": "Performance degradation and error rate increase"
+    {
+      "type": "battery_degradation",
+      "target": "battery_pack",
+      "degradation": 0.0057,
+      "capacity_loss_pct": 0.22,
+      "desc": "Battery capacity loss from cold cycling at -67.1\u00b0C"
     },
-    "data_sources": [
-      "NASA OCHMO Technical Brief: Bone Loss (NASA/TB-2022-030)",
-      "Curiosity Mars Science Laboratory Radiation Assessment Detector (RAD)",
-      "ISS crew health and countermeasures database",
-      "Mars-500 isolation study psychological and physiological data",
-      "HI-SEAS analog mission crew health monitoring",
-      "NASA Fatigue Countermeasures Laboratory circadian research"
-    ]
+    {
+      "type": "module_cascade_failure",
+      "min_modules": 4,
+      "severity_per_module": 0.0076,
+      "desc": "Cascade failure \u2014 each additional module increases systemic risk"
+    }
+  ],
+  "comms": {
+    "earth_delay_min": 7.2,
+    "window_open": true,
+    "bandwidth_kbps": 32
   },
-  "physics_constants": {
-    "mars_radiation_daily": "0.67 mSv/day",
-    "nasa_career_limit": "1.0 Sv",
-    "bone_loss_mars_gravity": "0.015 fraction per month",
-    "muscle_loss_mars_gravity": "0.020 fraction per month",
-    "circadian_drift_daily": "0.027000 phase hours per sol",
-    "exercise_bone_protection": "0.60 (60% reduction in bone loss)",
-    "exercise_muscle_protection": "0.70 (70% reduction in muscle loss)"
-  }
+  "terrain": {
+    "regolith_hardness": 0.63,
+    "water_ice_depth_m": 1.0,
+    "surface_radiation_usv": 0.87
+  },
+  "challenge": null,
+  "frame_echo": {
+    "prev_sol": 1042,
+    "global_dust_trend": "rising",
+    "solar_efficiency_trend": "declining",
+    "temp_delta": 1.9,
+    "dust_delta": 0.023
+  },
+  "_hash": "7600f1eb91f27289"
 }
