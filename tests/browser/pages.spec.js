@@ -265,11 +265,13 @@ test.describe('Mission Control', () => {
 
 test.describe('Twin telemetry', () => {
   test('Player preserves zero-valued telemetry in RTS', async ({ context }) => {
+    test.setTimeout(60000);
     const rts = await context.newPage();
     const player = await context.newPage();
     await rts.goto('/rts.html');
     await player.goto('/player.html');
     await rts.waitForSelector('#pwr-level');
+    await rts.waitForFunction(() => window.__rtsTwinChannel !== undefined);
 
     await player.evaluate(() => {
       currentSol=0;

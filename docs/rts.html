@@ -233,6 +233,38 @@
   <span data-speed="50">50×</span>
 </div>
 
+<script>
+  window.__applyRtsTelemetry = function(message) {
+    const state = message && message.payload ? message.payload : message;
+    if (!state || typeof state !== 'object') return;
+    const values = {
+      'mod-count': state.modules,
+      'crew-alive': state.crew_alive,
+      'pwr-level': state.power,
+      'val-o2': state.o2,
+      'val-h2o': state.h2o,
+      'val-food': state.food,
+      'val-pwr': state.power,
+    };
+    for (const [id, value] of Object.entries(values)) {
+      if (!Number.isFinite(value)) continue;
+      const element = document.getElementById(id);
+      if (!element) continue;
+      const percent = id.startsWith('val-');
+      element.textContent = `${Math.round(value)}${percent ? '%' : ''}`;
+    }
+  };
+  try {
+    window.__rtsTwinChannel = new BroadcastChannel('mars-barn-twin');
+    window.__rtsTwinChannel.onmessage = event => {
+      window.__applyRtsTelemetry(event.data);
+      const dot = document.getElementById('conn-dot');
+      if (dot) dot.textContent = 'LIVE';
+    };
+  } catch (error) {
+    window.__rtsTwinChannel = null;
+  }
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function() {
@@ -1463,12 +1495,13 @@
   // ─── BROADCAST CHANNEL ───────────────────────────────────────
   let twinConnected = false;
   let twinState = null;
-  let bc = null;
+  let bc = window.__rtsTwinChannel;
   try {
-    bc = new BroadcastChannel('mars-barn-twin');
+    if (!bc) bc = new BroadcastChannel('mars-barn-twin');
     bc.onmessage = (ev) => {
       twinConnected = true;
       twinState = ev.data;
+      window.__applyRtsTelemetry(ev.data);
       document.getElementById('conn-dot').textContent = '🟢';
     };
   } catch(e) {}
