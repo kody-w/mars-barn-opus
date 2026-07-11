@@ -1,6 +1,10 @@
 """End-to-end integration tests."""
 from __future__ import annotations
 
+import json
+import os
+from pathlib import Path
+import subprocess
 import sys
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent.parent / "src"))
 
@@ -52,11 +56,29 @@ class TestMultiColony:
         assert total_trades > 0
 
     def test_results_json_serializable(self):
-        import json
         result = run_multi(num_colonies=2, sols=30, seed=42)
         # Should not raise
         json_str = json.dumps(result)
         assert len(json_str) > 100
+
+    def test_multi_is_deterministic_across_processes(self):
+        code = """
+import json,sys
+sys.path.insert(0,'src')
+from sim import run_multi
+print(json.dumps(run_multi(num_colonies=6,sols=100,seed=42),sort_keys=True))
+"""
+        root = Path(__file__).resolve().parents[1]
+        outputs = []
+        for hash_seed in ("2", "777"):
+            environment = {**os.environ, "PYTHONHASHSEED": hash_seed}
+            outputs.append(subprocess.check_output(
+                [sys.executable, "-c", code],
+                cwd=root,
+                env=environment,
+                text=True,
+            ))
+        assert outputs[0] == outputs[1]
 
 
 class TestPerformance:

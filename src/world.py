@@ -54,6 +54,7 @@ class World:
     colonies: Dict[str, Colony] = field(default_factory=dict)
     governors: Dict[str, Governor] = field(default_factory=dict)
     event_engines: Dict[str, EventEngine] = field(default_factory=dict)
+    previous_resources: Dict[str, Resources] = field(default_factory=dict)
     sol: int = 0
     max_sols: int = 500
     seed: int = 42
@@ -112,7 +113,11 @@ def create_world(num_colonies: int = 3, max_sols: int = 500,
             location_x=cx, location_y=cy,
         )
 
-        governor = create_governor(name=f"Gov-{archetype}", archetype=archetype)
+        governor = create_governor(
+            name=f"Gov-{archetype}",
+            archetype=archetype,
+            seed=seed + i * 1000 + 17,
+        )
 
         event_engine = EventEngine()
         event_engine.set_seed(seed + i * 1000)
@@ -120,6 +125,13 @@ def create_world(num_colonies: int = 3, max_sols: int = 500,
         world.colonies[name] = colony
         world.governors[name] = governor
         world.event_engines[name] = event_engine
+        world.previous_resources[name] = Resources(
+            o2_kg=colony.resources.o2_kg,
+            h2o_liters=colony.resources.h2o_liters,
+            food_kcal=colony.resources.food_kcal,
+            power_kwh=colony.resources.power_kwh,
+            crew_size=colony.resources.crew_size,
+        )
 
     return world
 
@@ -172,19 +184,20 @@ def world_step(world: World) -> Dict:
         governor = world.governors[name]
         engine = world.event_engines[name]
 
-        prev_resources = Resources(
-            o2_kg=colony.resources.o2_kg,
-            h2o_liters=colony.resources.h2o_liters,
-            food_kcal=colony.resources.food_kcal,
-            power_kwh=colony.resources.power_kwh,
-            crew_size=colony.resources.crew_size,
-        )
+        prev_resources = world.previous_resources[name]
 
         allocation = governor.decide(
             colony, events_active=len(engine.active_events),
             prev_resources=prev_resources,
         )
         allocations[name] = allocation
+        world.previous_resources[name] = Resources(
+            o2_kg=colony.resources.o2_kg,
+            h2o_liters=colony.resources.h2o_liters,
+            food_kcal=colony.resources.food_kcal,
+            power_kwh=colony.resources.power_kwh,
+            crew_size=colony.resources.crew_size,
+        )
 
     # --- Phase 3: Step colonies ---
     for name in alive:
@@ -213,8 +226,7 @@ def world_step(world: World) -> Dict:
 
         rad = radiation_dose(
             sol_count=1, in_habitat=True,
-            solar_flare=any(e.event_type == "solar_flare"
-                          for e in engine.active_events),
+            solar_flare=False,
         )
 
         step(colony, irradiance, ext_temp, allocation,
@@ -324,25 +336,31 @@ def _compute_trade_offer(src: Colony, dst: Colony) -> Tuple[Dict, Dict]:
 
     resources = [
         ("o2_kg", src.resources.o2_kg, dst.resources.o2_kg,
-         O2_KG_PER_PERSON_PER_SOL * src.resources.crew_size),
+         O2_KG_PER_PERSON_PER_SOL * src.resources.crew_size,
+         O2_KG_PER_PERSON_PER_SOL * dst.resources.crew_size),
         ("h2o_liters", src.resources.h2o_liters, dst.resources.h2o_liters,
-         H2O_L_PER_PERSON_PER_SOL * src.resources.crew_size),
+         H2O_L_PER_PERSON_PER_SOL * src.resources.crew_size,
+         H2O_L_PER_PERSON_PER_SOL * dst.resources.crew_size),
         ("food_kcal", src.resources.food_kcal, dst.resources.food_kcal,
-         FOOD_KCAL_PER_PERSON_PER_SOL * src.resources.crew_size),
+         FOOD_KCAL_PER_PERSON_PER_SOL * src.resources.crew_size,
+         FOOD_KCAL_PER_PERSON_PER_SOL * dst.resources.crew_size),
     ]
 
-    for rname, my_amount, their_amount, daily_consumption in resources:
-        my_days = my_amount / daily_consumption if daily_consumption > 0 else 999
-        their_days = their_amount / daily_consumption if daily_consumption > 0 else 999
+    for (rname, my_amount, their_amount,
+         my_daily_consumption, their_daily_consumption) in resources:
+        my_days = (my_amount / my_daily_consumption
+                   if my_daily_consumption > 0 else 999)
+        their_days = (their_amount / their_daily_consumption
+                      if their_daily_consumption > 0 else 999)
 
         if my_days > their_days + 10:
             # I have surplus, offer some
-            surplus = (my_days - 20) * daily_consumption * 0.1
+            surplus = (my_days - 20) * my_daily_consumption * 0.1
             if surplus > 0:
                 offering[rname] = surplus
         elif their_days > my_days + 10:
             # I need this, request some
-            deficit = (20 - my_days) * daily_consumption * 0.1
+            deficit = (20 - my_days) * my_daily_consumption * 0.1
             if deficit > 0:
                 requesting[rname] = deficit
 

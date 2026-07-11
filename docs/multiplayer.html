@@ -127,6 +127,29 @@ let running=false,simInt=null;
 let pc=null,dc=null;// WebRTC peer connection + data channel
 let isHost=false;
 let msgQueue=[];// Messages in transit (delayed)
+let pendingTrades=[];
+const seenTradeIds=new Set();
+
+function processPendingTrades(){
+  pendingTrades=pendingTrades.filter(trade=>{
+    if(localState.sol<trade.arrive)return true;
+    localState.o2+=trade.o2;
+    localState.h2o+=trade.h2o;
+    addMsg(`[Trade received: +${trade.o2}kg O2, +${trade.h2o}L H2O]`,'msg-remote');
+    return false;
+  });
+}
+
+function queueIncomingTrade(data){
+  if(typeof data.id!=='string'||!data.id||seenTradeIds.has(data.id))return false;
+  const o2=Number(data.o2),h2o=Number(data.h2o),delay=Number(data.delay);
+  if(!Number.isFinite(o2)||!Number.isFinite(h2o)||!Number.isFinite(delay)||
+     o2<0||h2o<0||(o2===0&&h2o===0)||o2>10000||h2o>10000||
+     delay<1||delay>24)return false;
+  seenTradeIds.add(data.id);
+  pendingTrades.push({id:data.id,o2,h2o,arrive:localState.sol+Math.floor(delay)});
+  return true;
+}
 
 function stepLocal(){
   if(!localState.alive)return;
@@ -146,6 +169,7 @@ function stepLocal(){
       return false;
     }return true;
   });
+  processPendingTrades();
   // Send state to peer
   if(dc&&dc.readyState==='open'){
     dc.send(JSON.stringify({type:'state',state:localState}));
@@ -179,8 +203,27 @@ function updateMP(){
 
 function addMsg(text,cls){
   const box=document.getElementById('msg-box');
-  box.innerHTML+=`<div class="msg ${cls}">${text}</div>`;
+  const message=document.createElement('div');
+  const allowedClasses=new Set(['msg-local','msg-remote','msg-system']);
+  message.className=`msg ${allowedClasses.has(cls)?cls:'msg-system'}`;
+  message.textContent=String(text).slice(0,1000);
+  box.appendChild(message);
   box.scrollTop=box.scrollHeight;
+}
+
+function normalizeRemoteState(raw){
+  if(!raw||typeof raw!=='object')return null;
+  const numericFields=['sol','crew','o2','h2o','food','power'];
+  if(!numericFields.every(field=>Number.isFinite(Number(raw[field]))))return null;
+  return {
+    sol:Math.max(0,Number(raw.sol)),
+    crew:Math.max(0,Number(raw.crew)),
+    o2:Math.max(0,Number(raw.o2)),
+    h2o:Math.max(0,Number(raw.h2o)),
+    food:Math.max(0,Number(raw.food)),
+    power:Math.max(0,Number(raw.power)),
+    alive:!!raw.alive,
+  };
 }
 
 function sendMessage(){
@@ -195,18 +238,28 @@ function sendMessage(){
   msgQueue.push({text:`[Remote → You]: ${text}`,from:'remote',arrive:localState.sol+delay});
 }
 
+function sendTrade(o2,h2o){
+  if(!Number.isFinite(o2)||!Number.isFinite(h2o)||
+     o2<0||h2o<0||(o2===0&&h2o===0))return false;
+  if(!dc||dc.readyState!=='open'){
+    addMsg('Connect to a peer before sending resources.','msg-system');
+    return false;
+  }
+  if(localState.o2<o2||localState.h2o<h2o){addMsg('Not enough resources!','msg-system');return false}
+  const delay=2;
+  const id=globalThis.crypto?.randomUUID?.()||
+    `trade-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  localState.o2-=o2;localState.h2o-=h2o;
+  addMsg(`[Trade sent: ${o2}kg O2 + ${h2o}L H2O, ETA ${delay} sols]`,'msg-local');
+  dc.send(JSON.stringify({type:'trade',id,o2,h2o,delay}));
+  updateMP();
+  return true;
+}
+
 function offerTrade(){
   const o2=parseInt(prompt('O2 to send (kg):','10'))||0;
   const h2o=parseInt(prompt('H2O to send (L):','20'))||0;
-  if(o2<=0&&h2o<=0)return;
-  if(localState.o2<o2||localState.h2o<h2o){addMsg('Not enough resources!','msg-system');return}
-  localState.o2-=o2;localState.h2o-=h2o;
-  const delay=2;
-  addMsg(`[Trade sent: ${o2}kg O2 + ${h2o}L H2O, ETA ${delay} sols]`,'msg-local');
-  if(dc&&dc.readyState==='open'){
-    dc.send(JSON.stringify({type:'trade',o2,h2o,delay}));
-  }
-  updateMP();
+  sendTrade(o2,h2o);
 }
 
 // WebRTC
@@ -270,20 +323,23 @@ function setupDC(){
     addMsg('Connection lost.','msg-system');
   };
   dc.onmessage=e=>{
-    const data=JSON.parse(e.data);
-    if(data.type==='state')remoteState=data.state;
+    let data;
+    try{data=JSON.parse(e.data)}catch{return}
+    if(!data||typeof data!=='object'||typeof data.type!=='string')return;
+    if(data.type==='state'){
+      const normalized=normalizeRemoteState(data.state);
+      if(!normalized)return;
+      remoteState=normalized;
+    }
     if(data.type==='msg'){
-      const delay=data.delay||1;
-      msgQueue.push({text:`[Remote → You]: ${data.text}`,from:'remote',arrive:localState.sol+delay});
+      if(typeof data.text!=='string')return;
+      const delay=Math.max(1,Math.min(24,Number(data.delay)||1));
+      const text=data.text.slice(0,500);
+      msgQueue.push({text:`[Remote → You]: ${text}`,from:'remote',arrive:localState.sol+delay});
       addMsg(`[Incoming message, ETA ${delay} sols...]`,'msg-system');
     }
     if(data.type==='trade'){
-      const delay=data.delay||2;
-      setTimeout(()=>{
-        localState.o2+=data.o2;localState.h2o+=data.h2o;
-        addMsg(`[Trade received: +${data.o2}kg O2, +${data.h2o}L H2O]`,'msg-remote');
-        updateMP();
-      },delay*500);
+      queueIncomingTrade(data);
     }
     updateMP();
   };

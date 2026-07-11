@@ -67,7 +67,7 @@ def run_single(sols: int = DEFAULT_SOLS, seed: int = DEFAULT_SEED,
         ext_temp = atm.temperature_k + temp_offset
         rad = radiation_dose(
             sol_count=1, in_habitat=True,
-            solar_flare=any(e.event_type == "solar_flare" for e in events.active_events),
+            solar_flare=False,
         )
 
         allocation = governor.decide(colony, len(events.active_events), prev)
@@ -288,9 +288,8 @@ def run_lispy_colony(program_name: str, sols: int = DEFAULT_SOLS,
         irradiance = daily_mean_irradiance(0.0, sol_of_year, dust_factor) * solar_mult
         atm = atmosphere_at(0.0, 0.0, sol_of_year, dust_factor=dust_factor)
         ext_temp = atm.temperature_k
-        rad = radiation_dose(sol_count=1, in_habitat=True,
-            solar_flare=any(e.event_type == "solar_flare"
-                           for e in events_engine.active_events))
+        rad = radiation_dose(
+            sol_count=1, in_habitat=True, solar_flare=False)
 
         # Load colony state into VM
         r = colony.resources
@@ -483,7 +482,7 @@ def run_interactive(seed: int = DEFAULT_SEED) -> None:
         ext_temp = atm.temperature_k + temp_offset
         rad = radiation_dose(
             sol_count=1, in_habitat=True,
-            solar_flare=any(e.event_type == "solar_flare" for e in events.active_events),
+            solar_flare=False,
         )
 
         # Show status and events

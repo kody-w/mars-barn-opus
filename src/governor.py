@@ -10,6 +10,7 @@ Personality diverges behavior only when physics allows it.
 from __future__ import annotations
 
 import math
+import random
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
@@ -80,6 +81,11 @@ class Governor:
     archetype: str
     traits: Dict[str, float] = field(default_factory=dict)
     memory: GovernorMemory = field(default_factory=GovernorMemory)
+    rng: random.Random = field(
+        default_factory=lambda: random.Random(0),
+        repr=False,
+        compare=False,
+    )
 
     # Trade history for iterated game theory
     trade_history: Dict[str, List[str]] = field(default_factory=dict)  # neighbor -> ["cooperate", "defect", ...]
@@ -429,8 +435,7 @@ class Governor:
 
             elif archetype in ("contrarian", "wildcard"):
                 # Random with bias
-                import random
-                return random.random() < willingness
+                return self.rng.random() < willingness
 
             elif archetype == "merchant":
                 # Always cooperate (trade is life)
@@ -461,10 +466,14 @@ class Governor:
         aggression = t.get("crisis_aggression", 0.5)
 
         # Will we sabotage?
-        sabotage_score = desperation * aggression
-        return sabotage_score > (1.0 - threshold)
+        sabotage_score = desperation * (0.6 + 0.4 * aggression)
+        return sabotage_score >= (1.0 - threshold)
 
 
-def create_governor(name: str, archetype: str) -> Governor:
+def create_governor(name: str, archetype: str, seed: int = 0) -> Governor:
     """Create a governor with the given personality archetype."""
-    return Governor(name=name, archetype=archetype)
+    return Governor(
+        name=name,
+        archetype=archetype,
+        rng=random.Random(seed),
+    )

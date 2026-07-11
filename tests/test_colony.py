@@ -76,6 +76,21 @@ class TestAllocation:
         a.validate()
         assert a.food_ration == 1.0  # Maximum
 
+    def test_validate_enforces_nonnegative_simplex(self):
+        a = Allocation(
+            heating_fraction=-1.0,
+            isru_fraction=1.0,
+            greenhouse_fraction=1.0,
+        )
+        a.validate()
+        fractions = [
+            a.heating_fraction,
+            a.isru_fraction,
+            a.greenhouse_fraction,
+        ]
+        assert all(value >= 0 for value in fractions)
+        assert abs(sum(fractions) - 1.0) < 1e-9
+
 
 class TestColonyCreation:
     def test_create_balanced(self):
@@ -128,6 +143,64 @@ class TestProduction:
         a = Allocation(greenhouse_fraction=0.8, isru_fraction=0.1, heating_fraction=0.1)
         produce(c, 300.0, a)
         assert c.resources.food_kcal > initial_food
+
+    def test_powered_production_debits_power_and_greenhouse_water(self):
+        c = create_colony("Test")
+        c.resources.power_kwh = 500.0
+        c.resources.h2o_liters = 100.0
+        initial_power = c.resources.power_kwh
+        initial_h2o = c.resources.h2o_liters
+        a = Allocation(
+            greenhouse_fraction=0.5,
+            isru_fraction=0.5,
+            heating_fraction=0.0,
+        )
+        produce(c, 0.0, a)
+        assert c.resources.power_kwh < initial_power
+        assert c.resources.h2o_liters != initial_h2o
+
+    def test_zero_discretionary_power_stops_powered_production(self):
+        c = create_colony("Test")
+        c.resources.power_kwh = POWER_BASELINE_KWH_PER_SOL
+        initial = (
+            c.resources.o2_kg,
+            c.resources.h2o_liters,
+            c.resources.food_kcal,
+        )
+        produce(c, 0.0, Allocation())
+        assert (
+            c.resources.o2_kg,
+            c.resources.h2o_liters,
+            c.resources.food_kcal,
+        ) == initial
+
+    def test_isru_scales_exactly_to_available_power(self):
+        c = create_colony("Test")
+        c.resources.power_kwh = 60.0
+        initial_o2 = c.resources.o2_kg
+        initial_h2o = c.resources.h2o_liters
+        produce(c, 0.0, Allocation(
+            heating_fraction=0.0,
+            isru_fraction=1.0,
+            greenhouse_fraction=0.0,
+        ))
+        assert abs(c.resources.o2_kg - initial_o2 - 2.5) < 1e-9
+        assert abs(c.resources.h2o_liters - initial_h2o - 6.0) < 1e-9
+        assert abs(c.resources.power_kwh - 30.0) < 1e-9
+
+    def test_greenhouse_scales_to_power_and_water_limits(self):
+        c = create_colony("Test")
+        c.resources.power_kwh = 45.0
+        c.resources.h2o_liters = 2.5
+        initial_food = c.resources.food_kcal
+        produce(c, 0.0, Allocation(
+            heating_fraction=0.0,
+            isru_fraction=0.0,
+            greenhouse_fraction=1.0,
+        ))
+        assert abs(c.resources.food_kcal - initial_food - 7500.0) < 1e-9
+        assert abs(c.resources.h2o_liters) < 1e-9
+        assert abs(c.resources.power_kwh - 30.0) < 1e-9
 
 
 class TestConsumption:
@@ -217,6 +290,23 @@ class TestCascade:
         assert c.cascade_state == CascadeState.DEAD
         assert c.cause_of_death == "starvation"
 
+    def test_h2o_depletion_instant_death(self):
+        c = create_colony("Test")
+        c.resources.h2o_liters = 0.0
+        advance_cascade(c)
+        assert c.cascade_state == CascadeState.DEAD
+        assert c.alive is False
+        assert c.cause_of_death == "dehydration"
+
+    def test_life_support_death_outranks_power_cascade(self):
+        c = create_colony("Test")
+        c.resources.power_kwh = 0.0
+        c.resources.o2_kg = 0.0
+        advance_cascade(c)
+        assert c.cascade_state == CascadeState.DEAD
+        assert c.alive is False
+        assert c.cause_of_death == "O2 depletion"
+
 
 class TestApplyEvents:
     def test_solar_damage(self):
@@ -224,6 +314,18 @@ class TestApplyEvents:
         events = [{"effects": {"solar_damage": 0.5}}]
         apply_events(c, events)
         assert c.systems.solar_efficiency == 0.5
+
+    def test_repair_radiation_and_comms_effects(self):
+        c = create_colony("Test")
+        c.systems.solar_efficiency = 0.5
+        apply_events(c, [{"effects": {
+            "solar_repair": 0.5,
+            "radiation_msv": 12.5,
+            "comms_damage": 0.2,
+        }}])
+        assert c.systems.solar_efficiency == 0.75
+        assert c.cumulative_radiation_msv == 0.0
+        assert c.systems.comms_efficiency == 0.8
 
     def test_water_loss(self):
         c = create_colony("Test")
@@ -267,6 +369,49 @@ class TestStep:
             step(c, 300.0, 200.0, a)
         # Should survive at least 10 sols with good conditions
         assert c.sol >= 10
+
+    def test_heating_kw_is_billed_for_full_sol(self):
+        import mars
+
+        c = create_colony("Test")
+        c.resources.power_kwh = 100.0
+        original = mars.required_heating_kw
+        mars.required_heating_kw = lambda exterior, irradiance: 42.0
+        try:
+            step(
+                c,
+                solar_irradiance_w_m2=0.0,
+                exterior_temp_k=250.0,
+                allocation=Allocation(
+                    heating_fraction=1.0,
+                    isru_fraction=0.0,
+                    greenhouse_fraction=0.0,
+                ),
+            )
+        finally:
+            mars.required_heating_kw = original
+
+        expected = 100.0 - POWER_BASELINE_KWH_PER_SOL - 2.0 * 24.66
+        assert abs(c.resources.power_kwh - expected) < 1e-9
+
+    def test_flare_radiation_is_counted_once(self):
+        from mars import radiation_dose
+
+        c = create_colony("Test")
+        background = radiation_dose(
+            sol_count=1,
+            in_habitat=True,
+            solar_flare=False,
+        )
+        step(
+            c,
+            solar_irradiance_w_m2=300.0,
+            exterior_temp_k=250.0,
+            allocation=Allocation(),
+            active_events=[{"effects": {"radiation_msv": 25.0}}],
+            radiation_msv=background,
+        )
+        assert abs(c.cumulative_radiation_msv - (background + 25.0)) < 1e-9
 
 
 class TestSerialize:

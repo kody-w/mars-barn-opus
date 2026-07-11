@@ -8,6 +8,8 @@
 
 **[Play it live](https://rappter2-ux.github.io/mars-barn-opus/)** | **[3D Colony RTS](https://rappter2-ux.github.io/mars-barn-opus/rts.html)** | **[3D Viewer](https://rappter2-ux.github.io/mars-barn-opus/viewer.html)** | **[Split-Screen](https://rappter2-ux.github.io/mars-barn-opus/splitscreen.html)** | **[Timelapse](https://rappter2-ux.github.io/mars-barn-opus/timelapse.html)** | **[Multiplayer](https://rappter2-ux.github.io/mars-barn-opus/multiplayer.html)**
 
+**[See the autonomous evolution guide](https://kody-w.github.io/mars-barn-opus/evolution.html)**
+
 ## Why this exists
 
 The question isn't "can we get to Mars?" It's "can we STAY on Mars — without calling home?"
@@ -52,10 +54,10 @@ python3 src/sim.py --leaderboard                   # Monte Carlo scoring
 python3 src/sim.py --evolve                        # Breed optimal governor DNA
 python3 src/sim.py --colonies 5 --sols 500         # Multi-colony competition
 python3 src/sim.py --html report.html              # Generate HTML report
-python3 -m pytest tests/ -v                        # 246 tests
+npm test                                           # Python + frame ledger + browser tests
 ```
 
-**No dependencies. Python 3.9+ stdlib only.**
+**Runtime:** no dependencies; Python 3.9+ stdlib only. Development tests use the locked tooling in `package-lock.json`.
 
 ## What's in here
 

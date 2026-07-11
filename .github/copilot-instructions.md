@@ -3,14 +3,17 @@
 ## Build & Test
 
 ```bash
-# Run all tests (299 tests, no dependencies to install)
-python3 -m pytest tests/ -v
+# Run the complete release gate
+npm test
+
+# Run only Python tests
+python3 tools/run_tests.py
 
 # Run a single test file
-python3 -m pytest tests/test_colony.py -v
+python3 tools/run_tests.py tests/test_colony.py
 
 # Run a single test class or method
-python3 -m pytest tests/test_colony.py::TestResources::test_create_with_defaults -v
+python3 tools/run_tests.py tests/test_colony.py::TestResources::test_create_with_defaults
 
 # Run simulation
 python3 src/sim.py --mission-control

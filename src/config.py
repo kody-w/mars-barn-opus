@@ -60,6 +60,9 @@ POWER_BASELINE_KWH_PER_SOL = 30.0
 ISRU_O2_KG_PER_SOL = 5.0                  # MOXIE-class, per unit
 ISRU_H2O_L_PER_SOL = 12.0                 # Regolith extraction
 GREENHOUSE_KCAL_PER_SOL = 15000.0          # Pressurized growing area
+ISRU_POWER_KWH_PER_SOL = 60.0              # MOXIE + regolith extraction process load
+GREENHOUSE_POWER_KWH_PER_SOL = 30.0        # Lighting, pumps, and climate control
+GREENHOUSE_H2O_L_PER_SOL = 5.0             # Recirculating crop evapotranspiration makeup
 SOLAR_PANEL_AREA_M2 = 200.0               # Default panel area
 SOLAR_PANEL_EFFICIENCY = 0.22             # Multi-junction cells
 

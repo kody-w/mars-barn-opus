@@ -125,21 +125,46 @@ let echoes = [];
 let decisions = [];
 let playing = false;
 let currentSol = 0;
+let minSol = 0;
 let maxSol = 0;
 let playInterval = null;
 let speed = 1;
 let resourceHistory = [];
 
+function replayText(value,maxLength=500){
+  const div=document.createElement('div');
+  div.textContent=String(value??'').slice(0,maxLength);
+  return div.innerHTML;
+}
+
+function validateReplayCartridge(value){
+  if(!value||typeof value!=='object'||value._format!=='mars-barn-cartridge'){
+    return 'Not a valid cartridge';
+  }
+  if(!Array.isArray(value.echoHistory)||!Array.isArray(value.taskHistory)){
+    return 'Replay history is malformed';
+  }
+  if(value.echoHistory.length>5000||value.taskHistory.length>5000){
+    return 'Replay history exceeds supported limits';
+  }
+  for(const echo of value.echoHistory){
+    if(!echo||!Number.isInteger(echo.frame)||echo.frame<0||
+       (echo.events!==undefined&&!Array.isArray(echo.events))){
+      return 'Replay contains an invalid echo';
+    }
+  }
+  return null;
+}
+
 function loadFile(file) {
   if (!file) return;
+  if(file.size>5*1024*1024){alert('Replay exceeds the 5 MB limit');return}
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
       cartridge = JSON.parse(e.target.result);
-      if (cartridge._format !== 'mars-barn-cartridge') {
-        alert('Not a valid cartridge');
-        return;
-      }
+      const error=validateReplayCartridge(cartridge);
+      if(error){alert(error);cartridge=null;return}
       initReplay();
     } catch (err) {
       alert('Failed to parse: ' + err.message);
@@ -152,10 +177,11 @@ function initReplay() {
   document.getElementById('drop-area').style.display = 'none';
   document.getElementById('player').style.display = 'block';
 
-  echoes = cartridge.echoHistory || [];
+  echoes = (cartridge.echoHistory || []).slice().sort((a,b)=>a.frame-b.frame);
   decisions = cartridge.taskHistory || [];
-  maxSol = cartridge.sol || echoes.length;
-  currentSol = 0;
+  minSol = echoes.length ? echoes[0].frame : 0;
+  maxSol = echoes.length ? echoes[echoes.length-1].frame : 0;
+  currentSol = minSol;
 
   // Build resource history from echoes
   resourceHistory = [];
@@ -164,7 +190,7 @@ function initReplay() {
   let food = cartridge.config?.food || 300000;
   let power = cartridge.config?.power || 500;
   
-  for (const echo of echoes) {
+  for (const echo of minSol<=1?echoes:[]) {
     if (echo.delta) {
       o2 += echo.delta.o2 || 0;
       h2o += echo.delta.h2o || 0;
@@ -174,32 +200,35 @@ function initReplay() {
     resourceHistory.push({ sol: echo.frame, o2, h2o, food: food/1000, power, cri: echo.cri || 0 });
   }
 
-  // Show score if dead
-  if (!cartridge.alive && cartridge.score) {
+  // Show score for any terminal outcome
+  if ((!cartridge.alive || cartridge.outcome === 'won') && cartridge.score) {
     const sc = cartridge.score;
+    const scoreTotal=Number.isFinite(Number(sc.total))?Number(sc.total):0;
     const area = document.getElementById('score-area');
     const gradeColor = sc.grade === 'S+' || sc.grade === 'S' ? '#ffd700' :
       sc.grade === 'A' ? 'var(--green)' : sc.grade === 'B' ? 'var(--cyan)' :
       sc.grade === 'C' ? 'var(--yellow)' : 'var(--red)';
+    const won=cartridge.outcome==='won';
     area.innerHTML = `
-      <div style="color:var(--red);font-size:12px;letter-spacing:2px">COLONY LOST — ${(cartridge.state?.cause || 'unknown').toUpperCase()}</div>
-      <div class="score-grade" style="color:${gradeColor}">${sc.grade}</div>
-      <div class="score-total">${(sc.total || 0).toLocaleString()} points</div>
+      <div style="color:${won?'var(--green)':'var(--red)'};font-size:12px;letter-spacing:2px">${won?'MISSION COMPLETE':`COLONY LOST — ${replayText(cartridge.state?.cause || 'unknown').toUpperCase()}`}</div>
+      <div class="score-grade" style="color:${gradeColor}">${replayText(sc.grade)}</div>
+      <div class="score-total">${scoreTotal.toLocaleString()} points</div>
     `;
     area.style.display = 'block';
   }
 
-  renderSol(0);
+  renderSol(minSol);
 }
 
 function renderSol(sol) {
   currentSol = sol;
-  const pct = maxSol > 0 ? (sol / maxSol * 100) : 0;
+  const span=Math.max(1,maxSol-minSol);
+  const pct = maxSol > minSol ? ((sol-minSol)/span*100) : 100;
   document.getElementById('timeline-fill').style.width = pct + '%';
   document.getElementById('sol-label').textContent = 'Sol ' + sol;
 
   // Find echo at this sol
-  const echo = echoes.find(e => e.frame === sol) || echoes[Math.min(sol, echoes.length - 1)];
+  const echo = echoes.find(e => e.frame === sol);
 
   // State display
   const stateEl = document.getElementById('state-display');
@@ -208,13 +237,15 @@ function renderSol(sol) {
     stateEl.innerHTML = `
       <div class="kv"><span class="k">Sol</span><span class="v" style="color:var(--cyan)">${echo.frame}</span></div>
       <div class="kv"><span class="k">Alive</span><span class="v" style="color:${echo.alive !== false ? 'var(--green)' : 'var(--red)'}">${echo.alive !== false ? 'YES' : 'NO'}</span></div>
-      <div class="kv"><span class="k">CRI</span><span class="v" style="color:${(echo.cri||0)>50?'var(--red)':'var(--green)'}">${echo.cri || '?'} ${echo.cri_grade || ''}</span></div>
+      <div class="kv"><span class="k">CRI</span><span class="v" style="color:${(echo.cri||0)>50?'var(--red)':'var(--green)'}">${Number.isFinite(echo.cri)?echo.cri:'?'} ${replayText(echo.cri_grade||'')}</span></div>
       <div class="kv"><span class="k">ΔO₂</span><span class="v" style="color:${(d.o2||0)>0?'var(--green)':'var(--red)'}">${(d.o2||0).toFixed(2)}</span></div>
       <div class="kv"><span class="k">ΔH₂O</span><span class="v" style="color:${(d.h2o||0)>0?'var(--green)':'var(--red)'}">${(d.h2o||0).toFixed(2)}</span></div>
       <div class="kv"><span class="k">ΔPower</span><span class="v" style="color:${(d.power||0)>0?'var(--green)':'var(--red)'}">${(d.power||0).toFixed(1)}</span></div>
       <div class="kv"><span class="k">Events</span><span class="v">${(echo.events||[]).length}</span></div>
       <div class="kv"><span class="k">Reflexes</span><span class="v">${echo.reflex_count || 0}</span></div>
     `;
+  } else {
+    stateEl.innerHTML='<div style="color:var(--yellow)">History for this sol was not retained in the cartridge.</div>';
   }
 
   // Decisions up to this sol
@@ -224,14 +255,14 @@ function renderSol(sol) {
     const cls = d.timedOut ? 'decision-timeout' : d.choice === 'approve' ? 'decision-approve' :
       d.choice === 'alt' ? 'decision-alt' : 'decision-deny';
     const icon = d.timedOut ? '⏱️' : d.choice === 'approve' ? '✓' : d.choice === 'alt' ? '◐' : '✗';
-    return `<div class="decision-item ${cls}">${icon} Sol ${d.sol}: ${(d.id || '?').replace(/_/g, ' ')}${d.timedOut ? ' (TIMEOUT)' : ''}</div>`;
+    return `<div class="decision-item ${cls}">${icon} Sol ${Number.isFinite(d.sol)?d.sol:'?'}: ${replayText(d.id||'?').replace(/_/g,' ')}${d.timedOut ? ' (TIMEOUT)' : ''}</div>`;
   }).join('') || '<div style="color:var(--dim)">No decisions yet</div>';
 
   // Events
   const eEl = document.getElementById('events-display');
   if (echo && echo.events && echo.events.length) {
     eEl.innerHTML = echo.events.map(ev =>
-      `<div class="event-item" style="color:var(--yellow)">${ev.type}: ${ev.desc || ''} (${(ev.severity * 100).toFixed(0)}%)</div>`
+      `<div class="event-item" style="color:var(--yellow)">${replayText(ev.type)}: ${replayText(ev.desc||'')} (${(Number(ev.severity||0)*100).toFixed(0)}%)</div>`
     ).join('');
   } else {
     eEl.innerHTML = '<div class="event-item" style="color:var(--dim)">No events this sol</div>';
@@ -252,7 +283,7 @@ function drawResourceChart(upToSol) {
   const w = rect.width - 24, h = 80;
   ctx.clearRect(0, 0, w, h);
 
-  const visible = resourceHistory.slice(0, Math.min(upToSol + 1, resourceHistory.length));
+  const visible = resourceHistory.filter(entry=>entry.sol<=upToSol);
   if (visible.length < 2) return;
 
   const maxVal = Math.max(...visible.map(v => Math.max(v.o2, v.h2o, v.power, v.food)), 1);
@@ -292,7 +323,9 @@ function togglePlay() {
     btn.textContent = '⏸ PAUSE';
     playInterval = setInterval(() => {
       if (currentSol >= maxSol) { togglePlay(); return; }
-      renderSol(currentSol + 1);
+      const next=echoes.find(echo=>echo.frame>currentSol);
+      if(!next){togglePlay();return}
+      renderSol(next.frame);
     }, 500 / speed);
   } else {
     btn.textContent = '▶ PLAY';
@@ -303,7 +336,10 @@ function togglePlay() {
 function seek(e) {
   const rect = e.target.getBoundingClientRect();
   const pct = (e.clientX - rect.left) / rect.width;
-  renderSol(Math.floor(pct * maxSol));
+  const target=minSol+Math.floor(pct*Math.max(0,maxSol-minSol));
+  const nearest=echoes.reduce((best,echo)=>
+    !best||Math.abs(echo.frame-target)<Math.abs(best.frame-target)?echo:best,null);
+  if(nearest)renderSol(nearest.frame);
 }
 
 function setSpeed(s) {
@@ -314,7 +350,9 @@ function setSpeed(s) {
     clearInterval(playInterval);
     playInterval = setInterval(() => {
       if (currentSol >= maxSol) { togglePlay(); return; }
-      renderSol(currentSol + 1);
+      const next=echoes.find(echo=>echo.frame>currentSol);
+      if(!next){togglePlay();return}
+      renderSol(next.frame);
     }, 500 / speed);
   }
 }

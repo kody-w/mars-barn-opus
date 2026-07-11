@@ -68,21 +68,26 @@ class CommChannel:
         phase = 2 * math.pi * sol / synodic_period
 
         # Base delay: varies from 0.3 to 1.5 sols
-        base_delay = 0.9 + 0.6 * math.cos(phase)
+        base_delay = 0.9 - 0.6 * math.cos(phase)
 
         # Solar conjunction blackout: ~14 sols every synodic period
         # Conjunction happens at phase ≈ π (halfway through synodic period)
-        conjunction_distance = abs(math.sin(phase))
-        if conjunction_distance < 0.05:  # Within ~3% of conjunction
+        conjunction_distance = abs(
+            (phase - math.pi + math.pi) % (2 * math.pi) - math.pi
+        )
+        conjunction_half_width = 2 * math.pi * 7 / synodic_period
+        if conjunction_distance <= conjunction_half_width:
             self.blackout = True
             self.blackout_remaining_sols = max(
-                self.blackout_remaining_sols,
-                int(14 * (1.0 - conjunction_distance / 0.05))
+                1,
+                math.ceil(
+                    (conjunction_half_width - conjunction_distance)
+                    * synodic_period / (2 * math.pi)
+                ),
             )
-        elif self.blackout_remaining_sols > 0:
-            self.blackout_remaining_sols -= 1
-            if self.blackout_remaining_sols <= 0:
-                self.blackout = False
+        else:
+            self.blackout = False
+            self.blackout_remaining_sols = 0
 
         self.current_delay_sols = max(0.2, base_delay)
         return self.current_delay_sols

@@ -1,6 +1,9 @@
 """Tests for procedural crew journals."""
 from __future__ import annotations
 
+import os
+from pathlib import Path
+import subprocess
 import sys
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent.parent / "src"))
 
@@ -62,6 +65,27 @@ class TestJournals:
         e1 = generate_journal_entry(crew, state, [], 42, seed=7)
         e2 = generate_journal_entry(crew, state, [], 42, seed=7)
         assert e1 == e2
+
+    def test_deterministic_across_python_hash_seeds(self):
+        code = """
+import sys
+sys.path.insert(0, 'src')
+from journals import generate_journal_entry
+crew={'name':'Chen W.','role':'CMDR','hp':90,'mor':75,'alive':True,'st':'Nominal','rad':20}
+state={'o2_days':20,'food_days':20,'power':300,'modules':[],'research':[],'crew':[crew]}
+print(generate_journal_entry(crew,state,[],42,seed=7))
+"""
+        root = Path(__file__).resolve().parents[1]
+        outputs = []
+        for hash_seed in ("1", "999"):
+            environment = {**os.environ, "PYTHONHASHSEED": hash_seed}
+            outputs.append(subprocess.check_output(
+                [sys.executable, "-c", code],
+                cwd=root,
+                env=environment,
+                text=True,
+            ))
+        assert outputs[0] == outputs[1]
 
     def test_generate_all(self):
         crew = [

@@ -169,6 +169,23 @@ class TestColonyIntegration:
         produce(c2, 300.0, alloc)
         assert c2.resources.power_kwh > c1.resources.power_kwh
 
+    def test_water_recycling_reduces_consumption(self):
+        from colony import consume
+
+        control = create_colony("Control")
+        researched = create_colony("Researched")
+        researched.research = ResearchLab()
+        researched.research.completed.append("water_recycling")
+        control_start = control.resources.h2o_liters
+        researched_start = researched.resources.h2o_liters
+
+        consume(control, Allocation())
+        consume(researched, Allocation())
+
+        control_used = control_start - control.resources.h2o_liters
+        researched_used = researched_start - researched.resources.h2o_liters
+        assert abs(researched_used - control_used * 0.8) < 1e-9
+
     def test_serialize_includes_research(self):
         from colony import serialize
         colony = create_colony("Test")

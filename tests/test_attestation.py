@@ -240,6 +240,30 @@ class TestAttestationBuilding:
             assert batch[1].prev_frame_hash == batch[0].frame_hash
             assert batch[2].prev_frame_hash == batch[1].frame_hash
 
+    def test_partial_batch_uses_predecessor_anchor(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir = Path(tmpdir)
+            frame1 = _make_frame(1, prev_sol=None)
+            _write_frame(tmpdir, frame1)
+            _write_frame(tmpdir, _make_frame(2, prev_sol=1))
+            _write_frame(tmpdir, _make_frame(3, prev_sol=2))
+
+            batch = build_attestation_batch(tmpdir, from_sol=2, to_sol=3)
+
+            assert batch[0].prev_frame_hash == hash_frame(frame1)
+            assert batch[1].prev_frame_hash == batch[0].frame_hash
+
+    def test_partial_batch_missing_predecessor_fails(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir = Path(tmpdir)
+            _write_frame(tmpdir, _make_frame(2, prev_sol=1))
+            try:
+                build_attestation_batch(tmpdir, from_sol=2, to_sol=2)
+            except FileNotFoundError as error:
+                assert "sol-0001.json" in str(error)
+            else:
+                raise AssertionError("Missing predecessor was accepted")
+
     def test_attestation_to_dict(self):
         frame = _make_frame(1)
         att = build_attestation(frame)
@@ -330,6 +354,15 @@ class TestOnChainVerification:
         result = verify_frame_on_chain(config, 1, "a" * 64)
         assert result.valid
         assert result.attested_at == 1700000000
+        rpc_url, address, call_data = mock_eth_call.call_args.args
+        assert rpc_url == config.rpc_url
+        assert address == config.contract_address
+        assert call_data == (
+            "0xa2ec70be"
+            + format(1, "064x")
+            + "a" * 64
+        )
+        assert len(call_data) == 2 + 8 + 64 + 64
 
     @patch("attestation._eth_call")
     def test_invalid_attestation(self, mock_eth_call):
@@ -363,6 +396,7 @@ class TestOnChainVerification:
         )
         sol = get_latest_attested_sol(config)
         assert sol == 729
+        assert mock_eth_call.call_args.args[2] == "0xe396b797"
 
     def test_get_latest_sol_unconfigured(self):
         config = AttestationConfig()
@@ -377,7 +411,7 @@ class TestTwinVerificationGate:
     """The gate the physical twin uses before acting on any frame."""
 
     def test_local_only_verification(self):
-        gate = TwinVerificationGate()
+        gate = TwinVerificationGate(require_on_chain=False)
         with tempfile.TemporaryDirectory() as tmpdir:
             frame = _make_frame(1)
             path = _write_frame(Path(tmpdir), frame)
@@ -387,7 +421,7 @@ class TestTwinVerificationGate:
             assert gate.last_verified_sol == 1
 
     def test_tampered_frame_rejected(self):
-        gate = TwinVerificationGate()
+        gate = TwinVerificationGate(require_on_chain=False)
         with tempfile.TemporaryDirectory() as tmpdir:
             frame = _make_frame(1)
             frame["_hash"] = "0000000000000000"  # Tampered
@@ -398,13 +432,37 @@ class TestTwinVerificationGate:
             assert gate.last_verified_sol == 0  # Not updated
 
     def test_missing_file_rejected(self):
-        gate = TwinVerificationGate()
+        gate = TwinVerificationGate(require_on_chain=False)
         result = gate.verify_frame(Path("/nonexistent/sol-0001.json"))
         assert not result.valid
         assert "cannot load" in result.error.lower()
 
+    def test_hashless_frame_rejected(self):
+        gate = TwinVerificationGate(require_on_chain=False)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            frame = _make_frame(1)
+            del frame["_hash"]
+            path = _write_frame(Path(tmpdir), frame)
+            result = gate.verify_frame(path)
+            assert not result.valid
+            assert "must contain" in result.error
+
+    def test_replay_and_rollback_rejected(self):
+        gate = TwinVerificationGate(require_on_chain=False)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir = Path(tmpdir)
+            sol10 = _write_frame(tmpdir, _make_frame(10, prev_sol=9))
+            assert gate.verify_frame(sol10).valid
+            sol5 = _write_frame(tmpdir, _make_frame(5, prev_sol=4))
+            result = gate.verify_frame(sol5)
+            assert not result.valid
+            assert gate.last_verified_sol == 10
+            duplicate = gate.verify_frame(sol10)
+            assert not duplicate.valid
+            assert gate.last_verified_sol == 10
+
     def test_sequential_verification(self):
-        gate = TwinVerificationGate()
+        gate = TwinVerificationGate(require_on_chain=False)
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir = Path(tmpdir)
             for sol in range(1, 4):
@@ -429,6 +487,16 @@ class TestTwinVerificationGate:
             path = _write_frame(Path(tmpdir), frame)
             result = gate.verify_frame(path)
             assert result.valid
+
+    def test_on_chain_required_but_unconfigured_fails_closed(self):
+        gate = TwinVerificationGate(require_on_chain=True)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            frame = _make_frame(1)
+            path = _write_frame(Path(tmpdir), frame)
+            result = gate.verify_frame(path)
+            assert not result.valid
+            assert "required but not configured" in result.error
+            assert gate.last_verified_sol == 0
 
 
 # =============================================================================

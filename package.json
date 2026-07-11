@@ -8,7 +8,11 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run test:python && npm run test:frames && npm run test:node && npm run test:browser",
+    "test:python": "python3 tools/run_tests.py",
+    "test:frames": "python3 tools/generate_frames.py --check",
+    "test:node": "node --test tests/*.test.js",
+    "test:browser": "playwright test"
   },
   "keywords": [],
   "author": "",

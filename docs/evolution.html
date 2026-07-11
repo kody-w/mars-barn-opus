@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>First Principles to Mars - Evolution Log</title>
+  <style>
+    :root{--bg:#07090d;--panel:#10151d;--line:#253143;--text:#e6edf3;--dim:#8b949e;
+      --cyan:#58a6ff;--green:#3fb950;--orange:#f0883e;--purple:#bc8cff}
+    *{box-sizing:border-box} body{margin:0;background:
+      radial-gradient(circle at 80% 0,#3b1a1022,transparent 35%),
+      radial-gradient(circle at 10% 15%,#12345b33,transparent 35%),var(--bg);
+      color:var(--text);font:15px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}
+    a{color:var(--cyan)} .wrap{width:min(1120px,92vw);margin:auto}
+    header{padding:68px 0 32px;border-bottom:1px solid var(--line)}
+    .eyebrow{color:var(--orange);letter-spacing:.18em;font-size:12px}
+    h1{font:700 clamp(36px,7vw,76px)/.95 system-ui;margin:12px 0}
+    .lede{max-width:760px;color:#b8c2cc;font-size:18px}
+    nav{display:flex;gap:14px;flex-wrap:wrap;margin-top:24px}
+    nav a,.filter{border:1px solid var(--line);background:#0b1119;color:var(--text);
+      padding:8px 12px;border-radius:999px;text-decoration:none;cursor:pointer}
+    nav a:hover,.filter:hover,.filter.active{border-color:var(--cyan);color:var(--cyan)}
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:30px 0}
+    .stat,.card,.phase{background:linear-gradient(145deg,#121923,#0c1118);
+      border:1px solid var(--line);border-radius:14px;padding:18px}
+    .stat strong{display:block;font:700 28px system-ui;color:var(--green)}
+    section{padding:44px 0} h2{font:700 30px system-ui;margin:0 0 8px}
+    .sub{color:var(--dim);margin:0 0 22px}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+    .card h3{margin:4px 0 8px;font:700 19px system-ui}.tag{color:var(--purple);font-size:11px}
+    .why{border-left:3px solid var(--green);padding-left:11px;color:#b9e6c2}
+    .timeline{display:grid;gap:12px}.phase{display:grid;grid-template-columns:120px 1fr;gap:18px}
+    .phase b{color:var(--orange)} code{color:#c9d1d9;background:#080c12;padding:2px 5px;border-radius:4px}
+    footer{border-top:1px solid var(--line);padding:28px 0 50px;color:var(--dim)}
+    @media(max-width:600px){header{padding-top:38px}.phase{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header><div class="wrap">
+    <div class="eyebrow">24-HOUR AUTONOMOUS PRODUCT EVOLUTION</div>
+    <h1>What changed<br>and why it is cool.</h1>
+    <p class="lede">Eight independent strategy lenses repeatedly reviewed the improved build.
+      Each cycle selected three consensus upgrades, implemented them, and ran the full release gate.
+      The result is a much more playable, deterministic, secure, and honest Mars survival system.</p>
+    <nav>
+      <a href="viewer.html">Play the evolved game</a>
+      <a href="simhub.html">Open SimHub</a>
+      <a href="replay.html">Replay a cartridge</a>
+      <a href="../README.md">Read the project</a>
+    </nav>
+    <div class="stats">
+      <div class="stat"><strong>20+</strong>consensus cycles</div>
+      <div class="stat"><strong>350+</strong>dependency-free Python tests</div>
+      <div class="stat"><strong>100+</strong>browser journeys</div>
+      <div class="stat"><strong>1,067</strong>validated immutable frames</div>
+    </div>
+  </div></header>
+
+  <main class="wrap">
+    <section>
+      <h2>The biggest improvements</h2>
+      <p class="sub">Filter the story by the kind of improvement you care about.</p>
+      <div class="filters">
+        <button class="filter active" data-filter="all">All</button>
+        <button class="filter" data-filter="game">Game</button>
+        <button class="filter" data-filter="physics">Physics</button>
+        <button class="filter" data-filter="trust">Trust</button>
+        <button class="filter" data-filter="platform">Platform</button>
+      </div>
+      <div class="grid" id="cards">
+        <article class="card" data-kind="game"><div class="tag">GAME</div>
+          <h3>The first tick actually works</h3>
+          <p>The fatal research-event ordering bug was removed, WebGL became optional, and a dashboard
+            fallback starts missions even on low-end or headless browsers.</p>
+          <p class="why">Why cool: the ambitious demo became a game you can reliably start and play.</p></article>
+        <article class="card" data-kind="game physics"><div class="tag">MISSIONS</div>
+          <h3>Robots are finally robots</h3>
+          <p>OPT and LUN crews no longer breathe or eat, but they do consume power and fail when power is gone.
+            Lunar darkness, ISRU repair, Dust Bowl storms, resupply rules, and living victory are executable.</p>
+          <p class="why">Why cool: mission selection changes the actual survival problem, not just the skin.</p></article>
+        <article class="card" data-kind="physics"><div class="tag">PHYSICS</div>
+          <h3>Resources have real costs</h3>
+          <p>ISRU and greenhouse output now debit process energy and water. Heating converts kW to full-sol kWh.
+            Water recycling, solar, crops, and radiation research now affect measured simulation behavior.</p>
+          <p class="why">Why cool: a winning strategy must obey a ledger instead of creating free matter.</p></article>
+        <article class="card" data-kind="trust platform"><div class="tag">FRAME LEDGER</div>
+          <h3>1,067 frames reconciled safely</h3>
+          <p>Every immutable frame is indexed with SHA-256 file identity. Publication is frozen against collisions,
+            truncation, tampering, gaps, and unsupported schemas. Mixed legacy frames normalize at consumption.</p>
+          <p class="why">Why cool: every player can face the same auditable Mars history.</p></article>
+        <article class="card" data-kind="trust"><div class="tag">SECURITY</div>
+          <h3>Untrusted data stays untrusted</h3>
+          <p>Cartridges, replay files, peer messages, SimHub fields, iframe content, twin commands, wallet transfers,
+            and the local proxy gained validation, sandboxing, escaping, bounds, and fail-closed behavior.</p>
+          <p class="why">Why cool: sharing a run no longer means trusting arbitrary executable content.</p></article>
+        <article class="card" data-kind="platform trust"><div class="tag">DETERMINISM</div>
+          <h3>Save means resume</h3>
+          <p>The browser PRNG cursor is serialized. Multi-colony governors and journals are stable across processes.
+            Event duration, terminal ticks, chain blocks, and replay windows now have explicit deterministic rules.</p>
+          <p class="why">Why cool: two copies of the same experiment can produce the same evidence.</p></article>
+        <article class="card" data-kind="platform"><div class="tag">RELEASE ENGINEERING</div>
+          <h3>One command proves the build</h3>
+          <p><code>npm test</code> runs a dependency-free Python collector, frame-ledger validation,
+            Node security/contract tests, and Playwright journeys. Read-only CI runs the same gate.</p>
+          <p class="why">Why cool: the test command is now the executable product contract.</p></article>
+        <article class="card" data-kind="game trust"><div class="tag">AUTONOMY</div>
+          <h3>Assistance is recorded, not hidden</h3>
+          <p>Human tasks, emergency actions, landing control, twin commands, and Earth supply launches enter an
+            intervention ledger. Assisted and legacy runs cannot quietly claim autonomous status.</p>
+          <p class="why">Why cool: the scoreboard can distinguish an AI achievement from a human rescue.</p></article>
+      </div>
+    </section>
+
+    <section>
+      <h2>How the evolution unfolded</h2>
+      <p class="sub">The work deliberately moved from “can it run?” to “can it be trusted?”</p>
+      <div class="timeline">
+        <div class="phase"><b>Cycles 1-4</b><div><strong>Stabilize the organism.</strong>
+          Browser ticks, WebGL fallback, robot metabolism, selected LisPy programs, frame reconciliation,
+          atomic terminal states, and strict cartridge/twin validation.</div></div>
+        <div class="phase"><b>Cycles 5-8</b><div><strong>Make runs portable and accountable.</strong>
+          Chain checks, intervention provenance, RNG checkpoints, truthful replay windows, mission victory,
+          Dust Bowl behavior, mission parity, sabotage, and conserved trade.</div></div>
+        <div class="phase"><b>Cycles 9-13</b><div><strong>Close the physics and verification gaps.</strong>
+          Dehydration, allocation simplex, governor memory, process power/water, event effects,
+          attestation calldata, exact event lifetimes, research physics, and flare-dose parity.</div></div>
+        <div class="phase"><b>Cycles 14+</b><div><strong>Harden every boundary.</strong>
+          Missing-frame blocking, replay safety, wallet invariants, Lunar/ISRU mission rules,
+          physical-twin rollback protection, and cross-page telemetry fidelity.</div></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>The honest remaining frontier</h2>
+      <div class="grid">
+        <article class="card"><h3>One shared rules kernel</h3>
+          <p>Several historical browser/Node/Python engines still encode overlapping simulation logic.
+            Cross-runtime golden traces are the next architectural ceiling.</p></article>
+        <article class="card"><h3>Exhaustive hazard dispatch</h3>
+          <p>The public ledger contains more hazard families than every consumer currently executes.
+            Official runs should eventually handle or explicitly classify every type.</p></article>
+        <article class="card"><h3>One official scoring vocabulary</h3>
+          <p>Game points, autonomy sols, diagnostic fitness, and official Monte Carlo scores must remain
+            clearly versioned and never masquerade as real-world certification.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="wrap">Built by autonomous consensus cycles. The code is the argument.</div></footer>
+  <script>
+    const buttons=[...document.querySelectorAll('.filter')];
+    const cards=[...document.querySelectorAll('#cards .card')];
+    buttons.forEach(button=>button.addEventListener('click',()=>{
+      buttons.forEach(item=>item.classList.remove('active'));
+      button.classList.add('active');
+      const filter=button.dataset.filter;
+      cards.forEach(card=>{
+        card.hidden=filter!=='all'&&!card.dataset.kind.split(' ').includes(filter);
+      });
+    }));
+  </script>
+</body>
+</html>

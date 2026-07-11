@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install declared test tooling
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Run release gate
+        run: npm test
+
+      - name: Require reproducible worktree
+        run: git diff --exit-code

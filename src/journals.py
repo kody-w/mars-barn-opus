@@ -9,6 +9,7 @@ Chen W. feel like a person instead of a health bar.
 """
 from __future__ import annotations
 
+import hashlib
 import random
 from typing import Dict, List, Optional
 
@@ -148,7 +149,12 @@ def generate_journal_entry(crew_member: Dict, colony_state: Dict,
     if not crew_member.get("alive", True):
         return ""
 
-    rng = random.Random(sol * 1000 + seed + hash(crew_member.get("name", "")))
+    name_bytes = crew_member.get("name", "").encode("utf-8")
+    stable_name = int.from_bytes(
+        hashlib.sha256(name_bytes).digest()[:8],
+        "big",
+    )
+    rng = random.Random(sol * 1000 + seed + stable_name)
     lines = []
 
     name = crew_member.get("name", "Unknown")

@@ -184,3 +184,48 @@ class TestCrewColonyIntegration:
         data = serialize(colony)
         assert data["crew"] is not None
         assert len(data["crew"]) == 4
+
+    def test_event_radiation_reaches_colony_and_crew_once(self):
+        from colony import create_colony, step, Allocation
+
+        colony = create_colony("Test")
+        colony.crew = generate_crew(size=4, seed=42)
+        step(
+            colony,
+            300.0,
+            250.0,
+            Allocation(),
+            active_events=[{"effects": {"radiation_msv": 25.0}}],
+            radiation_msv=0.5,
+        )
+        assert colony.cumulative_radiation_msv == 25.5
+        assert all(
+            member.radiation_dose_msv == 25.5
+            for member in colony.crew.members
+        )
+
+    def test_research_and_shelter_radiation_protection_compose(self):
+        from colony import create_colony, step, Allocation
+        from modules import BuiltModule, ColonyBase
+        from research import ResearchLab
+
+        colony = create_colony("Protected")
+        colony.crew = generate_crew(size=4, seed=42)
+        colony.research = ResearchLab()
+        colony.research.completed.append("radiation_hardening")
+        colony.base = ColonyBase()
+        colony.base.modules.append(BuiltModule("radiation_shelter"))
+
+        step(
+            colony,
+            300.0,
+            250.0,
+            Allocation(),
+            radiation_msv=20.0,
+        )
+
+        assert abs(colony.cumulative_radiation_msv - 5.6) < 1e-9
+        assert all(
+            abs(member.radiation_dose_msv - 5.6) < 1e-9
+            for member in colony.crew.members
+        )

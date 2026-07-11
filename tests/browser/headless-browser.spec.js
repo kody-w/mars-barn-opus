@@ -22,6 +22,43 @@ test.describe('LisPy Headless Browser', () => {
     expect(methods).toHaveLength(14);
   });
 
+  test('external srcdoc runs in an opaque scriptless sandbox', async ({ page }) => {
+    const result = await page.evaluate(async () => {
+      window.__vOSCompromised = false;
+      window.os.browser._html = '<script>parent.__vOSCompromised=true</script><img src=x onerror="parent.__vOSCompromised=true">';
+      window.os.browser._doc = new DOMParser().parseFromString(
+        window.os.browser._html,
+        'text/html'
+      );
+      window.os.browser._renderToGUI('https://attacker.invalid/');
+      await new Promise(resolve => setTimeout(resolve, 100));
+      const iframe = document.querySelector('#win-iframe-vbrowser iframe');
+      return {
+        compromised: window.__vOSCompromised,
+        sandbox: iframe?.getAttribute('sandbox') || '',
+      };
+    });
+
+    expect(result.compromised).toBe(false);
+    expect(result.sandbox).not.toContain('allow-scripts');
+    expect(result.sandbox).not.toContain('allow-same-origin');
+  });
+
+  test('trusted-host substrings cannot bypass external URL routing', async ({ page }) => {
+    let privateRequests=0;
+    await page.route('http://127.0.0.1:3000/**', route => {
+      privateRequests++;
+      return route.abort();
+    });
+    const result = await page.evaluate(() =>
+      window.os.browser.open(
+        'http://127.0.0.1:3000/admin?next=localhost:8787'
+      )
+    );
+    expect(privateRequests).toBe(0);
+    expect(result).toContain('Unavailable');
+  });
+
   // ── Loading Pages ──
 
   test('browser-open loads a page', async ({ page }) => {

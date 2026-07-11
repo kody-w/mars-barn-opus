@@ -33,11 +33,11 @@ DEFAULT_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000"
 # EVM function selectors (first 4 bytes of keccak256 of the signature)
 # Pre-computed because we can't do keccak256 in stdlib.
 # verify(uint64,bytes32) → selector
-SELECTOR_VERIFY = "0x8e760afe"
+SELECTOR_VERIFY = "0xa2ec70be"
 # getAttestation(uint64) → selector
-SELECTOR_GET_ATTESTATION = "0x6d568c43"
+SELECTOR_GET_ATTESTATION = "0x62252880"
 # latestSol() → selector
-SELECTOR_LATEST_SOL = "0x7a3c4b5d"
+SELECTOR_LATEST_SOL = "0xe396b797"
 
 
 # =============================================================================
@@ -347,6 +347,15 @@ def build_attestation_batch(frames_dir: Path,
     attestations = []
     prev_data = None
 
+    if from_sol > 1:
+        previous_path = frames_dir / f"sol-{from_sol - 1:04d}.json"
+        if not previous_path.exists():
+            raise FileNotFoundError(
+                f"Missing predecessor frame: {previous_path.name}"
+            )
+        with open(previous_path) as previous_file:
+            prev_data = json.load(previous_file)
+
     if to_sol is None:
         frame_files = sorted(frames_dir.glob("sol-*.json"))
         if not frame_files:
@@ -356,7 +365,7 @@ def build_attestation_batch(frames_dir: Path,
     for sol in range(from_sol, to_sol + 1):
         path = frames_dir / f"sol-{sol:04d}.json"
         if not path.exists():
-            continue
+            raise FileNotFoundError(f"Missing frame in batch: {path.name}")
 
         with open(path) as f:
             data = json.load(f)
@@ -381,7 +390,7 @@ class TwinVerificationGate:
     enters safe mode — all actuators go to nominal defaults.
     """
     config: AttestationConfig = field(default_factory=AttestationConfig)
-    require_on_chain: bool = False  # If True, frames MUST be attested on-chain
+    require_on_chain: bool = True  # Physical twin defaults to authenticated frames
     last_verified_sol: int = 0
 
     def verify_frame(self, frame_path: Path) -> VerificationResult:
@@ -404,17 +413,38 @@ class TwinVerificationGate:
 
         # Verify local hash matches stored hash
         stored_hash = data.get("_hash", "")
-        if stored_hash:
-            hash_prefix = local_hash[:len(stored_hash)]
-            if hash_prefix != stored_hash:
-                return VerificationResult(
-                    sol=sol, local_hash=local_hash, chain_hash=None,
-                    valid=False, attested_at=0,
-                    error=f"Local hash mismatch: computed {hash_prefix} != stored {stored_hash}"
-                )
+        if not isinstance(stored_hash, str) or len(stored_hash) != 16:
+            return VerificationResult(
+                sol=sol, local_hash=local_hash, chain_hash=None,
+                valid=False, attested_at=0,
+                error="Frame must contain a 16-character legacy hash",
+            )
+        hash_prefix = local_hash[:16]
+        if hash_prefix != stored_hash:
+            return VerificationResult(
+                sol=sol, local_hash=local_hash, chain_hash=None,
+                valid=False, attested_at=0,
+                error=f"Local hash mismatch: computed {hash_prefix} != stored {stored_hash}"
+            )
 
-        # If on-chain verification is required and configured
-        if self.require_on_chain and self.config.is_configured:
+        if self.last_verified_sol and sol != self.last_verified_sol + 1:
+            return VerificationResult(
+                sol=sol, local_hash=local_hash, chain_hash=None,
+                valid=False, attested_at=0,
+                error=(
+                    f"Expected Sol {self.last_verified_sol + 1}, got Sol {sol}"
+                ),
+            )
+
+        # Required attestation never degrades to local-only verification.
+        if self.require_on_chain and not self.config.is_configured:
+            return VerificationResult(
+                sol=sol, local_hash=local_hash, chain_hash=None,
+                valid=False, attested_at=0,
+                error="On-chain verification required but not configured",
+            )
+
+        if self.require_on_chain:
             result = verify_frame_on_chain(self.config, sol, local_hash)
             if result.valid:
                 self.last_verified_sol = sol

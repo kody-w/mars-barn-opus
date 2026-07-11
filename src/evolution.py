@@ -137,9 +137,8 @@ def evaluate_genome(genome: Genome, seeds: List[int] = None,
             irradiance = daily_mean_irradiance(0.0, sol_of_year, dust_factor) * solar_mult
             atm = atmosphere_at(0.0, 0.0, sol_of_year, dust_factor=dust_factor)
             ext_temp = atm.temperature_k
-            rad = radiation_dose(sol_count=1, in_habitat=True,
-                solar_flare=any(e.event_type == "solar_flare"
-                               for e in events.active_events))
+            rad = radiation_dose(
+                sol_count=1, in_habitat=True, solar_flare=False)
 
             allocation = gov.decide(colony, len(events.active_events), prev)
             prev = Resources(

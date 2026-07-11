@@ -675,6 +675,18 @@ function maxWindow(winId){
 const RAW_BASE = 'https://raw.githubusercontent.com/kody-w/mars-barn-opus/main';
 let govFrameData = [];
 
+function govFrameMars(frame){
+  const raw=frame?.mars||frame?.environment||{};
+  const tempK=raw.temp_k??raw.temperature_k;
+  const tempC=raw.temp_c??raw.temperature_c;
+  return {
+    temp_c:tempC??(tempK==null?-60:tempK-273.15),
+    dust_tau:raw.dust_tau??(raw.dust_storm?0.8:0.15),
+    solar_wm2:raw.solar_wm2??raw.solar_irradiance??490,
+    wind_ms:raw.wind_ms??raw.wind_speed_ms??4,
+  };
+}
+
 async function govRefresh(){
   const st = document.getElementById('gov-status');
   st.textContent = 'Loading...';
@@ -701,7 +713,7 @@ async function govRefresh(){
 
     // Latest frame conditions
     const frame = await fetch(RAW_BASE+'/data/frames/sol-'+String(latest.sol).padStart(4,'0')+'.json').then(r=>r.json());
-    const m = frame.mars;
+    const m = govFrameMars(frame);
     document.getElementById('gm-temp').textContent = m.temp_c+'°C';
     document.getElementById('gm-dust').textContent = m.dust_tau;
     document.getElementById('gm-solar').textContent = m.solar_wm2;
@@ -754,14 +766,15 @@ function drawGovDustChart(){
   const w = rect.width - 24, h = 60;
   ctx.clearRect(0,0,w,h);
 
-  const maxDust = Math.max(...govFrameData.map(f=>f.mars.dust_tau), 0.5);
+  const maxDust = Math.max(...govFrameData.map(f=>govFrameMars(f).dust_tau), 0.5);
   const barW = Math.max(1, w / govFrameData.length);
 
   // Dust line
   ctx.beginPath();
   govFrameData.forEach((f,i)=>{
+    const dustTau=govFrameMars(f).dust_tau;
     const x = i * barW;
-    const y = h - (f.mars.dust_tau / maxDust) * h * 0.9 - 2;
+    const y = h - (dustTau / maxDust) * h * 0.9 - 2;
     if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
   });
   ctx.strokeStyle = '#d29922';
@@ -805,9 +818,9 @@ function simSolIrr(sol,dust){const y=sol%669,a=2*Math.PI*(y-445)/669;return 589*
 
 const MISSIONS_SIM={
   optimus:{power:800,crew:[{n:'OPT-01',bot:true,hp:100},{n:'OPT-02',bot:true,hp:100},{n:'OPT-03',bot:true,hp:100},{n:'OPT-04',bot:true,hp:100}]},
-  hybrid:{o2:150,h2o:400,food:400000,power:800,crew:[{n:'Chen',bot:false,hp:97},{n:'Rod',bot:false,hp:96},{n:'OPT-01',bot:true,hp:100},{n:'OPT-02',bot:true,hp:100},{n:'OPT-03',bot:true,hp:100},{n:'OPT-04',bot:true,hp:100}]},
+  hybrid:{o2:50,h2o:200,food:150000,power:800,crew:[{n:'Chen',bot:false,hp:97},{n:'Rod',bot:false,hp:96},{n:'OPT-01',bot:true,hp:100},{n:'OPT-02',bot:true,hp:100},{n:'OPT-03',bot:true,hp:100},{n:'OPT-04',bot:true,hp:100}]},
   ares:{o2:100,h2o:300,food:300000,power:500,crew:[{n:'Chen',bot:false,hp:97},{n:'Rod',bot:false,hp:96},{n:'Okafor',bot:false,hp:98},{n:'Johan',bot:false,hp:95}]},
-  garden:{o2:300,h2o:900,food:900000,power:1000,crew:[{n:'Chen',bot:false,hp:97},{n:'Rod',bot:false,hp:96},{n:'Okafor',bot:false,hp:98},{n:'Johan',bot:false,hp:95},{n:'OPT-01',bot:true,hp:100},{n:'OPT-02',bot:true,hp:100}]},
+  garden:{o2:300,h2o:900,food:900000,power:1000,crew:[{n:'Chen',bot:false,hp:97},{n:'Rod',bot:false,hp:96},{n:'Okafor',bot:false,hp:98},{n:'Johan',bot:false,hp:95},{n:'Kim',bot:false,hp:96},{n:'Volkov',bot:false,hp:97}]},
   skeleton:{o2:25,h2o:75,food:75000,power:300,crew:[{n:'Chen',bot:false,hp:97},{n:'Rod',bot:false,hp:96}]}
 };
 
@@ -1219,30 +1232,35 @@ window.os = {
         return 'Ready';
       }
 
-      // Same-origin: fetch directly (no proxy needed)
-      const isExternal = url.startsWith('https://') || url.startsWith('http://');
-      const isSameOrigin = !isExternal || url.includes(window.location.host);
+      let resolvedUrl;
+      try{
+        resolvedUrl=new URL(url,window.location.href);
+      }catch{
+        return 'Error: invalid URL';
+      }
+      const isHttp=resolvedUrl.protocol==='http:'||resolvedUrl.protocol==='https:';
+      if(!isHttp)return 'Error: only HTTP(S) URLs are supported';
+      const isSameOrigin=resolvedUrl.origin===window.location.origin;
 
       if (isSameOrigin) {
         try {
-          const resp = await fetch(url);
+          const resp = await fetch(resolvedUrl.href);
           this._status = resp.status;
           this._html = await resp.text();
           const parser = new DOMParser();
           this._doc = parser.parseFromString(this._html, 'text/html');
-          this._renderToGUI(url);
-          return 'Loaded: ' + url;
+          this._renderToGUI(resolvedUrl.href);
+          return 'Loaded: ' + resolvedUrl.href;
         } catch (e) {
           return 'Error: ' + e.message;
         }
+        url=resolvedUrl.href;
       }
 
       // External URL: fetch through proxy chain, inject via srcdoc
       // This bypasses X-Frame-Options — the engine fetches, not the iframe.
       const proxies = [
-        'https://api.allorigins.win/raw?url=',                  // Public proxy (global, free)
-        'https://corsproxy.io/?',                                // Public fallback (global, free)
-        'http://localhost:8789/?url=',                           // Local dev proxy (optional)
+        'http://localhost:8789/?url=', // Explicit local development proxy only
       ];
 
       this._renderToGUI(url); // Show window immediately with loading state
@@ -1415,7 +1433,7 @@ window.os = {
             <button onclick="window.os.browser._goBack()" style="background:none;border:none;color:#8b949e;font-size:14px;cursor:pointer;padding:2px 6px" title="Back">◀</button>
             <button onclick="window.os.browser._goForward()" style="background:none;border:none;color:#8b949e;font-size:14px;cursor:pointer;padding:2px 6px" title="Forward">▶</button>
             <button onclick="window.os.browser._reload()" style="background:none;border:none;color:#8b949e;font-size:14px;cursor:pointer;padding:2px 6px" title="Reload">⟳</button>
-            <input id="vos-url-bar" type="text" value="${url||''}" placeholder="Enter URL..."
+            <input id="vos-url-bar" type="text" value="" placeholder="Enter URL..."
               style="flex:1;background:#0d1117;border:1px solid #30363d;border-radius:4px;color:#c9d1d9;font-family:monospace;font-size:12px;padding:5px 10px;outline:none"
               onkeydown="if(event.key==='Enter'){window.os.browser.open(this.value)}"
               onfocus="this.select()">
@@ -1437,6 +1455,14 @@ window.os = {
       // Always inject via srcdoc — the engine fetches, the iframe just renders
       const iframe = win.querySelector('iframe');
       if (iframe) {
+        const resolvedUrl = new URL(url || 'about:blank', window.location.href);
+        const trustedLocal = resolvedUrl.origin === window.location.origin;
+        iframe.setAttribute(
+          'sandbox',
+          trustedLocal
+            ? 'allow-scripts allow-same-origin allow-forms allow-popups allow-pointer-lock'
+            : 'allow-forms allow-popups'
+        );
         if (this._html) {
           iframe.removeAttribute('src');
           iframe.srcdoc = this._html;

@@ -185,15 +185,7 @@ class TestSabotage:
         c.resources.food_kcal = 100.0
         c.resources.power_kwh = 1.0
         target = create_colony("Target")
-        # desperation ~1.0 * aggression 0.6 = 0.6 > (1.0 - 0.20) = 0.80 ? No...
-        # Let's check: days_of("power") = 1.0/30 = 0.033, desp = 1.0 - 0.033/30 = 0.999
-        # score = 0.999 * 0.6 = 0.599 vs threshold 0.80. Still no.
-        # The math requires aggression * desperation > 1 - sabotage_threshold.
-        # For contrarian: 0.8 * 1.0 = 0.8 vs 0.85 — close but no.
-        # For hermit: 0.3 * 1.0 = 0.3 vs 0.75 — no.
-        # The sabotage bar is intentionally high. Test the boundary:
-        result = g.consider_sabotage(c, target)
-        assert isinstance(result, bool)  # Just verify it doesn't crash
+        assert g.consider_sabotage(c, target) is True
 
     def test_stable_philosopher_doesnt_sabotage(self):
         g = create_governor("Test", "philosopher")
@@ -201,13 +193,10 @@ class TestSabotage:
         target = create_colony("Target")
         assert g.consider_sabotage(c, target) is False
 
-    def test_hermit_sabotages_when_cornered(self):
+    def test_low_aggression_hermit_doesnt_sabotage(self):
         g = create_governor("Test", "hermit")
         c = create_colony("Attacker")
         c.resources.o2_kg = 2.0
         c.resources.h2o_liters = 3.0
         target = create_colony("Target")
-        # Hermit has low threshold + high sabotage tendency when desperate
-        result = g.consider_sabotage(c, target)
-        # May or may not depending on exact desperation calc
-        assert isinstance(result, bool)
+        assert g.consider_sabotage(c, target) is False

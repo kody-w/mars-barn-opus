@@ -317,7 +317,7 @@ function tick(st, sol, frame, R, govCode, vm){
       if(h.type==='supply_cache_contamination') st.food=Math.max(0,st.food*(1-(h.food_loss_pct||0.15)));
     }
   }
-  st.ev=st.ev.filter(e=>{e.r--;return e.r>0});
+  st.ev=st.ev.filter(e=>e.r>0);
   if(R()<0.012*(1+st.cri/80)){st.ie*=(1-0.02);st.power=Math.max(0,st.power-2)}
 
   // Run governor (LisPy program)
@@ -382,6 +382,8 @@ function tick(st, sol, frame, R, govCode, vm){
   st.cri=Math.min(100,Math.max(0,5+(st.power<50?25:st.power<150?10:0)+st.ev.length*6+(o2d<5?20:0)+(hd<5?20:0)+(fd<5?20:0)));
 
   // Death
+  st.ev.forEach(event=>{event.r--});
+  st.ev=st.ev.filter(event=>event.r>0);
   if(st.o2<=0&&nh>0) return {alive:false,cause:'☠️ Suffocation — O₂ depleted'};
   if(st.food<=0&&nh>0) return {alive:false,cause:'☠️ Starvation — Food exhausted'};
   if(st.h2o<=0&&nh>0) return {alive:false,cause:'☠️ Dehydration — Water gone'};
@@ -410,26 +412,34 @@ let deathCause = null;
 let twinBC = null;
 try { twinBC = new BroadcastChannel('mars-barn-twin'); } catch(e) {}
 
+function playerFrameMars(frame){
+  const raw=frame?.mars||frame?.environment;
+  if(!raw)return null;
+  const tempK=raw.temp_k??raw.temperature_k;
+  return {
+    dust:raw.dust_tau??(raw.dust_storm?0.8:0.15),
+    temp:raw.temp_c??raw.temperature_c??(tempK==null?-47:tempK-273.15),
+    windSpeed:raw.wind_ms??raw.wind_speed_ms??7,
+  };
+}
+
 function broadcastState() {
   if (!twinBC || !STATE) return;
   const ac = STATE.crew.filter(c => c.a);
   const frame = FRAMES ? FRAMES[currentSol] : null;
+  const weather = playerFrameMars(frame);
   twinBC.postMessage({
     sol: currentSol,
     hour: (currentSol % 1) * 24.66,
     cri: STATE.cri / 100,
     crew_alive: ac.length,
-    modules: STATE.mod ? STATE.mod.length : 8,
-    power: STATE.power ? Math.min(100, STATE.power / 10) : 50,
-    o2: STATE.o2 ? Math.min(100, STATE.o2 / 5) : 80,
-    h2o: STATE.h2o ? Math.min(100, STATE.h2o / 5) : 70,
-    food: STATE.food ? Math.min(100, STATE.food / 5) : 60,
+    modules: Array.isArray(STATE.mod) ? STATE.mod.length : 0,
+    power: Number.isFinite(STATE.power) ? Math.min(100, STATE.power / 10) : 0,
+    o2: Number.isFinite(STATE.o2) ? Math.min(100, STATE.o2 / 5) : 0,
+    h2o: Number.isFinite(STATE.h2o) ? Math.min(100, STATE.h2o / 5) : 0,
+    food: Number.isFinite(STATE.food) ? Math.min(100, STATE.food / 5) : 0,
     crew: ac.map(c => ({ name: c.n, hp: c.hp, alive: c.a, bot: c.bot })),
-    weather: frame && frame.mars ? {
-      dust: frame.mars.dust_tau || 0.15,
-      temp: frame.mars.temp_c || -47,
-      windSpeed: frame.mars.wind_ms || 7,
-    } : undefined,
+    weather,
   });
 }
 

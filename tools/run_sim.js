@@ -22,13 +22,69 @@ const FRAMES_DIR = path.join(__dirname, '..', 'data', 'frames');
 const O2_PP = 0.84;    // kg/person/sol
 const H2O_PP = 2.5;    // L/person/sol
 const FOOD_PP = 2500;   // kcal/person/sol
+const PWR_BASE = 30;     // kWh/sol habitat baseline
 const PCRIT = 50;       // kWh critical power
-const PANEL = 15;       // m² panel area
+const PANEL = 200;      // m² panel area
 const EFF = 0.22;       // panel efficiency
-const SOL_H = 12.3;     // Mars daylight hours
-const ISRU_O2 = 2.8;    // kg O₂/sol at full
-const ISRU_H2O = 1.2;   // L H₂O/sol at full
-const GH_KCAL = 3500;   // kcal/sol greenhouse
+const SOL_H = 24.66;    // Mars sol hours
+const ISRU_O2 = 5;      // kg O₂/sol at full
+const ISRU_H2O = 12;    // L H₂O/sol at full
+const GH_KCAL = 15000;  // kcal/sol greenhouse
+const ISRU_PWR = 60;    // kWh/sol process load
+const GH_PWR = 30;      // kWh/sol greenhouse load
+const GH_H2O = 5;       // L/sol greenhouse makeup water
+
+function frameMars(frame){
+  const raw = frame?.mars || frame?.environment || {};
+  const tempK = raw.temp_k ?? raw.temperature_k;
+  const tempC = raw.temp_c ?? raw.temperature_c;
+  return {
+    temp_k: tempK ?? (tempC == null ? 218 : tempC + 273.15),
+    dust_tau: raw.dust_tau ?? (raw.dust_storm ? 0.8 : 0.15),
+    solar_wm2: raw.solar_wm2 ?? raw.solar_irradiance ?? 490,
+    wind_ms: raw.wind_ms ?? raw.wind_speed_ms ?? 4,
+  };
+}
+
+function applyPoweredProduction(state,solarWm2,allocation,dustStorm=false){
+  const solarBonus=1+state.modules.filter(module=>module.type==='solar_farm').length*0.4;
+  state.power+=solarWm2*(dustStorm?0.3:1)*PANEL*EFF*SOL_H/1000*
+    state.s_eff*solarBonus;
+  let discretionary=Math.max(0,state.power-PWR_BASE);
+
+  const requestedIsruScale=Math.min(1.5,allocation.i*2);
+  const requestedIsruPower=ISRU_PWR*requestedIsruScale;
+  const usedIsruPower=Math.min(discretionary,requestedIsruPower);
+  const isruScale=requestedIsruPower>0
+    ?requestedIsruScale*usedIsruPower/requestedIsruPower:0;
+  discretionary-=usedIsruPower;
+  state.power-=usedIsruPower;
+  const isruBonus=1+state.modules.filter(module=>module.type==='isru_plant').length*0.4;
+  state.o2+=ISRU_O2*state.i_eff*isruScale*isruBonus;
+  state.h2o+=ISRU_H2O*state.i_eff*isruScale*isruBonus;
+  state.h2o+=state.modules.filter(module=>module.type==='water_extractor').length*3;
+
+  const requestedGhScale=Math.min(1.5,allocation.g*2);
+  const requestedGhPower=GH_PWR*requestedGhScale;
+  const requestedGhWater=GH_H2O*requestedGhScale;
+  const powerScale=requestedGhPower>0?Math.min(1,discretionary/requestedGhPower):0;
+  const waterScale=requestedGhWater>0?Math.min(1,state.h2o/requestedGhWater):0;
+  const limit=Math.min(powerScale,waterScale);
+  const ghScale=requestedGhScale*limit;
+  state.power-=requestedGhPower*limit;
+  state.h2o-=requestedGhWater*limit;
+  const ghBonus=1+state.modules.filter(module=>module.type==='greenhouse_dome').length*0.5;
+  state.food+=GH_KCAL*state.g_eff*ghScale*ghBonus;
+}
+
+function resourceDelta(before,after){
+  return {
+    o2:after.o2-before.o2,
+    h2o:after.h2o-before.h2o,
+    food:after.food-before.food,
+    power:after.power-before.power,
+  };
+}
 
 // ── LisPy VM (identical to viewer.html) ──
 class LispyVM {
@@ -84,8 +140,12 @@ class LispyVM {
 }
 
 // ── Deterministic RNG ──
-function rng32(seed){let s=seed&0xFFFFFFFF;return()=>{s=(s*1664525+1013904223)&0xFFFFFFFF;return s/0xFFFFFFFF}}
+function rng32(seed){let s=seed>>>0;return()=>{s=(Math.imul(s,1664525)+1013904223)>>>0;return s/0x100000000}}
 let R = rng32(42);
+
+function isRobotCrew(member){
+  return member.bot===true||member.name.startsWith('OPT')||member.name.startsWith('LUN');
+}
 
 // ── Load all frames ──
 function loadFrames(){
@@ -115,12 +175,14 @@ const CRI_PROGRAM = `(begin
 
 function computeCRI(state, dustTau){
   const vm = new LispyVM();
-  const n = Math.max(1, state.crew.filter(c=>c.alive).length);
-  vm.setEnv('o2_days', state.o2/(O2_PP*n));
-  vm.setEnv('h2o_days', state.h2o/(H2O_PP*n));
-  vm.setEnv('food_days', state.food/(FOOD_PP*n));
+  const alive=state.crew.filter(c=>c.alive);
+  const humans=alive.filter(c=>!isRobotCrew(c)).length;
+  const lifeDays=(resource,rate)=>humans===0?Infinity:resource/(rate*humans);
+  vm.setEnv('o2_days', lifeDays(state.o2,O2_PP));
+  vm.setEnv('h2o_days', lifeDays(state.h2o,H2O_PP));
+  vm.setEnv('food_days', lifeDays(state.food,FOOD_PP));
   vm.setEnv('power_kwh', state.power);
-  vm.setEnv('crew_alive', n);
+  vm.setEnv('crew_alive', alive.length);
   vm.setEnv('crew_total', state.crew.length);
   vm.setEnv('morale', state.morale*100);
   vm.setEnv('solar_eff', state.s_eff);
@@ -148,9 +210,9 @@ const MISSIONS = {
       {name:'Rodriguez M.',role:'ENGR',hp:96,fat:0,mor:85,rad:0,alive:true,st:'Nominal'},
       {name:'Okafor A.',role:'SCI',hp:98,fat:0,mor:78,rad:0,alive:true,st:'Nominal'},
       {name:'Johansson K.',role:'MED',hp:95,fat:0,mor:88,rad:0,alive:true,st:'Nominal'},
-      {name:'OPT-01',role:'ENGR',hp:100,fat:0,mor:100,rad:0,alive:true,st:'Nominal'},
-      {name:'OPT-02',role:'ENGR',hp:100,fat:0,mor:100,rad:0,alive:true,st:'Nominal'}]},
-  hybrid: { name:'Hybrid Colony', crew:6, o2:150, h2o:400, food:400000, power:800,
+      {name:'Kim J.',role:'SCI',hp:96,fat:0,mor:80,rad:0,alive:true,st:'Nominal'},
+      {name:'Volkov D.',role:'ENGR',hp:97,fat:0,mor:82,rad:0,alive:true,st:'Nominal'}]},
+  hybrid: { name:'Hybrid Colony', crew:6, o2:50, h2o:200, food:150000, power:800,
     crewList:[
       {name:'Chen W.',role:'CMDR',hp:97,fat:0,mor:82,rad:0,alive:true,st:'Nominal'},
       {name:'Rodriguez M.',role:'ENGR',hp:96,fat:0,mor:85,rad:0,alive:true,st:'Nominal'},
@@ -196,15 +258,16 @@ function runSim(missionKey){
     const ac = state.crew.filter(c=>c.alive);
     const n = ac.length;
     if(!n){state.alive=false;state.cause='all crew lost';break}
+    const pre={o2:state.o2,h2o:state.h2o,food:state.food,power:state.power};
     
     // Humans only consume food/water/o2 — robots just use power
-    const humans = ac.filter(c=>!c.name.startsWith('OPT'));
+    const humans = ac.filter(c=>!isRobotCrew(c));
     const nh = humans.length;
 
     // ── APPLY FRAME DATA (the rules) ──
     let dustTau = 0.15, solarWm2 = 490, windMs = 4, tempK = 218;
     if(frame){
-      const m = frame.mars;
+      const m = frameMars(frame);
       dustTau = m.dust_tau; solarWm2 = m.solar_wm2; windMs = m.wind_ms; tempK = m.temp_k;
       
       // Inject frame events
@@ -227,8 +290,8 @@ function runSim(missionKey){
       }
     }
 
-    // Tick down existing events
-    state.events=state.events.filter(e=>{e.remaining--;return e.remaining>0});
+    // Expired events were already applied for their declared duration.
+    state.events=state.events.filter(e=>e.remaining>0);
 
     // Random events from probabilities (CRI-weighted)
     colonyRiskIndex = computeCRI(state, dustTau);
@@ -263,23 +326,7 @@ function runSim(missionKey){
 
     // ── PRODUCTION ──
     const isDustStorm = state.events.some(e=>e.type==='dust_storm');
-    const solarFactor = solarWm2 / 589;
-    const dustPenalty = isDustStorm ? 0.3 : 1;
-    const solarBonus = 1 + state.modules.filter(m=>m.type==='solar_farm').length * 0.4;
-    state.power += solarFactor * dustPenalty * PANEL * EFF * SOL_H / 1000 * state.s_eff * solarBonus;
-
-    if(state.power > PCRIT * 0.3){
-      const is = Math.min(1.5, a.i * 2);
-      const ib = 1 + state.modules.filter(m=>m.type==='isru_plant').length * 0.4;
-      state.o2 += ISRU_O2 * state.i_eff * is * ib;
-      state.h2o += ISRU_H2O * state.i_eff * is * ib;
-    }
-    state.h2o += state.modules.filter(m=>m.type==='water_extractor').length * 3;
-    if(state.power > PCRIT * 0.3 && state.h2o > 5){
-      const gs = Math.min(1.5, a.g * 2);
-      const gb = 1 + state.modules.filter(m=>m.type==='greenhouse_dome').length * 0.5;
-      state.food += GH_KCAL * state.g_eff * gs * gb;
-    }
+    applyPoweredProduction(state,solarWm2,a,isDustStorm);
 
     // Repair bay slowly restores efficiency
     if(state.modules.some(m=>m.type==='repair_bay')){
@@ -292,7 +339,9 @@ function runSim(missionKey){
     state.o2  = Math.max(0, state.o2  - nh * O2_PP);
     state.h2o = Math.max(0, state.h2o - nh * H2O_PP);
     state.food= Math.max(0, state.food- nh * FOOD_PP * a.r);
-    state.power = Math.max(0, state.power - n * 5 - state.modules.length * 3);
+    const robotCount=ac.filter(isRobotCrew).length;
+    state.power=Math.max(0,state.power-PWR_BASE-robotCount*(PWR_BASE/4)-
+      state.modules.length*3);
 
     // Heating
     const heatPwr = state.power * a.h * 0.5;
@@ -300,7 +349,7 @@ function runSim(missionKey){
 
     // ── CREW HEALTH ──
     ac.forEach(c=>{
-      const isBot = c.name.startsWith('OPT');
+      const isBot = isRobotCrew(c);
       if(!isBot){
         if(state.o2 < O2_PP * 2) c.hp -= 5;
         if(state.food < FOOD_PP * 2) c.hp -= 3;
@@ -315,6 +364,15 @@ function runSim(missionKey){
 
     state.morale = ac.filter(c=>c.alive).reduce((s,c)=>s+c.mor,0)/Math.max(1,ac.filter(c=>c.alive).length)/100;
 
+    // ── TERMINAL CHECK — no progression or rewards after a lethal phase ──
+    const survivingCrew = ac.filter(c=>c.alive);
+    const survivingHumans = survivingCrew.filter(c=>!isRobotCrew(c)).length;
+    if(!survivingCrew.length){state.alive=false;state.cause='all crew lost'}
+    else if(state.o2 <= 0 && survivingHumans > 0){state.alive=false;state.cause='O2 depletion'}
+    else if(state.food <= 0 && survivingHumans > 0){state.alive=false;state.cause='starvation'}
+    else if(state.h2o <= 0 && survivingHumans > 0){state.alive=false;state.cause='dehydration'}
+
+    if(state.alive){
     // ── AUTO-BUILD (every 40 sols if we have power) ──
     if(sol % 40 === 0 && moduleIdx < MODULE_ORDER.length && state.power > 150){
       state.modules.push({type: MODULE_ORDER[moduleIdx], built: sol});
@@ -337,11 +395,12 @@ function runSim(missionKey){
       marsCirculating += reward;
     });
     state.economy = Object.values(state.marsLedger).reduce((s,l)=>s+l.balance, 0);
+    }
 
     // ── ECHO FRAME ──
     const echo = {
       frame: sol, utc: new Date().toISOString(),
-      delta:{o2: state.o2 - (echoHistory.length ? 0 : mission.o2), power: state.power},
+      delta:resourceDelta(pre,state),
       events: state.events.map(e=>({type:e.type,severity:e.severity})),
       alive: state.alive, cri: colonyRiskIndex, reflex_count: 0
     };
@@ -352,12 +411,8 @@ function runSim(missionKey){
     const blockHash = crypto.createHash('sha256').update(blockData).digest('hex').slice(0,16);
     chainBlocks.push({sol, hash:blockHash, prevHash:chainHead, frameHash:frame?._hash||null, circulating:marsCirculating});
     chainHead = blockHash;
-
-    // ── DEATH CHECK ──
-    if(state.o2 <= 0 && nh > 0){state.alive=false;state.cause='O2 depletion'}
-    if(state.food <= 0 && nh > 0){state.alive=false;state.cause='starvation'}
-    if(state.h2o <= 0 && nh > 0){state.alive=false;state.cause='dehydration'}
-    if(!ac.filter(c=>c.alive).length){state.alive=false;state.cause='all crew lost'}
+    state.events.forEach(event=>{event.remaining--});
+    state.events=state.events.filter(event=>event.remaining>0);
 
     // Progress
     if(sol % 25 === 0 || !state.alive){
@@ -372,7 +427,7 @@ function runSim(missionKey){
   // ── FINAL RESULTS ──
   const ac = state.crew.filter(c=>c.alive);
   const n = Math.max(1, ac.length);
-  const nh = ac.filter(c=>!c.name.startsWith('OPT')).length;
+  const nh = ac.filter(c=>!isRobotCrew(c)).length;
 
   console.log('\n=== FINAL RESULTS ===');
   console.log(`Sols: ${state.sol} | ${state.alive?'ALIVE':'DEAD: '+state.cause}`);
@@ -430,6 +485,12 @@ function runSim(missionKey){
 }
 
 // ── CLI ──
-const missionArg = process.argv.find(a=>a.startsWith('--mission='));
-const missionKey = missionArg ? missionArg.split('=')[1] : 'garden';
-runSim(missionKey);
+if(require.main===module){
+  const missionArg = process.argv.find(a=>a.startsWith('--mission='));
+  const missionKey = missionArg ? missionArg.split('=')[1] : 'garden';
+  runSim(missionKey);
+}
+
+module.exports={
+  MISSIONS,applyPoweredProduction,computeCRI,isRobotCrew,resourceDelta,rng32,runSim,
+};

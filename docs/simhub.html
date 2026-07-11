@@ -314,6 +314,21 @@ let allFrames = [];
 let leaderboard = [];
 let pendingCartridge = null;
 
+function frameMars(frame){
+  const raw=frame?.mars||frame?.environment||{};
+  const tempK=raw.temp_k??raw.temperature_k;
+  const tempC=raw.temp_c??raw.temperature_c;
+  return {
+    temp_c:tempC??(tempK==null?-60:tempK-273.15),
+    temp_k:tempK??(tempC==null?213.15:tempC+273.15),
+    dust_tau:raw.dust_tau??(raw.dust_storm?0.8:0.15),
+    solar_wm2:raw.solar_wm2??raw.solar_irradiance??490,
+    wind_ms:raw.wind_ms??raw.wind_speed_ms??4,
+    pressure_pa:raw.pressure_pa??740,
+    season:raw.season??'Unknown Season',
+  };
+}
+
 // ── Tab Switching ──
 function switchTab(tab){
   document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
@@ -329,50 +344,23 @@ function switchTab(tab){
 // ── Load Frame Data ──
 async function loadFrameData(){
   try{
-    // Load manifest
-    const mRes = await fetch(REPO_BASE+'/frames/manifest.json');
-    if(!mRes.ok) throw new Error('No manifest');
-    const manifest = await mRes.json();
+    const [manifestResponse,latestResponse,bundleResponse]=await Promise.all([
+      fetch(REPO_BASE+'/frames/manifest.json'),
+      fetch(REPO_BASE+'/frames/latest.json'),
+      fetch(REPO_BASE+'/frames/frames.json'),
+    ]);
+    if(!manifestResponse.ok||!bundleResponse.ok)throw new Error('Frame indexes unavailable');
+    const manifest=await manifestResponse.json();
+    const bundle=await bundleResponse.json();
+    allFrames=Object.values(bundle.frames||{}).sort((a,b)=>a.sol-b.sol);
+    if(allFrames.length!==manifest.total_frames)throw new Error('Frame bundle count mismatch');
 
-    // Load latest
-    const lRes = await fetch(REPO_BASE+'/frames/latest.json');
-    if(lRes.ok){
-      const latest = await lRes.json();
-      document.getElementById('latest-sol').textContent = latest.sol;
-    }
-
-    // Load last 10 frames for display
-    const loadCount = Math.min(10, manifest.total_frames);
-    const startSol = manifest.last_sol - loadCount + 1;
-    const promises = [];
-    for(let s = startSol; s <= manifest.last_sol; s++){
-      promises.push(
-        fetch(REPO_BASE+`/frames/sol-${String(s).padStart(4,'0')}.json`)
-          .then(r=>r.ok?r.json():null)
-          .catch(()=>null)
-      );
-    }
-    const frames = (await Promise.all(promises)).filter(Boolean);
-    allFrames = frames;
-
-    if(frames.length){
-      latestFrame = frames[frames.length-1];
+    const latest=latestResponse.ok?await latestResponse.json():{sol:manifest.last_sol};
+    document.getElementById('latest-sol').textContent=latest.sol;
+    latestFrame=allFrames.find(frame=>frame.sol===latest.sol)||allFrames[allFrames.length-1];
+    if(latestFrame){
       renderFrameTicker(latestFrame);
       renderTimeline(manifest);
-    }
-
-    // Load ALL frames for timeline (just sol + dust_tau)
-    if(manifest.total_frames > 10){
-      const allPromises = [];
-      for(let s = 1; s <= manifest.last_sol; s++){
-        allPromises.push(
-          fetch(REPO_BASE+`/frames/sol-${String(s).padStart(4,'0')}.json`)
-            .then(r=>r.ok?r.json():null)
-            .catch(()=>null)
-        );
-      }
-      const allF = (await Promise.all(allPromises)).filter(Boolean);
-      if(allF.length) { allFrames = allF; renderTimeline(manifest); }
     }
   }catch(e){
     console.log('Frame loading failed (offline mode):', e.message);
@@ -383,7 +371,7 @@ async function loadFrameData(){
 function renderFrameTicker(frame){
   document.getElementById('ticker-sol').textContent = 'SOL ' + frame.sol;
 
-  const m = frame.mars;
+  const m = frameMars(frame);
   const conds = document.getElementById('ticker-conditions');
   conds.innerHTML = `
     <div class="cond"><div class="val">${m.temp_c}°C</div><div class="lbl">Temp</div></div>
@@ -397,7 +385,7 @@ function renderFrameTicker(frame){
   const evts = document.getElementById('ticker-events');
   evts.innerHTML = frame.events.map(e=>{
     const cls = e.type.includes('storm')?'storm':e.type.includes('flare')?'flare':'devil';
-    return `<span class="event-tag ${cls}">${e.type.replace(/_/g,' ').toUpperCase()} · ${(e.severity*100).toFixed(0)}%</span>`;
+    return `<span class="event-tag ${cls}">${e.type.replace(/_/g,' ').toUpperCase()} · ${((e.severity??0.5)*100).toFixed(0)}%</span>`;
   }).join('') || '<span style="color:var(--green);font-size:10px">☀️ Clear conditions</span>';
 }
 
@@ -405,13 +393,14 @@ function renderTimeline(manifest){
   const el = document.getElementById('frame-timeline');
   if(!allFrames.length) return;
 
-  const maxDust = Math.max(...allFrames.map(f=>f.mars.dust_tau), 0.5);
+  const maxDust = Math.max(...allFrames.map(f=>frameMars(f).dust_tau), 0.5);
   el.innerHTML = allFrames.map(f=>{
-    const h = Math.max(4, (f.mars.dust_tau / maxDust) * 36);
+    const dustTau=frameMars(f).dust_tau;
+    const h = Math.max(4, (dustTau / maxDust) * 36);
     const cls = f.events.some(e=>e.type==='solar_flare')?'flare':
                 f.events.some(e=>e.type.includes('storm'))?'storm':
-                f.mars.dust_tau < 0.1 ? 'calm' : '';
-    return `<div class="timeline-bar ${cls}" style="height:${h}px" title="Sol ${f.sol}: τ=${f.mars.dust_tau}"></div>`;
+                dustTau < 0.1 ? 'calm' : '';
+    return `<div class="timeline-bar ${cls}" style="height:${h}px" title="Sol ${f.sol}: τ=${dustTau}"></div>`;
   }).join('');
   document.getElementById('timeline-end').textContent = 'Sol ' + allFrames[allFrames.length-1].sol;
 }
@@ -423,7 +412,7 @@ function renderFrameFeed(){
     return;
   }
   el.innerHTML = allFrames.slice().reverse().slice(0,20).map(f=>{
-    const m = f.mars;
+    const m = frameMars(f);
     const evts = f.events.map(e=>e.type.replace(/_/g,' ')).join(', ') || 'clear';
     const challenge = f.challenge ? `🎯 ${f.challenge.type.replace(/_/g,' ')}` : '';
     return `<div style="background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:4px;display:flex;gap:16px;align-items:center;font-size:11px">
@@ -472,13 +461,13 @@ function renderLeaderboard(){
 
     return `<div class="lb-row" onclick="showRunDetail(${i})">
       <div class="rank ${rankClass}">${medal||i+1}</div>
-      <div><div class="name">${esc(entry.name||entry.id||'Unknown Colony')}</div><div class="mission">${esc(entry.mission||'custom')} · ${entry.id||''}</div></div>
-      <div class="score">${(entry.score||0).toLocaleString()}</div>
-      <div class="sol">${entry.sol||0}</div>
-      <div class="crew">${entry.crew||'?'}</div>
-      <div class="cri">${entry.cri!==undefined?entry.cri:'?'}</div>
+      <div><div class="name">${esc(entry.name||entry.id||'Unknown Colony')}</div><div class="mission">${esc(entry.mission||'custom')} · ${esc(entry.id||'')}</div></div>
+      <div class="score">${safeNumber(entry.score).toLocaleString()}</div>
+      <div class="sol">${safeNumber(entry.sol)}</div>
+      <div class="crew">${esc(entry.crew||'?')}</div>
+      <div class="cri">${safeNumber(entry.cri)}</div>
       <div class="status ${statusClass}">${statusText}</div>
-      <div class="grade ${gradeClass}">${entry.grade||'?'}</div>
+      <div class="grade ${gradeClass}">${esc(entry.grade||'?')}</div>
     </div>`;
   }).join('');
 
@@ -502,18 +491,23 @@ function renderLeaderboard(){
 // ── Upload Cartridge ──
 function handleUpload(file){
   if(!file) return;
+  if(file.size>5*1024*1024){
+    showUploadResult('error','❌ Cartridge exceeds the 5 MB upload limit.');
+    return;
+  }
   const reader = new FileReader();
   reader.onload = (e)=>{
     try{
       const cartridge = JSON.parse(e.target.result);
-      if(!cartridge._format || cartridge._format !== 'mars-barn-cartridge'){
+      if(!cartridge||typeof cartridge!=='object'||cartridge._format !== 'mars-barn-cartridge'||
+         !cartridge.state||!Array.isArray(cartridge.state.crew)){
         showUploadResult('error', '❌ Not a valid Mars Barn cartridge file.');
         return;
       }
       pendingCartridge = cartridge;
-      showUploadResult('success', `✅ Valid cartridge: ${cartridge.id}<br>
-        Sol ${cartridge.sol} · Score: ${(cartridge.score?.total||0).toLocaleString()} · Grade: ${cartridge.score?.grade||'?'}<br>
-        ${cartridge.alive?'🟢 COLONY ALIVE':'☠ COLONY DEAD'+(cartridge.state?.cause?' — '+cartridge.state.cause:'')}`);
+      showUploadResult('success', `✅ Valid cartridge: ${plain(cartridge.id)}
+Sol ${safeNumber(cartridge.sol)} · Score: ${safeNumber(cartridge.score?.total).toLocaleString()} · Grade: ${plain(cartridge.score?.grade||'?')}
+${cartridge.alive?'🟢 COLONY ALIVE':'☠ COLONY DEAD'+(cartridge.state?.cause?' — '+plain(cartridge.state.cause):'')}`);
 
       // Show submit form
       document.getElementById('submit-form').style.display = 'block';
@@ -523,10 +517,10 @@ function handleUpload(file){
       const preview = document.getElementById('submit-preview');
       const sc = cartridge.score || {};
       preview.innerHTML = `<div style="font-size:10px;color:var(--dim);line-height:1.8">
-        <strong>Mission:</strong> ${cartridge.mission||'custom'} · <strong>Governor:</strong> ${cartridge.config?.arch||'?'}<br>
-        <strong>Crew:</strong> ${cartridge.state?.crew?.filter(c=>c.alive).length||'?'}/${cartridge.state?.crew?.length||'?'} alive ·
-        <strong>Sols:</strong> ${cartridge.sol} · <strong>CRI:</strong> ${cartridge.cri||0}<br>
-        ${sc.breakdown ? sc.breakdown.map(([l,v])=>`${l}: ${v>=0?'+':''}${v}`).join(' · ') : ''}
+        <strong>Mission:</strong> ${esc(cartridge.mission||'custom')} · <strong>Governor:</strong> ${esc(cartridge.config?.arch||'?')}<br>
+        <strong>Crew:</strong> ${safeNumber(cartridge.state?.crew?.filter(c=>c.alive).length)}/${safeNumber(cartridge.state?.crew?.length)} alive ·
+        <strong>Sols:</strong> ${safeNumber(cartridge.sol)} · <strong>CRI:</strong> ${safeNumber(cartridge.cri)}<br>
+        ${Array.isArray(sc.breakdown) ? sc.breakdown.map(([l,v])=>`${esc(l)}: ${safeNumber(v)>=0?'+':''}${safeNumber(v)}`).join(' · ') : ''}
       </div>`;
     }catch(err){
       showUploadResult('error', '❌ Failed to parse: ' + err.message);
@@ -535,12 +529,15 @@ function handleUpload(file){
   reader.readAsText(file);
 }
 
-function showUploadResult(type, html){
+function showUploadResult(type, message){
   const el = document.getElementById('upload-result');
   el.style.display = 'block';
   el.style.background = type==='error'?'rgba(218,54,51,0.1)':'rgba(63,185,80,0.1)';
   el.style.border = `1px solid ${type==='error'?'var(--red)':'var(--green)'}`;
-  el.innerHTML = `<div style="font-size:12px;color:${type==='error'?'var(--red)':'var(--green)'};">${html}</div>`;
+  el.textContent = message;
+  el.style.whiteSpace = 'pre-line';
+  el.style.fontSize = '12px';
+  el.style.color = type==='error'?'var(--red)':'var(--green)';
 }
 
 function submitToLeaderboard(){
@@ -550,19 +547,19 @@ function submitToLeaderboard(){
   const sc = c.score || {};
 
   const entry = {
-    id: c.id,
-    name: name,
-    mission: c.mission || 'custom',
-    score: sc.total || 0,
-    grade: sc.grade || '?',
-    sol: c.sol || 0,
+    id: plain(c.id),
+    name: plain(name),
+    mission: plain(c.mission || 'custom'),
+    score: safeNumber(sc.total),
+    grade: plain(sc.grade || '?'),
+    sol: safeNumber(c.sol),
     crew: (c.state?.crew?.filter(x=>x.alive).length||0) + '/' + (c.state?.crew?.length||0),
     cri: c.cri || 0,
     alive: !!c.alive,
-    cause: c.state?.cause || null,
-    governor: c.config?.arch || 'unknown',
+    cause: plain(c.state?.cause || ''),
+    governor: plain(c.config?.arch || 'unknown'),
     date: new Date().toISOString(),
-    frameHash: c.state?.startWeather ? 'verified' : 'local',
+    frameHash: c.state?.startWeather ? 'self-reported' : 'local',
     // MARS Token chain verification
     marsBalance: c.marsCirculating || 0,
     marsSupplyPct: c.marsSupplyPct || '0',
@@ -659,9 +656,9 @@ function renderLiveRuns(){
       <div class="pulse"></div>
       <div class="info">
         <div class="colony-name">${esc(entry.name||entry.id)}</div>
-        <div class="meta">${entry.mission||'custom'} · Sol ${entry.sol} · ${entry.crew||'?'} crew · CRI ${entry.cri||0} · ${entry.governor||'?'} governor</div>
+        <div class="meta">${esc(entry.mission||'custom')} · Sol ${safeNumber(entry.sol)} · ${esc(entry.crew||'?')} crew · CRI ${safeNumber(entry.cri)} · ${esc(entry.governor||'?')} governor</div>
       </div>
-      <div class="score">${(entry.score||0).toLocaleString()}</div>
+      <div class="score">${safeNumber(entry.score).toLocaleString()}</div>
     </div>
   `).join('');
 }
@@ -678,27 +675,27 @@ function showRunDetail(idx){
   const chainColor = entry.chainVerified==='verified'?'var(--green)':entry.chainVerified==='broken'?'var(--red)':'var(--yellow)';
   body.innerHTML = `
     <div class="detail-grid">
-      <div class="detail-item"><div class="lbl">Cartridge ID</div><div class="val" style="font-size:11px">${entry.id||'?'}</div></div>
-      <div class="detail-item"><div class="lbl">Mission</div><div class="val">${entry.mission||'custom'}</div></div>
-      <div class="detail-item"><div class="lbl">Score</div><div class="val" style="color:var(--cyan)">${(entry.score||0).toLocaleString()}</div></div>
-      <div class="detail-item"><div class="lbl">Grade</div><div class="val" style="font-size:24px;color:${entry.grade==='S'||entry.grade==='S+'?'var(--gold)':'var(--cyan)'}">${entry.grade||'?'}</div></div>
-      <div class="detail-item"><div class="lbl">Sols Survived</div><div class="val">${entry.sol||0}</div></div>
-      <div class="detail-item"><div class="lbl">Crew</div><div class="val">${entry.crew||'?'}</div></div>
-      <div class="detail-item"><div class="lbl">Final CRI</div><div class="val">${entry.cri||0}</div></div>
-      <div class="detail-item"><div class="lbl">Governor</div><div class="val">${entry.governor||'?'}</div></div>
+      <div class="detail-item"><div class="lbl">Cartridge ID</div><div class="val" style="font-size:11px">${esc(entry.id||'?')}</div></div>
+      <div class="detail-item"><div class="lbl">Mission</div><div class="val">${esc(entry.mission||'custom')}</div></div>
+      <div class="detail-item"><div class="lbl">Score</div><div class="val" style="color:var(--cyan)">${safeNumber(entry.score).toLocaleString()}</div></div>
+      <div class="detail-item"><div class="lbl">Grade</div><div class="val" style="font-size:24px;color:${entry.grade==='S'||entry.grade==='S+'?'var(--gold)':'var(--cyan)'}">${esc(entry.grade||'?')}</div></div>
+      <div class="detail-item"><div class="lbl">Sols Survived</div><div class="val">${safeNumber(entry.sol)}</div></div>
+      <div class="detail-item"><div class="lbl">Crew</div><div class="val">${esc(entry.crew||'?')}</div></div>
+      <div class="detail-item"><div class="lbl">Final CRI</div><div class="val">${safeNumber(entry.cri)}</div></div>
+      <div class="detail-item"><div class="lbl">Governor</div><div class="val">${esc(entry.governor||'?')}</div></div>
       <div class="detail-item"><div class="lbl">Status</div><div class="val" style="color:${entry.alive?'var(--green)':'var(--red)'}">${entry.alive?'● ALIVE':'☠ DEAD'}</div></div>
-      <div class="detail-item"><div class="lbl">Cause of Death</div><div class="val">${entry.cause||'—'}</div></div>
-      <div class="detail-item"><div class="lbl">Frame Verification</div><div class="val">${entry.frameHash||'unverified'}</div></div>
+      <div class="detail-item"><div class="lbl">Cause of Death</div><div class="val">${esc(entry.cause||'—')}</div></div>
+      <div class="detail-item"><div class="lbl">Frame Verification</div><div class="val">${esc(entry.frameHash||'unverified')}</div></div>
       <div class="detail-item"><div class="lbl">Submitted</div><div class="val" style="font-size:10px">${entry.date?new Date(entry.date).toLocaleString():'?'}</div></div>
     </div>
     <div style="margin-top:16px;padding:12px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px">
       <div style="font-size:10px;color:var(--cyan);letter-spacing:1px;margin-bottom:8px">🪙 MARS TOKEN CHAIN</div>
       <div class="detail-grid">
-        <div class="detail-item"><div class="lbl">MARS Balance</div><div class="val" style="color:var(--cyan)">${(entry.marsBalance||0).toLocaleString()}</div></div>
-        <div class="detail-item"><div class="lbl">Supply Minted</div><div class="val">${entry.marsSupplyPct||'0'}%</div></div>
-        <div class="detail-item"><div class="lbl">Chain Length</div><div class="val">${entry.chainLength||0} blocks</div></div>
-        <div class="detail-item"><div class="lbl">Chain Status</div><div class="val" style="color:${chainColor}">${entry.chainVerified==='verified'?'✓ VERIFIED':entry.chainVerified==='broken'?'✗ BROKEN':'⚠ '+entry.chainVerified}</div></div>
-        <div class="detail-item" style="grid-column:1/-1"><div class="lbl">Chain Head</div><div class="val" style="font-size:10px;font-family:monospace">${entry.chainHead||'none'}</div></div>
+        <div class="detail-item"><div class="lbl">MARS Balance</div><div class="val" style="color:var(--cyan)">${safeNumber(entry.marsBalance).toLocaleString()}</div></div>
+        <div class="detail-item"><div class="lbl">Supply Minted</div><div class="val">${safeNumber(entry.marsSupplyPct)}%</div></div>
+        <div class="detail-item"><div class="lbl">Chain Length</div><div class="val">${safeNumber(entry.chainLength)} blocks</div></div>
+        <div class="detail-item"><div class="lbl">Chain Status</div><div class="val" style="color:${chainColor}">${entry.chainVerified==='verified'?'✓ VERIFIED':entry.chainVerified==='broken'?'✗ BROKEN':'⚠ '+esc(entry.chainVerified)}</div></div>
+        <div class="detail-item" style="grid-column:1/-1"><div class="lbl">Chain Head</div><div class="val" style="font-size:10px;font-family:monospace">${esc(entry.chainHead||'none')}</div></div>
       </div>
     </div>
   `;
@@ -709,25 +706,49 @@ function closeModal(){
 }
 
 // ── Utility ──
+function plain(value){
+  return String(value??'').replace(/[\u0000-\u001f\u007f]/g,' ').slice(0,500);
+}
+
+function safeNumber(value,fallback=0){
+  const number=Number(value);
+  return Number.isFinite(number)?number:fallback;
+}
+
 function esc(s){
   const d = document.createElement('div');
-  d.textContent = s || '';
+  d.textContent = plain(s);
   return d.innerHTML;
 }
 
 // ── Chain Verification ──
+function hashStr(str){
+  let hash=0x811c9dc5;
+  for(let index=0;index<str.length;index++){
+    hash^=str.charCodeAt(index);
+    hash=Math.imul(hash,0x01000193);
+  }
+  return(hash>>>0).toString(16).padStart(8,'0');
+}
+
 // Verify hash chain integrity of a cartridge's block history
 function verifyChain(cartridge){
   if(!cartridge.chainBlocks || !cartridge.chainBlocks.length) return 'no-chain';
-  let prevHash = null;
+  let prevHash = cartridge.chainBlocks[0].prevHash ?? null;
   for(let i=0; i<cartridge.chainBlocks.length; i++){
     const block = cartridge.chainBlocks[i];
+    if(block.version!==2) return 'legacy-unverified';
     if(block.prevHash !== prevHash) return 'broken';
+    const blockData=JSON.stringify({version:2,sol:block.sol,stateHash:block.stateHash,
+      decisionHash:block.decisionHash,rewardHash:block.rewardHash,
+      circulating:block.circulating,prevHash:block.prevHash,
+      frameHash:block.frameHash??null,totalReward:block.totalReward});
+    if(hashStr(blockData)!==block.hash)return 'hash-mismatch';
     prevHash = block.hash;
   }
   // Check final hash matches cartridge head
   if(cartridge.chainHead && prevHash !== cartridge.chainHead) return 'head-mismatch';
-  return 'verified';
+  return 'self-consistent';
 }
 
 // ── Also import high scores from the game ──

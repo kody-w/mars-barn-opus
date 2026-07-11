@@ -2,6 +2,12 @@
 node_modules/
 test-results/
 playwright-report/
+.pytest_cache/
+__pycache__/
+.playwright-profile/
+logs/
+cache/
+artifacts/
 
 # Deployment secrets
 .env.testnet
@@ -31,6 +37,6 @@ tools/gauntlet_backup.js
 !tools/gauntlet.known-good.js
 
 # No stray generators/tests in root
-generate_v*.py
-test_*.js
-test_*.py
+/generate_v*.py
+/test_*.js
+/test_*.py

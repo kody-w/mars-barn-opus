@@ -1842,25 +1842,25 @@
   function updateHUD() {
     const s = twinConnected ? twinState : simState;
 
-    document.getElementById('sol').textContent = String(Math.floor(s.sol || 1)).padStart(3, '0');
+    document.getElementById('sol').textContent = String(Math.floor(s.sol ?? 0)).padStart(3, '0');
 
     const cri = s.cri != null ? s.cri : 0.3;
     document.getElementById('cri-fill').style.width = (Math.min(cri, 1) * 100) + '%';
     document.getElementById('cri-fill').style.background = cri < 0.5 ? '#4caf50' : cri < 0.75 ? '#ffc107' : '#f44336';
     document.getElementById('cri-val').textContent = (typeof cri === 'number' ? cri : 0.3).toFixed(2);
 
-    document.getElementById('mod-count').textContent = s.modules || 8;
-    document.getElementById('crew-alive').textContent = s.crew_alive || 5;
-    document.getElementById('pwr-level').textContent = Math.round(s.power || 87);
+    document.getElementById('mod-count').textContent = s.modules ?? 0;
+    document.getElementById('crew-alive').textContent = s.crew_alive ?? 0;
+    document.getElementById('pwr-level').textContent = Math.round(s.power ?? 0);
 
     function setBar(id, val) {
       document.getElementById('bar-' + id).style.width = val + '%';
       document.getElementById('val-' + id).textContent = Math.round(val) + '%';
     }
-    setBar('o2', s.o2 || 82);
-    setBar('h2o', s.h2o || 68);
-    setBar('food', s.food || 55);
-    setBar('pwr', s.power || 87);
+    setBar('o2', s.o2 ?? 0);
+    setBar('h2o', s.h2o ?? 0);
+    setBar('food', s.food ?? 0);
+    setBar('pwr', s.power ?? 0);
   }
 
   // ─── ANIMATION LOOP ──────────────────────────────────────────

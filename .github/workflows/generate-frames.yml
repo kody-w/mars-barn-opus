@@ -1,9 +1,8 @@
 name: Generate Mars Frames
 
 on:
-  schedule:
-    # Run daily at 06:00 UTC — new frame every Earth day
-    - cron: '0 6 * * *'
+  # Automatic publication is paused until all historical frame schemas are
+  # normalized. Manual runs remain fail-closed and append-only.
   workflow_dispatch:
     inputs:
       count:
@@ -24,10 +23,26 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Generate new frames
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Validate current release
         run: |
-          COUNT=${{ github.event.inputs.count || '1' }}
-          python3 tools/generate_frames.py --count "$COUNT"
+          npm ci
+          npx playwright install --with-deps chromium
+          npm test
+
+      - name: Generate new frames
+        env:
+          FRAME_COUNT: ${{ github.event.inputs.count || '1' }}
+        run: |
+          case "$FRAME_COUNT" in
+            ''|*[!0-9]*|0) echo "count must be a positive integer"; exit 2 ;;
+          esac
+          python3 tools/generate_frames.py --count "$FRAME_COUNT"
+          python3 tools/generate_frames.py --check
 
       - name: Commit and push
         run: |

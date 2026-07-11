@@ -17,6 +17,8 @@ from config import (
     O2_KG_PER_PERSON_PER_SOL, H2O_L_PER_PERSON_PER_SOL,
     FOOD_KCAL_PER_PERSON_PER_SOL, POWER_BASELINE_KWH_PER_SOL,
     ISRU_O2_KG_PER_SOL, ISRU_H2O_L_PER_SOL, GREENHOUSE_KCAL_PER_SOL,
+    ISRU_POWER_KWH_PER_SOL, GREENHOUSE_POWER_KWH_PER_SOL,
+    GREENHOUSE_H2O_L_PER_SOL,
     SOLAR_PANEL_AREA_M2, SOLAR_PANEL_EFFICIENCY, MARS_SOL_HOURS,
     POWER_CRITICAL_THRESHOLD_KWH, TEMP_CRITICAL_LOW_K, CASCADE_STEP_SOLS,
     RESOURCE_FACTOR_RANGES,
@@ -110,11 +112,25 @@ class Allocation:
 
     def validate(self) -> None:
         """Ensure fractions sum to 1.0 and are non-negative."""
-        total = self.heating_fraction + self.isru_fraction + self.greenhouse_fraction
-        if total > 0:
-            self.heating_fraction /= total
-            self.isru_fraction /= total
-            self.greenhouse_fraction /= total
+        fractions = [
+            self.heating_fraction,
+            self.isru_fraction,
+            self.greenhouse_fraction,
+        ]
+        fractions = [
+            max(0.0, value) if math.isfinite(value) else 0.0
+            for value in fractions
+        ]
+        total = sum(fractions)
+        if total <= 0:
+            fractions = [1.0 / 3.0] * 3
+        else:
+            fractions = [value / total for value in fractions]
+        (
+            self.heating_fraction,
+            self.isru_fraction,
+            self.greenhouse_fraction,
+        ) = fractions
         self.food_ration = max(0.3, min(1.0, self.food_ration))
 
 
@@ -231,7 +247,15 @@ def produce(colony: Colony, solar_irradiance_w_m2: float,
     gh_frac = allocation.greenhouse_fraction
 
     # ISRU production (with module bonus)
-    isru_scale = min(1.5, isru_frac * 2.0) if r.power_kwh > POWER_CRITICAL_THRESHOLD_KWH * 0.3 else 0.0
+    discretionary_power = max(0.0, r.power_kwh - POWER_BASELINE_KWH_PER_SOL)
+    requested_isru_kwh = ISRU_POWER_KWH_PER_SOL * min(1.5, isru_frac * 2.0)
+    used_isru_kwh = min(discretionary_power, requested_isru_kwh)
+    r.power_kwh -= used_isru_kwh
+    discretionary_power -= used_isru_kwh
+    isru_scale = (
+        min(1.5, isru_frac * 2.0) * used_isru_kwh / requested_isru_kwh
+        if requested_isru_kwh > 0 else 0.0
+    )
     r.o2_kg += ISRU_O2_KG_PER_SOL * s.isru_efficiency * isru_scale * factors["o2"] * isru_bonus
     r.h2o_liters += ISRU_H2O_L_PER_SOL * s.isru_efficiency * isru_scale * factors["h2o"] * isru_bonus
 
@@ -239,7 +263,19 @@ def produce(colony: Colony, solar_irradiance_w_m2: float,
     r.h2o_liters += passive_h2o
 
     # Greenhouse production (with module bonus)
-    gh_scale = min(1.5, gh_frac * 2.0) if (r.power_kwh > POWER_CRITICAL_THRESHOLD_KWH * 0.3 and r.h2o_liters > 5.0) else 0.0
+    requested_gh_scale = min(1.5, gh_frac * 2.0)
+    requested_gh_kwh = GREENHOUSE_POWER_KWH_PER_SOL * requested_gh_scale
+    used_gh_kwh = min(discretionary_power, requested_gh_kwh)
+    power_scale = (used_gh_kwh / requested_gh_kwh
+                   if requested_gh_kwh > 0 else 0.0)
+    requested_h2o = GREENHOUSE_H2O_L_PER_SOL * requested_gh_scale
+    water_scale = (min(1.0, r.h2o_liters / requested_h2o)
+                   if requested_h2o > 0 else 0.0)
+    gh_scale = requested_gh_scale * min(power_scale, water_scale)
+    actual_gh_kwh = requested_gh_kwh * min(power_scale, water_scale)
+    actual_gh_h2o = requested_h2o * min(power_scale, water_scale)
+    r.power_kwh -= actual_gh_kwh
+    r.h2o_liters -= actual_gh_h2o
     r.food_kcal += GREENHOUSE_KCAL_PER_SOL * s.greenhouse_efficiency * gh_scale * factors["food"] * gh_bonus
 
     # Repair (with module bonus)
@@ -254,7 +290,15 @@ def consume(colony: Colony, allocation: Allocation) -> None:
     crew = r.crew_size
 
     r.o2_kg = max(0.0, r.o2_kg - crew * O2_KG_PER_PERSON_PER_SOL)
-    r.h2o_liters = max(0.0, r.h2o_liters - crew * H2O_L_PER_PERSON_PER_SOL)
+    h2o_reduction = (
+        colony.research.get_effect("h2o_consumption_reduction")
+        if colony.research is not None else 0.0
+    )
+    h2o_multiplier = max(0.0, 1.0 - h2o_reduction)
+    r.h2o_liters = max(
+        0.0,
+        r.h2o_liters - crew * H2O_L_PER_PERSON_PER_SOL * h2o_multiplier,
+    )
     r.food_kcal = max(0.0,
                       r.food_kcal - crew * FOOD_KCAL_PER_PERSON_PER_SOL * allocation.food_ration)
     r.power_kwh = max(0.0, r.power_kwh - POWER_BASELINE_KWH_PER_SOL)
@@ -275,6 +319,23 @@ def advance_cascade(colony: Colony) -> None:
         return
 
     r = colony.resources
+
+    # Immediate life-support failure outranks slower cascade transitions.
+    if r.o2_kg <= 0:
+        colony.cascade_state = CascadeState.DEAD
+        colony.cause_of_death = "O2 depletion"
+        colony.alive = False
+        return
+    if r.h2o_liters <= 0:
+        colony.cascade_state = CascadeState.DEAD
+        colony.cause_of_death = "dehydration"
+        colony.alive = False
+        return
+    if r.food_kcal <= 0:
+        colony.cascade_state = CascadeState.DEAD
+        colony.cause_of_death = "starvation"
+        colony.alive = False
+        return
 
     # Check for recovery
     if (r.power_kwh > POWER_CRITICAL_THRESHOLD_KWH
@@ -315,18 +376,6 @@ def advance_cascade(colony: Colony) -> None:
         colony.cause_of_death = "cascade: power -> thermal -> water -> O2"
         colony.alive = False
 
-    # Instant death conditions
-    if r.o2_kg <= 0 and colony.cascade_state != CascadeState.DEAD:
-        colony.cascade_state = CascadeState.DEAD
-        colony.cause_of_death = "O2 depletion"
-        colony.alive = False
-
-    if r.food_kcal <= 0 and colony.cascade_state != CascadeState.DEAD:
-        colony.cascade_state = CascadeState.DEAD
-        colony.cause_of_death = "starvation"
-        colony.alive = False
-
-
 def step(colony: Colony, solar_irradiance_w_m2: float,
          exterior_temp_k: float, allocation: Allocation,
          active_events: Optional[list] = None,
@@ -348,6 +397,10 @@ def step(colony: Colony, solar_irradiance_w_m2: float,
     allocation.validate()
 
     # Apply event effects to systems
+    event_radiation_msv = sum(
+        max(0.0, event.get("effects", {}).get("radiation_msv", 0.0))
+        for event in (active_events or [])
+    )
     if active_events:
         apply_events(colony, active_events)
 
@@ -363,14 +416,18 @@ def step(colony: Colony, solar_irradiance_w_m2: float,
     # Kilopower-class fission reactor (NASA design: 10 kW each, 4 units)
     rtg_baseline_kw = 40.0 * colony.systems.heating_efficiency
     needed_kw = _required_heating(exterior_temp_k, solar_irradiance_w_m2)
+    max_electrical_heating_kw = (
+        colony.resources.power_kwh * allocation.heating_fraction
+        / MARS_SOL_HOURS
+    )
     electrical_heating_kw = min(
         needed_kw - rtg_baseline_kw,
-        colony.resources.power_kwh * allocation.heating_fraction * 0.5
+        max_electrical_heating_kw,
     )
     total_heating_kw = rtg_baseline_kw + max(0.0, electrical_heating_kw)
 
     # Deduct electrical heating from power reserves
-    heating_kwh_used = max(0.0, electrical_heating_kw) * 1.0  # Per sol
+    heating_kwh_used = max(0.0, electrical_heating_kw) * MARS_SOL_HOURS
     colony.resources.power_kwh = max(0.0, colony.resources.power_kwh - heating_kwh_used)
 
     from mars import compute_thermal
@@ -378,8 +435,21 @@ def step(colony: Colony, solar_irradiance_w_m2: float,
                               colony.interior_temp_k, total_heating_kw)
     colony.interior_temp_k = thermal.interior_temp_k
 
-    # Radiation
-    colony.cumulative_radiation_msv += radiation_msv
+    # Radiation protections compose multiplicatively.
+    research_reduction = (
+        colony.research.get_effect("radiation_reduction")
+        if colony.research is not None else 0.0
+    )
+    shelter_reduction = (
+        colony.base.get_bonus("radiation_shielding")
+        if colony.base is not None else 0.0
+    )
+    effective_radiation_msv = (
+        radiation_msv + event_radiation_msv
+    ) * max(0.0, 1.0 - research_reduction) * max(
+        0.0, 1.0 - shelter_reduction
+    )
+    colony.cumulative_radiation_msv += effective_radiation_msv
 
     # Crew simulation (if enabled)
     if colony.crew is not None:
@@ -398,7 +468,7 @@ def step(colony: Colony, solar_irradiance_w_m2: float,
 
         crew_events = tick_crew(
             colony.crew, colony.sol, resources_per_person,
-            colony.interior_temp_k, radiation_msv,
+            colony.interior_temp_k, effective_radiation_msv,
         )
 
         # Sync crew count back to resources
@@ -480,6 +550,10 @@ def apply_events(colony: Colony, events: list) -> None:
             colony.systems.damage("greenhouse", fx["greenhouse_damage"])
         if "heating_damage" in fx:
             colony.systems.damage("heating", fx["heating_damage"])
+        if "comms_damage" in fx:
+            colony.systems.damage("comms", fx["comms_damage"])
+        if "solar_repair" in fx:
+            colony.systems.repair("solar", fx["solar_repair"])
         if "water_loss" in fx:
             colony.resources.h2o_liters = max(0.0,
                 colony.resources.h2o_liters - fx["water_loss"])

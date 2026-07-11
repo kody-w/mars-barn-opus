@@ -6,7 +6,7 @@ sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent.parent / "src
 
 from world import (
     create_world, world_step, run_world, distance_between,
-    _compute_trade_offer,
+    _compute_trade_offer, _execute_trade,
 )
 from colony import create_colony
 
@@ -74,6 +74,23 @@ class TestWorldStep:
         alive = w.alive_colonies()
         assert len(alive) >= 1  # At least one should survive 10 sols
 
+    def test_governor_memory_uses_prior_sol_resources(self):
+        world = create_world(num_colonies=2, seed=42)
+        world_step(world)
+        world_step(world)
+
+        trends = []
+        for governor in world.governors.values():
+            entry = governor.memory.entries[-1]
+            trends.extend([
+                entry.o2_trend,
+                entry.h2o_trend,
+                entry.food_trend,
+                entry.power_trend,
+            ])
+
+        assert any(abs(value) > 1e-9 for value in trends)
+
 
 class TestTradeOffer:
     def test_surplus_offers(self):
@@ -93,6 +110,29 @@ class TestTradeOffer:
         total_requested = sum(requesting.values()) if requesting else 0
         # Should be small or zero
         assert total_offered < 100 or total_requested < 100
+
+    def test_trade_runway_uses_each_colonys_crew_size(self):
+        src = create_colony("Small", crew_size=2)
+        dst = create_colony("Large", crew_size=8)
+        src.resources.h2o_liters = 400
+        dst.resources.h2o_liters = 400
+
+        offering, requesting = _compute_trade_offer(src, dst)
+
+        assert offering["h2o_liters"] > 0
+        assert "h2o_liters" not in requesting
+
+    def test_execute_trade_conserves_combined_resources(self):
+        src = create_colony("Source", crew_size=2)
+        dst = create_colony("Destination", crew_size=8)
+        before = src.resources.h2o_liters + dst.resources.h2o_liters
+
+        _execute_trade(src, dst, {"h2o_liters": 25.0}, {})
+
+        after = src.resources.h2o_liters + dst.resources.h2o_liters
+        assert abs(after - before) < 1e-9
+        assert src.resources.h2o_liters >= 0
+        assert dst.resources.h2o_liters >= 0
 
 
 class TestRunWorld:

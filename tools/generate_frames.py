@@ -9,13 +9,15 @@ to produce conditions for Jezero Crater.
 Usage:
   python3 tools/generate_frames.py              # Generate 1 new frame
   python3 tools/generate_frames.py --count 10   # Generate 10 new frames
-  python3 tools/generate_frames.py --reseed 100 # Regenerate first 100 frames
+  python3 tools/generate_frames.py --reconcile  # Rebuild indexes without changing frames
+  python3 tools/generate_frames.py --check      # Validate the append-only ledger
 """
 
 import json
 import math
 import hashlib
 import argparse
+import re
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -322,9 +324,278 @@ def generate_frame(sol, rng, prev_mars=None):
         'challenge': challenge, 'frame_echo': echo
     }
 
-    frame_str = json.dumps(frame, sort_keys=True)
+    frame_str = json.dumps(frame, sort_keys=True, separators=(',', ':'))
     frame['_hash'] = hashlib.sha256(frame_str.encode()).hexdigest()[:16]
     return frame, mars
+
+
+FRAME_FILE_RE = re.compile(r"sol-(\d+)\.json$")
+
+
+def _generated_at():
+    return datetime.utcnow().isoformat() + 'Z'
+
+
+def _atomic_write(path, content):
+    temp_path = path.with_suffix(path.suffix + '.tmp')
+    temp_path.write_text(content)
+    temp_path.replace(path)
+
+
+def _semantic_number(mapping, aliases, sol, field, minimum, maximum,
+                     required=True):
+    value = None
+    for alias in aliases:
+        if alias in mapping:
+            value = mapping[alias]
+            break
+    if value is None:
+        if required:
+            raise ValueError(f'Sol {sol} missing {field}')
+        return None
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f'Sol {sol} {field} must be numeric')
+    if not math.isfinite(value) or not minimum <= value <= maximum:
+        raise ValueError(
+            f'Sol {sol} {field} must be between {minimum} and {maximum}'
+        )
+    return value
+
+
+def _validate_frame_semantics(frame):
+    sol = frame.get('sol')
+    if isinstance(sol, bool) or not isinstance(sol, int) or sol < 1:
+        raise ValueError('Frame sol must be a positive integer')
+
+    version = frame.get('version')
+    if version is not None and version not in (7, 12):
+        raise ValueError(f'Sol {sol} has unsupported frame version {version}')
+
+    environment = frame.get('mars') or frame.get('environment')
+    if not isinstance(environment, dict):
+        raise ValueError(f'Sol {sol} requires mars or environment data')
+
+    _semantic_number(
+        environment, ('temp_k', 'temperature_k'), sol,
+        'environment.temperature_k', 130, 330,
+    )
+    _semantic_number(
+        environment, ('pressure_pa',), sol,
+        'environment.pressure_pa', 0, 2000,
+    )
+    _semantic_number(
+        environment, ('solar_wm2', 'solar_irradiance'), sol,
+        'environment.solar_wm2', 0, 1500,
+    )
+    _semantic_number(
+        environment, ('dust_tau',), sol,
+        'environment.dust_tau', 0, 10,
+        required='mars' in frame,
+    )
+    _semantic_number(
+        environment, ('wind_ms', 'wind_speed_ms'), sol,
+        'environment.wind_ms', 0, 200,
+        required='mars' in frame,
+    )
+
+    for collection_name in ('events', 'hazards'):
+        collection = frame.get(collection_name)
+        if not isinstance(collection, list):
+            raise ValueError(f'Sol {sol} {collection_name} must be a list')
+        for index, item in enumerate(collection):
+            if not isinstance(item, dict) or not isinstance(item.get('type'), str):
+                raise ValueError(
+                    f'Sol {sol} {collection_name}[{index}].type must be text'
+                )
+
+    if 'challenge' in frame and not isinstance(frame['challenge'], (dict, type(None))):
+        raise ValueError(f'Sol {sol} challenge must be an object or null')
+    if 'challenges' in frame and not isinstance(frame['challenges'], list):
+        raise ValueError(f'Sol {sol} challenges must be a list')
+
+    echo = frame.get('frame_echo')
+    if echo is not None:
+        if not isinstance(echo, dict):
+            raise ValueError(f'Sol {sol} frame_echo must be an object')
+        expected_previous = sol - 1 if sol > 1 else None
+        if echo.get('prev_sol') != expected_previous:
+            raise ValueError(
+                f'Sol {sol} frame_echo.prev_sol must be {expected_previous}'
+            )
+
+    stored_hash = frame.get('_hash')
+    if stored_hash is not None and (
+        not isinstance(stored_hash, str)
+        or not re.fullmatch(r'[0-9a-f]{16}', stored_hash)
+    ):
+        raise ValueError(f'Sol {sol} _hash must be 16 lowercase hex characters')
+
+
+def _frame_entry(path, expected_sol=None):
+    raw = path.read_bytes()
+    frame = json.loads(raw)
+    match = FRAME_FILE_RE.fullmatch(path.name)
+    if not match:
+        raise ValueError(f'Invalid frame filename: {path.name}')
+
+    filename_sol = int(match.group(1))
+    frame_sol = frame.get('sol')
+    if frame_sol != filename_sol:
+        raise ValueError(
+            f'Frame Sol mismatch: {path.name} contains sol={frame_sol!r}'
+        )
+    if expected_sol is not None and frame_sol != expected_sol:
+        raise ValueError(
+            f'Frame ledger gap: expected Sol {expected_sol}, found Sol {frame_sol}'
+        )
+    _validate_frame_semantics(frame)
+
+    return frame, {
+        'sol': frame_sol,
+        'hash': hashlib.sha256(raw).hexdigest(),
+        'size': len(raw),
+    }
+
+
+def _manifest_from_frames(frames_dir, generated=None):
+    paths = sorted(
+        frames_dir.glob('sol-*.json'),
+        key=lambda path: int(FRAME_FILE_RE.fullmatch(path.name).group(1)),
+    )
+    if not paths:
+        raise ValueError('Frame ledger is empty')
+
+    entries = []
+    for expected_sol, path in enumerate(paths, start=1):
+        _, entry = _frame_entry(path, expected_sol)
+        entries.append(entry)
+
+    return {
+        'version': 2,
+        'hash_algorithm': 'sha256-file',
+        'generated': generated or _generated_at(),
+        'total_frames': len(entries),
+        'first_sol': entries[0]['sol'],
+        'last_sol': entries[-1]['sol'],
+        'frames': entries,
+    }
+
+
+def _bundle_frame(frame):
+    if frame.get('mars') or not frame.get('environment'):
+        return frame
+
+    environment = frame['environment']
+    temp_k = environment.get('temp_k', environment.get('temperature_k'))
+    temp_c = environment.get('temp_c', environment.get('temperature_c'))
+    if temp_k is None:
+        temp_k = temp_c + 273.15 if temp_c is not None else 213.15
+    if temp_c is None:
+        temp_c = temp_k - 273.15
+
+    normalized = dict(frame)
+    normalized['mars'] = {
+        'ls': environment.get(
+            'ls',
+            environment.get('solar_longitude', 0),
+        ),
+        'season': environment.get('season', 'Unknown'),
+        'temp_k': temp_k,
+        'temp_c': temp_c,
+        'pressure_pa': environment.get('pressure_pa', 740),
+        'solar_wm2': environment.get(
+            'solar_wm2',
+            environment.get('solar_irradiance', 490),
+        ),
+        'dust_tau': environment.get(
+            'dust_tau',
+            0.8 if environment.get('dust_storm') else 0.15,
+        ),
+        'wind_ms': environment.get(
+            'wind_ms',
+            environment.get('wind_speed_ms', 4),
+        ),
+        'lmst': environment.get('lmst', 12),
+    }
+    return normalized
+
+
+def _write_indexes(frames_dir, manifest):
+    manifest_path = frames_dir / 'manifest.json'
+    latest_path = frames_dir / 'latest.json'
+    bundle_path = frames_dir / 'frames.json'
+
+    _atomic_write(manifest_path, json.dumps(manifest, indent=2))
+    _atomic_write(latest_path, json.dumps({
+        'sol': manifest['last_sol'],
+        'hash': manifest['frames'][-1]['hash'],
+        'updated': manifest['generated'],
+    }, indent=2))
+
+    bundle = {
+        '_format': 'mars-barn-frames-bundle',
+        'version': 1,
+        'total': manifest['total_frames'],
+        'first_sol': manifest['first_sol'],
+        'last_sol': manifest['last_sol'],
+        'generated': manifest['generated'],
+        'frames': {},
+    }
+    for entry in manifest['frames']:
+        path = frames_dir / f'sol-{entry["sol"]:04d}.json'
+        bundle['frames'][str(entry['sol'])] = _bundle_frame(
+            json.loads(path.read_text())
+        )
+
+    bundle_json = json.dumps(bundle)
+    _atomic_write(bundle_path, bundle_json)
+    return len(bundle_json)
+
+
+def _check_ledger(frames_dir):
+    manifest_path = frames_dir / 'manifest.json'
+    latest_path = frames_dir / 'latest.json'
+    bundle_path = frames_dir / 'frames.json'
+    for path in (manifest_path, latest_path, bundle_path):
+        if not path.exists():
+            raise ValueError(f'Missing ledger index: {path.name}')
+
+    manifest = json.loads(manifest_path.read_text())
+    expected = _manifest_from_frames(
+        frames_dir,
+        generated=manifest.get('generated'),
+    )
+    comparable_keys = (
+        'version', 'hash_algorithm', 'total_frames', 'first_sol', 'last_sol',
+        'frames'
+    )
+    for key in comparable_keys:
+        if manifest.get(key) != expected[key]:
+            raise ValueError(f'Manifest {key} does not match frame files')
+
+    latest = json.loads(latest_path.read_text())
+    if latest.get('sol') != expected['last_sol']:
+        raise ValueError('latest.json Sol does not match the manifest')
+    if latest.get('hash') != expected['frames'][-1]['hash']:
+        raise ValueError('latest.json hash does not match the manifest')
+
+    bundle = json.loads(bundle_path.read_text())
+    expected_sols = [str(entry['sol']) for entry in expected['frames']]
+    if bundle.get('total') != expected['total_frames']:
+        raise ValueError('frames.json total does not match the manifest')
+    if bundle.get('first_sol') != expected['first_sol']:
+        raise ValueError('frames.json first_sol does not match the manifest')
+    if bundle.get('last_sol') != expected['last_sol']:
+        raise ValueError('frames.json last_sol does not match the manifest')
+    if list(bundle.get('frames', {}).keys()) != expected_sols:
+        raise ValueError('frames.json contents do not match the manifest')
+    for sol in expected_sols:
+        frame_path = frames_dir / f'sol-{int(sol):04d}.json'
+        expected_frame = _bundle_frame(json.loads(frame_path.read_text()))
+        if bundle['frames'][sol] != expected_frame:
+            raise ValueError(f'frames.json payload differs from Sol {sol}')
+
+    return expected
 
 
 def main():
@@ -332,18 +603,71 @@ def main():
     parser.add_argument('--count', type=int, default=1, help='Number of new frames to generate')
     parser.add_argument('--reseed', type=int, default=0, help='Regenerate from sol 1 to N')
     parser.add_argument('--seed', type=int, default=42, help='RNG seed')
+    parser.add_argument('--reconcile', action='store_true',
+                        help='Rebuild manifest/latest/bundle from immutable frame files')
+    parser.add_argument('--check', action='store_true',
+                        help='Validate frame files and indexes without writing')
+    parser.add_argument('--frames-dir', type=Path,
+                        help=argparse.SUPPRESS)
     args = parser.parse_args()
 
     repo_root = Path(__file__).parent.parent
-    frames_dir = repo_root / 'data' / 'frames'
+    frames_dir = args.frames_dir or repo_root / 'data' / 'frames'
     frames_dir.mkdir(parents=True, exist_ok=True)
 
+    if args.check:
+        checked = _check_ledger(frames_dir)
+        print(
+            f'Ledger valid: {checked["total_frames"]} frames '
+            f'(Sol {checked["first_sol"]}-{checked["last_sol"]})'
+        )
+        return
+
+    if args.reconcile:
+        existing_manifest = None
+        manifest_path = frames_dir / 'manifest.json'
+        if manifest_path.exists():
+            existing_manifest = json.loads(manifest_path.read_text())
+        manifest = _manifest_from_frames(frames_dir)
+        if existing_manifest and existing_manifest.get('version', 1) >= 2:
+            existing_by_sol = {
+                entry['sol']: entry for entry in existing_manifest.get('frames', [])
+            }
+            reconciled_sols = {entry['sol'] for entry in manifest['frames']}
+            missing_sols = sorted(set(existing_by_sol) - reconciled_sols)
+            if missing_sols:
+                raise SystemExit(
+                    f'Refusing to truncate immutable frame ledger; '
+                    f'missing Sol {missing_sols[0]}'
+                )
+            for entry in manifest['frames']:
+                previous = existing_by_sol.get(entry['sol'])
+                if previous and previous.get('hash') != entry['hash']:
+                    raise SystemExit(
+                        f'Refusing to reconcile modified historical frame '
+                        f'Sol {entry["sol"]}'
+                    )
+        bundle_size = _write_indexes(frames_dir, manifest)
+        _check_ledger(frames_dir)
+        print(
+            f'Reconciled {manifest["total_frames"]} immutable frames '
+            f'(Sol {manifest["first_sol"]}-{manifest["last_sol"]})'
+        )
+        print(f'Bundle: {manifest["total_frames"]} frames, {bundle_size//1024} KB')
+        return
+
+    if args.count < 1 or args.reseed < 0:
+        parser.error('--count must be positive and --reseed cannot be negative')
+
     manifest_path = frames_dir / 'manifest.json'
+    if manifest_path.exists():
+        _check_ledger(frames_dir)
     if manifest_path.exists() and args.reseed == 0:
         manifest = json.loads(manifest_path.read_text())
         start_sol = manifest['last_sol'] + 1
     else:
-        manifest = {'version': 1, 'generated': '', 'total_frames': 0,
+        manifest = {'version': 2, 'hash_algorithm': 'sha256-file',
+                     'generated': '', 'total_frames': 0,
                      'first_sol': 1, 'last_sol': 0, 'frames': []}
         start_sol = 1
 
@@ -352,59 +676,65 @@ def main():
         start_sol = 1
 
     end_sol = start_sol + count - 1
-    rng = MarsRNG(args.seed + start_sol)
+    target_paths = [
+        frames_dir / f'sol-{sol:04d}.json'
+        for sol in range(start_sol, end_sol + 1)
+    ]
+    collisions = [path.name for path in target_paths if path.exists()]
+    if collisions:
+        raise SystemExit(
+            'Refusing to overwrite immutable frame files: '
+            + ', '.join(collisions[:5])
+        )
+
+    existing_paths = list(frames_dir.glob('sol-*.json'))
+    if existing_paths:
+        highest_existing = max(
+            int(FRAME_FILE_RE.fullmatch(path.name).group(1))
+            for path in existing_paths
+        )
+        if highest_existing >= start_sol:
+            raise SystemExit(
+                f'Manifest ends at Sol {start_sol - 1}, but frame files exist '
+                f'through Sol {highest_existing}; run --reconcile first'
+            )
 
     prev_mars = None
     if start_sol > 1:
         prev_path = frames_dir / f'sol-{start_sol - 1:04d}.json'
         if prev_path.exists():
             prev_mars = json.loads(prev_path.read_text()).get('mars')
+        if prev_mars is None:
+            raise SystemExit(
+                f'Sol {start_sol - 1} uses an unsupported frame schema; '
+                'publication remains frozen until schemas are normalized'
+            )
 
+    generated_frames = []
     for sol in range(start_sol, end_sol + 1):
+        rng = MarsRNG(args.seed + sol)
         frame, mars = generate_frame(sol, rng, prev_mars)
-        (frames_dir / f'sol-{sol:04d}.json').write_text(json.dumps(frame, indent=2))
-
-        entry = {'sol': sol, 'hash': frame['_hash'], 'size': len(json.dumps(frame))}
-        existing = [f for f in manifest['frames'] if f['sol'] == sol]
-        if existing:
-            manifest['frames'][manifest['frames'].index(existing[0])] = entry
-        else:
-            manifest['frames'].append(entry)
+        generated_frames.append((sol, frame))
         prev_mars = mars
+
+    for sol, frame in generated_frames:
+        frame_path = frames_dir / f'sol-{sol:04d}.json'
+        _atomic_write(frame_path, json.dumps(frame, indent=2))
+        _, entry = _frame_entry(frame_path, sol)
+        manifest['frames'].append(entry)
 
     manifest['frames'].sort(key=lambda f: f['sol'])
     manifest['total_frames'] = len(manifest['frames'])
     manifest['first_sol'] = manifest['frames'][0]['sol']
     manifest['last_sol'] = manifest['frames'][-1]['sol']
-    manifest['generated'] = datetime.utcnow().isoformat() + 'Z'
-    manifest_path.write_text(json.dumps(manifest, indent=2))
-
-    (frames_dir / 'latest.json').write_text(json.dumps({
-        'sol': manifest['last_sol'],
-        'hash': manifest['frames'][-1]['hash'],
-        'updated': datetime.utcnow().isoformat() + 'Z'
-    }, indent=2))
+    manifest['generated'] = _generated_at()
 
     print(f'Generated {count} frames (Sol {start_sol}-{end_sol})')
     print(f'Total: {manifest["total_frames"]} frames (Sol {manifest["first_sol"]}-{manifest["last_sol"]})')
 
-    # Build consolidated frames.json bundle (one fetch for all frames)
-    bundle = {
-        '_format': 'mars-barn-frames-bundle',
-        'version': 1,
-        'total': manifest['total_frames'],
-        'first_sol': manifest['first_sol'],
-        'last_sol': manifest['last_sol'],
-        'generated': manifest['generated'],
-        'frames': {}
-    }
-    for entry in manifest['frames']:
-        fp = frames_dir / f'sol-{entry["sol"]:04d}.json'
-        if fp.exists():
-            bundle['frames'][str(entry['sol'])] = json.loads(fp.read_text())
-    bundle_json = json.dumps(bundle)
-    (frames_dir / 'frames.json').write_text(bundle_json)
-    print(f'Bundle: {len(bundle["frames"])} frames, {len(bundle_json)//1024} KB')
+    bundle_size = _write_indexes(frames_dir, manifest)
+    _check_ledger(frames_dir)
+    print(f'Bundle: {manifest["total_frames"]} frames, {bundle_size//1024} KB')
 
 
 if __name__ == '__main__':

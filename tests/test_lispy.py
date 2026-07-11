@@ -1,11 +1,24 @@
 """Tests for LisPy VM — sandboxed colony control language."""
 from __future__ import annotations
 
+from contextlib import contextmanager
+import re
 import sys
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent.parent / "src"))
 
-import pytest
 from lispy import LispyVM, LispyError, read, CONTROL_PROGRAMS
+
+
+@contextmanager
+def raises(error_type, match):
+    try:
+        yield
+    except error_type as error:
+        assert re.search(match, str(error)), (
+            f"{error!r} does not match {match!r}"
+        )
+    else:
+        raise AssertionError(f"{error_type.__name__} was not raised")
 
 
 class TestParser:
@@ -103,12 +116,12 @@ class TestSafety:
         vm = LispyVM()
         vm.MAX_STEPS = 100
         # This should hit the limit
-        with pytest.raises(LispyError, match="limit"):
+        with raises(LispyError, match="limit"):
             vm.run("(begin " + "(+ 1 1) " * 200 + ")")
 
     def test_undefined_variable(self):
         vm = LispyVM()
-        with pytest.raises(LispyError, match="Undefined"):
+        with raises(LispyError, match="Undefined"):
             vm.run("nonexistent")
 
 

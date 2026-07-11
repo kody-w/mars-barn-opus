@@ -20,6 +20,17 @@ class TestCommDelay:
         assert min(delays) >= 0.2
         assert max(delays) <= 2.0
 
+    def test_opposition_and_conjunction_geometry(self):
+        ch = CommChannel()
+        opposition = ch.delay_at_sol(0)
+        assert abs(opposition - 0.3) < 1e-9
+        assert ch.blackout is False
+
+        conjunction = ch.delay_at_sol(380)
+        assert abs(conjunction - 1.5) < 1e-9
+        assert ch.blackout is True
+        assert ch.send_command("message", {}, 380) is None
+
     def test_send_creates_queued_command(self):
         ch = CommChannel()
         cmd = ch.send_command("override_allocation", {"heating": 30}, 10)
@@ -81,26 +92,17 @@ class TestBlackout:
 
     def test_blackout_blocks_commands(self):
         ch = CommChannel()
-        # Force blackout
-        ch.blackout = True
-        ch.blackout_remaining_sols = 5
-        cmd = ch.send_command("message", {"text": "hello"}, 100)
+        cmd = ch.send_command("message", {"text": "hello"}, 380)
         assert cmd is None
         assert ch.commands_lost == 1
 
     def test_blackout_recovers(self):
         ch = CommChannel()
-        ch.blackout = True
-        ch.blackout_remaining_sols = 2
-        # Tick through blackout
-        ch.delay_at_sol(100)  # remaining = 1
-        ch.delay_at_sol(101)  # remaining = 0, blackout ends
-        # Note: delay_at_sol may re-trigger blackout if near conjunction
-        # So test with non-conjunction sol
-        ch.blackout = True
-        ch.blackout_remaining_sols = 1
-        ch.delay_at_sol(50)  # Far from conjunction
+        ch.delay_at_sol(380)
+        assert ch.blackout
+        ch.delay_at_sol(400)
         assert ch.blackout_remaining_sols == 0
+        assert not ch.blackout
 
 
 class TestApplyCommand:

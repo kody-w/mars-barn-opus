@@ -373,8 +373,7 @@ def run_mission_control(seed: int = DEFAULT_SEED, max_sols: int = DEFAULT_SOLS,
         ext_temp = atm.temperature_k + temp_offset
         rad = radiation_dose(
             sol_count=1, in_habitat=True,
-            solar_flare=any(e.event_type == "solar_flare"
-                          for e in event_engine.active_events),
+            solar_flare=False,
         )
 
         # Process arriving commands (delayed from previous sols)

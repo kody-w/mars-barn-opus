@@ -541,6 +541,7 @@ body.cinematic-active .cartridge-bar,body.cinematic-active #task-panel{
 <div id="top-nav" class="game-hidden" style="position:fixed;top:0;left:0;right:0;z-index:200;background:#080b10;border-bottom:1px solid var(--border);padding:4px 16px;display:flex;align-items:center;gap:12px;font-size:11px;font-family:var(--font)">
   <span style="color:var(--cyan);font-weight:700;font-size:12px;letter-spacing:1px;margin-right:6px">FIRST PRINCIPLES TO MARS</span>
   <a href="simhub.html" style="color:var(--cyan);text-decoration:none;padding:3px 8px;border-radius:3px;border:1px solid var(--border)">🏆 SimHub</a>
+  <a href="evolution.html" style="color:var(--green);text-decoration:none;padding:3px 8px;border-radius:3px;border:1px solid var(--border)">Evolution</a>
   <a href="hall-of-fame.html" style="color:var(--dim);text-decoration:none;padding:3px 8px;border-radius:3px">🏅 LisPy</a>
   <a href="patterns.html" style="color:var(--dim);text-decoration:none;padding:3px 8px;border-radius:3px">🔧 Patterns</a>
   <a href="control.html" target="_blank" style="color:var(--dim);text-decoration:none;padding:3px 8px;border-radius:3px">◉ Control</a>
@@ -812,19 +813,23 @@ async function loadFrame(sol){
 function applyPublicFrame(sol){
   const frame = publicFrames[sol];
   if(!frame) return false;
-  
+
   // Override Mars weather with frame data
-  const m = frame.mars;
+  const m = frame.mars || frame.environment;
+  if(!m) return false;
+  const frameTempK = m.temp_k ?? m.temperature_k;
+  const frameTempC = m.temp_c ?? m.temperature_c;
   marsWeather = {
     ...marsWeather,
-    tempC: m.temp_c, tempK: m.temp_k,
-    pressurePa: m.pressure_pa,
-    solarWm2: m.solar_wm2,
-    dustTau: m.dust_tau,
-    windMs: m.wind_ms,
-    lmst: m.lmst,
-    ls: m.ls,
-    season: m.season,
+    tempC: frameTempC ?? (frameTempK == null ? marsWeather.tempC : frameTempK - 273.15),
+    tempK: frameTempK ?? (frameTempC == null ? marsWeather.tempK : frameTempC + 273.15),
+    pressurePa: m.pressure_pa ?? marsWeather.pressurePa,
+    solarWm2: m.solar_wm2 ?? m.solar_irradiance ?? marsWeather.solarWm2,
+    dustTau: m.dust_tau ?? (m.dust_storm == null ? marsWeather.dustTau : (m.dust_storm ? 0.8 : 0.15)),
+    windMs: m.wind_ms ?? m.wind_speed_ms ?? marsWeather.windMs,
+    lmst: m.lmst ?? marsWeather.lmst,
+    ls: m.ls ?? m.solar_longitude ?? marsWeather.ls,
+    season: m.season ?? marsWeather.season,
   };
   
   // Inject frame events into state
@@ -855,8 +860,9 @@ function applyPublicFrame(sol){
   }
   
   // Frame challenge → inject task trigger
-  if(frame.challenge){
-    state._pendingChallenge = frame.challenge;
+  const challenge = frame.challenge || frame.challenges?.[0];
+  if(challenge){
+    state._pendingChallenge = challenge;
   }
   
   return true;
@@ -1385,17 +1391,36 @@ let lispyCode = LISPY_PROGRAMS.adaptive_governor;
 let lispyEnabled = true;
 let lastLispyOutput = [];
 
+function isRobotCrewMember(member){
+  return member?.kind === 'robot' || /^(OPT|LUN)-/.test(member?.name || '');
+}
+
+function aliveHumanCrew(crew){
+  return (crew || []).filter(member => member.alive && !isRobotCrewMember(member));
+}
+
+function lifeSupportDays(resource, perPerson, crew){
+  const consumers = aliveHumanCrew(crew).length;
+  return consumers === 0 ? Infinity : resource / (perPerson * consumers);
+}
+
+function powerDemandPerSol(crew){
+  const alive = (crew || []).filter(member => member.alive);
+  const robots = alive.filter(isRobotCrewMember).length;
+  return PWR_BASE + robots * (PWR_BASE / 4);
+}
+
 function runLispyOnState(){
   if(!lispyEnabled||!lispyCode)return;
   const vm=new LispyVM();
-  const n=Math.max(1,state.crew.filter(c=>c.alive).length);
+  const aliveCount=Math.max(1,state.crew.filter(c=>c.alive).length);
   // Feed real colony state into VM
   vm.setEnv('sol',state.sol);
-  vm.setEnv('o2_days',state.o2/(O2_PP*n));
-  vm.setEnv('h2o_days',state.h2o/(H2O_PP*n));
-  vm.setEnv('food_days',state.food/(FOOD_PP*n));
+  vm.setEnv('o2_days',lifeSupportDays(state.o2,O2_PP,state.crew));
+  vm.setEnv('h2o_days',lifeSupportDays(state.h2o,H2O_PP,state.crew));
+  vm.setEnv('food_days',lifeSupportDays(state.food,FOOD_PP,state.crew));
   vm.setEnv('power_kwh',state.power);
-  vm.setEnv('crew_alive',n);
+  vm.setEnv('crew_alive',aliveCount);
   vm.setEnv('crew_total',state.crew.length);
   vm.setEnv('morale',state.morale*100);
   vm.setEnv('interior_temp_k',state.int_temp);
@@ -1459,12 +1484,12 @@ let riskGrade = 'LOW';
 
 function computeCRI(){
   const vm = new LispyVM();
-  const n = Math.max(1, state.crew.filter(c=>c.alive).length);
-  vm.setEnv('o2_days', state.o2/(O2_PP*n));
-  vm.setEnv('h2o_days', state.h2o/(H2O_PP*n));
-  vm.setEnv('food_days', state.food/(FOOD_PP*n));
+  const aliveCount = Math.max(1, state.crew.filter(c=>c.alive).length);
+  vm.setEnv('o2_days', lifeSupportDays(state.o2,O2_PP,state.crew));
+  vm.setEnv('h2o_days', lifeSupportDays(state.h2o,H2O_PP,state.crew));
+  vm.setEnv('food_days', lifeSupportDays(state.food,FOOD_PP,state.crew));
   vm.setEnv('power_kwh', state.power);
-  vm.setEnv('crew_alive', n);
+  vm.setEnv('crew_alive', aliveCount);
   vm.setEnv('crew_total', state.crew.length);
   vm.setEnv('morale', state.morale*100);
   vm.setEnv('solar_eff', state.s_eff);
@@ -1625,20 +1650,23 @@ function buildChainBlock(sol, echo, rewards){
   const rewardSnapshot = {};
   Object.keys(rewards).filter(k=>k!=='_milestone').forEach(k=>{rewardSnapshot[k]=rewards[k]});
 
-  const blockData = JSON.stringify({sol, state:stateSnapshot, decisions:decisionSnapshot,
-    rewards:rewardSnapshot, circulating:marsCirculating, prevHash:chainHead});
-  const blockHash = hashStr(blockData);
-
   // Include public frame hash if available for cross-verification
-  const frameHash = (publicFrames[sol] && publicFrames[sol]._hash) ? publicFrames[sol]._hash : null;
+  const frameHash = (
+    frameMode==='public'&&publicFrames[sol]&&publicFrames[sol]._hash
+  ) ? publicFrames[sol]._hash : null;
+  const stateHash=hashStr(JSON.stringify(stateSnapshot));
+  const decisionHash=hashStr(JSON.stringify(decisionSnapshot));
+  const rewardHash=hashStr(JSON.stringify(rewardSnapshot));
+  const totalReward=Object.values(rewardSnapshot).reduce((s,v)=>s+v,0);
+  const blockData=JSON.stringify({version:2,sol,stateHash,decisionHash,rewardHash,
+    circulating:marsCirculating,prevHash:chainHead,frameHash,totalReward});
+  const blockHash=hashStr(blockData);
 
   const block = {
-    sol, hash:blockHash, prevHash:chainHead, frameHash,
-    stateHash: hashStr(JSON.stringify(stateSnapshot)),
-    decisionHash: hashStr(JSON.stringify(decisionSnapshot)),
-    rewardHash: hashStr(JSON.stringify(rewardSnapshot)),
+    version:2,sol,hash:blockHash,prevHash:chainHead,frameHash,
+    stateHash,decisionHash,rewardHash,
     circulating: marsCirculating,
-    totalReward: Object.values(rewardSnapshot).reduce((s,v)=>s+v,0),
+    totalReward,
     ts: new Date().toISOString()
   };
 
@@ -1662,17 +1690,23 @@ function verifyCartridgeChain(cartridge){
   }
 
   // Verify hash chain integrity
-  let prevHash = null;
+  let prevHash = cartridge.chainBlocks[0].prevHash ?? null;
   for(let i=0; i<cartridge.chainBlocks.length; i++){
     const block = cartridge.chainBlocks[i];
+    if(block.version!==2){
+      return {verified:false, reason:`Unsupported legacy chain block at sol ${block.sol}`};
+    }
     if(block.prevHash !== prevHash){
       return {verified:false, reason:`Chain break at sol ${block.sol}: expected prev ${prevHash}, got ${block.prevHash}`};
     }
 
-    // Verify block hash
-    const blockData = JSON.stringify({sol:block.sol, state:{sol:block.sol},
-      decisions:[], rewards:{}, circulating:block.circulating, prevHash:block.prevHash});
-    // Note: full verification requires replay — this just checks chain continuity
+    const blockData=JSON.stringify({version:2,sol:block.sol,stateHash:block.stateHash,
+      decisionHash:block.decisionHash,rewardHash:block.rewardHash,
+      circulating:block.circulating,prevHash:block.prevHash,
+      frameHash:block.frameHash??null,totalReward:block.totalReward});
+    if(hashStr(blockData)!==block.hash){
+      return {verified:false,reason:`Block hash mismatch at sol ${block.sol}`};
+    }
 
     // Verify against public frame hash if available
     if(block.frameHash && publicFrames[block.sol]){
@@ -1682,6 +1716,9 @@ function verifyCartridgeChain(cartridge){
     }
 
     prevHash = block.hash;
+  }
+  if(cartridge.chainHead&&prevHash!==cartridge.chainHead){
+    return {verified:false,reason:'Chain head mismatch'};
   }
 
   return {
@@ -1922,7 +1959,13 @@ function getWalletAddress(name){
 function marsTransfer(fromAddr, toAddr, amount, memo){
   if(!marsWallets[fromAddr]) return {ok:false, error:'Sender wallet not found: '+fromAddr};
   if(!marsWallets[toAddr]) return {ok:false, error:'Recipient wallet not found: '+toAddr};
-  if(amount <= 0) return {ok:false, error:'Amount must be positive'};
+  if(typeof amount!=='number'||!Number.isFinite(amount)||amount<=0){
+    return {ok:false,error:'Amount must be a finite positive number'};
+  }
+  if(!Number.isFinite(marsWallets[fromAddr].balance)||
+     !Number.isFinite(marsWallets[toAddr].balance)){
+    return {ok:false,error:'Wallet balance is invalid'};
+  }
   if(marsWallets[fromAddr].balance < amount) return {ok:false, error:`Insufficient balance: ${marsWallets[fromAddr].balance} < ${amount}`};
 
   // Execute transfer
@@ -2412,6 +2455,45 @@ let activeTask = null;
 let taskHistory = [];
 let tasksResolved = 0;
 let tasksIgnored = 0;
+let interventionHistory = [];
+const decisionIntervals = new Set();
+const decisionTimeouts = new Set();
+
+function scheduleDecisionTimeout(callback, delay){
+  const timeoutId=setTimeout(()=>{
+    decisionTimeouts.delete(timeoutId);
+    callback();
+  },delay);
+  decisionTimeouts.add(timeoutId);
+  return timeoutId;
+}
+
+function clearDecisionTimers(clearPending=false){
+  if(activeTask?._timer){
+    clearInterval(activeTask._timer);
+    delete activeTask._timer;
+  }
+  decisionIntervals.forEach(clearInterval);
+  decisionIntervals.clear();
+  decisionTimeouts.forEach(clearTimeout);
+  decisionTimeouts.clear();
+  overrideBusy=false;
+  overrideSentCmds=[];
+  if(clearPending){
+    activeTask=null;
+    taskQueue=[];
+  }
+}
+
+function recordIntervention(actor,kind,details=''){
+  interventionHistory.push({sol:state.sol,actor,kind,details});
+}
+
+function autonomyEligible(){
+  return !interventionHistory.some(entry=>
+    entry.actor==='human'||entry.actor==='external'||entry.actor==='legacy'
+  );
+}
 
 // ── TASK AUTOPILOT (LisPy Cartridge Programs) ──
 // These LisPy programs auto-resolve tasks when autopilot is enabled.
@@ -2477,15 +2559,15 @@ const DEFAULT_AUTOPILOT = {
 function runAutopilotOnTask(task){
   if(!autopilotEnabled || !task) return null;
   const vm = new LispyVM();
-  const n = Math.max(1, state.crew.filter(c=>c.alive).length);
+  const aliveCount = Math.max(1, state.crew.filter(c=>c.alive).length);
 
   // Feed colony state
   vm.setEnv('sol', state.sol);
-  vm.setEnv('o2_days', state.o2/(O2_PP*n));
-  vm.setEnv('h2o_days', state.h2o/(H2O_PP*n));
-  vm.setEnv('food_days', state.food/(FOOD_PP*n));
+  vm.setEnv('o2_days', lifeSupportDays(state.o2,O2_PP,state.crew));
+  vm.setEnv('h2o_days', lifeSupportDays(state.h2o,H2O_PP,state.crew));
+  vm.setEnv('food_days', lifeSupportDays(state.food,FOOD_PP,state.crew));
   vm.setEnv('power_kwh', state.power);
-  vm.setEnv('crew_alive', n);
+  vm.setEnv('crew_alive', aliveCount);
   vm.setEnv('morale', state.morale*100);
   vm.setEnv('interior_temp_k', state.int_temp);
   vm.setEnv('radiation_msv', state.rad);
@@ -2520,6 +2602,7 @@ function autopilotResolveTask(){
   if(!decision) return;
 
   if(task.override){
+    task._actor='autopilot';
     // For override tasks, the autopilot returns the command sequence as a string
     // Simulate sending commands with delays
     const cmds = decision.split(' ').map(s=>s.trim()).filter(Boolean);
@@ -2535,7 +2618,10 @@ function autopilotResolveTask(){
       if(matchIdx >= 0) sendOverrideCmd(matchIdx);
       cmdIdx++;
       if(cmdIdx < cmds.length && activeTask){
-        setTimeout(sendNextAutopilotCmd, (task.override.delaySeconds||3)*1000 + 200);
+        scheduleDecisionTimeout(
+          sendNextAutopilotCmd,
+          (task.override.delaySeconds||3)*1000+200
+        );
       }
     }
     sendNextAutopilotCmd();
@@ -2545,12 +2631,13 @@ function autopilotResolveTask(){
     const validChoices = ['approve','deny','alt'];
     const choice = validChoices.includes(decision) ? decision : 'approve';
     state.log.push(`  🤖 AUTOPILOT: ${choice.toUpperCase()} on "${task.title}" (CRI:${colonyRiskIndex})`);
-    resolveTask(choice, false);
+    resolveTask(choice, false, 'autopilot');
   }
 }
 
 function toggleAutopilot(){
   autopilotEnabled = !autopilotEnabled;
+  recordIntervention('human','autopilot_toggle',autopilotEnabled?'on':'off');
   const btn = document.getElementById('autopilot-btn');
   if(btn){
     btn.textContent = autopilotEnabled ? '✈️ PILOT ON' : '✈️ PILOT OFF';
@@ -2634,11 +2721,12 @@ const TASK_TEMPLATES = [
   // ── RESOURCE CRISES ──
   // O₂ low — reroute power to ISRU or let food production continue
   // ── O₂ REROUTE — triggered by echo showing O₂ dropping ──
-  {trigger: (s,echo)=>{ const n=Math.max(1,s.crew.filter(c=>c.alive).length);
+  {trigger: (s,echo)=>{
     const dropping=echo&&echo.delta&&echo.delta.o2<-0.5;
-    return s.o2/(O2_PP*n)<8 && s.o2/(O2_PP*n)>2 && (dropping||R()<0.1)},
-   gen: s=>{ const n=Math.max(1,s.crew.filter(c=>c.alive).length); const d=(s.o2/(O2_PP*n)).toFixed(1);
-    const fd=(s.food/(FOOD_PP*n)).toFixed(0);
+    const days=lifeSupportDays(s.o2,O2_PP,s.crew);
+    return days<8 && days>2 && (dropping||R()<0.1)},
+   gen: s=>{ const d=lifeSupportDays(s.o2,O2_PP,s.crew).toFixed(1);
+    const fd=lifeSupportDays(s.food,FOOD_PP,s.crew).toFixed(0);
     return {id:'o2_reroute',urgency:'urgent',from:s.crew.find(c=>c.role==='ENGR'&&c.alive)||s.crew[0],
       title:'O₂ RESERVES CRITICAL',
       body:`O₂ at ${d} sols. If we reroute ISRU to 70%, we breathe — but greenhouse drops to 15%. Food is at ${fd} sols. That clock starts ticking instead.`,
@@ -2659,15 +2747,16 @@ const TASK_TEMPLATES = [
 
   // Water crisis — sacrifice greenhouse or dehydrate
   // ── WATER CRISIS — triggered by echo showing H₂O dropping ──
-  {trigger: (s,echo)=>{ const n=Math.max(1,s.crew.filter(c=>c.alive).length);
+  {trigger: (s,echo)=>{
     const dropping=echo&&echo.delta&&echo.delta.h2o<-1;
-    return s.h2o/(H2O_PP*n)<6 && s.h2o/(H2O_PP*n)>1 && (dropping||R()<0.08)},
-   gen: s=>{ const n=Math.max(1,s.crew.filter(c=>c.alive).length);
-    const wd=(s.h2o/(H2O_PP*n)).toFixed(1);
+    const days=lifeSupportDays(s.h2o,H2O_PP,s.crew);
+    return days<6 && days>1 && (dropping||R()<0.08)},
+   gen: s=>{ const humans=Math.max(1,aliveHumanCrew(s.crew).length);
+    const wd=lifeSupportDays(s.h2o,H2O_PP,s.crew).toFixed(1);
     return {id:'h2o_crisis',urgency:'urgent',from:s.crew.find(c=>c.role==='SCI'&&c.alive)||s.crew[0],
       title:'WATER RESERVES LOW',
       body:`H₂O at ${wd} sols. The greenhouse uses 40% of our water. Shutting it saves water but kills food production. Or we ration crew water to 60% — everyone gets dehydrated but the greenhouse survives.`,
-      data:`H₂O: ${wd} sols | Greenhouse: ${s.g_eff>0.5?'ACTIVE':'DEGRADED'} | Crew HP: ${(s.crew.filter(c=>c.alive).reduce((a,c)=>a+c.hp,0)/n).toFixed(0)}%`,
+      data:`H₂O: ${wd} sols | Greenhouse: ${s.g_eff>0.5?'ACTIVE':'DEGRADED'} | Crew HP: ${(aliveHumanCrew(s.crew).reduce((a,c)=>a+c.hp,0)/humans).toFixed(0)}%`,
       approve:{label:'✓ SHUT GREENHOUSE',effect:s=>{
         s.alloc.g=0.05;s.alloc.i=0.65;s.alloc.h=0.30;
         s.log.push('  ✓ MC: Greenhouse shut down. Water conserved. No food production.');
@@ -2820,8 +2909,8 @@ const TASK_TEMPLATES = [
   // ── CO₂ SCRUBBER — more humans + high activity = faster saturation ──
   {trigger: (s,echo)=>{
     const highActivity=echo&&echo.delta&&(echo.delta.food<-3000); // crew consuming hard
-    return s.sol>30 && s.crew.filter(c=>c.alive&&!c.name.startsWith('OPT')).length>=2 && riskRoll(highActivity?0.04:0.015)},
-   gen: s=>{const humans=s.crew.filter(c=>c.alive&&!c.name.startsWith('OPT')).length;
+    return s.sol>30 && aliveHumanCrew(s.crew).length>=2 && riskRoll(highActivity?0.04:0.015)},
+   gen: s=>{const humans=aliveHumanCrew(s.crew).length;
     const scrubberLoad=(humans*1.0).toFixed(1); // kg CO₂/sol
     const capacity=(humans*1.2).toFixed(1);
     return {id:'co2_scrubber',urgency:'urgent',from:s.crew.find(c=>c.role==='SCI'&&c.alive)||s.crew[0],
@@ -2833,7 +2922,7 @@ const TASK_TEMPLATES = [
         s.log.push('  📊 LiOH canister life: ~30 sols per unit. Each weighs 25 kg. They don\'t ship from Earth fast.');}},
       deny:{label:'✗ REDUCE ACTIVITY',effect:s=>{
         s.alloc.r=Math.max(0.3,s.alloc.r-0.2);
-        s.crew.filter(c=>c.alive).forEach(c=>{c.hp-=2;});
+        aliveHumanCrew(s.crew).forEach(c=>{c.hp-=2;});
         s.log.push('  ✗ MC: Crew on reduced activity. Lower CO₂ but lower productivity.');
         s.log.push('  📊 Elevated CO₂ (>1%): headaches, impaired judgment. At 5%: unconsciousness.');}},
       timeout:10, defaultChoice:'approve'}}},
@@ -3160,10 +3249,9 @@ function generateTask(){
   // Data sloshing: output of frame N drives the tasks of frame N+1.
 
   if(echo){
-    const n=Math.max(1,state.crew.filter(c=>c.alive).length);
-    const o2d=state.o2/(O2_PP*n);
-    const h2od=state.h2o/(H2O_PP*n);
-    const fd=state.food/(FOOD_PP*n);
+    const o2d=lifeSupportDays(state.o2,O2_PP,state.crew);
+    const h2od=lifeSupportDays(state.h2o,H2O_PP,state.crew);
+    const fd=lifeSupportDays(state.food,FOOD_PP,state.crew);
 
     // Inject echo-derived context into triggers — each template
     // can now see the delta, the visual state, the events
@@ -3316,7 +3404,7 @@ function renderTask(task){
   // Autopilot indicator
   if(autopilotEnabled){
     const decision = runAutopilotOnTask(task);
-    const choiceLabel = task.override ? 'sequence ready' : (decision||'analyzing...');
+    const choiceLabel = escapeHtml(task.override ? 'sequence ready' : (decision||'analyzing...'));
     html += `<div id="autopilot-indicator" style="margin-top:8px;padding:6px 10px;background:rgba(88,166,255,0.08);
       border:1px solid var(--border);border-radius:6px;font-size:10px;display:flex;align-items:center;gap:8px">
       <span style="color:var(--cyan)">🤖 AUTOPILOT:</span>
@@ -3390,6 +3478,7 @@ function sendOverrideCmd(idx){
     if(bar)bar.style.width=Math.min(100,elapsed/(delay*1000)*100)+'%';
     if(elapsed>=delay*1000){
       clearInterval(delayInterval);
+      decisionIntervals.delete(delayInterval);
       if(bar)bar.style.width='0%';
       overrideBusy=false;
 
@@ -3402,7 +3491,7 @@ function sendOverrideCmd(idx){
 
         // Check if sequence complete
         if(overrideSentCmds.length>=task.override.sequence.length){
-          setTimeout(()=>resolveOverride(true),500);
+          scheduleDecisionTimeout(()=>resolveOverride(true),500);
         }
       }else{
         // WRONG COMMAND — consequences
@@ -3411,10 +3500,11 @@ function sendOverrideCmd(idx){
         const errMsg=cmd.failResponse||'Command failed. Incorrect sequence.';
         if(log)log.innerHTML+=`<div class="err">◄ ERROR: ${errMsg}</div>`;
         if(log)log.scrollTop=9999;
-        setTimeout(()=>resolveOverride(false),800);
+        scheduleDecisionTimeout(()=>resolveOverride(false),800);
       }
     }
   },100);
+  decisionIntervals.add(delayInterval);
 }
 
 function resolveOverride(success){
@@ -3433,18 +3523,20 @@ function resolveOverride(success){
     state.log.push(`  ✗ OVERRIDE FAILED: ${task.title} — wrong sequence or timeout`);
   }
 
-  taskHistory.push({id:task.id,sol:state.sol,choice:success?'override_success':'override_fail',timedOut:false});
+  const actor=task._actor||'human';
+  taskHistory.push({id:task.id,sol:state.sol,choice:success?'override_success':'override_fail',timedOut:false,actor});
+  recordIntervention(actor,'override',task.id);
   activeTask=null;
   overrideSentCmds=[];
   overrideBusy=false;
   cameraPOV=null;
   document.getElementById('task-panel').classList.remove('task-visible');
-  setTimeout(()=>{ if(taskQueue.length)showNextTask(); },1200);
+  scheduleDecisionTimeout(()=>{ if(taskQueue.length)showNextTask(); },1200);
   updateTaskBadge();
   updateAllUI();
 }
 
-function resolveTask(choice, timedOut){
+function resolveTask(choice, timedOut, actor){
   if(!activeTask)return;
   clearInterval(activeTask._timer);
   const task=activeTask;
@@ -3457,7 +3549,9 @@ function resolveTask(choice, timedOut){
   }else{
     tasksResolved++;
   }
-  taskHistory.push({id:task.id,sol:state.sol,choice,timedOut:!!timedOut});
+  const decisionActor=actor||(timedOut?'timeout':'human');
+  taskHistory.push({id:task.id,sol:state.sol,choice,timedOut:!!timedOut,actor:decisionActor});
+  recordIntervention(decisionActor,'task',task.id);
 
   // ── HIDDEN CONSEQUENCES — Mars doesn't care about your intentions ──
   // Realistic secondary effects that fire based on chance + conditions.
@@ -3467,7 +3561,7 @@ function resolveTask(choice, timedOut){
   activeTask=null;
   cameraPOV=null;
   document.getElementById('task-panel').classList.remove('task-visible');
-  setTimeout(()=>{ if(taskQueue.length)showNextTask(); },1200);
+  scheduleDecisionTimeout(()=>{ if(taskQueue.length)showNextTask(); },1200);
   updateTaskBadge();
   updateAllUI();
 }
@@ -3500,7 +3594,8 @@ function rollSecondaryConsequence(taskId, choice){
   }
   if(taskId==='h2o_crisis'&&choice==='deny'&&riskRoll(0.18)){
     // Rationed water causes kidney stress in one crew member
-    const victim=s.crew.filter(c=>c.alive&&!c.name.startsWith('OPT'))[Math.floor(R()*Math.max(1,s.crew.filter(c=>c.alive&&!c.name.startsWith('OPT')).length))];
+    const humans=aliveHumanCrew(s.crew);
+    const victim=humans[Math.floor(R()*Math.max(1,humans.length))];
     if(victim){victim.hp-=12;victim.st='Kidney stress';
       s.log.push(`  🏥 UNINTENDED: ${victim.name} showing signs of kidney stress from dehydration.`);
       s.log.push(`  📊 Human kidneys need minimum 1.5L/day. Below that, damage accumulates.`);}
@@ -3672,8 +3767,24 @@ function updateTaskBadge(){
 // ── End Papers Please ────────────────────────────────────────────
 
 // Sim state (reuse from index.html engine)
-const O2_PP=0.84,H2O_PP=2.5,FOOD_PP=2500,PWR_BASE=30,ISRU_O2=5,ISRU_H2O=12,GH_KCAL=15000,PANEL=200,EFF=0.22,SOL_H=24.66,PCRIT=50;
-function rng32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t^=t+Math.imul(t^t>>>7,61|t);return((t^t>>>14)>>>0)/4294967296}}
+const O2_PP=0.84,H2O_PP=2.5,FOOD_PP=2500,PWR_BASE=30,ISRU_O2=5,ISRU_H2O=12,
+  GH_KCAL=15000,ISRU_PWR=60,GH_PWR=30,GH_H2O=5,
+  PANEL=200,EFF=0.22,SOL_H=24.66,PCRIT=50;
+function rng32(seed){
+  let cursor=seed|0;
+  const next=function(){
+    cursor|=0;cursor=cursor+0x6D2B79F5|0;
+    let t=Math.imul(cursor^cursor>>>15,1|cursor);
+    t^=t+Math.imul(t^t>>>7,61|t);
+    return((t^t>>>14)>>>0)/4294967296;
+  };
+  next.getState=()=>cursor;
+  next.setState=value=>{
+    if(!Number.isInteger(value))throw new Error('Invalid RNG checkpoint');
+    cursor=value|0;
+  };
+  return next;
+}
 let R=rng32(42);
 
 let state={sol:0,alive:true,cause:null,arch:'engineer',
@@ -3691,6 +3802,7 @@ let state={sol:0,alive:true,cause:null,arch:'engineer',
 };
 
 let globe=null, running=false, simInterval=null;
+let twinChannel=null;
 let currentZoom='planet';
 let groundScene=null,groundCamera=null,groundRenderer=null,groundAnimId=null;
 let groundRobots=[], groundCrew=[];
@@ -3783,8 +3895,10 @@ function setZoom(level){
       const el=document.getElementById('globe-container');
       el.style.display='block';
       setTimeout(()=>el.classList.remove('fade-out'),20);
-      if(level==='planet')globe.pointOfView({altitude:2.5},1000);
-      else globe.pointOfView({lat:state.lat,lng:state.lng,altitude:0.15},1000);
+      if(globe){
+        if(level==='planet')globe.pointOfView({altitude:2.5},1000);
+        else globe.pointOfView({lat:state.lat,lng:state.lng,altitude:0.15},1000);
+      }
     } else if(level==='warmap'){
       exitGround();
       const el=document.getElementById('warmap-view');
@@ -4182,8 +4296,52 @@ function removeLandingShip(){
   }
 }
 
+function completeMissionLanding(ref){
+  if(!ref)return;
+  const {mission:m,wx,seed,startInDust}=ref;
+  const hud=document.getElementById('landing-hud');
+  if(hud)hud.style.display='none';
+  const landingOverlay=document.getElementById('landing-overlay');
+  if(landingOverlay)landingOverlay.style.display='none';
+  const missionOverlay=document.getElementById('mission-overlay');
+  if(missionOverlay)missionOverlay.style.display='none';
+
+  for(const id of ['game-hdr','left-panel','right-panel','top-nav','cartridge-bar']){
+    const element=document.getElementById(id);
+    element.classList.remove('game-hidden');
+    element.classList.add('game-visible');
+  }
+
+  updateAllUI();
+  state.log.push('Mission: '+m.name);
+  state.log.push('Governor: '+m.arch.toUpperCase()+' + LisPy ('+activeLispy+')');
+  state.log.push('Crew: '+m.crewList.length+' members deployed');
+  state.log.push('\u{1F321}\u{FE0F} Real Mars: '+wx.season+' \u00B7 '+wx.tempC+'\u00B0C \u00B7 Solar '+wx.solarWm2+' W/m\u00B2');
+  state.log.push('\u{1F32A}\u{FE0F} Dust \u03C4: '+wx.dustTau+' \u00B7 Wind: '+wx.windMs+' m/s \u00B7 Storm risk: '+wx.dustStormProb+'%');
+  if(startInDust)state.log.push('\u26A0\u{FE0F} DUST STORM ACTIVE \u2014 starting in reduced solar conditions');
+  state.log.push('\u2500\u2500\u2500 Sol 1 begins \u2500\u2500\u2500');
+
+  setTimeout(()=>{
+    simSpeed=1;
+    cartridgeId=generateCartridgeId();
+    state.startConfig={o2:state.o2,h2o:state.h2o,food:state.food,power:state.power};
+    state.startSeed=seed;
+    updateCartridgeDisplay();
+    startSimulationClock();
+  },500);
+}
+
+function completeMissionWithout3D(message,error){
+  landingPhase='playing';
+  exitGround();
+  console.warn(message,error||'');
+  completeMissionLanding(landingMissionRef);
+  landingMissionRef=null;
+}
+
 function toggleLandingManual(){
   landingShipData.manual=!landingShipData.manual;
+  recordIntervention('human','landing_override',landingShipData.manual?'manual':'auto');
   const btn=document.getElementById('lh-override');
   if(btn){
     btn.textContent=landingShipData.manual?'🤖 AUTO PILOT':'🎮 MANUAL OVERRIDE';
@@ -4950,61 +5108,8 @@ function buildGroundScene(){
         if(landingShipData.deployTimer>300){
           landingPhase='playing';
           removeLandingShip();
-          // Hide landing HUD
-          const hud=document.getElementById('landing-hud');
-          if(hud) hud.style.display='none';
-          // Hide landing overlay text
-          const lo=document.getElementById('landing-overlay');
-          if(lo) lo.style.display='none';
-          const mo=document.getElementById('mission-overlay');
-          if(mo) mo.style.display='none';
-
-          // Show game UI
-          document.getElementById('game-hdr').classList.remove('game-hidden');
-          document.getElementById('game-hdr').classList.add('game-visible');
-          document.getElementById('left-panel').classList.remove('game-hidden');
-          document.getElementById('left-panel').classList.add('game-visible');
-          document.getElementById('right-panel').classList.remove('game-hidden');
-          document.getElementById('right-panel').classList.add('game-visible');
-          document.getElementById('top-nav').classList.remove('game-hidden');
-          document.getElementById('top-nav').classList.add('game-visible');
-          document.getElementById('cartridge-bar').classList.remove('game-hidden');
-          document.getElementById('cartridge-bar').classList.add('game-visible');
-
-          // Start simulation
-          updateAllUI();
           if(typeof landingMissionRef!=='undefined'&&landingMissionRef){
-            const m=landingMissionRef.mission;
-            const wx=landingMissionRef.wx;
-            const seed=landingMissionRef.seed;
-            const startInDust=landingMissionRef.startInDust;
-            state.log.push('Mission: '+m.name);
-            state.log.push('Governor: '+m.arch.toUpperCase()+' + LisPy ('+activeLispy+')');
-            state.log.push('Crew: '+m.crewList.length+' members deployed');
-            state.log.push('\u{1F321}\u{FE0F} Real Mars: '+wx.season+' \u00B7 '+wx.tempC+'\u00B0C \u00B7 Solar '+wx.solarWm2+' W/m\u00B2');
-            state.log.push('\u{1F32A}\u{FE0F} Dust \u03C4: '+wx.dustTau+' \u00B7 Wind: '+wx.windMs+' m/s \u00B7 Storm risk: '+wx.dustStormProb+'%');
-            if(startInDust) state.log.push('\u26A0\u{FE0F} DUST STORM ACTIVE \u2014 starting in reduced solar conditions');
-            state.log.push('\u2500\u2500\u2500 Sol 1 begins \u2500\u2500\u2500');
-            setTimeout(()=>{
-              simSpeed=1;
-              running=true;
-              cartridgeId=generateCartridgeId();
-              state.startConfig={o2:state.o2,h2o:state.h2o,food:state.food,power:state.power};
-              state.startSeed=seed;
-              updateCartridgeDisplay();
-              document.getElementById('sim-btn').textContent='\u23F8 PAUSE';
-              simInterval=setInterval(()=>{
-                stepSim();
-                autoSaveCheck();
-                if(state.sol%25===0&&groundScene){exitGround();enterGround()}
-                if(!state.alive){
-                  running=false;
-                  clearInterval(simInterval);
-                  document.getElementById('sim-btn').textContent='COLONY LOST';
-                  showDeathScreen();
-                }
-              },Math.max(50,500/simSpeed));
-            },500);
+            completeMissionLanding(landingMissionRef);
             landingMissionRef=null;
           }
         }
@@ -5018,10 +5123,12 @@ function buildGroundScene(){
 
 // ── Sim Engine (same as index.html, minimal) ──
 function solIrr(sol){
+  if(state.missionContract?.lunarNightSols&&
+     (sol-1)%28<state.missionContract.lunarNightSols)return 0;
   const sy=sol%669,oa=2*Math.PI*(sy-445)/669,of=1+0.09*Math.cos(oa);
   const sc=589*of,ls=2*Math.PI*sy/669,el=Math.max(0.3,Math.cos(ls)*0.5+0.5);
   const dust=state.events.some(e=>e.type==='dust_storm')?0.25:1;
-  return sc*el*dust*0.7;
+  return sc*el*dust*0.7*(state.missionContract?.solarMultiplier||1);
 }
 // ══════════════════════════════════════════════════════════════════════
 // THE RAPPTER NERVOUS SYSTEM — Reflexes Between Heartbeats
@@ -5105,7 +5212,7 @@ function computeReflexArcs(){
   // ══════════════════════════════════════════════════════════════
 
   // REFLEX 1: O₂ crash trajectory → auto-boost ISRU before player even sees the task
-  if(echoInertia.o2_velocity < -0.3 && s.o2/(O2_PP*n) < 15){
+  if(echoInertia.o2_velocity < -0.3 && lifeSupportDays(s.o2,O2_PP,s.crew) < 15){
     const severity = Math.min(1, Math.abs(echoInertia.o2_velocity));
     activeReflexes.push({
       id:'o2_trajectory_warning',
@@ -5263,7 +5370,7 @@ function computeReflexArcs(){
   }
 
   // REFLEX 9: Food flipping to consumption → greenhouse emergency
-  if(echoInertia.discourse_flips.some(f=>f.system==='food'&&f.to==='consuming') && s.food/(FOOD_PP*n) < 20){
+  if(echoInertia.discourse_flips.some(f=>f.system==='food'&&f.to==='consuming') && lifeSupportDays(s.food,FOOD_PP,s.crew) < 20){
     activeReflexes.push({
       id:'food_emergency_reflex',
       condition:'Food production reversed + reserves < 20 sols',
@@ -5416,11 +5523,77 @@ function clearReflexVisuals(){
 let echoHistory=[];
 let lastEcho=null;
 
+function generatePostMortem(){
+  const critSol=Math.max(1,state.sol-15);
+  const mistakes=[];const recs=[];
+  if(state.cause==='O2 depletion'){mistakes.push('Insufficient ISRU allocation');recs.push('Shift to 70%+ ISRU when O2 < 10 days')}
+  else if(state.cause==='starvation'){mistakes.push('Food production never matched consumption');recs.push('Build greenhouse dome earlier')}
+  else if(state.cause==='dehydration'){mistakes.push('Water reserves reached zero');recs.push('Protect water recycling and extraction capacity')}
+  else if(state.cause==='all crew lost'){mistakes.push('No crew remained operational');recs.push('Reduce exposure and preserve medical capacity')}
+  else{mistakes.push('Power reserves depleted');recs.push('Build solar farms, maintain 100 kWh reserve')}
+  if(state.discoveries.length===0)recs.push('Deploy more rovers for geological surveys — discoveries provide permanent bonuses');
+  if(state.research.length<2)recs.push('Prioritize research — each tech permanently improves survival odds');
+  state.postMortem={critSol,mistakes,recs};
+  state.log.push(`📋 POST-MORTEM: Point of no return was Sol ${critSol}`);
+  mistakes.forEach(m=>state.log.push(`  ❌ ${m}`));
+  recs.forEach(r=>state.log.push(`  ✅ ${r}`));
+}
+
+function finalizeTerminalStep(s,pre,newEv,crewEvents){
+  const post={o2:state.o2,h2o:state.h2o,food:state.food,power:state.power,
+    crew_alive:state.crew.filter(c=>c.alive).length,morale:state.morale};
+  const echo={
+    frame:s,utc:new Date().toISOString(),
+    delta:{o2:post.o2-pre.o2,h2o:post.h2o-pre.h2o,food:post.food-pre.food,power:post.power-pre.power},
+    events:newEv.map(e=>({type:e.type,severity:e.severity,desc:e.desc})),
+    crew_events:crewEvents,build:null,alive:false,cause:state.cause,
+    inertia:{...echoInertia},reflexes_fired:[],reflex_count:0,
+    cri:colonyRiskIndex,cri_grade:riskGrade,
+    visual:{dust_storm:state.events.some(e=>e.type==='dust_storm'),
+      solar_flare:state.events.some(e=>e.type==='solar_flare'),
+      meteorite:newEv.some(e=>e.type==='meteorite'),
+      night:marsWeather.lmst<6||marsWeather.lmst>19,
+      construction:false,alert:'colony_dead'},
+  };
+  echoHistory.push(echo);if(echoHistory.length>500)echoHistory.shift();
+  lastEcho=echo;
+  state.log.push(`Sol ${s}: terminal transition, ${post.crew_alive} crew`);
+  crewEvents.forEach(event=>state.log.push(`  💀 ${event.name} (${event.type==='crew_death'?'DECEASED':'CRITICAL'})`));
+  state.log.push(`☠ COLONY LOST: ${state.cause}`);
+  generatePostMortem();
+  clearReflexVisuals();
+  computeInertia();
+  updateAllUI();
+  applyEchoVisuals(echo);
+  broadcastEchoIfNeeded();
+  return echo;
+}
+
+function completeMissionIfReady(echo){
+  const target=state.missionContract?.targetSols;
+  if(!state.alive||state.outcome!=='running'||!Number.isInteger(target)||state.sol<target){
+    return false;
+  }
+  state.outcome='won';
+  echo.outcome='won';
+  echo.type='mission_complete';
+  echo.visual.alert='mission_complete';
+  state.log.push(`🏁 MISSION COMPLETE: ${state.missionContract.objective}`);
+  return true;
+}
+
 function stepSim(){
-  if(!state.alive)return null;
-  state.sol++;const s=state.sol;
+  if(!state.alive||state.outcome==='won')return null;
+  const nextSol=state.sol+1;
+  if(frameMode==='public'&&latestPublicSol>=nextSol&&!publicFrames[nextSol]){
+    waitingForFrame=true;
+    ensureFramesAhead(state.sol);
+    return null;
+  }
   const ac=state.crew.filter(c=>c.alive);
   if(!ac.length){state.alive=false;state.cause='all crew lost';return{type:'death',cause:'all crew lost'}}
+  state.sol++;const s=state.sol;
+  const humanCount=aliveHumanCrew(ac).length;
 
   // ── PUBLIC FRAME CONSUMPTION ──
   // If public frames are available, apply them to override weather + inject events.
@@ -5444,13 +5617,31 @@ function stepSim(){
   const pre={o2:state.o2,h2o:state.h2o,food:state.food,power:state.power,
     crew_alive:ac.length,morale:state.morale};
 
+  if(state.missionContract?.isruRepairSols&&
+     (state.missionRepairProgress||0)<state.missionContract.isruRepairSols){
+    state.missionRepairProgress=(state.missionRepairProgress||0)+1;
+    if(state.missionRepairProgress===state.missionContract.isruRepairSols){
+      state.i_eff=0.95;
+      state.log.push('🔧 MISSION REPAIR COMPLETE: ISRU restored to 95%.');
+    }
+  }
+
   // Events
-  state.events=state.events.filter(e=>{e.remaining--;return e.remaining>0});
+  state.events=state.events.filter(e=>e.remaining>0);
+  const eventRadiationMultiplier=state.research.includes('radiation_hardening')?0.7:1;
+  let eventRadiationDose=state.events
+    .filter(event=>event.type==='solar_flare')
+    .reduce((dose,event)=>dose+50*(event.severity||0.5)*eventRadiationMultiplier,0);
+  state.rad+=eventRadiationDose;
   const probs={dust_storm:0.12,dust_devil:0.15,solar_flare:0.04,meteorite:0.003,equipment_failure:0.02,radiation_spike:0.03};
   const newEv=[];const types=state.events.map(e=>e.type);
   for(const[t,p]of Object.entries(probs)){
+    if(state.missionContract?.noAtmosphericIsru&&
+       (t==='dust_storm'||t==='dust_devil'))continue;
     if(types.includes(t))continue;
-    if(R()<p){const sv=0.2+R()*0.8,dur=t==='dust_storm'?Math.floor(5+R()*25):t==='dust_devil'?Math.floor(1+R()*2):Math.floor(1+R()*5);
+    const probability=t==='equipment_failure'
+      ?p*(state.missionContract?.equipmentFailureMultiplier||1):p;
+    if(R()<probability){const sv=0.2+R()*0.8,dur=t==='dust_storm'?Math.floor(5+R()*25):t==='dust_devil'?Math.floor(1+R()*2):Math.floor(1+R()*5);
       const descs={dust_storm:'Dust storm approaching from the north',dust_devil:'Dust devil spotted near habitat',
         solar_flare:'Solar particle event — seek shelter',meteorite:'Meteorite impact detected nearby',
         equipment_failure:'Equipment malfunction in ISRU unit',radiation_spike:'Elevated background radiation'};
@@ -5458,35 +5649,72 @@ function stepSim(){
       state.events.push(ev);newEv.push(ev);
       if(t==='meteorite'){state.s_eff*=(1-0.15*sv);state.g_eff*=(1-0.2*sv)}
       if(t==='equipment_failure'){state.i_eff*=(1-0.15*sv);state.power-=20*sv}
-      if(t==='solar_flare'){state.rad+=50*sv}
+      if(t==='solar_flare'){
+        const dose=50*sv*eventRadiationMultiplier;
+        eventRadiationDose+=dose;
+        state.rad+=dose;
+      }
     }
+  }
+  if(state.missionContract?.stormInterval&&s%state.missionContract.stormInterval===0&&
+     !state.events.some(event=>event.type==='dust_storm')){
+    const storm={type:'dust_storm',severity:0.8,remaining:25,duration:25,
+      desc:'Contract dust storm — deterministic mission hazard'};
+    state.events.push(storm);newEv.push(storm);
   }
   // Production (with module bonuses)
   const irr=solIrr(s);const a=state.alloc;
-  const solarBonus=1+state.modules.filter(m=>m.type==='solar_farm').length*0.4;
+  const solarResearch=state.research.includes('improved_solar')?1.15:1;
+  const solarBonus=(1+state.modules.filter(m=>m.type==='solar_farm').length*0.4)*solarResearch;
   state.power+=irr*PANEL*EFF*SOL_H/1000*state.s_eff*solarBonus;
-  if(state.power>PCRIT*0.3){
-    const is=Math.min(1.5,a.i*2),ib=1+state.modules.filter(m=>m.type==='isru_plant').length*0.4;
-    state.o2+=ISRU_O2*state.i_eff*is*ib;state.h2o+=ISRU_H2O*state.i_eff*is*ib;
-  }
+  let discretionaryPower=Math.max(0,state.power-PWR_BASE);
+  const isruAvailable=!state.missionContract?.noAtmosphericIsru&&
+    (!state.missionContract?.isruRepairSols||
+     state.missionRepairProgress>=state.missionContract.isruRepairSols);
+  const requestedIsruScale=isruAvailable?Math.min(1.5,a.i*2):0;
+  const requestedIsruPower=ISRU_PWR*requestedIsruScale;
+  const usedIsruPower=Math.min(discretionaryPower,requestedIsruPower);
+  const is=requestedIsruPower>0
+    ?requestedIsruScale*usedIsruPower/requestedIsruPower:0;
+  discretionaryPower-=usedIsruPower;state.power-=usedIsruPower;
+  const ib=1+state.modules.filter(m=>m.type==='isru_plant').length*0.4;
+  state.o2+=ISRU_O2*state.i_eff*is*ib;
+  state.h2o+=ISRU_H2O*state.i_eff*is*ib;
   state.h2o+=state.modules.filter(m=>m.type==='water_extractor').length*3;
-  if(state.power>PCRIT*0.3&&state.h2o>5){
-    const gs=Math.min(1.5,a.g*2),gb=1+state.modules.filter(m=>m.type==='greenhouse_dome').length*0.5;
-    state.food+=GH_KCAL*state.g_eff*gs*gb;
-  }
+  const requestedGhScale=Math.min(1.5,a.g*2);
+  const requestedGhPower=GH_PWR*requestedGhScale;
+  const requestedGhWater=GH_H2O*requestedGhScale;
+  const ghPowerScale=requestedGhPower>0
+    ?Math.min(1,discretionaryPower/requestedGhPower):0;
+  const ghWaterScale=requestedGhWater>0
+    ?Math.min(1,state.h2o/requestedGhWater):0;
+  const ghLimit=Math.min(ghPowerScale,ghWaterScale);
+  const gs=requestedGhScale*ghLimit;
+  state.power-=requestedGhPower*ghLimit;
+  state.h2o-=requestedGhWater*ghLimit;
+  const cropResearch=state.research.includes('crop_optimization')?1.25:1;
+  const gb=(1+state.modules.filter(m=>m.type==='greenhouse_dome').length*0.5)*cropResearch;
+  state.food+=GH_KCAL*state.g_eff*gs*gb;
   // Consumption
-  const n=ac.length;
-  state.o2=Math.max(0,state.o2-n*O2_PP);state.h2o=Math.max(0,state.h2o-n*H2O_PP);
-  state.food=Math.max(0,state.food-n*FOOD_PP*a.r);state.power=Math.max(0,state.power-PWR_BASE);
+  const waterUseMultiplier=state.research.includes('water_recycling')?0.8:1;
+  state.o2=Math.max(0,state.o2-humanCount*O2_PP);
+  state.h2o=Math.max(0,state.h2o-humanCount*H2O_PP*waterUseMultiplier);
+  state.food=Math.max(0,state.food-humanCount*FOOD_PP*a.r);
+  state.power=Math.max(0,state.power-powerDemandPerSol(ac));
   // Thermal
   state.int_temp=Math.max(200,Math.min(310,state.int_temp+(state.power>PCRIT?0.5:-2)));
-  state.rad+=0.335;
+  const radiationMultiplier=state.research.includes('radiation_hardening')?0.7:1;
+  state.rad+=0.335*radiationMultiplier;
   // Crew
   const crewEvents=[];
   ac.forEach(m=>{
-    m.rad+=0.335;const prevHp=m.hp;
-    if(state.food/(n*FOOD_PP)<0.3){m.hp-=3;m.mor-=5;m.st='STARVING'}
-    else if(state.h2o/(n*H2O_PP)<0.3){m.hp-=5;m.mor-=3;m.st='DEHYDRATED'}
+    m.rad+=0.335*radiationMultiplier+eventRadiationDose;const prevHp=m.hp;
+    if(isRobotCrewMember(m)){
+      if(state.power<=0){m.hp-=5;m.st='POWER FAILURE'}
+      else{m.hp=Math.min(100,m.hp+0.25);m.st='Nominal'}
+    }
+    else if(lifeSupportDays(state.food,FOOD_PP,ac)<0.3){m.hp-=3;m.mor-=5;m.st='STARVING'}
+    else if(lifeSupportDays(state.h2o,H2O_PP,ac)<0.3){m.hp-=5;m.mor-=3;m.st='DEHYDRATED'}
     else if(state.int_temp<263){m.hp-=4;m.st='HYPOTHERMIC'}
     else{m.hp=Math.min(100,m.hp+0.5);m.st='Nominal'}
     m.mor=Math.max(0,Math.min(100,m.mor));
@@ -5494,10 +5722,14 @@ function stepSim(){
     if(prevHp>50&&m.hp<=50){crewEvents.push({type:'crew_critical',name:m.name})}
   });
   state.morale=ac.filter(c=>c.alive).reduce((s,m)=>s+m.mor,0)/Math.max(1,ac.filter(c=>c.alive).length)/100;
-  if(state.o2<=0){state.alive=false;state.cause='O2 depletion'}
-  if(state.food<=0){state.alive=false;state.cause='starvation'}
+  const survivingHumanCount=aliveHumanCrew(state.crew).length;
+  if(!state.crew.some(c=>c.alive)){state.alive=false;state.cause='all crew lost'}
+  else if(survivingHumanCount>0&&state.o2<=0){state.alive=false;state.cause='O2 depletion'}
+  else if(survivingHumanCount>0&&state.h2o<=0){state.alive=false;state.cause='dehydration'}
+  else if(survivingHumanCount>0&&state.food<=0){state.alive=false;state.cause='starvation'}
+  if(!state.alive)return finalizeTerminalStep(s,pre,newEv,crewEvents);
   // Governor decisions — LisPy automation runs first, personality fallback second
-  const o2d=state.o2/(O2_PP*n),h2od=state.h2o/(H2O_PP*n),fd=state.food/(FOOD_PP*n);
+  const o2d=lifeSupportDays(state.o2,O2_PP,ac),h2od=lifeSupportDays(state.h2o,H2O_PP,ac),fd=lifeSupportDays(state.food,FOOD_PP,ac);
   if(lispyEnabled){
     runLispyOnState();
   } else {
@@ -5549,6 +5781,30 @@ function stepSim(){
       state.log.push(`  🔭 DISCOVERY: ${d.n} — ${d.b}`);
     }
   }
+  // Auto-research (tier 1 → 2 → 3)
+  let researchEvent=null;
+  const RTREE={improved_solar:{name:'Improved Solar',sols:12,tier:1,cost_pwr:100,eff:'solar+15%'},
+    water_recycling:{name:'Water Recycling',sols:10,tier:1,cost_pwr:80,eff:'h2o-20%'},
+    crop_optimization:{name:'Crop Optimization',sols:15,tier:1,cost_pwr:60,eff:'food+25%'},
+    radiation_hardening:{name:'Radiation Hardening',sols:14,tier:1,cost_pwr:120,eff:'rad-30%'},
+    moxie_upgrade:{name:'MOXIE II',sols:20,tier:2,cost_pwr:200,req:'water_recycling',eff:'isru+30%'},
+    dust_mitigation:{name:'Dust Mitigation',sols:12,tier:2,cost_pwr:80,req:'improved_solar',eff:'dust-40%'},
+    autonomous_repair:{name:'Auto Repair',sols:18,tier:2,cost_pwr:150,req:'improved_solar',eff:'repair+'},
+    nuclear_thermal:{name:'Nuclear Thermal',sols:30,tier:3,cost_pwr:500,req:'moxie_upgrade',eff:'no cascade'}};
+  if(!state.researching&&s>30&&o2d>8&&fd>8&&state.power>200){
+    const done=new Set(state.research);
+    const opts=Object.entries(RTREE).filter(([k,v])=>!done.has(k)&&(!v.req||done.has(v.req))&&state.power>=v.cost_pwr);
+    if(opts.length){
+      const[rk,rv]=opts[0];state.researching={slug:rk,name:rv.name,remaining:rv.sols,total:rv.sols};
+      state.power-=rv.cost_pwr;
+      researchEvent={type:'research_start',name:rv.name};
+    }
+  }
+  if(state.researching){state.researching.remaining--;if(state.researching.remaining<=0){
+    state.research.push(state.researching.slug);
+    researchEvent={type:'research_complete',name:state.researching.name};
+    state.researching=null;
+  }}
   // ── MARS Token Virtual Economy (LisPy-computed, per-agent ledger) ──
   // Token economics are a LisPy program — same VM, same pattern as CRI.
   // Agents earn MARS tokens for survival. Total balance IS the sim score.
@@ -5594,31 +5850,6 @@ function stepSim(){
       if(state.conversations.length>20)state.conversations.shift();
     }
   }
-  // Auto-research (tier 1 → 2 → 3)
-  let researchEvent=null;
-  const RTREE={improved_solar:{name:'Improved Solar',sols:12,tier:1,cost_pwr:100,eff:'solar+15%'},
-    water_recycling:{name:'Water Recycling',sols:10,tier:1,cost_pwr:80,eff:'h2o-20%'},
-    crop_optimization:{name:'Crop Optimization',sols:15,tier:1,cost_pwr:60,eff:'food+25%'},
-    radiation_hardening:{name:'Radiation Hardening',sols:14,tier:1,cost_pwr:120,eff:'rad-30%'},
-    moxie_upgrade:{name:'MOXIE II',sols:20,tier:2,cost_pwr:200,req:'water_recycling',eff:'isru+30%'},
-    dust_mitigation:{name:'Dust Mitigation',sols:12,tier:2,cost_pwr:80,req:'improved_solar',eff:'dust-40%'},
-    autonomous_repair:{name:'Auto Repair',sols:18,tier:2,cost_pwr:150,req:'improved_solar',eff:'repair+'},
-    nuclear_thermal:{name:'Nuclear Thermal',sols:30,tier:3,cost_pwr:500,req:'moxie_upgrade',eff:'no cascade'}};
-  if(!state.researching&&s>30&&o2d>8&&fd>8&&state.power>200){
-    const done=new Set(state.research);
-    const opts=Object.entries(RTREE).filter(([k,v])=>!done.has(k)&&(!v.req||done.has(v.req))&&state.power>=v.cost_pwr);
-    if(opts.length){
-      const[rk,rv]=opts[0];state.researching={slug:rk,name:rv.name,remaining:rv.sols,total:rv.sols};
-      state.power-=rv.cost_pwr;
-      researchEvent={type:'research_start',name:rv.name};
-    }
-  }
-  if(state.researching){state.researching.remaining--;if(state.researching.remaining<=0){
-    state.research.push(state.researching.slug);
-    researchEvent={type:'research_complete',name:state.researching.name};
-    state.researching=null;
-  }}
-
   // ── Build Echo Frame Delta ──
   // Include reflexes that fired since last frame as input context.
   // Frame N+1 knows what the nervous system did between heartbeats.
@@ -5649,8 +5880,8 @@ function stepSim(){
       construction:!!state.building,
       alert:post.crew_alive<pre.crew_alive?'crew_lost':
         !state.alive?'colony_dead':
-        (post.o2/(O2_PP*n))<5?'o2_critical':
-        (post.food/(FOOD_PP*n))<5?'food_critical':'nominal',
+        o2d<5?'o2_critical':
+        fd<5?'food_critical':'nominal',
     },
   };
   echoHistory.push(echo);if(echoHistory.length>500)echoHistory.shift();
@@ -5666,19 +5897,9 @@ function stepSim(){
   if(researchEvent)state.log.push(`  🔬 ${researchEvent.name} ${researchEvent.type==='research_complete'?'BREAKTHROUGH':'started'}`);
   if(!state.alive){
     state.log.push(`☠ COLONY LOST: ${state.cause}`);
-    // Generate post-mortem
-    const critSol=Math.max(1,state.sol-15);
-    const mistakes=[];const recs=[];
-    if(state.cause==='O2 depletion'){mistakes.push('Insufficient ISRU allocation');recs.push('Shift to 70%+ ISRU when O2 < 10 days')}
-    else if(state.cause==='starvation'){mistakes.push('Food production never matched consumption');recs.push('Build greenhouse dome earlier')}
-    else{mistakes.push('Power reserves depleted');recs.push('Build solar farms, maintain 100 kWh reserve')}
-    if(state.discoveries.length===0)recs.push('Deploy more rovers for geological surveys — discoveries provide permanent bonuses');
-    if(state.research.length<2)recs.push('Prioritize research — each tech permanently improves survival odds');
-    state.postMortem={critSol,mistakes,recs};
-    state.log.push(`📋 POST-MORTEM: Point of no return was Sol ${critSol}`);
-    mistakes.forEach(m=>state.log.push(`  ❌ ${m}`));
-    recs.forEach(r=>state.log.push(`  ✅ ${r}`));
+    generatePostMortem();
   }
+  completeMissionIfReady(echo);
 
   // ── NERVOUS SYSTEM: compute inertia + reflex arcs from this echo ──
   // Then clear previous reflex visuals before new ones take effect.
@@ -5689,6 +5910,8 @@ function stepSim(){
   updateAllUI();
   applyEchoVisuals(echo);
   broadcastEchoIfNeeded(); // push to Mission Control twin
+  state.events.forEach(event=>{event.remaining--});
+  state.events=state.events.filter(event=>event.remaining>0);
   return echo;
 }
 
@@ -5760,9 +5983,11 @@ function genJournal(crew,state,sol){
 // ── Colony DNA (browser port) ──
 let dnaHistory=[];
 function updateDNA(state){
-  const n=Math.max(1,state.crew.filter(c=>c.alive).length);
+  const o2Days=lifeSupportDays(state.o2,O2_PP,state.crew);
+  const foodDays=lifeSupportDays(state.food,FOOD_PP,state.crew);
   dnaHistory.push({
-    o2d:state.o2/(0.84*n),fd:state.food/(2500*n),
+    o2d:Number.isFinite(o2Days)?o2Days:30,
+    fd:Number.isFinite(foodDays)?foodDays:30,
     pwr:state.power,mor:state.morale,
     ev:state.events.length>0,crew:state.crew.filter(c=>c.alive).length
   });
@@ -5801,16 +6026,15 @@ let marsSmoothedPrice = 100; // EMA starting point
 
 function computeMarsPrice(){
   const s = state;
-  const n = Math.max(1, s.crew.filter(c=>c.alive).length);
   if(!s.alive) return {price:0, delta:0, fidelity:0, volume:0};
 
   // Component signals (each 0-100)
   const healthSignal = Math.min(100, (s.crew.filter(c=>c.alive).reduce((a,c)=>a+c.hp,0) / (s.crew.length||1)));
   const criSignal = 100 - colonyRiskIndex;
   const survivalSignal = (s.crew.filter(c=>c.alive).length / (s.crew.length||1)) * 100;
-  const o2Runway = Math.min(100, (s.o2 / (0.84 * n)) * 3.3); // 30 days = 100
-  const h2oRunway = Math.min(100, (s.h2o / (2.5 * n)) * 3.3);
-  const foodRunway = Math.min(100, (s.food / (2500 * n)) * 3.3);
+  const o2Runway = Math.min(100, lifeSupportDays(s.o2,O2_PP,s.crew) * 3.3); // 30 days = 100
+  const h2oRunway = Math.min(100, lifeSupportDays(s.h2o,H2O_PP,s.crew) * 3.3);
+  const foodRunway = Math.min(100, lifeSupportDays(s.food,FOOD_PP,s.crew) * 3.3);
   const powerSignal = Math.min(100, s.power / 5);
   const moraleSignal = s.morale * 100;
 
@@ -5964,7 +6188,7 @@ function updateMarsMarket(){
 }
 
 function updateAllUI(){
-  const s=state,ac=s.crew.filter(c=>c.alive),n=Math.max(1,ac.length);
+  const s=state,ac=s.crew.filter(c=>c.alive),humanCount=aliveHumanCrew(ac).length;
   // Status
   const echoTag=lastEcho?` | ECHO ${echoHistory.length}`:'';
   const riskCol=colonyRiskIndex>50?'var(--red)':colonyRiskIndex>30?'var(--yellow)':'var(--green)';
@@ -5992,16 +6216,17 @@ function updateAllUI(){
   // Resources — with delta arrows from echo inertia
   const deltas=lastEcho?lastEcho.delta:{o2:0,h2o:0,food:0,power:0};
   const res=[
-    ['O₂',s.o2,n*O2_PP*60,s.o2/(n*O2_PP),deltas.o2,'--blue'],
-    ['H₂O',s.h2o,n*H2O_PP*60,s.h2o/(n*H2O_PP),deltas.h2o,'--blue'],
-    ['Food',s.food,n*FOOD_PP*60,s.food/(n*FOOD_PP),deltas.food/1000,'--yellow'],
-    ['Power',s.power,1000,s.power/PWR_BASE,deltas.power,'--purple']];
+    ['O₂',s.o2,humanCount?humanCount*O2_PP*60:Math.max(1,s.o2),lifeSupportDays(s.o2,O2_PP,ac),deltas.o2,'--blue'],
+    ['H₂O',s.h2o,humanCount?humanCount*H2O_PP*60:Math.max(1,s.h2o),lifeSupportDays(s.h2o,H2O_PP,ac),deltas.h2o,'--blue'],
+    ['Food',s.food,humanCount?humanCount*FOOD_PP*60:Math.max(1,s.food),lifeSupportDays(s.food,FOOD_PP,ac),deltas.food/1000,'--yellow'],
+    ['Power',s.power,1000,s.power/powerDemandPerSol(ac),deltas.power,'--purple']];
   document.getElementById('resources').innerHTML=res.map(([l,v,mx,d,delta,c])=>{
     const pct=Math.min(100,v/mx*100);
     const col=pct>50?'var(--green)':pct>20?'var(--yellow)':'var(--red)';
     const arrow=delta>0.5?'<span style="color:var(--green)">▲</span>':delta<-0.5?'<span style="color:var(--red)">▼</span>':'<span style="color:var(--dim)">●</span>';
     const deltaStr=Math.abs(delta)>0.1?`<span style="font-size:9px;color:${delta>0?'var(--green)':'var(--red)'}"> ${delta>0?'+':''}${delta.toFixed(1)}</span>`:'';
-    return`<div class="res-bar"><span class="res-label">${arrow} ${l}</span><div class="res-track"><div class="res-fill" style="width:${pct}%;background:${col}"></div></div><span class="res-val">${d.toFixed(0)}d${deltaStr}</span></div>`;
+    const days=Number.isFinite(d)?d.toFixed(0):'∞';
+    return`<div class="res-bar"><span class="res-label">${arrow} ${l}</span><div class="res-track"><div class="res-fill" style="width:${pct}%;background:${col}"></div></div><span class="res-val">${days}d${deltaStr}</span></div>`;
   }).join('');
 
   // Systems — with degradation warning
@@ -6132,8 +6357,10 @@ function updateAllUI(){
   const lispyEd=document.getElementById('lispy-editor');
   if(lispyEd&&!lispyEd.matches(':focus'))lispyEd.value=lispyCode;
   const lispyOut=document.getElementById('lispy-output');
-  if(lispyOut)lispyOut.innerHTML=lastLispyOutput.length?lastLispyOutput.map(l=>
-    l.startsWith('ERROR')?`<span style="color:var(--red)">${l}</span>`:l).join('<br>')
+  if(lispyOut)lispyOut.innerHTML=lastLispyOutput.length?lastLispyOutput.map(l=>{
+    const safeLine=escapeHtml(l);
+    return l.startsWith('ERROR')?`<span style="color:var(--red)">${safeLine}</span>`:safeLine;
+  }).join('<br>')
     :'<span style="color:var(--green)">LisPy: nominal</span>';
   const lispyAlloc=document.getElementById('lispy-alloc');
   if(lispyAlloc)lispyAlloc.textContent=`H:${(s.alloc.h*100).toFixed(0)}% I:${(s.alloc.i*100).toFixed(0)}% G:${(s.alloc.g*100).toFixed(0)}% R:${(s.alloc.r*100).toFixed(0)}%`;
@@ -6143,12 +6370,16 @@ function updateAllUI(){
     globe.htmlElementsData([{id:'ares',name:`Ares Colony (Sol ${s.sol})`,lat:s.lat,lng:s.lng,health:hp}]);
   }
   // Ground HUD
+  const groundO2Days=lifeSupportDays(s.o2,O2_PP,ac);
+  const groundH2oDays=lifeSupportDays(s.h2o,H2O_PP,ac);
+  const groundFoodDays=lifeSupportDays(s.food,FOOD_PP,ac);
+  const showDays=days=>Number.isFinite(days)?days.toFixed(0):'∞';
   document.getElementById('ground-hud').innerHTML=`
     <div class="hud-stat"><div class="hud-val">${s.sol}</div><div class="hud-label">Sol</div></div>
     <div class="hud-stat"><div class="hud-val">${ac.length}/${s.crew.length}</div><div class="hud-label">Crew</div></div>
-    <div class="hud-stat"><div class="hud-val">${(s.o2/(n*O2_PP)).toFixed(0)}d</div><div class="hud-label">O₂</div></div>
-    <div class="hud-stat"><div class="hud-val">${(s.h2o/(n*H2O_PP)).toFixed(0)}d</div><div class="hud-label">H₂O</div></div>
-    <div class="hud-stat"><div class="hud-val">${(s.food/(n*FOOD_PP)).toFixed(0)}d</div><div class="hud-label">Food</div></div>
+    <div class="hud-stat"><div class="hud-val">${showDays(groundO2Days)}d</div><div class="hud-label">O₂</div></div>
+    <div class="hud-stat"><div class="hud-val">${showDays(groundH2oDays)}d</div><div class="hud-label">H₂O</div></div>
+    <div class="hud-stat"><div class="hud-val">${showDays(groundFoodDays)}d</div><div class="hud-label">Food</div></div>
     <div class="hud-stat"><div class="hud-val">${s.power.toFixed(0)}</div><div class="hud-label">kWh</div></div>
     <div class="hud-stat"><div class="hud-val">${s.modules.length}</div><div class="hud-label">Modules</div></div>
     <div class="hud-stat"><div class="hud-val" style="color:${s.alive?'var(--green)':'var(--red)'}">${s.alive?'ALIVE':'DEAD'}</div><div class="hud-label">Status</div></div>
@@ -6179,6 +6410,55 @@ function updateAllUI(){
 
 let simSpeed = 1; // 1x = 500ms, 2x = 250ms, 5x = 100ms, 10x = 50ms
 let manualOverride = false;
+let simulationClockStarts = 0;
+
+function stopSimulationClock(buttonText=null){
+  if(simInterval!==null){
+    clearInterval(simInterval);
+    simInterval=null;
+  }
+  running=false;
+  if(buttonText!==null){
+    document.getElementById('sim-btn').textContent=buttonText;
+  }
+}
+
+function runSimulationTick(){
+  if(state.outcome==='won'){
+    stopSimulationClock('MISSION COMPLETE');
+    clearDecisionTimers(false);
+    showVictoryScreen();
+    return;
+  }
+  if(!state.alive){
+    stopSimulationClock('COLONY LOST');
+    clearDecisionTimers(false);
+    showDeathScreen();
+    return;
+  }
+  stepSim();
+  autoSaveCheck();
+  if(state.sol%25===0&&groundScene){exitGround();enterGround()}
+  if(state.outcome==='won'){
+    stopSimulationClock('MISSION COMPLETE');
+    clearDecisionTimers(false);
+    showVictoryScreen();
+  }else if(!state.alive){
+    stopSimulationClock('COLONY LOST');
+    clearDecisionTimers(false);
+    showDeathScreen();
+  }
+}
+
+function startSimulationClock(){
+  if(!state.alive||state.outcome==='won')return false;
+  if(simInterval!==null)clearInterval(simInterval);
+  running=true;
+  simulationClockStarts++;
+  document.getElementById('sim-btn').textContent='⏸ PAUSE';
+  simInterval=setInterval(runSimulationTick,Math.max(50,500/simSpeed));
+  return true;
+}
 
 function setSpeed(spd){
   simSpeed = spd;
@@ -6187,21 +6467,12 @@ function setSpeed(spd){
     if(el){el.style.color=s===spd?'var(--cyan)':'';el.style.borderColor=s===spd?'var(--cyan)':''}
   });
   // Restart interval at new speed if running
-  if(running){
-    clearInterval(simInterval);
-    simInterval=setInterval(()=>{
-      stepSim();
-      if(!state.alive){
-        running=false;clearInterval(simInterval);
-        document.getElementById('sim-btn').textContent='COLONY LOST';
-        showDeathScreen();
-      }
-    }, Math.max(50, 500/spd));
-  }
+  if(running)startSimulationClock();
 }
 
 function emergencyAction(type){
   manualOverride = type!=='normal';
+  recordIntervention('human','emergency',type);
   if(type==='shelter'){
     state.alloc={h:0.50,i:0.30,g:0.20,r:0.50};
     lispyEnabled=false;
@@ -6223,29 +6494,22 @@ function emergencyAction(type){
 }
 
 function toggleSim(){
-  if(running){running=false;clearInterval(simInterval);document.getElementById('sim-btn').textContent='▶ RESUME';return}
-  running=true;document.getElementById('sim-btn').textContent='⏸ PAUSE';
-  simInterval=setInterval(()=>{
-    stepSim();
-    if(!state.alive){
-      running=false;clearInterval(simInterval);
-      document.getElementById('sim-btn').textContent='COLONY LOST';
-      showDeathScreen();
-    }
-  }, Math.max(50, 500/simSpeed));
+  if(running){stopSimulationClock('▶ RESUME');return}
+  startSimulationClock();
 }
 
 function resetState(){
   const seed=Math.floor(Math.random()*99999);R=rng32(seed);
   const arch=document.getElementById('gov-sel').value;
-  state={sol:0,alive:true,cause:null,arch,o2:4*O2_PP*30,h2o:4*H2O_PP*30,food:4*FOOD_PP*30,power:500,
+  state={sol:0,alive:true,cause:null,outcome:'running',arch,o2:4*O2_PP*30,h2o:4*H2O_PP*30,food:4*FOOD_PP*30,power:500,
     s_eff:1,i_eff:1,g_eff:1,h_eff:1,cascade:'NOM',int_temp:293.15,morale:0.85,rad:0,
     crew:[{name:'Chen W.',role:'CMDR',hp:97,fat:0,mor:82,rad:0,alive:true,st:'Nominal'},
       {name:'Rodriguez M.',role:'ENGR',hp:96,fat:0,mor:85,rad:0,alive:true,st:'Nominal'},
       {name:'Okafor A.',role:'SCI',hp:98,fat:0,mor:78,rad:0,alive:true,st:'Nominal'},
       {name:'Johansson K.',role:'MED',hp:95,fat:0,mor:88,rad:0,alive:true,st:'Nominal'}],
     events:[],log:[],modules:[],building:null,research:[],researching:null,
-    discoveries:[],economy:10000,conversations:[],postMortem:null,alloc:{h:.25,i:.4,g:.35,r:1},lat:18.38,lng:77.58};
+    discoveries:[],economy:10000,conversations:[],postMortem:null,alloc:{h:.25,i:.4,g:.35,r:1},lat:18.38,lng:77.58,
+    missionContract:{...MISSION_CONTRACTS.ares}};
   document.getElementById('sim-btn').textContent='▶ START SIM';
   updateAllUI();
 }
@@ -6265,9 +6529,10 @@ function voiceCommand(){
     console.log('Voice:',cmd);
     let response='';
     const ac=state.crew.filter(c=>c.alive);
-    const n=Math.max(1,ac.length);
     if(cmd.includes('status')||cmd.includes('report')){
-      response=`Sol ${state.sol}. ${ac.length} crew alive. O2 at ${(state.o2/(0.84*n)).toFixed(0)} days. Food at ${(state.food/(2500*n)).toFixed(0)} days. ${state.alive?'Colony nominal.':'Colony lost.'}`;
+      const o2Days=lifeSupportDays(state.o2,O2_PP,state.crew);
+      const foodDays=lifeSupportDays(state.food,FOOD_PP,state.crew);
+      response=`Sol ${state.sol}. ${ac.length} crew alive. O2 at ${Number.isFinite(o2Days)?o2Days.toFixed(0):'infinite'} days. Food at ${Number.isFinite(foodDays)?foodDays.toFixed(0):'infinite'} days. ${state.alive?'Colony nominal.':'Colony lost.'}`;
     }else if(cmd.includes('start')||cmd.includes('go')){
       if(!running)toggleSim();response='Simulation started.';
     }else if(cmd.includes('pause')||cmd.includes('stop')){
@@ -6302,12 +6567,14 @@ function voiceCommand(){
 // Rockets launch every ~760 sols (synodic period). Transit time ~180 sols.
 let supplyChain={nextLaunchWindow:100,inTransit:[],delivered:0};
 function tickSupplyChain(sol){
+  const interval=state.missionContract?.resupplyInterval;
   // Check for launch window
-  if(sol>=supplyChain.nextLaunchWindow&&state.alive){
+  if(Number.isInteger(interval)&&interval>0&&sol>=supplyChain.nextLaunchWindow&&state.alive){
     supplyChain.inTransit.push({launched:sol,arrives:sol+180,
       cargo:{o2:50,h2o:100,food:50000,power:200}});
+    recordIntervention('external','supply_launch',`Earth cargo launched on Sol ${sol}`);
     state.log.push(`🚀 Supply rocket launched from Earth! Arrives sol ${sol+180}`);
-    supplyChain.nextLaunchWindow=sol+760;
+    supplyChain.nextLaunchWindow=sol+interval;
   }
   // Check for arrivals
   const arrived=supplyChain.inTransit.filter(r=>sol>=r.arrives);
@@ -6392,6 +6659,20 @@ const MISSIONS = {
              crewList:[
                {name:'LUN-01',role:'ENGR',hp:100,fat:0,mor:100,rad:0,alive:true,st:'Nominal'},
                {name:'LUN-02',role:'SCI',hp:100,fat:0,mor:100,rad:0,alive:true,st:'Nominal'}]}
+};
+
+const MISSION_CONTRACTS={
+  ares:{targetSols:500,resupplyInterval:760,objective:'Keep the Ares crew alive for 500 sols.'},
+  optimus:{targetSols:687,resupplyInterval:null,objective:'Operate four robots autonomously for one Mars year.'},
+  skeleton:{targetSols:500,resupplyInterval:null,objective:'Keep the two-person colony alive for 500 sols without resupply.'},
+  garden:{targetSols:500,resupplyInterval:400,objective:'Sustain six crew for 500 sols.'},
+  dustbowl:{targetSols:500,resupplyInterval:null,solarMultiplier:0.4,stormInterval:50,
+    equipmentFailureMultiplier:2,objective:'Survive 500 sols under permanent dust-season conditions.'},
+  noisru:{targetSols:100,resupplyInterval:null,isruRepairSols:60,
+    objective:'Survive 100 sols and restore landing-damaged ISRU.'},
+  hybrid:{targetSols:500,resupplyInterval:760,objective:'Sustain the human-robot colony for 500 sols.'},
+  lunar:{targetSols:28,resupplyInterval:null,lunarNightSols:14,noAtmosphericIsru:true,
+    objective:'Complete a 28-sol lunar test campaign.'},
 };
 
 // activeMission + pendingConfig declared earlier (with globe/state vars)
@@ -6501,7 +6782,7 @@ function updateConfig(){
   const o2d=mouthsToFeed>0?(o2/(0.84*n)).toFixed(0):'∞';
   const h2od=mouthsToFeed>0?(h2o/(2.5*n)).toFixed(0):'∞';
   const fd=mouthsToFeed>0?((food*1000)/(2500*n)).toFixed(0):'∞';
-  const pd=(pwr/30).toFixed(0);
+  const pd=(pwr/(PWR_BASE+r*(PWR_BASE/4))).toFixed(0);
   document.getElementById('cfg-survival-est').innerHTML=
     `<div style="color:var(--cyan);font-size:10px;letter-spacing:0.5px;margin-bottom:4px">SURVIVAL ESTIMATE (no production)</div>
      O₂: <span style="color:${parseInt(o2d)<10?'var(--red)':'var(--green)'}">${o2d} sols</span> · 
@@ -6520,11 +6801,11 @@ function launchConfigured(){
   for(let i=0;i<h;i++){
     crew.push({name:HUMAN_NAMES[i]||`Human-${i+1}`,role:HUMAN_ROLES[i]||'ENGR',
       hp:95+Math.floor(Math.random()*5),fat:0,mor:78+Math.floor(Math.random()*12),
-      rad:0,alive:true,st:'Nominal'});
+      rad:0,alive:true,st:'Nominal',kind:'human'});
   }
   for(let i=0;i<r;i++){
     crew.push({name:`OPT-${String(i+1).padStart(2,'0')}`,role:i===0?'CMDR':'ENGR',
-      hp:100,fat:0,mor:100,rad:0,alive:true,st:'Nominal'});
+      hp:100,fat:0,mor:100,rad:0,alive:true,st:'Nominal',kind:'robot'});
   }
 
   // Override mission with configured values
@@ -6537,11 +6818,12 @@ function launchConfigured(){
     h2o: parseInt(document.getElementById('cfg-h2o').value),
     food: parseInt(document.getElementById('cfg-food').value)*1000,
     power: parseInt(document.getElementById('cfg-power').value),
-    crewList: crew
+    crewList: crew,
+    lispyProgram: document.getElementById('cfg-lispy').value
   };
 
   // Set LisPy
-  const lispySel=document.getElementById('cfg-lispy').value;
+  const lispySel=customMission.lispyProgram;
   activeLispy=lispySel;
   lispyCode=LISPY_PROGRAMS[lispySel]||LISPY_PROGRAMS.adaptive_governor;
 
@@ -6565,16 +6847,18 @@ function launchMission(key, customConfig){
   // Configure state — seeded from REAL Mars right now
   const seed = Math.floor(Math.random()*99999);
   R = rng32(seed);
-  state = {sol:0,alive:true,cause:null,arch:m.arch,
+  const missionContract={...(MISSION_CONTRACTS[key]||{targetSols:500,resupplyInterval:null,
+    objective:'Survive the mission horizon.'})};
+  state = {sol:0,alive:true,cause:null,outcome:'running',arch:m.arch,
     o2:m.o2, h2o:m.h2o, food:m.food, power:m.power * realSolarFactor,
-    s_eff:(key==='noisru'?0.3:1) * realDustPenalty,
-    i_eff:key==='noisru'?0.1:1, g_eff:1, h_eff:1,
+    s_eff:realDustPenalty,
+    i_eff:key==='noisru'?0:1, g_eff:1, h_eff:1,
     cascade:'NOM', int_temp:Math.max(250, Math.min(300, realTempK + 80)), morale:0.85, rad:0,
     crew: m.crewList.map(c=>({...c})),
     events:[], log:[], modules:[], building:null, research:[], researching:null,
     discoveries:[], economy:10000, conversations:[], postMortem:null,
     alloc:{h:.25,i:.4,g:.35,r:1}, lat:18.38, lng:77.58,
-    startWeather: wx};
+    startWeather: wx,missionContract,missionRepairProgress:0};
 
   // Inject real dust storm if Mars is dusty right now
   if(startInDust || key==='dustbowl'){
@@ -6586,13 +6870,30 @@ function launchMission(key, customConfig){
 
   // Set active LisPy program
   lispyEnabled = true;
-  lispyCode = LISPY_PROGRAMS.adaptive_governor;
-  activeLispy = 'adaptive_governor';
+  const missionLispy = m.lispyProgram || 'adaptive_governor';
+  if(missionLispy !== 'custom' && LISPY_PROGRAMS[missionLispy]){
+    activeLispy = missionLispy;
+    lispyCode = LISPY_PROGRAMS[missionLispy];
+  } else if(missionLispy !== 'custom'){
+    activeLispy = 'adaptive_governor';
+    lispyCode = LISPY_PROGRAMS.adaptive_governor;
+  }
 
   document.getElementById('gov-sel').value = m.arch;
   echoHistory = [];
   dnaHistory = [];
-  supplyChain = {nextLaunchWindow:100,inTransit:[],delivered:0};
+  supplyChain = {
+    nextLaunchWindow:missionContract.resupplyInterval||Infinity,
+    inTransit:[],delivered:0,
+  };
+  landingMissionRef={mission:m,wx:wx,seed:seed,startInDust:startInDust};
+
+  if(!globe){
+    completeMissionWithout3D(
+      '[3D] Landing cinematic unavailable; starting mission in dashboard mode.'
+    );
+    return;
+  }
 
   // Start cinematic landing sequence
   const overlay = document.getElementById('mission-overlay');
@@ -6609,7 +6910,7 @@ function launchMission(key, customConfig){
     subEl.textContent = m.brief;
     textEl.style.opacity = '1';
     subEl.style.opacity = '1';
-    globe.pointOfView({altitude:2.5},500);
+    if(globe)globe.pointOfView({altitude:2.5},500);
   }, 800);
 
   // Phase 2: Zoom to Mars surface
@@ -6623,7 +6924,7 @@ function launchMission(key, customConfig){
     subEl.textContent = `Jezero Crater · ${wx.season} · ${wx.tempC}°C · Wind ${wx.windMs} m/s`;
     textEl.style.opacity = '1';
     subEl.style.opacity = '1';
-    globe.pointOfView({lat:state.lat,lng:state.lng,altitude:0.4},2000);
+    if(globe)globe.pointOfView({lat:state.lat,lng:state.lng,altitude:0.4},2000);
   }, 3500);
 
   // Phase 3: Transition to ground view for 3D landing sequence
@@ -6635,13 +6936,18 @@ function launchMission(key, customConfig){
   setTimeout(()=>{
     // Enter ground view and build landing ship
     landingPhase='descent';
-    enterGround();
-    setZoom('base');
-    createLandingShip();
-    initFpsPointerLock();
-
-    // Stash mission data so the deploy-complete handler can start the sim
-    landingMissionRef={mission:m,wx:wx,seed:seed,startInDust:startInDust};
+    try{
+      enterGround();
+      setZoom('base');
+      createLandingShip();
+      initFpsPointerLock();
+    }catch(error){
+      completeMissionWithout3D(
+        '[3D] Ground view unavailable; starting mission in dashboard mode.',
+        error
+      );
+      return;
+    }
 
     // Show landing text overlay
     textEl.textContent = 'POWERED DESCENT';
@@ -6657,10 +6963,31 @@ function launchMission(key, customConfig){
   }, 6500);
 }
 
+function showVictoryScreen(){
+  const overlay=document.getElementById('death-overlay');
+  overlay.style.display='flex';
+  const heading=overlay.querySelector('h1');
+  heading.textContent='MISSION COMPLETE';
+  heading.style.color='var(--green)';
+  document.getElementById('death-cause').textContent=state.missionContract?.objective||'OBJECTIVE COMPLETE';
+  const alive=state.crew.filter(member=>member.alive).length;
+  document.getElementById('death-stats').innerHTML=`
+    <div class="death-stat"><div class="val">${state.sol}</div><div class="lbl">Sols Completed</div></div>
+    <div class="death-stat"><div class="val">${alive}/${state.crew.length}</div><div class="lbl">Crew Alive</div></div>
+    <div class="death-stat"><div class="val">${state.modules.length}</div><div class="lbl">Modules Built</div></div>`;
+  document.getElementById('death-postmortem').innerHTML=
+    `<strong>Contract satisfied.</strong><br>${escapeHtml(state.missionContract?.objective||'Mission objective complete.')}`;
+  renderDeathScore();
+  autoSave();
+}
+
 function showDeathScreen(){
   setTimeout(()=>{
     const el = document.getElementById('death-overlay');
     el.style.display = 'flex';
+    const heading=el.querySelector('h1');
+    heading.textContent='COLONY LOST';
+    heading.style.color='';
 
     document.getElementById('death-cause').textContent = state.cause ? state.cause.toUpperCase() : 'UNKNOWN FAILURE';
 
@@ -6676,10 +7003,9 @@ function showDeathScreen(){
 
     // ── CAUSAL CHAIN POST-MORTEM ──
     // Trace backwards through the log to find what killed the colony
-    const n = Math.max(1, state.crew.length);
-    const o2d = state.o2 / (O2_PP * n);
-    const h2od = state.h2o / (H2O_PP * n);
-    const fd = state.food / (FOOD_PP * n);
+    const o2d = lifeSupportDays(state.o2,O2_PP,state.crew);
+    const h2od = lifeSupportDays(state.h2o,H2O_PP,state.crew);
+    const fd = lifeSupportDays(state.food,FOOD_PP,state.crew);
 
     let analysis = `<strong>Post-Mortem Investigation — Sol ${state.sol}</strong><br><br>`;
     analysis += `<strong>Cause of death:</strong> ${state.cause}<br>`;
@@ -6734,7 +7060,9 @@ function showDeathScreen(){
 
     // Grade
     const grade = state.sol >= 500 ? 'MARS-READY' : state.sol >= 300 ? 'A' : state.sol >= 200 ? 'B' : state.sol >= 100 ? 'C' : state.sol >= 50 ? 'D' : 'F';
-    analysis += `<br><strong style="font-size:14px">AUTONOMY GRADE: ${grade}</strong>`;
+    analysis += autonomyEligible()
+      ? `<br><strong style="font-size:14px">AUTONOMY GRADE: ${grade}</strong>`
+      : `<br><strong style="font-size:14px">ASSISTED RUN — AUTONOMY UNRANKED</strong>`;
     if(grade==='F') analysis += '<br><em>The colony barely began. Every sol you survive teaches you something.</em>';
     else if(grade==='D') analysis += '<br><em>You survived the first weeks. That\'s harder than it sounds.</em>';
     else if(grade==='C') analysis += '<br><em>100+ sols. You proved a colony can exist. Now prove it can last.</em>';
@@ -6750,11 +7078,11 @@ function showDeathScreen(){
 
 function restartGame(){
   // Stop sim
-  running = false;
-  clearInterval(simInterval);
+  stopSimulationClock();
+  clearDecisionTimers(true);
 
   // Reset task state
-  taskQueue=[];activeTask=null;taskHistory=[];tasksResolved=0;tasksIgnored=0;
+  taskHistory=[];tasksResolved=0;tasksIgnored=0;interventionHistory=[];
   document.getElementById('task-panel').classList.remove('task-visible');
   document.getElementById('task-badge').style.display='none';
 
@@ -6789,7 +7117,12 @@ function restartGame(){
 }
 
 // Init — show globe spinning behind mission selector, wait for player to choose
-initGlobe();
+try{
+  initGlobe();
+}catch(error){
+  globe=null;
+  console.warn('[3D] Globe unavailable; mission controls remain operational.',error);
+}
 resetState();
 
 // ══════════════════════════════════════════════════════════════
@@ -6859,6 +7192,7 @@ function serializeCartridge(){
   return {
     _format: 'mars-barn-cartridge',
     version: CARTRIDGE_VERSION,
+    checkpointVersion: 2,
     id: cartridgeId,
     created: new Date().toISOString(),
     mission: activeMission || 'custom',
@@ -6872,7 +7206,8 @@ function serializeCartridge(){
       autopilotEnabled: autopilotEnabled,
       autopilotPrograms: {...autopilotPrograms},
       simSpeed: simSpeed,
-      seed: state.startSeed || null,
+      seed: Number.isInteger(state.startSeed)?state.startSeed:42,
+      rngState: typeof R.getState==='function'?R.getState():null,
       o2: state.startConfig?.o2,
       h2o: state.startConfig?.h2o,
       food: state.startConfig?.food,
@@ -6891,6 +7226,8 @@ function serializeCartridge(){
     taskHistory: taskHistory,
     tasksResolved: tasksResolved,
     tasksIgnored: tasksIgnored,
+    interventionHistory: interventionHistory,
+    autonomyEligible: autonomyEligible(),
     
     // Reflex arc memory
     reflexHistory: reflexHistory.slice(-50),
@@ -6921,6 +7258,8 @@ function serializeCartridge(){
     
     // Meta
     alive: state.alive,
+    outcome: state.outcome,
+    missionContract: {...state.missionContract},
     sol: state.sol,
     runtime: { 
       userAgent: navigator.userAgent.substr(0,80),
@@ -6929,54 +7268,191 @@ function serializeCartridge(){
   };
 }
 
+function escapeHtml(value){
+  return String(value)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+function sanitizeImportedData(value,depth=0){
+  if(depth>20)throw new Error('Cartridge nesting exceeds the supported limit');
+  if(value===null||typeof value==='boolean')return value;
+  if(typeof value==='number'){
+    if(!Number.isFinite(value))throw new Error('Cartridge contains a non-finite number');
+    return value;
+  }
+  if(typeof value==='string')return escapeHtml(value.slice(0,10000));
+  if(Array.isArray(value)){
+    if(value.length>5000)throw new Error('Cartridge array exceeds the supported limit');
+    return value.map(item=>sanitizeImportedData(item,depth+1));
+  }
+  if(typeof value==='object'){
+    const entries=Object.entries(value);
+    if(entries.length>500)throw new Error('Cartridge object exceeds the supported limit');
+    const clean={};
+    for(const[key,item]of entries){
+      if(key==='__proto__'||key==='prototype'||key==='constructor')continue;
+      clean[key]=sanitizeImportedData(item,depth+1);
+    }
+    return clean;
+  }
+  throw new Error('Cartridge contains an unsupported value');
+}
+
+function validateCartridge(cartridge){
+  if(!cartridge||typeof cartridge!=='object'||cartridge._format!=='mars-barn-cartridge'){
+    return 'Not a valid Mars Barn cartridge file.';
+  }
+  if(!cartridge.state||typeof cartridge.state!=='object'){
+    return 'Cartridge state is missing.';
+  }
+  if(!Array.isArray(cartridge.state.crew)||cartridge.state.crew.length<1||cartridge.state.crew.length>32){
+    return 'Cartridge crew must contain 1-32 members.';
+  }
+  for(const member of cartridge.state.crew){
+    if(!member||typeof member!=='object'||typeof member.name!=='string'||
+       typeof member.role!=='string'||typeof member.alive!=='boolean'||
+       !Number.isFinite(member.hp)||member.hp<0||member.hp>100){
+      return 'Cartridge contains an invalid crew member.';
+    }
+  }
+  for(const field of ['sol','o2','h2o','food','power']){
+    if(!Number.isFinite(cartridge.state[field]))return `Invalid state field: ${field}`;
+  }
+  if(!Number.isInteger(cartridge.state.sol)||cartridge.state.sol<0||
+     ['o2','h2o','food','power'].some(field=>cartridge.state[field]<0)){
+    return 'Cartridge resources and Sol must be nonnegative.';
+  }
+  if(typeof cartridge.state.alive!=='boolean'){
+    return 'Cartridge alive state is invalid.';
+  }
+  const allocation=cartridge.state.alloc;
+  if(!allocation||!['h','i','g','r'].every(field=>Number.isFinite(allocation[field]))){
+    return 'Cartridge allocation is invalid.';
+  }
+  const allocationTotal=allocation.h+allocation.i+allocation.g;
+  if(!['h','i','g'].every(field=>allocation[field]>=0&&allocation[field]<=1)||
+     allocation.r<0.1||allocation.r>1.5||Math.abs(allocationTotal-1)>1e-6){
+    return 'Cartridge allocation is outside allowed ranges.';
+  }
+  for(const field of ['events','log','modules','research','discoveries','conversations']){
+    if(cartridge.state[field]!==undefined&&!Array.isArray(cartridge.state[field])){
+      return `Invalid state collection: ${field}`;
+    }
+  }
+  if(cartridge.state.log?.some(entry=>typeof entry!=='string')||
+     cartridge.state.conversations?.some(entry=>typeof entry!=='string')){
+    return 'Cartridge narrative fields must contain text.';
+  }
+  if(cartridge.config?.lispyCode&&(
+    typeof cartridge.config.lispyCode!=='string'||cartridge.config.lispyCode.length>100000
+  )){
+    return 'Governor program exceeds the supported limit.';
+  }
+  if(cartridge.checkpointVersion===2&&(
+    !Number.isInteger(cartridge.config?.seed)||
+    !Number.isInteger(cartridge.config?.rngState)
+  )){
+    return 'Cartridge RNG checkpoint is invalid.';
+  }
+  if(JSON.stringify(cartridge).length>5*1024*1024){
+    return 'Cartridge exceeds the 5 MB import limit.';
+  }
+  return null;
+}
+
 function deserializeCartridge(cartridge){
-  if(!cartridge._format || cartridge._format !== 'mars-barn-cartridge'){
-    alert('Not a valid Mars Barn cartridge file.');
+  const validationError=validateCartridge(cartridge);
+  if(validationError){
+    alert(validationError);
     return false;
   }
+  let imported;
+  try{
+    imported={
+      state:sanitizeImportedData(cartridge.state),
+      echoHistory:sanitizeImportedData(cartridge.echoHistory||[]),
+      echoInertia:cartridge.echoInertia?sanitizeImportedData(cartridge.echoInertia):null,
+      dnaHistory:sanitizeImportedData(cartridge.dnaHistory||[]),
+      taskHistory:sanitizeImportedData(cartridge.taskHistory||[]),
+      interventionHistory:sanitizeImportedData(cartridge.interventionHistory||[]),
+      reflexHistory:sanitizeImportedData(cartridge.reflexHistory||[]),
+      supplyChain:cartridge.supplyChain?sanitizeImportedData(cartridge.supplyChain):null,
+      chainBlocks:cartridge.chainBlocks?sanitizeImportedData(cartridge.chainBlocks):null,
+      marsLedger:cartridge.marsLedger?sanitizeImportedData(cartridge.marsLedger):null,
+      marsWallets:cartridge.marsWallets?sanitizeImportedData(cartridge.marsWallets):null,
+      marsTransfers:cartridge.marsTransfers?sanitizeImportedData(cartridge.marsTransfers):null,
+    };
+  }catch(error){
+    alert(error.message);
+    return false;
+  }
+  stopSimulationClock();
+  clearDecisionTimers(true);
   
   // Restore state
-  state = cartridge.state;
-  cartridgeId = cartridge.id;
-  activeMission = cartridge.mission;
+  state = imported.state;
+  if(state.outcome==='won'){
+    state.claimedOutcome='won';
+    state.outcome='running';
+  }
+  cartridgeId = escapeHtml(cartridge.id||'imported');
+  activeMission = escapeHtml(cartridge.mission||'custom');
   
   // Restore nervous system
-  echoHistory = cartridge.echoHistory || [];
-  if(cartridge.echoInertia) Object.assign(echoInertia, cartridge.echoInertia);
-  dnaHistory = cartridge.dnaHistory || [];
+  echoHistory = imported.echoHistory;
+  if(imported.echoInertia) Object.assign(echoInertia, imported.echoInertia);
+  dnaHistory = imported.dnaHistory;
   
   // Restore decisions
-  taskHistory = cartridge.taskHistory || [];
-  tasksResolved = cartridge.tasksResolved || 0;
-  tasksIgnored = cartridge.tasksIgnored || 0;
+  taskHistory = imported.taskHistory;
+  interventionHistory = imported.interventionHistory;
+  if(!Array.isArray(cartridge.interventionHistory)&&state.sol>0){
+    interventionHistory.push({sol:0,actor:'legacy',kind:'unknown',details:'No intervention ledger'});
+  }
+  tasksResolved = 0;
+  tasksIgnored = 0;
   
   // Restore reflexes
-  reflexHistory = cartridge.reflexHistory || [];
+  reflexHistory = imported.reflexHistory;
   // activeReflexes will be recomputed on next frame
   
   // Restore CRI
-  colonyRiskIndex = cartridge.cri || 0;
-  riskGrade = cartridge.criGrade || 'LOW';
+  colonyRiskIndex = Number.isFinite(cartridge.cri)?cartridge.cri:0;
+  riskGrade = escapeHtml(cartridge.criGrade || 'LOW');
   
   // Restore supply chain
-  if(cartridge.supplyChain) supplyChain = cartridge.supplyChain;
+  if(imported.supplyChain) supplyChain = imported.supplyChain;
   
   // Restore chain state
-  if(cartridge.marsCirculating) marsCirculating = cartridge.marsCirculating;
-  if(cartridge.chainHead) chainHead = cartridge.chainHead;
-  if(cartridge.chainBlocks) chainBlocks = cartridge.chainBlocks;
-  if(cartridge.marsLedger) state.marsLedger = cartridge.marsLedger;
-  if(cartridge.marsWallets) marsWallets = cartridge.marsWallets;
-  if(cartridge.marsTransfers) marsTransfers = cartridge.marsTransfers;
+  // Imported financial/chain claims are untrusted derived data. Start a fresh
+  // local ledger rather than hydrating balances, outcomes, or attestations.
+  marsCirculating=0;
+  chainHead=null;
+  chainBlocks=[];
+  state.marsLedger={};
+  marsWallets={};
+  marsTransfers=[];
+  initWallets();
+  state.importTrust='unverified';
   
   // Restore config
   if(cartridge.config){
-    activeLispy = cartridge.config.lispy || 'adaptive_governor';
+    activeLispy = escapeHtml(cartridge.config.lispy || 'adaptive_governor');
     lispyCode = cartridge.config.lispyCode || LISPY_PROGRAMS.adaptive_governor;
     lispyEnabled = cartridge.config.lispyEnabled !== false;
     autopilotEnabled = !!cartridge.config.autopilotEnabled;
     if(cartridge.config.autopilotPrograms) autopilotPrograms = cartridge.config.autopilotPrograms;
-    if(cartridge.config.simSpeed) simSpeed = cartridge.config.simSpeed;
+    if([1,2,5,10].includes(cartridge.config.simSpeed)) simSpeed = cartridge.config.simSpeed;
+    if(Number.isInteger(cartridge.config.seed)){
+      R=rng32(cartridge.config.seed);
+      if(cartridge.checkpointVersion===2&&Number.isInteger(cartridge.config.rngState)){
+        R.setState(cartridge.config.rngState);
+      }
+    }
     document.getElementById('gov-sel').value = state.arch;
     const ed = document.getElementById('lispy-editor');
     if(ed) ed.value = lispyCode;
@@ -7018,6 +7494,11 @@ function exportCartridge(){
 function importCartridgeFile(event){
   const file = event.target.files[0];
   if(!file) return;
+  if(file.size>5*1024*1024){
+    alert('Cartridge exceeds the 5 MB import limit.');
+    event.target.value='';
+    return;
+  }
   
   const reader = new FileReader();
   reader.onload = (e)=>{
@@ -7052,27 +7533,18 @@ function resumeFromCartridge(cartridge){
   setZoom('base');
   updateAllUI();
   
-  state.log.push(`💾 Cartridge loaded: ${cartridge.id}`);
+  state.log.push(`💾 Cartridge loaded: ${cartridgeId}`);
   state.log.push(`⟳ Resuming from Sol ${state.sol} · ${state.crew.filter(c=>c.alive).length} crew alive`);
-  if(cartridge.score) state.log.push(`📊 Current score: ${cartridge.score.total} (${cartridge.score.grade})`);
+  if(cartridge.score&&Number.isFinite(cartridge.score.total)){
+    state.log.push(`📊 Current score: ${cartridge.score.total} (${escapeHtml(cartridge.score.grade||'?')})`);
+  }
   
-  // If colony is still alive, start the sim
-  if(state.alive){
-    setTimeout(()=>{
-      running = true;
-      document.getElementById('sim-btn').textContent = '⏸ PAUSE';
-      simInterval = setInterval(()=>{
-        stepSim();
-        autoSaveCheck();
-        if(state.sol % 25 === 0 && groundScene){ exitGround(); enterGround(); }
-        if(!state.alive){
-          running = false;
-          clearInterval(simInterval);
-          document.getElementById('sim-btn').textContent = 'COLONY LOST';
-          showDeathScreen();
-        }
-      }, Math.max(50, 500/simSpeed));
-    }, 300);
+  // Resume running colonies; terminal outcomes remain terminal.
+  if(state.outcome==='won'){
+    document.getElementById('sim-btn').textContent='MISSION COMPLETE';
+    showVictoryScreen();
+  }else if(state.alive){
+    setTimeout(()=>startSimulationClock(),300);
   } else {
     // Colony was dead in the cartridge — show death screen
     document.getElementById('sim-btn').textContent = 'COLONY LOST';
@@ -7165,7 +7637,6 @@ function updateCartridgeDisplay(){
 // ══════════════════════════════════════════════════════════════
 
 const TWIN_CHANNEL_NAME = 'mars-barn-twin';
-let twinChannel = null;
 
 function initTwinChannel(){
   if(typeof BroadcastChannel === 'undefined') return;
@@ -7221,12 +7692,24 @@ function handleTwinMessage(msg){
     case 'push_alloc':
       if(msg.payload){
         const p = msg.payload;
-        if(p.h!==undefined) state.alloc.h = Math.max(0,Math.min(1,p.h));
-        if(p.i!==undefined) state.alloc.i = Math.max(0,Math.min(1,p.i));
-        if(p.g!==undefined) state.alloc.g = Math.max(0,Math.min(1,p.g));
-        if(p.r!==undefined) state.alloc.r = Math.max(0.1,Math.min(1.5,p.r));
-        const tot = state.alloc.h+state.alloc.i+state.alloc.g;
-        if(tot>0){state.alloc.h/=tot;state.alloc.i/=tot;state.alloc.g/=tot}
+        const next={...state.alloc};
+        const fields={h:[0,1],i:[0,1],g:[0,1],r:[0.1,1.5]};
+        let valid=true;
+        for(const[field,[minimum,maximum]]of Object.entries(fields)){
+          if(p[field]===undefined)continue;
+          if(typeof p[field]!=='number'||!Number.isFinite(p[field])){
+            valid=false;break;
+          }
+          next[field]=Math.max(minimum,Math.min(maximum,p[field]));
+        }
+        const tot=next.h+next.i+next.g;
+        if(!valid||!Number.isFinite(tot)||tot<=0){
+          twinBroadcast('allocation_error',{ok:false,error:'Allocation values must be finite with a positive work total'});
+          break;
+        }
+        next.h/=tot;next.i/=tot;next.g/=tot;
+        state.alloc=next;
+        recordIntervention('external','allocation','twin');
         state.log.push(`📡 TWIN: Allocation override H:${(state.alloc.h*100).toFixed(0)}% I:${(state.alloc.i*100).toFixed(0)}% G:${(state.alloc.g*100).toFixed(0)}%`);
         updateAllUI();
         sendTwinState();
@@ -7235,14 +7718,15 @@ function handleTwinMessage(msg){
 
     case 'exec_lispy':
       if(msg.payload?.code){
+        recordIntervention('external','lispy_exec','twin');
         const vm = new LispyVM();
-        const n = Math.max(1,state.crew.filter(c=>c.alive).length);
+        const aliveCount = Math.max(1,state.crew.filter(c=>c.alive).length);
         vm.setEnv('sol',state.sol);
-        vm.setEnv('o2_days',state.o2/(O2_PP*n));
-        vm.setEnv('h2o_days',state.h2o/(H2O_PP*n));
-        vm.setEnv('food_days',state.food/(FOOD_PP*n));
+        vm.setEnv('o2_days',lifeSupportDays(state.o2,O2_PP,state.crew));
+        vm.setEnv('h2o_days',lifeSupportDays(state.h2o,H2O_PP,state.crew));
+        vm.setEnv('food_days',lifeSupportDays(state.food,FOOD_PP,state.crew));
         vm.setEnv('power_kwh',state.power);
-        vm.setEnv('crew_alive',n);
+        vm.setEnv('crew_alive',aliveCount);
         vm.setEnv('colony_risk_index',colonyRiskIndex);
         vm.setEnv('dust_tau',marsWeather.dustTau);
         vm.setEnv('heating_alloc',state.alloc.h);
@@ -7266,6 +7750,7 @@ function handleTwinMessage(msg){
 
     case 'push_lispy':
       if(msg.payload?.code){
+        recordIntervention('external','lispy_update','twin');
         lispyCode = msg.payload.code;
         const ed = document.getElementById('lispy-editor');
         if(ed) ed.value = lispyCode;
@@ -7277,9 +7762,7 @@ function handleTwinMessage(msg){
 
     case 'emergency_stop':
       if(running){
-        running = false;
-        clearInterval(simInterval);
-        document.getElementById('sim-btn').textContent = '▶ START SIM';
+        stopSimulationClock('▶ START SIM');
         state.log.push('⛔ TWIN: Emergency stop from Mission Control');
         updateAllUI();
       }
@@ -7405,6 +7888,11 @@ initTwinChannel();
 setInterval(()=>{
   if(twinChannel && state.sol > 0) sendTwinState();
 }, 5000);
+
+window.addEventListener('pagehide',()=>{
+  stopSimulationClock();
+  clearDecisionTimers(false);
+});
 
 // ── Cinematic Mode (from Levi) ──
 let cinematicActive = false;

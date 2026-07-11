@@ -349,10 +349,34 @@ def get_manifest():
     return fetch_json(f"{RAW_BASE}/data/frames/manifest.json")
 
 
+def frame_mars(frame):
+    """Normalize legacy and versioned frame environment fields."""
+    raw = (frame or {}).get('mars') or (frame or {}).get('environment') or {}
+    temp_k = raw.get('temp_k', raw.get('temperature_k'))
+    temp_c = raw.get('temp_c', raw.get('temperature_c'))
+    if temp_k is None:
+        temp_k = temp_c + 273.15 if temp_c is not None else 213.15
+    if temp_c is None:
+        temp_c = temp_k - 273.15
+    return {
+        'temp_c': temp_c,
+        'temp_k': temp_k,
+        'dust_tau': raw.get(
+            'dust_tau',
+            0.8 if raw.get('dust_storm') else 0.15,
+        ),
+        'solar_wm2': raw.get('solar_wm2', raw.get('solar_irradiance', 490)),
+        'wind_ms': raw.get('wind_ms', raw.get('wind_speed_ms', 4)),
+        'pressure_pa': raw.get('pressure_pa', 740),
+        'season': raw.get('season', 'Unknown'),
+        'lmst': raw.get('lmst', 12),
+    }
+
+
 def seed_vm_from_frame(vm, frame):
     """Seed the LisPy VM with Mars conditions from a frame."""
     if not frame: return
-    m = frame.get('mars', {})
+    m = frame_mars(frame)
     vm.set_env('sol', frame.get('sol', 0))
     vm.set_env('temp_c', m.get('temp_c', -60))
     vm.set_env('temp_k', m.get('temp_k', 213))
@@ -379,7 +403,7 @@ def show_status():
     if not frame:
         print(f"Latest: Sol {latest['sol']} (frame fetch failed)")
         return
-    m = frame['mars']
+    m = frame_mars(frame)
     print(f"╔══════════════════════════════════╗")
     print(f"║  MARS STATUS — Sol {latest['sol']:<14}║")
     print(f"╠══════════════════════════════════╣")
@@ -455,7 +479,7 @@ def run_loop(interval):
                 frame = get_frame(latest['sol'])
                 seed_vm_from_frame(vm, frame)
                 last_sol = latest['sol']
-                m = frame['mars'] if frame else {}
+                m = frame_mars(frame)
                 print(f"[{datetime.now(timezone.utc).strftime('%H:%M:%S')}] "
                       f"Sol {latest['sol']} · {m.get('temp_c','?')}°C · "
                       f"τ{m.get('dust_tau','?')} · {len(frame.get('events',[]))} events")
