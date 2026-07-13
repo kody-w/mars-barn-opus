@@ -392,6 +392,26 @@ class TwinVerificationGate:
     config: AttestationConfig = field(default_factory=AttestationConfig)
     require_on_chain: bool = True  # Physical twin defaults to authenticated frames
     last_verified_sol: int = 0
+    checkpoint_path: Optional[Path] = None
+
+    def __post_init__(self) -> None:
+        if self.checkpoint_path is None or not self.checkpoint_path.exists():
+            return
+        try:
+            persisted = int(self.checkpoint_path.read_text().strip())
+        except (OSError, ValueError):
+            return
+        self.last_verified_sol = max(self.last_verified_sol, persisted)
+
+    def _persist_checkpoint(self) -> None:
+        if self.checkpoint_path is None:
+            return
+        self.checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = self.checkpoint_path.with_suffix(
+            self.checkpoint_path.suffix + ".tmp"
+        )
+        temporary.write_text(str(self.last_verified_sol))
+        temporary.replace(self.checkpoint_path)
 
     def verify_frame(self, frame_path: Path) -> VerificationResult:
         """Verify a frame before the physical twin acts on it.
@@ -448,10 +468,12 @@ class TwinVerificationGate:
             result = verify_frame_on_chain(self.config, sol, local_hash)
             if result.valid:
                 self.last_verified_sol = sol
+                self._persist_checkpoint()
             return result
 
         # Local-only verification passed
         self.last_verified_sol = sol
+        self._persist_checkpoint()
         return VerificationResult(
             sol=sol, local_hash=local_hash, chain_hash=None,
             valid=True, attested_at=0,

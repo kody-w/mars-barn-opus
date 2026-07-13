@@ -352,6 +352,7 @@ def run_mission_control(seed: int = DEFAULT_SEED, max_sols: int = DEFAULT_SOLS,
         o2_kg=colony.resources.o2_kg, h2o_liters=colony.resources.h2o_liters,
         food_kcal=colony.resources.food_kcal, power_kwh=colony.resources.power_kwh,
         crew_size=colony.resources.crew_size,
+        power_capacity_kwh=colony.resources.power_capacity_kwh,
     )
 
     while colony.alive and colony.sol < max_sols:
@@ -421,6 +422,7 @@ def run_mission_control(seed: int = DEFAULT_SEED, max_sols: int = DEFAULT_SOLS,
             o2_kg=colony.resources.o2_kg, h2o_liters=colony.resources.h2o_liters,
             food_kcal=colony.resources.food_kcal, power_kwh=colony.resources.power_kwh,
             crew_size=colony.resources.crew_size,
+            power_capacity_kwh=colony.resources.power_capacity_kwh,
         )
 
         # Step the colony

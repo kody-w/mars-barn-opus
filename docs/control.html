@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Mission Control — Digital Twin Interface</title>
 <meta name="description" content="The other side of the twin. Raw state, echo data, frame verification, and a standardized protocol surface for external system integration.">
+<script src="twin-pairing.js"></script>
 <style>
 :root{--bg:#080b10;--card:#0d1117;--border:#1b2028;--text:#c9d1d9;--dim:#484f58;
 --blue:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#da3633;--cyan:#79c0ff;
@@ -53,6 +54,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12
 .cmd-btn.green:hover{border-color:var(--green)}
 .cmd-btn.yellow{color:var(--yellow);border-color:rgba(210,153,34,0.3)}
 .cmd-btn.red{color:var(--red);border-color:rgba(218,54,51,0.3)}
+.cmd-btn:disabled,.cmd-input:disabled,input:disabled,select:disabled{
+  cursor:not-allowed;opacity:.42}
 
 /* Allocation Sliders */
 .alloc-row{display:flex;align-items:center;gap:6px;margin:3px 0}
@@ -79,13 +82,42 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12
 .conn-status.connected{background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.3);color:var(--green)}
 .conn-status.disconnected{background:rgba(218,54,51,0.1);border:1px solid rgba(218,54,51,0.3);color:var(--red)}
 .conn-status.local{background:rgba(210,153,34,0.1);border:1px solid rgba(210,153,34,0.3);color:var(--yellow)}
+.pairing-card{position:fixed;top:52px;right:14px;z-index:1000;
+  width:min(390px,calc(100vw - 28px));padding:14px;border:1px solid var(--cyan);
+  border-radius:12px;background:rgba(5,10,18,.98);box-shadow:0 10px 40px rgba(0,0,0,.65);
+  font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+.pairing-card[hidden]{display:none}.pairing-card h2{font-size:12px;color:var(--cyan);
+  letter-spacing:1px;margin-bottom:7px}.pairing-claim{color:#fff;font-weight:700}
+.pairing-pin{margin:10px 0;padding:9px;border:1px solid rgba(121,192,255,.45);
+  border-radius:7px;background:#080b10;color:#fff;text-align:center;font-size:27px;
+  font-weight:700;letter-spacing:.24em;font-variant-numeric:tabular-nums}
+.pairing-trust{color:#b1bac4}.pairing-actions{display:flex;gap:8px;margin-top:10px}
+.pairing-actions button{flex:1;min-height:44px}
 
 @media(max-width:900px){
   .mc-grid{grid-template-columns:1fr;grid-template-rows:40px 1fr 1fr 200px}
+  .pairing-card{top:46px;left:6px;right:6px;width:auto;max-height:calc(100vh - 52px);
+    overflow-y:auto}
 }
 </style>
 </head>
 <body>
+
+<section class="pairing-card" id="pairing-card" role="dialog"
+  aria-labelledby="pairing-title" aria-describedby="pairing-trust" hidden>
+  <h2 id="pairing-title">VERIFY VIEWER PAIRING</h2>
+  <div>Requester: <span class="pairing-claim" id="pairing-label">Mission Control</span></div>
+  <div>Twin ID: <span class="pairing-claim" id="pairing-twin-id">—</span></div>
+  <div class="pairing-pin" id="pairing-pin" aria-label="Six digit pairing PIN">—— ——</div>
+  <div id="pairing-status" role="status" aria-live="polite">PAIRING REQUIRED</div>
+  <p class="pairing-trust" id="pairing-trust">Confirm only when this exact PIN is visible in Viewer. The PIN and paired local-channel traffic are visible to same-origin tabs; the PIN is not a secret. P-256 key possession plus Viewer approval grants authority.</p>
+  <div class="pairing-actions">
+    <button class="cmd-btn green" type="button" id="pairing-confirm"
+      onclick="confirmControlPairing()">CONFIRM MATCH</button>
+    <button class="cmd-btn red" type="button" id="pairing-cancel"
+      onclick="cancelControlPairing()">CANCEL</button>
+  </div>
+</section>
 
 <div class="mc-grid">
 
@@ -93,10 +125,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12
 <div class="mc-header">
   <h1>◉ MISSION CONTROL</h1>
   <div class="status">
-    <div class="conn-status local" id="conn-status"><span class="dot dot-yellow"></span> LOCAL TWIN</div>
+    <div class="conn-status disconnected" id="conn-status"><span class="dot dot-red"></span> WAITING FOR VIEWER</div>
     <span style="color:var(--dim)">SOL <span id="mc-sol" style="color:var(--cyan)">—</span></span>
     <span style="color:var(--dim)">CRI <span id="mc-cri" style="color:var(--text)">—</span></span>
     <span style="color:var(--dim)">FRAME <span id="mc-frame-mode" style="color:var(--text)">—</span></span>
+    <a href="getting-started.html" style="color:var(--green);text-decoration:none;padding:2px 8px;border:1px solid var(--border);border-radius:3px;font-size:10px">START HERE</a>
     <a href="viewer.html" style="color:var(--dim);text-decoration:none;padding:2px 8px;border:1px solid var(--border);border-radius:3px;font-size:10px" target="_blank">◎ VIEWER</a>
     <a href="simhub.html" style="color:var(--dim);text-decoration:none;padding:2px 8px;border:1px solid var(--border);border-radius:3px;font-size:10px">🏆 SIMHUB</a>
   </div>
@@ -229,6 +262,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:12
 // ══════════════════════════════════════════════════════════════
 
 const CHANNEL_NAME = 'mars-barn-twin';
+const CONTROL_CAPABILITIES = Object.freeze(['observe','control']);
+const CONTROL_LABEL = 'Mission Control';
+const CONTROL_TWIN_ID = `MC-${TwinPairingProtocol.randomValue(9)}`;
 let channel = null;
 let twinState = null;
 let twinEcho = null;
@@ -237,62 +273,743 @@ let subscriptions = new Set();
 let protoLog = [];
 let echoStream = [];
 let snapshotHistory = [];
+let controlKeyPair = null;
+let controlPublicJwk = null;
+let pairingState = 'INITIALIZING';
+let activePairingChallenge = null;
+let pairedContext = null;
+let clientConfirmedPairing = false;
+let cachedPairingProof = null;
+let viewerPresence = null;
+let registrationPending = false;
+let outstandingRegistration = null;
+let pairingPaused = false;
+let signedSequence = 0;
+let authorityGeneration = 0;
+let signedSendChain = Promise.resolve();
+let viewerReceiveChain = Promise.resolve();
+let preparedDisconnectEnvelope = null;
 
 // ── Protocol Message Format ──
-// Every message on the channel follows this shape:
+// Bootstrap messages announce and complete matching-PIN pairing. Every
+// request after pairing is P-256 signed in this shape:
 // {
-//   type: 'request' | 'response' | 'event' | 'push',
-//   cmd: string,              // command name
-//   payload: any,             // data
-//   ts: ISO timestamp,        // when sent
-//   from: 'control' | 'twin', // who sent it
-//   id: string                // message ID for request/response matching
+//   id: string,               // correlation only
+//   cmd: string,
+//   twinId: string,           // explicit paired identity
+//   sequence: number,
+//   payload: any,
+//   signature: string
 // }
 
-function msgId(){ return Date.now().toString(36) + Math.random().toString(36).substr(2,4); }
+function msgId(){
+  return `${Date.now().toString(36)}-${TwinPairingProtocol.randomValue(6)}`;
+}
 
-function initChannel(){
+function setConnectionStatus(kind,text){
+  const status=document.getElementById('conn-status');
+  if(!status)return;
+  status.className=`conn-status ${kind}`;
+  const dot=document.createElement('span');
+  dot.className=`dot dot-${kind==='connected'?'green':
+    kind==='local'?'yellow':'red'}`;
+  status.replaceChildren(dot,document.createTextNode(` ${text}`));
+}
+
+function setControlAuthority(enabled){
+  document.querySelectorAll(
+    '#alloc-controls input,.panel button,.cmd-area button,.cmd-area textarea'
+  ).forEach(control=>{control.disabled=!enabled});
+  const walletAction=document.getElementById('wallet-action');
+  if(walletAction)walletAction.inert=!enabled;
+}
+
+function clearDisplayedTwinState(){
+  twinState=null;
+  twinEcho=null;
+  twinScore=null;
+  twinWallets={};
+  twinTransfers=[];
+  subscriptions.clear();
+  echoStream=[];
+  snapshotHistory=[];
+  document.getElementById('mc-sol').textContent='—';
+  document.getElementById('mc-cri').textContent='—';
+  document.getElementById('mc-frame-mode').textContent='—';
+  const stateKv=document.getElementById('state-kv');
+  stateKv.replaceChildren();
+  const notice=document.createElement('div');
+  notice.style.cssText='color:var(--dim);text-align:center;padding:20px';
+  notice.textContent='Pair with Viewer to read simulation state.';
+  stateKv.append(notice);
+  document.getElementById('echo-stream').replaceChildren();
+  document.getElementById('crew-state').textContent='—';
+  document.getElementById('wallet-display').replaceChildren();
+  document.getElementById('transfer-display').replaceChildren();
+  document.getElementById('wallet-action').style.display='none';
+  document.getElementById('wallet-action-inner').replaceChildren();
+  document.getElementById('att-run-id').textContent='—';
+  document.getElementById('att-state-hash').textContent='—';
+  document.getElementById('att-decision-hash').textContent='—';
+  const frameStatus=document.getElementById('att-frame-status');
+  frameStatus.className='unverified';
+  frameStatus.textContent='Not verified';
+  for(const[field,value,label]of [
+    ['h',25,'25%'],['i',40,'40%'],['g',35,'35%'],['r',100,'1.0×'],
+  ]){
+    document.getElementById(`alloc-${field}`).value=value;
+    document.getElementById(`alloc-${field}-v`).textContent=label;
+  }
+}
+
+function renderControlPairingCard(){
+  const card=document.getElementById('pairing-card');
+  const challenge=activePairingChallenge;
+  const show=Boolean(challenge||pairingPaused);
+  card.hidden=!show;
+  if(!show)return;
+  document.getElementById('pairing-label').textContent=CONTROL_LABEL;
+  document.getElementById('pairing-twin-id').textContent=CONTROL_TWIN_ID;
+  document.getElementById('pairing-pin').textContent=
+    challenge?.pairingPin||'—— ——';
+  const status=document.getElementById('pairing-status');
+  if(challenge){
+    if(pairingState==='AWAITING_VIEWER_CONFIRMATION'){
+      status.textContent='KEY PROOF VERIFIED · WAITING FOR VIEWER ALLOW';
+    }else if(clientConfirmedPairing){
+      status.textContent='MATCH CONFIRMED · SENDING P-256 PROOF';
+    }else if(challenge.viewerReady){
+      status.textContent='VIEWER ALLOWED · CONFIRM THE MATCH';
+    }else{
+      status.textContent='PAIRING REQUIRED · CONFIRM THE SAME SIX DIGITS';
+    }
+  }else{
+    status.textContent='PAIRING STOPPED · START A FRESH PIN HANDSHAKE';
+  }
+  const confirm=document.getElementById('pairing-confirm');
+  confirm.textContent=challenge?'CONFIRM MATCH':'START NEW PAIRING';
+  confirm.disabled=Boolean(challenge&&clientConfirmedPairing);
+}
+
+function clearPairingAuthority(reason,{pause=false,keepViewer=true}={}){
+  authorityGeneration++;
+  pairingState='PAIRING_REQUIRED';
+  activePairingChallenge=null;
+  pairedContext=null;
+  clientConfirmedPairing=false;
+  cachedPairingProof=null;
+  registrationPending=false;
+  outstandingRegistration=null;
+  pairingPaused=pause;
+  signedSequence=0;
+  signedSendChain=Promise.resolve();
+  preparedDisconnectEnvelope=null;
+  if(!keepViewer)viewerPresence=null;
+  setControlAuthority(false);
+  clearDisplayedTwinState();
+  setConnectionStatus(
+    viewerPresence?'local':'disconnected',
+    viewerPresence?'VIEWER FOUND · PAIRING REQUIRED':'WAITING FOR VIEWER'
+  );
+  renderControlPairingCard();
+  if(reason)logProto('sys',reason);
+}
+
+function postBootstrap(command,payload={},extra={}){
+  if(!channel)return null;
+  const message={
+    type:'request',
+    cmd:command,
+    payload,
+    ts:new Date().toISOString(),
+    from:'control',
+    id:msgId(),
+    ...extra,
+  };
+  channel.postMessage(message);
+  return message;
+}
+
+function announceControl(){
+  return postBootstrap('announce',{
+    role:'control',
+    protocolTag:TwinPairingProtocol.protocolTag,
+    pairingRequired:true,
+    capabilities:[...CONTROL_CAPABILITIES],
+  },{twinId:CONTROL_TWIN_ID});
+}
+
+async function initControlKey(){
+  controlKeyPair=await crypto.subtle.generateKey(
+    {name:'ECDSA',namedCurve:'P-256'},false,['sign','verify']
+  );
+  controlPublicJwk=await crypto.subtle.exportKey(
+    'jwk',controlKeyPair.publicKey
+  );
+}
+
+async function initChannel(){
+  setControlAuthority(false);
+  clearDisplayedTwinState();
   if(typeof BroadcastChannel === 'undefined'){
     logProto('err', 'BroadcastChannel not supported in this browser');
     return;
   }
   channel = new BroadcastChannel(CHANNEL_NAME);
-  channel.onmessage = (e) => handleMessage(e.data);
-  logProto('sys', `Channel "${CHANNEL_NAME}" opened. Waiting for twin...`);
-
-  // Announce ourselves
-  send('announce', {role:'control', capabilities:['state','echo','alloc','lispy','attest']});
-
-  // Request initial state
-  setTimeout(()=>{ protocolCmd('get_state'); protocolCmd('get_echo'); }, 500);
-}
-
-function send(cmd, payload){
-  if(!channel) return;
-  const msg = {
-    type: 'request',
-    cmd: cmd,
-    payload: payload || {},
-    ts: new Date().toISOString(),
-    from: 'control',
-    id: msgId()
+  channel.onmessage = (e) => {
+    viewerReceiveChain=viewerReceiveChain
+      .catch(()=>{})
+      .then(()=>handleMessage(e.data));
   };
-  channel.postMessage(msg);
-  return msg;
+  logProto('sys',`Channel "${CHANNEL_NAME}" opened. Pairing is required.`);
+  setConnectionStatus('disconnected','WAITING FOR VIEWER');
+  announceControl();
+  try{
+    await initControlKey();
+    pairingState='PAIRING_REQUIRED';
+    if(viewerPresence&&!pairingPaused)requestControlPairing();
+  }catch(error){
+    pairingState='ERROR';
+    pairingPaused=true;
+    renderControlPairingCard();
+    logProto('err','Web Crypto P-256 initialization failed');
+  }
 }
 
-function handleMessage(msg){
-  if(!msg || !msg.cmd) return;
+function requestControlPairing(){
+  pairingPaused=false;
+  if(!viewerPresence||!controlPublicJwk||registrationPending||
+     activePairingChallenge||pairedContext)return false;
+  registrationPending=true;
+  pairingState='PAIRING_REQUIRED';
+  setConnectionStatus('local','VIEWER FOUND · PAIRING REQUIRED');
+  const registration=postBootstrap('register_kited_twin',{
+    label:CONTROL_LABEL,
+    capabilities:[...CONTROL_CAPABILITIES],
+    mode:'idle',
+    activity:'Mission Control awaiting matching-PIN approval',
+    publicKeyJwk:controlPublicJwk,
+  },{twinId:CONTROL_TWIN_ID});
+  if(!registration){
+    registrationPending=false;
+    return false;
+  }
+  outstandingRegistration={
+    requestId:registration.id,
+    twinId:CONTROL_TWIN_ID,
+    viewerInstanceId:viewerPresence.viewerInstanceId,
+    requestedAtMs:Date.now(),
+  };
+  return true;
+}
+
+async function signPairingChallenge(challenge){
+  const signature=await crypto.subtle.sign(
+    {name:'ECDSA',hash:'SHA-256'},
+    controlKeyPair.privateKey,
+    TwinPairingProtocol.encodeText(
+      TwinPairingProtocol.canonicalChallenge(challenge)
+    )
+  );
+  return TwinPairingProtocol.base64UrlEncode(signature);
+}
+
+async function sendPairingProof(){
+  const challenge=activePairingChallenge;
+  if(!challenge||!clientConfirmedPairing)return false;
+  const challengeId=challenge.challengeId;
+  if(!cachedPairingProof){
+    const signature=await signPairingChallenge(challenge);
+    if(activePairingChallenge?.challengeId!==challengeId)return false;
+    cachedPairingProof={
+      payload:Object.freeze({
+        challengeId,
+        pairingPin:challenge.pairingPin,
+        clientConfirmed:true,
+        signature,
+      }),
+      sent:false,
+      requestId:null,
+    };
+  }
+  if(cachedPairingProof.sent)return true;
+  const proofMessage=postBootstrap(
+    'prove_kited_twin',{...cachedPairingProof.payload},{
+    twinId:CONTROL_TWIN_ID,
+  });
+  if(!proofMessage)return false;
+  cachedPairingProof.sent=true;
+  cachedPairingProof.requestId=proofMessage.id;
+  return true;
+}
+
+async function confirmControlPairing(){
+  if(!activePairingChallenge){
+    pairingPaused=false;
+    renderControlPairingCard();
+    announceControl();
+    return requestControlPairing();
+  }
+  if(Date.parse(activePairingChallenge.expiresAt)<=Date.now()){
+    clearPairingAuthority('Pairing PIN expired; a fresh PIN is required.');
+    announceControl();
+    return false;
+  }
+  clientConfirmedPairing=true;
+  pairingState='CLIENT_CONFIRMED';
+  renderControlPairingCard();
+  try{
+    return await sendPairingProof();
+  }catch(error){
+    clientConfirmedPairing=false;
+    cachedPairingProof=null;
+    pairingState='PAIRING_REQUIRED';
+    renderControlPairingCard();
+    logProto('err','Unable to sign pairing proof');
+    return false;
+  }
+}
+
+function cancelControlPairing(){
+  const challenge=activePairingChallenge;
+  if(challenge){
+    postBootstrap('cancel_kited_twin_pairing',{
+      challengeId:challenge.challengeId,
+      twinId:CONTROL_TWIN_ID,
+    },{twinId:CONTROL_TWIN_ID});
+  }
+  clearPairingAuthority('Pairing cancelled locally.',{pause:true});
+  return true;
+}
+
+function validPairingChallenge(payload){
+  return Boolean(
+    payload?.ok===true&&
+    payload.status==='pairing_required'&&
+    payload.protocolTag===TwinPairingProtocol.protocolTag&&
+    payload.twinId===CONTROL_TWIN_ID&&
+    typeof payload.challengeId==='string'&&
+    typeof payload.challenge==='string'&&
+    typeof payload.viewerInstanceId==='string'&&
+    typeof payload.runId==='string'&&
+    typeof payload.viewerApprovalCommitment==='string'&&
+    /^[A-Za-z0-9_-]{43}$/.test(payload.viewerApprovalCommitment)&&
+    typeof payload.viewerKeyId==='string'&&
+    /^[A-Za-z0-9_-]{43}$/.test(payload.viewerKeyId)&&
+    payload.viewerPublicKeyJwk&&
+    typeof payload.viewerPublicKeyJwk==='object'&&
+    !Array.isArray(payload.viewerPublicKeyJwk)&&
+    payload.viewerPublicKeyJwk.kty==='EC'&&
+    payload.viewerPublicKeyJwk.crv==='P-256'&&
+    typeof payload.viewerPublicKeyJwk.x==='string'&&
+    typeof payload.viewerPublicKeyJwk.y==='string'&&
+    !Object.hasOwn(payload.viewerPublicKeyJwk,'d')&&
+    typeof payload.pairingPin==='string'&&
+    /^\d{6}$/.test(payload.pairingPin)&&
+    Number.isFinite(Date.parse(payload.expiresAt))&&
+    Date.parse(payload.expiresAt)>Date.now()&&
+    Date.parse(payload.expiresAt)<=Date.now()+60_500
+  );
+}
+
+function normalizeViewerPublicKeyJwk(value){
+  if(!value||typeof value!=='object'||Array.isArray(value)||
+     value.kty!=='EC'||value.crv!=='P-256'||
+     typeof value.x!=='string'||typeof value.y!=='string'||
+     Object.hasOwn(value,'d')){
+    throw new Error('Viewer P-256 public key is invalid');
+  }
+  if(TwinPairingProtocol.base64UrlDecode(value.x,32).byteLength!==32||
+     TwinPairingProtocol.base64UrlDecode(value.y,32).byteLength!==32){
+    throw new Error('Viewer P-256 public key coordinates are invalid');
+  }
+  return {
+    kty:'EC',crv:'P-256',x:value.x,y:value.y,
+    ext:true,key_ops:['verify'],
+  };
+}
+
+async function importViewerChallengeKey(payload){
+  const publicKeyJwk=normalizeViewerPublicKeyJwk(
+    payload.viewerPublicKeyJwk
+  );
+  const keyId=await TwinPairingProtocol.sha256Base64Url(
+    TwinPairingProtocol.canonicalJson(publicKeyJwk)
+  );
+  if(keyId!==payload.viewerKeyId){
+    throw new Error('Viewer public key fingerprint does not match');
+  }
+  const publicKey=await crypto.subtle.importKey(
+    'jwk',publicKeyJwk,
+    {name:'ECDSA',namedCurve:'P-256'},false,['verify']
+  );
+  return {publicKeyJwk,publicKey,keyId};
+}
+
+async function verifyViewerMessage(msg,context,{initial=false}={}){
+  if(!context||msg.targetTwinId!==CONTROL_TWIN_ID||
+     msg.viewerInstanceId!==context.viewerInstanceId||
+     msg.runId!==context.runId||
+     msg.pairingChallengeId!==context.challengeId||
+     msg.viewerKeyId!==context.viewerKeyId||
+     !Number.isSafeInteger(msg.viewerSequence)||
+     msg.viewerSequence<=context.viewerSequence||
+     (initial&&msg.viewerSequence!==1)||
+     typeof msg.viewerSignature!=='string'){
+    return false;
+  }
+  let signature;
+  let canonical;
+  try{
+    signature=TwinPairingProtocol.base64UrlDecode(
+      msg.viewerSignature,96
+    );
+    canonical=TwinPairingProtocol.canonicalViewerMessage(msg);
+  }catch(error){
+    return false;
+  }
+  let verified=false;
+  try{
+    verified=await crypto.subtle.verify(
+      {name:'ECDSA',hash:'SHA-256'},
+      context.viewerPublicKey,
+      signature,
+      TwinPairingProtocol.encodeText(canonical)
+    );
+  }catch(error){
+    verified=false;
+  }
+  if(!verified||msg.viewerSequence<=context.viewerSequence)return false;
+  context.viewerSequence=msg.viewerSequence;
+  return true;
+}
+
+async function completeControlPairing(msg){
+  const payload=msg?.payload;
+  const challenge=activePairingChallenge;
+  if(!challenge||payload?.ok!==true||payload.status!=='paired'||
+     payload.challengeId!==challenge.challengeId||
+     payload.twinId!==CONTROL_TWIN_ID||
+     payload.viewerInstanceId!==challenge.viewerInstanceId||
+     payload.runId!==challenge.runId||
+     payload.viewerApproved!==true||
+     payload.clientConfirmed!==true||
+     payload.pairingPin!==challenge.pairingPin||
+     payload.viewerApprovalCommitment!==
+       challenge.viewerApprovalCommitment||
+     !outstandingRegistration||
+     outstandingRegistration.twinId!==CONTROL_TWIN_ID||
+     !clientConfirmedPairing||
+     !cachedPairingProof?.sent||
+     !cachedPairingProof.requestId||
+     cachedPairingProof.payload.challengeId!==challenge.challengeId||
+     cachedPairingProof.payload.pairingPin!==challenge.pairingPin||
+     cachedPairingProof.payload.clientConfirmed!==true||
+     msg.replyTo!==cachedPairingProof.requestId||
+     payload.clientProofRequestId!==cachedPairingProof.requestId||
+     payload.clientProofSignature!==
+       cachedPairingProof.payload.signature||
+     Date.parse(challenge.expiresAt)<=Date.now())return false;
+  if(typeof payload.viewerApprovalNonce!=='string'||
+     !/^[A-Za-z0-9_-]{43}$/.test(payload.viewerApprovalNonce))return false;
+  const approvalCommitment=await TwinPairingProtocol.sha256Base64Url(
+    payload.viewerApprovalNonce
+  );
+  if(activePairingChallenge!==challenge||
+     approvalCommitment!==challenge.viewerApprovalCommitment){
+    return false;
+  }
+  pairingState='PAIRED';
+  pairedContext={
+    challengeId:payload.challengeId,
+    pairingChallengeId:payload.challengeId,
+    viewerInstanceId:payload.viewerInstanceId,
+    runId:payload.runId,
+    pairingEpoch:viewerPresence?.pairingEpoch,
+    viewerKeyId:challenge.viewerKeyId,
+    viewerPublicKey:challenge.viewerPublicKey,
+    viewerPublicKeyJwk:challenge.viewerPublicKeyJwk,
+    viewerSequence:challenge.viewerSequence,
+  };
+  activePairingChallenge=null;
+  clientConfirmedPairing=false;
+  cachedPairingProof=null;
+  outstandingRegistration=null;
+  pairingPaused=false;
+  registrationPending=false;
+  signedSequence=Number.isSafeInteger(payload.sequence)?payload.sequence:0;
+  document.getElementById('pairing-card').hidden=true;
+  setControlAuthority(true);
+  setConnectionStatus('connected','TWIN LINKED');
+  logProto('in','Matching PIN and P-256 proof accepted by Viewer.');
+  send('subscribe_state');
+  send('subscribe_echo');
+  send('get_state');
+  send('get_echo');
+  send('get_wallets');
+  return true;
+}
+
+async function signCommandEnvelope(command,payload,generation,context){
+  if(pairingState!=='PAIRED'||generation!==authorityGeneration||
+     context!==pairedContext){
+    throw new Error('Pairing authority changed before signing');
+  }
+  const previousSequence=signedSequence;
+  const sequence=previousSequence+1;
+  const message={
+    type:'request',
+    cmd:command,
+    twinId:CONTROL_TWIN_ID,
+    sequence,
+    payload:payload??{},
+    ts:new Date().toISOString(),
+    from:'control',
+    id:msgId(),
+  };
+  const signature=await crypto.subtle.sign(
+    {name:'ECDSA',hash:'SHA-256'},
+    controlKeyPair.privateKey,
+    TwinPairingProtocol.encodeText(
+      TwinPairingProtocol.canonicalCommand(message,context)
+    )
+  );
+  if(pairingState!=='PAIRED'||generation!==authorityGeneration||
+     context!==pairedContext||signedSequence!==previousSequence){
+    throw new Error('Pairing authority changed while signing');
+  }
+  message.signature=TwinPairingProtocol.base64UrlEncode(signature);
+  const disconnect=await signDisconnectEnvelope(
+    sequence+1,generation,context
+  );
+  if(pairingState!=='PAIRED'||generation!==authorityGeneration||
+     context!==pairedContext||signedSequence!==previousSequence){
+    throw new Error('Pairing authority changed before publishing');
+  }
+  const previousDisconnect=preparedDisconnectEnvelope;
+  preparedDisconnectEnvelope=disconnect;
+  try{
+    channel.postMessage(message);
+  }catch(error){
+    preparedDisconnectEnvelope=previousDisconnect;
+    throw error;
+  }
+  signedSequence=sequence;
+  return message;
+}
+
+function send(cmd,payload={}){
+  if(pairingState!=='PAIRED'||!pairedContext){
+    logProto('err',`${String(cmd).toUpperCase()} blocked: pairing required`);
+    return Promise.resolve(null);
+  }
+  const generation=authorityGeneration;
+  const context=pairedContext;
+  const operation=signedSendChain.then(()=>
+    signCommandEnvelope(cmd,payload,generation,context)
+  );
+  signedSendChain=operation.catch(()=>{});
+  return operation.catch(error=>{
+    if(generation===authorityGeneration){
+      logProto('err',error.message);
+    }
+    return null;
+  });
+}
+
+async function signDisconnectEnvelope(sequence,generation,context){
+  if(pairingState!=='PAIRED'||generation!==authorityGeneration||
+     context!==pairedContext){
+    throw new Error('Pairing authority changed before disconnect signing');
+  }
+  const message={
+    type:'request',
+    cmd:'unregister_kited_twin',
+    twinId:CONTROL_TWIN_ID,
+    sequence,
+    payload:{reason:'Mission Control page closed'},
+    ts:new Date().toISOString(),
+    from:'control',
+    id:msgId(),
+  };
+  const signature=await crypto.subtle.sign(
+    {name:'ECDSA',hash:'SHA-256'},
+    controlKeyPair.privateKey,
+    TwinPairingProtocol.encodeText(
+      TwinPairingProtocol.canonicalCommand(message,context)
+    )
+  );
+  if(pairingState!=='PAIRED'||generation!==authorityGeneration||
+     context!==pairedContext){
+    throw new Error('Pairing authority changed while signing disconnect');
+  }
+  message.signature=TwinPairingProtocol.base64UrlEncode(signature);
+  return message;
+}
+
+async function handleMessage(msg){
+  if(!msg||!msg.cmd||msg.from!=='twin')return;
+  if(msg.targetTwinId&&msg.targetTwinId!==CONTROL_TWIN_ID)return;
 
   if(msg.cmd === 'announce' && msg.from === 'twin'){
-    logProto('in', `Twin connected: ${msg.payload.mission || 'unknown'} · Sol ${msg.payload.sol || '?'}`);
-    document.getElementById('conn-status').className = 'conn-status connected';
-    document.getElementById('conn-status').innerHTML = '<span class="dot dot-green"></span> TWIN LINKED';
-    protocolCmd('get_state');
+    if(msg.payload?.pairingSupported!==true||
+       msg.payload?.protocolTag!==TwinPairingProtocol.protocolTag)return;
+    const changed=Boolean(
+      viewerPresence&&(
+        viewerPresence.viewerInstanceId!==msg.payload.viewerInstanceId||
+        viewerPresence.pairingEpoch!==msg.payload.pairingEpoch
+      )
+    );
+    viewerPresence={
+      viewerInstanceId:msg.payload.viewerInstanceId,
+      pairingEpoch:msg.payload.pairingEpoch,
+    };
+    if(changed&&(pairedContext||activePairingChallenge)){
+      clearPairingAuthority(
+        'Viewer context changed; matching-PIN pairing is required again.'
+      );
+    }
+    if(pairingState!=='PAIRED'){
+      setConnectionStatus('local','VIEWER FOUND · PAIRING REQUIRED');
+      if(!pairingPaused)requestControlPairing();
+    }
     return;
   }
 
+  if(msg.cmd==='kited_twin_challenge'){
+    const registration=outstandingRegistration;
+    if(!registrationPending||!registration||
+       msg.targetTwinId!==CONTROL_TWIN_ID||
+       msg.replyTo!==registration.requestId||
+       registration.twinId!==CONTROL_TWIN_ID||
+       registration.viewerInstanceId!==viewerPresence?.viewerInstanceId||
+       !validPairingChallenge(msg.payload)||
+       msg.payload.viewerInstanceId!==viewerPresence?.viewerInstanceId){
+      logProto('err',msg.payload?.error||'Viewer returned an invalid pairing challenge');
+      return;
+    }
+    let viewerKey;
+    try{
+      viewerKey=await importViewerChallengeKey(msg.payload);
+    }catch(error){
+      logProto('err','Viewer challenge key could not be verified');
+      return;
+    }
+    const candidate={
+      ...msg.payload,
+      viewerReady:false,
+      viewerPublicKey:viewerKey.publicKey,
+      viewerPublicKeyJwk:viewerKey.publicKeyJwk,
+      viewerKeyId:viewerKey.keyId,
+      viewerSequence:0,
+    };
+    if(outstandingRegistration!==registration||
+       activePairingChallenge||
+       !(await verifyViewerMessage(msg,candidate,{initial:true}))||
+       Date.parse(candidate.expiresAt)<=Date.now()){
+      logProto('err','Viewer challenge signature could not be verified');
+      return;
+    }
+    registrationPending=false;
+    activePairingChallenge=candidate;
+    pairedContext=null;
+    clientConfirmedPairing=false;
+    cachedPairingProof=null;
+    pairingPaused=false;
+    pairingState='PAIRING_REQUIRED';
+    setControlAuthority(false);
+    setConnectionStatus('local','VIEWER FOUND · PAIRING REQUIRED');
+    renderControlPairingCard();
+    logProto('in','Viewer issued a six-digit matching-PIN challenge.');
+    return;
+  }
+
+  const viewerContext=activePairingChallenge||pairedContext;
+  if(!viewerContext||
+     !(await verifyViewerMessage(msg,viewerContext))){
+    return;
+  }
+  if(viewerContext!==activePairingChallenge&&
+     viewerContext!==pairedContext)return;
+
+  if(msg.cmd==='kited_twin_pairing_ready'){
+    if(!activePairingChallenge||
+       msg.payload?.challengeId!==activePairingChallenge.challengeId||
+       msg.payload?.twinId!==CONTROL_TWIN_ID||
+       msg.payload?.pairingPin!==activePairingChallenge.pairingPin||
+       msg.payload?.viewerApprovalCommitment!==
+         activePairingChallenge.viewerApprovalCommitment)return;
+    activePairingChallenge.viewerReady=true;
+    renderControlPairingCard();
+    if(clientConfirmedPairing)void sendPairingProof();
+    return;
+  }
+
+  if(msg.cmd==='kited_twin_proof_result'){
+    if(pairingState==='PAIRED'||!activePairingChallenge)return;
+    if(msg.payload?.status==='awaiting_viewer_confirmation'&&
+       msg.payload.challengeId===activePairingChallenge?.challengeId&&
+       clientConfirmedPairing&&cachedPairingProof?.sent&&
+       msg.replyTo===cachedPairingProof.requestId){
+      pairingState='AWAITING_VIEWER_CONFIRMATION';
+      renderControlPairingCard();
+      return;
+    }
+    if(msg.payload?.ok===true){
+      pairingState='VERIFYING_VIEWER_APPROVAL';
+      renderControlPairingCard();
+      try{
+        const completed=await completeControlPairing(msg);
+        if(!completed&&activePairingChallenge){
+          pairingState=clientConfirmedPairing
+            ?'AWAITING_VIEWER_CONFIRMATION':'PAIRING_REQUIRED';
+          renderControlPairingCard();
+          logProto('err','Viewer approval proof did not match this challenge');
+        }
+      }catch(error){
+        logProto('err','Viewer approval proof could not be verified');
+      }
+    }else if(msg.payload?.ok===false){
+      logProto('err',msg.payload.error||'Pairing proof rejected');
+    }
+    return;
+  }
+
+  if(msg.cmd==='kited_twin_pairing_denied'||
+     msg.cmd==='kited_twin_pairing_cancelled'){
+    if(pairingState==='PAIRED'||!activePairingChallenge)return;
+    if(msg.payload?.twinId&&msg.payload.twinId!==CONTROL_TWIN_ID)return;
+    if(msg.payload?.challengeId!==activePairingChallenge.challengeId||
+       msg.payload?.pairingPin!==activePairingChallenge.pairingPin)return;
+    clearPairingAuthority(
+      msg.payload?.reason||'Pairing ended; a fresh PIN is required.',
+      {pause:msg.payload?.status!=='expired'}
+    );
+    if(msg.payload?.status==='expired')announceControl();
+    return;
+  }
+
+  if(msg.cmd==='kited_twin_pairing_reset'){
+    clearPairingAuthority(
+      'Viewer reset or loaded a new context; pairing was cleared.'
+    );
+    announceControl();
+    return;
+  }
+
+  if(msg.cmd==='pairing_required'){
+    clearPairingAuthority(
+      'Viewer requires a fresh matching-PIN pairing.'
+    );
+    announceControl();
+    return;
+  }
+
+  if(pairingState!=='PAIRED')return;
+
   if(msg.cmd === 'state_update' || msg.cmd === 'state'){
+    if(!msg.payload||typeof msg.payload!=='object'||
+       Array.isArray(msg.payload))return;
     twinState = msg.payload;
     renderState(twinState);
     logProto('in', `State update: Sol ${twinState.sol} · ${twinState.alive?'ALIVE':'DEAD'}`);
@@ -300,6 +1017,8 @@ function handleMessage(msg){
   }
 
   if(msg.cmd === 'echo_frame'){
+    if(!msg.payload||typeof msg.payload!=='object'||
+       Array.isArray(msg.payload))return;
     twinEcho = msg.payload;
     echoStream.unshift(msg.payload);
     if(echoStream.length > 200) echoStream.length = 200;
@@ -309,28 +1028,35 @@ function handleMessage(msg){
   }
 
   if(msg.cmd === 'score'){
+    if(!msg.payload||typeof msg.payload!=='object'||
+       Array.isArray(msg.payload))return;
     twinScore = msg.payload;
     logProto('in', `Score: ${msg.payload.total} (${msg.payload.grade})`);
     return;
   }
 
   if(msg.cmd === 'task_event'){
+    if(!msg.payload||typeof msg.payload!=='object')return;
     logProto('in', `Task: ${msg.payload.title} [${msg.payload.urgency}]`);
     return;
   }
 
   if(msg.cmd === 'reflex_event'){
+    if(!msg.payload||typeof msg.payload!=='object')return;
     logProto('in', `Reflex: ${msg.payload.id} (intensity ${msg.payload.intensity?.toFixed(2)||'?'})`);
     return;
   }
 
   if(msg.cmd === 'attestation'){
+    if(!msg.payload||typeof msg.payload!=='object'||
+       Array.isArray(msg.payload))return;
     renderAttestation(msg.payload);
     logProto('in', 'Attestation received');
     return;
   }
 
   if(msg.cmd === 'cartridge'){
+    if(!msg.payload||typeof msg.payload!=='object')return;
     // Download the cartridge
     const json = JSON.stringify(msg.payload, null, 2);
     const blob = new Blob([json], {type:'application/json'});
@@ -350,7 +1076,12 @@ function handleMessage(msg){
 
   if(msg.cmd === 'wallets'){
     renderWallets(msg.payload);
-    logProto('in', `Wallets: ${Object.keys(msg.payload.wallets||{}).length} addresses, ${(msg.payload.transfers||[]).length} transfers`);
+    const walletCount=msg.payload?.wallets&&
+      typeof msg.payload.wallets==='object'
+      ?Object.keys(msg.payload.wallets).length:0;
+    const transferCount=Array.isArray(msg.payload?.transfers)
+      ?msg.payload.transfers.length:0;
+    logProto('in', `Wallets: ${walletCount} addresses, ${transferCount} transfers`);
     return;
   }
 
@@ -386,35 +1117,49 @@ function handleMessage(msg){
 }
 
 // ── State Rendering ──
+function appendStateValue(container,label,value,className=''){
+  const row=document.createElement('div');
+  row.className='kv';
+  const key=document.createElement('span');
+  key.className='k';
+  key.textContent=label;
+  const shown=document.createElement('span');
+  shown.className=`v${className?` ${className}`:''}`;
+  shown.textContent=String(value);
+  row.append(key,shown);
+  container.append(row);
+}
+
 function renderState(s){
   if(!s) return;
-  document.getElementById('mc-sol').textContent = s.sol;
-  document.getElementById('mc-cri').textContent = s.cri || '?';
+  document.getElementById('mc-sol').textContent = String(s.sol??'?');
+  document.getElementById('mc-cri').textContent = String(s.cri??'?');
   document.getElementById('mc-cri').style.color = (s.cri||0) > 50 ? 'var(--red)' : (s.cri||0) > 25 ? 'var(--yellow)' : 'var(--green)';
 
-  const n = s.crew ? s.crew.filter(c=>c.alive).length : '?';
+  const crew=Array.isArray(s.crew)?s.crew:[];
+  const n = crew.length ? crew.filter(c=>c?.alive).length : 0;
   const o2d = s.o2 !== undefined ? (s.o2 / (0.84 * Math.max(1,n))).toFixed(1) : '?';
   const h2od = s.h2o !== undefined ? (s.h2o / (2.5 * Math.max(1,n))).toFixed(1) : '?';
   const fd = s.food !== undefined ? (s.food / (2500 * Math.max(1,n))).toFixed(1) : '?';
 
-  document.getElementById('state-kv').innerHTML = `
-    <div class="kv"><span class="k">Sol</span><span class="v cyan">${s.sol}</span></div>
-    <div class="kv"><span class="k">Alive</span><span class="v ${s.alive?'green':'red'}">${s.alive?'YES':'NO'}</span></div>
-    <div class="kv"><span class="k">Cause</span><span class="v">${s.cause||'—'}</span></div>
-    <div class="kv"><span class="k">O₂</span><span class="v ${o2d<5?'red':o2d<15?'yellow':'green'}">${s.o2?.toFixed(1)} kg (${o2d}d)</span></div>
-    <div class="kv"><span class="k">H₂O</span><span class="v ${h2od<5?'red':h2od<15?'yellow':'green'}">${s.h2o?.toFixed(1)} L (${h2od}d)</span></div>
-    <div class="kv"><span class="k">Food</span><span class="v ${fd<5?'red':fd<15?'yellow':'green'}">${s.food?.toFixed(0)} kcal (${fd}d)</span></div>
-    <div class="kv"><span class="k">Power</span><span class="v ${s.power<100?'red':s.power<300?'yellow':'green'}">${s.power?.toFixed(0)} kWh</span></div>
-    <div class="kv"><span class="k">CRI</span><span class="v ${(s.cri||0)>50?'red':(s.cri||0)>25?'yellow':'green'}">${s.cri||0} (${s.criGrade||'?'})</span></div>
-    <div class="kv"><span class="k">Crew</span><span class="v">${n}/${s.crew?.length||'?'}</span></div>
-    <div class="kv"><span class="k">Morale</span><span class="v">${(s.morale*100)?.toFixed(0)||'?'}%</span></div>
-    <div class="kv"><span class="k">Modules</span><span class="v">${s.modules?.length||0}</span></div>
-    <div class="kv"><span class="k">Solar η</span><span class="v">${(s.s_eff*100)?.toFixed(0)||'?'}%</span></div>
-    <div class="kv"><span class="k">ISRU η</span><span class="v">${(s.i_eff*100)?.toFixed(0)||'?'}%</span></div>
-    <div class="kv"><span class="k">Alloc H/I/G</span><span class="v">${(s.alloc?.h*100)?.toFixed(0)||'?'}/${(s.alloc?.i*100)?.toFixed(0)||'?'}/${(s.alloc?.g*100)?.toFixed(0)||'?'}</span></div>
-    <div class="kv"><span class="k">Governor</span><span class="v">${s.arch||'?'}</span></div>
-    <div class="kv"><span class="k">Events</span><span class="v">${s.events?.length||0} active</span></div>
-  `;
+  const stateValues=document.getElementById('state-kv');
+  stateValues.replaceChildren();
+  appendStateValue(stateValues,'Sol',s.sol??'?','cyan');
+  appendStateValue(stateValues,'Alive',s.alive?'YES':'NO',s.alive?'green':'red');
+  appendStateValue(stateValues,'Cause',s.cause||'—');
+  appendStateValue(stateValues,'O₂',`${Number(s.o2)?.toFixed(1)} kg (${o2d}d)`,o2d<5?'red':o2d<15?'yellow':'green');
+  appendStateValue(stateValues,'H₂O',`${Number(s.h2o)?.toFixed(1)} L (${h2od}d)`,h2od<5?'red':h2od<15?'yellow':'green');
+  appendStateValue(stateValues,'Food',`${Number(s.food)?.toFixed(0)} kcal (${fd}d)`,fd<5?'red':fd<15?'yellow':'green');
+  appendStateValue(stateValues,'Power',`${Number(s.power)?.toFixed(0)} kWh`,s.power<100?'red':s.power<300?'yellow':'green');
+  appendStateValue(stateValues,'CRI',`${s.cri??0} (${s.criGrade||'?'})`,(s.cri||0)>50?'red':(s.cri||0)>25?'yellow':'green');
+  appendStateValue(stateValues,'Crew',`${n}/${crew.length}`);
+  appendStateValue(stateValues,'Morale',`${Number.isFinite(s.morale)?(s.morale*100).toFixed(0):'?'}%`);
+  appendStateValue(stateValues,'Modules',Array.isArray(s.modules)?s.modules.length:0);
+  appendStateValue(stateValues,'Solar η',`${Number.isFinite(s.s_eff)?(s.s_eff*100).toFixed(0):'?'}%`);
+  appendStateValue(stateValues,'ISRU η',`${Number.isFinite(s.i_eff)?(s.i_eff*100).toFixed(0):'?'}%`);
+  appendStateValue(stateValues,'Alloc H/I/G',`${Number.isFinite(s.alloc?.h)?(s.alloc.h*100).toFixed(0):'?'}/${Number.isFinite(s.alloc?.i)?(s.alloc.i*100).toFixed(0):'?'}/${Number.isFinite(s.alloc?.g)?(s.alloc.g*100).toFixed(0):'?'}`);
+  appendStateValue(stateValues,'Governor',s.arch||'?');
+  appendStateValue(stateValues,'Events',`${Array.isArray(s.events)?s.events.length:0} active`);
 
   // Update allocation sliders (don't fight user input)
   if(!document.activeElement || !document.activeElement.id?.startsWith('alloc-')){
@@ -431,17 +1176,34 @@ function renderState(s){
   }
 
   // Crew roster
-  if(s.crew){
-    document.getElementById('crew-state').innerHTML = s.crew.map(c=>{
+  const crewState=document.getElementById('crew-state');
+  crewState.replaceChildren();
+  if(crew.length){
+    crew.forEach(rawMember=>{
+      const c=rawMember&&typeof rawMember==='object'?rawMember:{};
       const col = !c.alive?'var(--red)':c.hp>50?'var(--green)':'var(--yellow)';
-      const icon = c.name.startsWith('OPT')||c.name.startsWith('LUN')?'🤖':'👤';
-      return `<div style="display:flex;gap:6px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.03)">
-        <span>${icon}</span>
-        <span style="color:${col};flex:1">${c.name}</span>
-        <span style="color:var(--dim)">${c.role}</span>
-        <span style="color:${col}">${c.alive?'HP:'+c.hp.toFixed(0):'☠'}</span>
-      </div>`;
-    }).join('');
+      const name=String(c.name??'Unknown');
+      const icon = name.startsWith('OPT')||name.startsWith('LUN')?'🤖':'👤';
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;gap:6px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.03)';
+      const iconEl=document.createElement('span');
+      iconEl.textContent=icon;
+      const nameEl=document.createElement('span');
+      nameEl.style.cssText=`color:${col};flex:1`;
+      nameEl.textContent=name;
+      const roleEl=document.createElement('span');
+      roleEl.style.color='var(--dim)';
+      roleEl.textContent=String(c.role??'');
+      const healthEl=document.createElement('span');
+      healthEl.style.color=col;
+      healthEl.textContent=c.alive
+        ?`HP:${Number.isFinite(c.hp)?c.hp.toFixed(0):'?'}`
+        :'☠';
+      row.append(iconEl,nameEl,roleEl,healthEl);
+      crewState.append(row);
+    });
+  }else{
+    crewState.textContent='—';
   }
 
   // Attestation IDs
@@ -450,18 +1212,47 @@ function renderState(s){
 
 function renderEchoStream(){
   const el = document.getElementById('echo-stream');
-  el.innerHTML = echoStream.slice(0,50).map(echo=>{
+  el.replaceChildren();
+  echoStream.slice(0,50).forEach(rawEcho=>{
+    const echo=rawEcho&&typeof rawEcho==='object'?rawEcho:{};
     const d = echo.delta || {};
-    const events = (echo.events||[]).map(e=>`<span class="event">${e.type} (${(e.severity*100).toFixed(0)}%)</span>`).join(' ');
-    const reflexes = (echo.reflexes_fired||[]).map(r=>`<span class="reflex">${r.id}</span>`).join(' ');
-    return `<div class="echo-entry">
-      <span class="frame-id">F${echo.frame}</span>
-      <span class="delta">Δo2:${d.o2?.toFixed(2)||'?'} Δh2o:${d.h2o?.toFixed(2)||'?'} Δpwr:${d.power?.toFixed(1)||'?'}</span>
-      ${echo.cri!==undefined?`<span style="color:${echo.cri>50?'var(--red)':'var(--dim)'}">CRI:${echo.cri}</span>`:''}
-      ${events?'<br>'+events:''}
-      ${reflexes?'<br>'+reflexes:''}
-    </div>`;
-  }).join('');
+    const entry=document.createElement('div');
+    entry.className='echo-entry';
+    const frame=document.createElement('span');
+    frame.className='frame-id';
+    frame.textContent=`F${String(echo.frame??'?')}`;
+    const delta=document.createElement('span');
+    delta.className='delta';
+    delta.textContent=`Δo2:${Number.isFinite(d.o2)?d.o2.toFixed(2):'?'} Δh2o:${Number.isFinite(d.h2o)?d.h2o.toFixed(2):'?'} Δpwr:${Number.isFinite(d.power)?d.power.toFixed(1):'?'}`;
+    entry.append(frame,delta);
+    if(echo.cri!==undefined){
+      const cri=document.createElement('span');
+      cri.style.color=echo.cri>50?'var(--red)':'var(--dim)';
+      cri.textContent=`CRI:${String(echo.cri)}`;
+      entry.append(cri);
+    }
+    for(const event of Array.isArray(echo.events)?echo.events:[]){
+      entry.append(document.createElement('br'));
+      const shown=document.createElement('span');
+      shown.className='event';
+      const severity=Number.isFinite(event?.severity)
+        ?` (${(event.severity*100).toFixed(0)}%)`:'';
+      const description=event?.description??event?.desc;
+      shown.textContent=`${String(event?.type??'?')}${severity}${
+        description?` · ${String(description)}`:''
+      }`;
+      entry.append(shown);
+    }
+    for(const reflex of Array.isArray(echo.reflexes_fired)
+      ?echo.reflexes_fired:[]){
+      entry.append(document.createElement('br'));
+      const shown=document.createElement('span');
+      shown.className='reflex';
+      shown.textContent=String(reflex?.id??'?');
+      entry.append(shown);
+    }
+    el.append(entry);
+  });
 }
 
 function renderAttestation(att){
@@ -479,11 +1270,14 @@ function renderAttestation(att){
 
 // ── Commands ──
 function protocolCmd(cmd){
+  if(pairingState!=='PAIRED')return false;
   logProto('out', cmd.toUpperCase());
   send(cmd);
+  return true;
 }
 
 function pushAlloc(){
+  if(pairingState!=='PAIRED')return false;
   const h = parseInt(document.getElementById('alloc-h').value);
   const i = parseInt(document.getElementById('alloc-i').value);
   const g = parseInt(document.getElementById('alloc-g').value);
@@ -497,39 +1291,50 @@ function pushAlloc(){
   const tot = h+i+g || 1;
   send('push_alloc', {h:h/tot, i:i/tot, g:g/tot, r:r/100});
   logProto('out', `ALLOC H:${Math.round(h/tot*100)}% I:${Math.round(i/tot*100)}% G:${Math.round(g/tot*100)}% R:${(r/100).toFixed(1)}×`);
+  return true;
 }
 
 function executeCommand(){
+  if(pairingState!=='PAIRED')return false;
   const input = document.getElementById('cmd-input').value.trim();
   if(!input) return;
   logProto('out', `EXEC: ${input.substr(0,80)}`);
   send('exec_lispy', {code: input});
+  return true;
 }
 
 function pushLispy(){
+  if(pairingState!=='PAIRED')return false;
   const input = document.getElementById('cmd-input').value.trim();
   if(!input) return;
   logProto('out', `PUSH PROGRAM (${input.length} chars)`);
   send('push_lispy', {code: input});
+  return true;
 }
 
 function snapshotState(){
+  if(pairingState!=='PAIRED')return false;
   logProto('out', 'SNAPSHOT');
   if(twinState){
     snapshotHistory.push({ts:new Date().toISOString(), state:JSON.parse(JSON.stringify(twinState))});
     logProto('sys', `Snapshot #${snapshotHistory.length} saved (Sol ${twinState.sol})`);
   }
   send('get_state');
+  return true;
 }
 
 function emergencyStop(){
+  if(pairingState!=='PAIRED')return false;
   logProto('out', 'E-STOP');
   send('emergency_stop');
+  return true;
 }
 
 function generateAttestation(){
+  if(pairingState!=='PAIRED')return false;
   logProto('out', 'GENERATE ATTESTATION');
   send('get_attestation');
+  return true;
 }
 
 // ── Wallet Functions ──
@@ -537,27 +1342,69 @@ let twinWallets = {};
 let twinTransfers = [];
 
 function showTipUI(){
+  if(pairingState!=='PAIRED')return false;
   const el = document.getElementById('wallet-action');
   const inner = document.getElementById('wallet-action-inner');
   el.style.display = 'block';
-  // Build agent dropdown from known wallets
-  const agents = Object.entries(twinWallets)
-    .filter(([a,w]) => w.type !== 'user' && w.type !== 'treasury')
-    .map(([a,w]) => `<option value="${w.owner}">${w.owner} (${(w.balance||0).toLocaleString()} MARS)</option>`)
-    .join('');
-  inner.innerHTML = `
-    <div style="font-size:10px;color:var(--cyan);margin-bottom:4px">TIP AN AGENT</div>
-    <div style="display:flex;gap:4px;align-items:center">
-      <select id="mc-tip-target" style="flex:1;background:#080b10;border:1px solid var(--border);color:var(--text);padding:4px;font-family:var(--mono);font-size:10px">${agents||'<option>No agents found — GET WALLETS first</option>'}</select>
-      <input type="number" id="mc-tip-amount" value="100" min="1" style="width:60px;background:#080b10;border:1px solid var(--border);color:var(--text);padding:4px;font-family:var(--mono);font-size:10px">
-      <button class="cmd-btn green" onclick="doMcTip()">SEND</button>
-      <button class="cmd-btn" onclick="document.getElementById('wallet-action').style.display='none'">✕</button>
-    </div>
-    <input type="text" id="mc-tip-memo" placeholder="memo (optional)" style="width:100%;margin-top:4px;background:#080b10;border:1px solid var(--border);color:var(--text);padding:4px;font-family:var(--mono);font-size:10px">
-  `;
+  inner.replaceChildren();
+  const title=document.createElement('div');
+  title.style.cssText='font-size:10px;color:var(--cyan);margin-bottom:4px';
+  title.textContent='TIP AN AGENT';
+  const controls=document.createElement('div');
+  controls.style.cssText='display:flex;gap:4px;align-items:center';
+  const target=document.createElement('select');
+  target.id='mc-tip-target';
+  target.style.cssText='flex:1;background:#080b10;border:1px solid var(--border);color:var(--text);padding:4px;font-family:var(--mono);font-size:10px';
+  const agents=Object.entries(twinWallets)
+    .filter(([,wallet])=>
+      wallet&&typeof wallet==='object'&&
+      wallet.type!=='user'&&wallet.type!=='treasury'
+    );
+  if(agents.length){
+    for(const[,wallet]of agents){
+      const option=document.createElement('option');
+      option.value=String(wallet.owner??'');
+      option.textContent=`${String(wallet.owner??'')} (${
+        Number.isFinite(wallet.balance)
+          ?wallet.balance.toLocaleString():'0'
+      } MARS)`;
+      target.append(option);
+    }
+  }else{
+    const option=document.createElement('option');
+    option.textContent='No agents found — GET WALLETS first';
+    option.value='';
+    target.append(option);
+  }
+  const amount=document.createElement('input');
+  amount.type='number';
+  amount.id='mc-tip-amount';
+  amount.value='100';
+  amount.min='1';
+  amount.style.cssText='width:60px;background:#080b10;border:1px solid var(--border);color:var(--text);padding:4px;font-family:var(--mono);font-size:10px';
+  const sendButton=document.createElement('button');
+  sendButton.type='button';
+  sendButton.className='cmd-btn green';
+  sendButton.textContent='SEND';
+  sendButton.addEventListener('click',doMcTip);
+  const closeButton=document.createElement('button');
+  closeButton.type='button';
+  closeButton.className='cmd-btn';
+  closeButton.textContent='✕';
+  closeButton.addEventListener('click',()=>{el.style.display='none'});
+  controls.append(target,amount,sendButton,closeButton);
+  const memo=document.createElement('input');
+  memo.type='text';
+  memo.id='mc-tip-memo';
+  memo.placeholder='memo (optional)';
+  memo.maxLength=256;
+  memo.style.cssText='width:100%;margin-top:4px;background:#080b10;border:1px solid var(--border);color:var(--text);padding:4px;font-family:var(--mono);font-size:10px';
+  inner.append(title,controls,memo);
+  return true;
 }
 
 function showRegisterUI(){
+  if(pairingState!=='PAIRED')return false;
   const el = document.getElementById('wallet-action');
   const inner = document.getElementById('wallet-action-inner');
   el.style.display = 'block';
@@ -571,9 +1418,11 @@ function showRegisterUI(){
       <button class="cmd-btn" onclick="document.getElementById('wallet-action').style.display='none'">✕</button>
     </div>
   `;
+  return true;
 }
 
 function doMcTip(){
+  if(pairingState!=='PAIRED')return false;
   const agent = document.getElementById('mc-tip-target')?.value;
   const amount = parseInt(document.getElementById('mc-tip-amount')?.value) || 0;
   const memo = document.getElementById('mc-tip-memo')?.value || '';
@@ -581,33 +1430,68 @@ function doMcTip(){
   send('tip_agent', {agent, amount, memo: memo || 'tip from Mission Control'});
   logProto('out', `TIP ${amount} MARS → ${agent}${memo?' ('+memo+')':''}`);
   document.getElementById('wallet-action').style.display = 'none';
+  return true;
 }
 
 function doRegister(){
+  if(pairingState!=='PAIRED')return false;
   const addr = document.getElementById('mc-ext-addr')?.value?.trim();
   const name = document.getElementById('mc-ext-name')?.value?.trim();
   if(!addr || !name) return;
   send('register_wallet', {address: addr, owner: name});
   logProto('out', `REGISTER WALLET ${addr} (${name})`);
   document.getElementById('wallet-action').style.display = 'none';
+  return true;
 }
 
 function renderWallets(data){
-  twinWallets = data.wallets || {};
-  twinTransfers = data.transfers || [];
+  twinWallets = data?.wallets&&typeof data.wallets==='object'&&
+    !Array.isArray(data.wallets)
+    ?data.wallets:{};
+  twinTransfers = Array.isArray(data?.transfers)?data.transfers:[];
   const el = document.getElementById('wallet-display');
   const txEl = document.getElementById('transfer-display');
   if(el){
-    const sorted = Object.entries(twinWallets).sort((a,b) => (b[1].balance||0) - (a[1].balance||0));
-    el.innerHTML = sorted.map(([addr, w]) => {
+    const sorted = Object.entries(twinWallets).sort(
+      (a,b)=>(Number(b[1]?.balance)||0)-(Number(a[1]?.balance)||0)
+    );
+    el.replaceChildren();
+    sorted.forEach(([addr,rawWallet])=>{
+      const w=rawWallet&&typeof rawWallet==='object'?rawWallet:{};
       const icon = w.type==='user'?'👤':w.type==='robot'?'🤖':w.type==='human'?'👤':w.type==='treasury'?'🏛️':w.type==='external'?'🔗':'❓';
-      return `<div class="kv"><span class="k">${icon} ${w.owner}</span><span class="v cyan">${(w.balance||0).toLocaleString()} MARS</span></div>`;
-    }).join('');
+      const row=document.createElement('div');
+      row.className='kv';
+      const owner=document.createElement('span');
+      owner.className='k';
+      owner.textContent=`${icon} ${String(w.owner??'')} · ${String(addr)}`;
+      const balance=document.createElement('span');
+      balance.className='v cyan';
+      balance.textContent=`${
+        Number.isFinite(w.balance)?w.balance.toLocaleString():'0'
+      } MARS`;
+      row.append(owner,balance);
+      el.append(row);
+    });
   }
   if(txEl){
-    txEl.innerHTML = twinTransfers.slice(-10).reverse().map(tx =>
-      `<div>Sol ${tx.sol}: ${tx.fromOwner} → ${tx.toOwner}: ${tx.amount} MARS${tx.memo?' · '+tx.memo:''}</div>`
-    ).join('') || '<div style="color:var(--dim)">No transfers yet</div>';
+    txEl.replaceChildren();
+    const recent=twinTransfers.slice(-10).reverse();
+    if(recent.length){
+      recent.forEach(tx=>{
+        const row=document.createElement('div');
+        row.textContent=`Sol ${String(tx?.sol??'?')}: ${
+          String(tx?.fromOwner??tx?.from??'?')
+        } → ${String(tx?.toOwner??tx?.to??'?')}: ${
+          String(tx?.amount??'?')
+        } MARS${tx?.memo?` · ${String(tx.memo)}`:''}`;
+        txEl.append(row);
+      });
+    }else{
+      const empty=document.createElement('div');
+      empty.style.color='var(--dim)';
+      empty.textContent='No transfers yet';
+      txEl.append(empty);
+    }
   }
 }
 
@@ -620,7 +1504,13 @@ function logProto(type, msg){
   const el = document.getElementById('proto-log');
   const div = document.createElement('div');
   div.className = 'msg';
-  div.innerHTML = `<span class="ts">${ts}</span> <span class="${type}">${type==='out'?'▶':'◀'} ${escHtml(msg)}</span>`;
+  const timestamp=document.createElement('span');
+  timestamp.className='ts';
+  timestamp.textContent=ts;
+  const body=document.createElement('span');
+  body.className=type;
+  body.textContent=` ${type==='out'?'▶':'◀'} ${String(msg)}`;
+  div.append(timestamp,body);
   el.appendChild(div);
   el.scrollTop = el.scrollHeight;
 }
@@ -632,12 +1522,48 @@ function escHtml(s){
 }
 
 // ── Init ──
-initChannel();
+void initChannel();
 
-// Poll for state every 2 seconds (fallback if no event subscription)
 setInterval(()=>{
-  if(channel) send('get_state');
+  if(pairingState!=='PAIRED')announceControl();
+},2000);
+
+setInterval(()=>{
+  if(pairingState==='PAIRED')send('get_state');
 }, 2000);
+
+setInterval(()=>{
+  if(!activePairingChallenge)return;
+  if(Date.parse(activePairingChallenge.expiresAt)<=Date.now()){
+    clearPairingAuthority('Pairing PIN expired; a fresh PIN is required.');
+    announceControl();
+  }
+},1000);
+
+function postPreparedDisconnect(){
+  if(!channel||!preparedDisconnectEnvelope)return false;
+  const envelope=preparedDisconnectEnvelope;
+  try{
+    channel.postMessage(envelope);
+    signedSequence=envelope.sequence;
+    preparedDisconnectEnvelope=null;
+    return true;
+  }catch(error){
+    return false;
+  }
+}
+
+window.addEventListener('beforeunload',postPreparedDisconnect);
+
+window.addEventListener('pagehide',()=>{
+  postPreparedDisconnect();
+  if(channel&&!pairedContext&&activePairingChallenge){
+    postBootstrap('cancel_kited_twin_pairing',{
+      challengeId:activePairingChallenge.challengeId,
+      twinId:CONTROL_TWIN_ID,
+    },{twinId:CONTROL_TWIN_ID});
+  }
+});
 </script>
 </body>
 </html>

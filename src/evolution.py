@@ -123,6 +123,7 @@ def evaluate_genome(genome: Genome, seeds: List[int] = None,
             food_kcal=colony.resources.food_kcal,
             power_kwh=colony.resources.power_kwh,
             crew_size=colony.resources.crew_size,
+            power_capacity_kwh=colony.resources.power_capacity_kwh,
         )
 
         for sol in range(max_sols):
@@ -147,6 +148,7 @@ def evaluate_genome(genome: Genome, seeds: List[int] = None,
                 food_kcal=colony.resources.food_kcal,
                 power_kwh=colony.resources.power_kwh,
                 crew_size=colony.resources.crew_size,
+                power_capacity_kwh=colony.resources.power_capacity_kwh,
             )
             step(colony, irradiance, ext_temp, allocation,
                  active_events=events.active_event_dicts(),

@@ -21,7 +21,8 @@ from config import (
     GREENHOUSE_H2O_L_PER_SOL,
     SOLAR_PANEL_AREA_M2, SOLAR_PANEL_EFFICIENCY, MARS_SOL_HOURS,
     POWER_CRITICAL_THRESHOLD_KWH, TEMP_CRITICAL_LOW_K, CASCADE_STEP_SOLS,
-    RESOURCE_FACTOR_RANGES,
+    RESOURCE_FACTOR_RANGES, HABITAT_WATER_RECOVERY_FRACTION,
+    INITIAL_POWER_RESERVE_KWH, POWER_STORAGE_CAPACITY_KWH,
 )
 
 
@@ -46,13 +47,76 @@ CASCADE_ORDER = [
 
 
 @dataclass
+class WaterBalance:
+    """One sol of crew potable-water circulation."""
+    gross_draw_liters: float
+    recovered_liters: float
+    net_tank_draw_liters: float
+
+
+def crew_water_balance(
+    crew_size: int,
+    consumption_reduction: float = 0.0,
+    recovery_fraction: float = HABITAT_WATER_RECOVERY_FRACTION,
+) -> WaterBalance:
+    """Calculate gross use, recovered water, and net tank draw."""
+    reduction = max(0.0, min(1.0, consumption_reduction))
+    recovery = max(0.0, min(1.0, recovery_fraction))
+    gross_draw = (
+        max(0, crew_size)
+        * H2O_L_PER_PERSON_PER_SOL
+        * (1.0 - reduction)
+    )
+    recovered = gross_draw * recovery
+    return WaterBalance(
+        gross_draw_liters=gross_draw,
+        recovered_liters=recovered,
+        net_tank_draw_liters=gross_draw - recovered,
+    )
+
+
+@dataclass
 class Resources:
     """Colony resource pool."""
     o2_kg: float = 0.0
     h2o_liters: float = 0.0
     food_kcal: float = 0.0
-    power_kwh: float = 500.0
+    power_kwh: float = INITIAL_POWER_RESERVE_KWH
     crew_size: int = DEFAULT_CREW_SIZE
+    power_capacity_kwh: Optional[float] = None
+
+    def __post_init__(self) -> None:
+        self.power_kwh = max(0.0, float(self.power_kwh))
+        if self.power_capacity_kwh is None:
+            self.power_capacity_kwh = max(
+                POWER_STORAGE_CAPACITY_KWH,
+                self.power_kwh,
+            )
+        else:
+            self.power_capacity_kwh = max(
+                0.0,
+                float(self.power_capacity_kwh),
+            )
+            self.power_kwh = min(
+                self.power_kwh,
+                self.power_capacity_kwh,
+            )
+
+    def store_power(self, generated_kwh: float) -> float:
+        """Store non-negative energy up to finite battery capacity."""
+        before = min(self.power_kwh, self.power_capacity_kwh)
+        self.power_kwh = min(
+            self.power_capacity_kwh,
+            max(0.0, before + max(0.0, generated_kwh)),
+        )
+        return self.power_kwh - before
+
+    def enforce_power_capacity(self) -> None:
+        """Clamp external transfers to physical storage bounds."""
+        self.power_kwh = max(
+            0.0,
+            min(self.power_kwh, self.power_capacity_kwh),
+        )
 
     def days_of(self, resource: str) -> float:
         """How many sols of a resource remain at current consumption."""
@@ -60,7 +124,11 @@ class Resources:
             return float('inf')
         per_sol = {
             "o2": O2_KG_PER_PERSON_PER_SOL * self.crew_size,
-            "h2o": H2O_L_PER_PERSON_PER_SOL * self.crew_size,
+            "h2o": (
+                H2O_L_PER_PERSON_PER_SOL
+                * (1.0 - HABITAT_WATER_RECOVERY_FRACTION)
+                * self.crew_size
+            ),
             "food": FOOD_KCAL_PER_PERSON_PER_SOL * self.crew_size,
             "power": POWER_BASELINE_KWH_PER_SOL,
         }
@@ -152,6 +220,9 @@ class Colony:
     reputation: float = 0.5
     morale: float = 1.0
     cumulative_radiation_msv: float = 0.0
+    last_water_balance: WaterBalance = field(
+        default_factory=lambda: WaterBalance(0.0, 0.0, 0.0)
+    )
 
     # Crew (optional — None = legacy mode with just crew_size)
     crew: Optional[Any] = None  # crew.Crew instance when enabled
@@ -188,7 +259,8 @@ def create_colony(name: str, crew_size: int = DEFAULT_CREW_SIZE,
         o2_kg=crew_size * O2_KG_PER_PERSON_PER_SOL * reserve_sols * factors["o2"],
         h2o_liters=crew_size * H2O_L_PER_PERSON_PER_SOL * reserve_sols * factors["h2o"],
         food_kcal=crew_size * FOOD_KCAL_PER_PERSON_PER_SOL * reserve_sols * factors["food"],
-        power_kwh=500.0 * factors["power"],
+        power_kwh=INITIAL_POWER_RESERVE_KWH * factors["power"],
+        power_capacity_kwh=POWER_STORAGE_CAPACITY_KWH * factors["power"],
         crew_size=crew_size,
     )
     return Colony(
@@ -200,14 +272,21 @@ def create_colony(name: str, crew_size: int = DEFAULT_CREW_SIZE,
     )
 
 
-def produce(colony: Colony, solar_irradiance_w_m2: float,
-            allocation: Allocation) -> None:
+def produce(
+    colony: Colony,
+    solar_irradiance_w_m2: float,
+    allocation: Allocation,
+    defer_power_capacity: bool = False,
+) -> None:
     """Apply one sol of resource production based on governor allocation.
 
     Power allocation determines how much goes to each system:
     - Heating: maintains habitat temperature
     - ISRU: produces O2 and H2O
     - Greenhouse: produces food (requires water)
+
+    Generated energy is available to same-sol loads before residual energy is
+    capped. step() defers that storage boundary until all sol loads finish.
     """
     r = colony.resources
     s = colony.systems
@@ -240,7 +319,7 @@ def produce(colony: Colony, solar_irradiance_w_m2: float,
     raw_kwh = (solar_irradiance_w_m2 * SOLAR_PANEL_AREA_M2
                * SOLAR_PANEL_EFFICIENCY * MARS_SOL_HOURS / 1000.0)
     generated_kwh = raw_kwh * s.solar_efficiency * solar_bonus
-    r.power_kwh += generated_kwh
+    r.power_kwh = max(0.0, r.power_kwh) + max(0.0, generated_kwh)
 
     # Allocate power — allocation fractions directly scale production
     isru_frac = allocation.isru_fraction
@@ -283,6 +362,9 @@ def produce(colony: Colony, solar_irradiance_w_m2: float,
         repair_rate = 0.05 * (1.0 + repair_bonus)
         s.repair(allocation.repair_target, repair_rate)
 
+    if not defer_power_capacity:
+        r.enforce_power_capacity()
+
 
 def consume(colony: Colony, allocation: Allocation) -> None:
     """Deduct one sol of crew consumption."""
@@ -294,10 +376,14 @@ def consume(colony: Colony, allocation: Allocation) -> None:
         colony.research.get_effect("h2o_consumption_reduction")
         if colony.research is not None else 0.0
     )
-    h2o_multiplier = max(0.0, 1.0 - h2o_reduction)
+    water_balance = crew_water_balance(
+        crew,
+        consumption_reduction=h2o_reduction,
+    )
+    colony.last_water_balance = water_balance
     r.h2o_liters = max(
         0.0,
-        r.h2o_liters - crew * H2O_L_PER_PERSON_PER_SOL * h2o_multiplier,
+        r.h2o_liters - water_balance.net_tank_draw_liters,
     )
     r.food_kcal = max(0.0,
                       r.food_kcal - crew * FOOD_KCAL_PER_PERSON_PER_SOL * allocation.food_ration)
@@ -405,7 +491,12 @@ def step(colony: Colony, solar_irradiance_w_m2: float,
         apply_events(colony, active_events)
 
     # Production and consumption
-    produce(colony, solar_irradiance_w_m2, allocation)
+    produce(
+        colony,
+        solar_irradiance_w_m2,
+        allocation,
+        defer_power_capacity=True,
+    )
     consume(colony, allocation)
 
     # Thermal update
@@ -523,6 +614,9 @@ def step(colony: Colony, solar_irradiance_w_m2: float,
                 colony.research.start_research(
                     choice, colony.resources, scientist_bonus)
 
+    # Only residual energy crosses the end-of-sol storage boundary.
+    colony.resources.enforce_power_capacity()
+
     # Cascade
     advance_cascade(colony)
 
@@ -539,8 +633,10 @@ def step(colony: Colony, solar_irradiance_w_m2: float,
 
 
 def apply_events(colony: Colony, events: list) -> None:
-    """Apply event effects to colony systems and resources."""
+    """Apply permanent event effects once, at event onset."""
     for event in events:
+        if not event.get("onset", True):
+            continue
         fx = event.get("effects", {})
         if "solar_damage" in fx:
             colony.systems.damage("solar", fx["solar_damage"])
@@ -589,7 +685,25 @@ def serialize(colony: Colony) -> dict:
             "h2o_liters": round(colony.resources.h2o_liters, 2),
             "food_kcal": round(colony.resources.food_kcal, 1),
             "power_kwh": round(colony.resources.power_kwh, 2),
+            "power_capacity_kwh": round(
+                colony.resources.power_capacity_kwh,
+                2,
+            ),
             "crew_size": colony.resources.crew_size,
+        },
+        "water_balance": {
+            "gross_draw_liters": round(
+                colony.last_water_balance.gross_draw_liters,
+                3,
+            ),
+            "recovered_liters": round(
+                colony.last_water_balance.recovered_liters,
+                3,
+            ),
+            "net_tank_draw_liters": round(
+                colony.last_water_balance.net_tank_draw_liters,
+                3,
+            ),
         },
         "systems": {
             "solar": round(colony.systems.solar_efficiency, 3),

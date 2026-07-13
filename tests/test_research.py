@@ -161,6 +161,8 @@ class TestColonyIntegration:
         from colony import produce
         c1 = create_colony("NoResearch")
         c2 = create_colony("WithResearch")
+        c1.resources.power_kwh = c1.resources.power_capacity_kwh / 2
+        c2.resources.power_kwh = c2.resources.power_capacity_kwh / 2
         c2.research = ResearchLab()
         c2.research.completed.append("improved_solar")
         alloc = Allocation(heating_fraction=0.2, isru_fraction=0.5,

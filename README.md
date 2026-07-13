@@ -6,7 +6,7 @@
 
 **For classrooms, robotics clubs, and anyone who wants to go to Mars.**
 
-**[Play it live](https://rappter2-ux.github.io/mars-barn-opus/)** | **[3D Colony RTS](https://rappter2-ux.github.io/mars-barn-opus/rts.html)** | **[3D Viewer](https://rappter2-ux.github.io/mars-barn-opus/viewer.html)** | **[Split-Screen](https://rappter2-ux.github.io/mars-barn-opus/splitscreen.html)** | **[Timelapse](https://rappter2-ux.github.io/mars-barn-opus/timelapse.html)** | **[Multiplayer](https://rappter2-ux.github.io/mars-barn-opus/multiplayer.html)**
+**[Start Here](https://kody-w.github.io/mars-barn-opus/getting-started.html)** | **[Play it live](https://rappter2-ux.github.io/mars-barn-opus/)** | **[3D Colony RTS](https://rappter2-ux.github.io/mars-barn-opus/rts.html)** | **[3D Viewer](https://rappter2-ux.github.io/mars-barn-opus/viewer.html)** | **[Split-Screen](https://rappter2-ux.github.io/mars-barn-opus/splitscreen.html)** | **[Timelapse](https://rappter2-ux.github.io/mars-barn-opus/timelapse.html)** | **[Multiplayer](https://rappter2-ux.github.io/mars-barn-opus/multiplayer.html)**
 
 **[See the autonomous evolution guide](https://kody-w.github.io/mars-barn-opus/evolution.html)**
 
@@ -50,6 +50,7 @@ python3 src/sim.py --mission-control              # Watch autonomous colony
 python3 src/sim.py --mission-control --speed 5     # Faster
 python3 src/sim.py --play                          # You are the governor
 python3 src/sim.py --benchmark                     # Test all 10 archetypes
+python3 src/sim.py --mission-readiness --seed 0 --cohort-seeds 100 --baseline-json data/analysis/baseline-cohort-legacy.json --json-file data/analysis/mission-readiness.json --html docs/mission-readiness.html
 python3 src/sim.py --leaderboard                   # Monte Carlo scoring
 python3 src/sim.py --evolve                        # Breed optimal governor DNA
 python3 src/sim.py --colonies 5 --sols 500         # Multi-colony competition
@@ -87,6 +88,8 @@ npm test                                           # Python + frame ledger + bro
 | `mission_control.py` | Terminal mission control with digital twin sync |
 | `mission_log.py` | Sol-by-sol narrative log |
 | `report.py` | HTML reports with inline SVG charts |
+| `mission_readiness.py` | Deterministic cohorts + observed cascade evidence |
+| `readiness_report.py` | Extinction Cascade Observatory HTML renderer |
 | `twin_spec.py` | Physical twin hardware specification |
 
 ### Web Experience (5 pages, zero dependencies)

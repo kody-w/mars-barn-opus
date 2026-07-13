@@ -7,12 +7,14 @@ sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent.parent / "src
 from colony import (
     Colony, Resources, Systems, Allocation, CascadeState,
     create_colony, produce, consume, advance_cascade, step, apply_events,
-    serialize,
+    serialize, crew_water_balance,
 )
 from config import (
     O2_KG_PER_PERSON_PER_SOL, H2O_L_PER_PERSON_PER_SOL,
     FOOD_KCAL_PER_PERSON_PER_SOL, POWER_BASELINE_KWH_PER_SOL,
     DEFAULT_CREW_SIZE, POWER_CRITICAL_THRESHOLD_KWH,
+    HABITAT_WATER_RECOVERY_FRACTION, INITIAL_POWER_RESERVE_KWH,
+    POWER_STORAGE_CAPACITY_KWH,
 )
 
 
@@ -20,7 +22,19 @@ class TestResources:
     def test_create_with_defaults(self):
         r = Resources()
         assert r.crew_size == DEFAULT_CREW_SIZE
-        assert r.power_kwh == 500.0
+        assert r.power_kwh == INITIAL_POWER_RESERVE_KWH
+        assert r.power_capacity_kwh == POWER_STORAGE_CAPACITY_KWH
+
+    def test_first_five_positional_arguments_remain_compatible(self):
+        r = Resources(1.0, 2.0, 3.0, 4.0, 6)
+        assert r.power_kwh == 4.0
+        assert r.crew_size == 6
+        assert r.power_capacity_kwh == POWER_STORAGE_CAPACITY_KWH
+
+    def test_default_capacity_expands_for_custom_initial_power(self):
+        r = Resources(power_kwh=2000.0)
+        assert r.power_kwh == 2000.0
+        assert r.power_capacity_kwh == 2000.0
 
     def test_days_of_calculation(self):
         r = Resources(o2_kg=10.0, crew_size=1)
@@ -112,10 +126,25 @@ class TestColonyCreation:
 class TestProduction:
     def test_solar_power_generation(self):
         c = create_colony("Test")
+        c.resources.power_kwh = c.resources.power_capacity_kwh / 2
         initial_power = c.resources.power_kwh
-        a = Allocation(isru_fraction=0.5, greenhouse_fraction=0.3, heating_fraction=0.2)
+        a = Allocation(
+            isru_fraction=0.0,
+            greenhouse_fraction=0.0,
+            heating_fraction=1.0,
+        )
         produce(c, 300.0, a)
         assert c.resources.power_kwh > initial_power
+
+    def test_solar_generation_cannot_exceed_storage_capacity(self):
+        c = create_colony("Test")
+        c.resources.power_kwh = c.resources.power_capacity_kwh
+        produce(c, 300.0, Allocation(
+            isru_fraction=0.0,
+            greenhouse_fraction=0.0,
+            heating_fraction=1.0,
+        ))
+        assert c.resources.power_kwh == c.resources.power_capacity_kwh
 
     def test_no_sun_no_power(self):
         c = create_colony("Test")
@@ -204,6 +233,26 @@ class TestProduction:
 
 
 class TestConsumption:
+    def test_water_recovery_mass_balance_and_tank_draw(self):
+        balance = crew_water_balance(DEFAULT_CREW_SIZE)
+        expected_gross = (
+            DEFAULT_CREW_SIZE * H2O_L_PER_PERSON_PER_SOL
+        )
+        assert balance.gross_draw_liters == expected_gross
+        assert balance.recovered_liters == (
+            expected_gross * HABITAT_WATER_RECOVERY_FRACTION
+        )
+        assert balance.gross_draw_liters == (
+            balance.recovered_liters + balance.net_tank_draw_liters
+        )
+
+        c = create_colony("Test")
+        initial = c.resources.h2o_liters
+        consume(c, Allocation())
+        assert initial - c.resources.h2o_liters == (
+            balance.net_tank_draw_liters
+        )
+
     def test_crew_consumes_resources(self):
         c = create_colony("Test")
         initial_o2 = c.resources.o2_kg
@@ -309,6 +358,18 @@ class TestCascade:
 
 
 class TestApplyEvents:
+    def test_permanent_damage_applies_on_event_onset_only(self):
+        c = create_colony("Test")
+        event = {
+            "onset": True,
+            "effects": {"solar_damage": 0.5},
+        }
+        apply_events(c, [event])
+        after_onset = c.systems.solar_efficiency
+        event["onset"] = False
+        apply_events(c, [event])
+        assert c.systems.solar_efficiency == after_onset
+
     def test_solar_damage(self):
         c = create_colony("Test")
         events = [{"effects": {"solar_damage": 0.5}}]
@@ -369,6 +430,48 @@ class TestStep:
             step(c, 300.0, 200.0, a)
         # Should survive at least 10 sols with good conditions
         assert c.sol >= 10
+
+    def test_full_battery_sun_serves_same_sol_loads(self):
+        sunny = create_colony("Sunny")
+        dark = create_colony("Dark")
+        sunny.resources.power_kwh = sunny.resources.power_capacity_kwh
+        dark.resources.power_kwh = dark.resources.power_capacity_kwh
+        allocation = {
+            "heating_fraction": 0.0,
+            "isru_fraction": 1.0,
+            "greenhouse_fraction": 0.0,
+        }
+
+        step(
+            sunny,
+            solar_irradiance_w_m2=300.0,
+            exterior_temp_k=293.15,
+            allocation=Allocation(**allocation),
+        )
+        step(
+            dark,
+            solar_irradiance_w_m2=0.0,
+            exterior_temp_k=293.15,
+            allocation=Allocation(**allocation),
+        )
+
+        assert sunny.resources.power_kwh > dark.resources.power_kwh
+        assert sunny.resources.power_kwh <= sunny.resources.power_capacity_kwh
+        assert dark.resources.power_kwh <= dark.resources.power_capacity_kwh
+
+    def test_step_caps_residual_power_at_storage_boundary(self):
+        c = create_colony("Test")
+        step(
+            c,
+            solar_irradiance_w_m2=10000.0,
+            exterior_temp_k=293.15,
+            allocation=Allocation(
+                heating_fraction=1.0,
+                isru_fraction=0.0,
+                greenhouse_fraction=0.0,
+            ),
+        )
+        assert c.resources.power_kwh == c.resources.power_capacity_kwh
 
     def test_heating_kw_is_billed_for_full_sol(self):
         import mars

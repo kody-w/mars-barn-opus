@@ -15,6 +15,12 @@ def generate_report(results: Dict, title: str = "Mars Barn Opus") -> str:
 
     Works with both single-colony and multi-colony results.
     """
+    if results.get("mode") in {
+        "mission_readiness",
+        "mission_readiness_comparison",
+    }:
+        from readiness_report import generate_mission_readiness_report
+        return generate_mission_readiness_report(results)
     if results.get("mode") == "single":
         return _single_colony_report(results, title)
     elif "colonies" in results:

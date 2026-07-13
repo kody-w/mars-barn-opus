@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="A step-by-step guide to Mars Barn Opus: missions, kited vTwins, PIN pairing, Mission Control, echo frames, cartridges, and mission readiness.">
+<title>Start Here - Mars Barn Opus</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#080b10;--panel:#0d1117;--raised:#141a22;--border:#273140;
+  --text:#d6deea;--dim:#8b98aa;--cyan:#79c0ff;--blue:#58a6ff;
+  --green:#3fb950;--yellow:#d29922;--red:#f85149;--purple:#bc8cff;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  --sans:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:
+  radial-gradient(circle at 80% 0,rgba(88,166,255,.12),transparent 34rem),
+  radial-gradient(circle at 10% 20%,rgba(188,140,255,.08),transparent 28rem),
+  var(--bg);color:var(--text);font:16px/1.65 var(--sans)}
+a{color:var(--cyan)}
+a:hover{color:#b6e3ff}
+code,kbd{font-family:var(--mono)}
+code{color:#b6e3ff;background:#101722;border:1px solid var(--border);
+  border-radius:4px;padding:.08rem .3rem}
+kbd{border:1px solid #566274;border-bottom-width:2px;border-radius:4px;
+  padding:.08rem .35rem;background:#161d27;color:#fff}
+.skip{position:fixed;left:12px;top:-60px;z-index:100;background:#fff;color:#000;
+  padding:8px 12px;border-radius:5px}
+.skip:focus{top:12px}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;
+  min-height:52px;padding:8px clamp(14px,4vw,48px);background:rgba(8,11,16,.92);
+  border-bottom:1px solid var(--border);backdrop-filter:blur(12px)}
+.brand{font:700 12px/1 var(--mono);color:var(--cyan);letter-spacing:.13em;
+  margin-right:auto}
+.topbar a{font:700 11px/1 var(--mono);text-decoration:none;color:var(--dim);
+  padding:8px;border-radius:5px}
+.topbar a:hover,.topbar a:focus{background:#17202b;color:#fff}
+.hero{max-width:1180px;margin:auto;padding:clamp(46px,8vw,96px) 24px 44px}
+.eyebrow{font:700 12px/1.4 var(--mono);letter-spacing:.16em;color:var(--green);
+  text-transform:uppercase}
+h1{font-size:clamp(2.6rem,8vw,6.4rem);line-height:.92;letter-spacing:-.055em;
+  max-width:920px;margin:.25em 0}
+.lede{max-width:760px;color:#b7c2d0;font-size:clamp(1.05rem,2.2vw,1.35rem)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin:28px 0 0}
+.button{display:inline-flex;align-items:center;justify-content:center;min-height:46px;
+  padding:10px 16px;border:1px solid var(--border);border-radius:7px;
+  background:var(--panel);font:700 12px/1 var(--mono);text-decoration:none;color:#fff}
+.button.primary{background:rgba(63,185,80,.13);border-color:rgba(63,185,80,.65);
+  color:#7ee787}
+.button:hover,.button:focus{transform:translateY(-1px);border-color:var(--cyan)}
+.layout{max-width:1180px;margin:auto;padding:0 24px 80px;display:grid;
+  grid-template-columns:230px minmax(0,1fr);gap:42px}
+.toc{position:sticky;top:76px;align-self:start;border:1px solid var(--border);
+  background:rgba(13,17,23,.82);border-radius:10px;padding:14px}
+.toc strong{font:700 11px/1 var(--mono);letter-spacing:.12em;color:var(--cyan)}
+.toc ol{margin:10px 0 0;padding-left:22px}
+.toc li{margin:5px 0;color:var(--dim)}
+.toc a{font-size:12px;color:var(--dim);text-decoration:none}
+.toc a:hover,.toc a:focus{color:#fff}
+main{min-width:0}
+section{scroll-margin-top:74px;padding:10px 0 48px;border-bottom:1px solid var(--border)}
+section:last-child{border-bottom:0}
+h2{font-size:clamp(1.7rem,4vw,2.55rem);line-height:1.1;letter-spacing:-.025em;
+  margin:30px 0 12px;color:#fff}
+h3{font-size:1.08rem;margin:26px 0 8px;color:#dbeafe}
+p{max-width:790px}
+.step{display:grid;grid-template-columns:42px 1fr;gap:12px;margin:16px 0;
+  padding:16px;background:linear-gradient(135deg,rgba(20,26,34,.94),rgba(13,17,23,.94));
+  border:1px solid var(--border);border-radius:9px}
+.step-number{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(121,192,255,.12);border:1px solid rgba(121,192,255,.45);
+  color:var(--cyan);font:700 13px var(--mono)}
+.step h3{margin:2px 0 5px}
+.step p{margin:0;color:#b7c2d0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.card{background:rgba(13,17,23,.9);border:1px solid var(--border);border-radius:9px;
+  padding:16px;min-width:0}
+.card h3{margin:0 0 7px}.card p{margin:0;color:#b7c2d0;font-size:.94rem}
+.label{display:inline-block;margin-bottom:8px;padding:3px 7px;border-radius:999px;
+  background:#151d28;color:var(--cyan);font:700 10px/1.2 var(--mono);
+  letter-spacing:.08em;text-transform:uppercase}
+.callout{border-left:4px solid var(--cyan);background:rgba(88,166,255,.08);
+  padding:13px 16px;margin:18px 0;border-radius:0 7px 7px 0}
+.callout.warning{border-color:var(--yellow);background:rgba(210,153,34,.08)}
+.callout.security{border-color:var(--green);background:rgba(63,185,80,.08)}
+.callout strong{color:#fff}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:18px 0}
+.flow span{padding:8px 10px;border:1px solid var(--border);border-radius:7px;
+  background:var(--panel);font:700 11px var(--mono)}
+.flow b{color:var(--dim)}
+.checklist{display:grid;gap:9px;margin:16px 0}
+.check{display:flex;gap:9px;align-items:flex-start;padding:10px 12px;
+  border:1px solid var(--border);border-radius:7px;background:rgba(13,17,23,.72)}
+.check input{margin-top:5px;accent-color:var(--green)}
+table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.9rem}
+th,td{border-bottom:1px solid var(--border);padding:9px;text-align:left;vertical-align:top}
+th{color:var(--cyan);font:700 11px var(--mono);text-transform:uppercase}
+.mode{font:700 11px var(--mono)}
+.observe{color:var(--cyan)}.interview{color:var(--purple)}
+.control{color:var(--yellow)}.collaborate{color:var(--green)}
+.terminal{background:#05080c;border:1px solid var(--border);border-radius:8px;
+  padding:13px;overflow:auto;color:#c5d1df;font:12px/1.6 var(--mono)}
+.footer{border-top:1px solid var(--border);padding:34px 24px;text-align:center;
+  color:var(--dim);font-size:.85rem}
+@media(max-width:820px){
+  .topbar a:not(.keep){display:none}
+  .layout{grid-template-columns:1fr;padding-inline:16px}
+  .toc{position:static}
+  .hero{padding-inline:16px}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .button:hover,.button:focus{transform:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to tutorial</a>
+<nav class="topbar" aria-label="Primary">
+  <span class="brand">MARS BARN OPUS / START HERE</span>
+  <a class="keep" href="viewer.html">Viewer</a>
+  <a href="control.html">Mission Control</a>
+  <a href="mission-readiness.html">Readiness</a>
+  <a href="simhub.html">SimHub</a>
+</nav>
+
+<header class="hero">
+  <div class="eyebrow">Zero install / browser-native / public simulation</div>
+  <h1>Your first mission, step by step.</h1>
+  <p class="lede">This guide takes a new user from opening the colony to pairing
+    Mission Control, watching kite-marked virtual twins solve a shared problem,
+    understanding echo frames, and carrying a run in a simulation cartridge.</p>
+  <div class="actions">
+    <a class="button primary" href="viewer.html">Launch the Viewer</a>
+    <a class="button" href="#ten-minute-path">Follow the 10-minute path</a>
+    <a class="button" href="control.html" target="_blank" rel="noopener">Open Mission Control</a>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="toc" aria-label="Tutorial contents">
+    <strong>CONTENTS</strong>
+    <ol>
+      <li><a href="#ten-minute-path">10-minute path</a></li>
+      <li><a href="#viewer">Viewer basics</a></li>
+      <li><a href="#kited-twins">Kited vTwins</a></li>
+      <li><a href="#pairing">PIN pairing</a></li>
+      <li><a href="#control">Mission Control</a></li>
+      <li><a href="#tasks">Tasks and influence</a></li>
+      <li><a href="#echoes">Echo frames</a></li>
+      <li><a href="#cartridges">Cartridges</a></li>
+      <li><a href="#readiness">Mission readiness</a></li>
+      <li><a href="#troubleshooting">Troubleshooting</a></li>
+      <li><a href="#glossary">Glossary</a></li>
+    </ol>
+  </aside>
+
+  <main id="content">
+    <section id="ten-minute-path">
+      <span class="label">Fastest path</span>
+      <h2>Understand the whole application in ten minutes</h2>
+      <div class="step">
+        <div class="step-number">1</div>
+        <div><h3>Open the simulation</h3>
+          <p>Open <a href="viewer.html">Viewer</a>. Choose <strong>Classroom Quick
+            Start</strong> for a pinned guided run, or choose
+            <strong>Optimus Pathfinder</strong> to see robot operations and kited
+            vTwin collaboration.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <div><h3>Move from orbit to the colony</h3>
+          <p>Use the zoom controls to move through planet, tactical warmap, base,
+            module, and crew views. The ground view is where crew, robots, modules,
+            and kited vTwins become embodied actors.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <div><h3>Watch the kites</h3>
+          <p><strong>KITE-SCOUT</strong> and <strong>KITE-OPS</strong> are virtual
+            twins, not crew. Their literal kites remain above them while they
+            observe, interview, control, or collaborate.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-number">4</div>
+        <div><h3>Pair Mission Control</h3>
+          <p>Open <a href="control.html" target="_blank" rel="noopener">Mission
+            Control</a> in another tab. Compare the same six-digit PIN in both
+            tabs. Click <strong>CONFIRM MATCH</strong> in Control and
+            <strong>ALLOW</strong> in Viewer.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-number">5</div>
+        <div><h3>Influence one outcome</h3>
+          <p>After pairing, inspect state or adjust allocations from Mission
+            Control. In an Optimus or Hybrid mission, a stuck-fastener task can
+            also offer <strong>DEPLOY KITED TWIN TEAM</strong>.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-number">6</div>
+        <div><h3>Read the evidence</h3>
+          <p>Open the event feed and echo stream. They show what changed, which
+            twin acted, what evidence it used, and whether an intervention made
+            the run assisted and unranked.</p></div>
+      </div>
+      <div class="checklist" aria-label="Quick-start completion checklist">
+        <label class="check"><input type="checkbox"> I launched a mission.</label>
+        <label class="check"><input type="checkbox"> I entered ground view and saw two kites.</label>
+        <label class="check"><input type="checkbox"> I matched and approved the six-digit PIN.</label>
+        <label class="check"><input type="checkbox"> Mission Control showed TWIN LINKED.</label>
+        <label class="check"><input type="checkbox"> I inspected an echo or completed a task.</label>
+      </div>
+    </section>
+
+    <section id="viewer">
+      <span class="label">The main experience</span>
+      <h2>1. Learn the Viewer</h2>
+      <p><a href="viewer.html">Viewer</a> is the game, not a passive dashboard.
+        Every simulation sol changes resources, systems, weather, crew, hazards,
+        tasks, and the next echo frame.</p>
+      <div class="grid">
+        <article class="card"><h3>Mission selector</h3><p>Choose humans, robots,
+          hybrid crews, severe dust, broken ISRU, or the lunar testbed. Each
+          mission changes the survival contract.</p></article>
+        <article class="card"><h3>Orbit and warmap</h3><p>Use orbit for the whole
+          mission and the warmap for colony location, status, and tactical
+          context.</p></article>
+        <article class="card"><h3>Ground view</h3><p>See modules, crew, robots,
+          weather, lighting, telepresence actors, targets, and task-related
+          movement in one 3D scene.</p></article>
+        <article class="card"><h3>Mission panels</h3><p>Track resources, system
+          efficiency, crew health, events, research, modules, LisPy policy, and
+          the intervention ledger.</p></article>
+      </div>
+      <h3>Basic controls</h3>
+      <table>
+        <thead><tr><th>Control</th><th>Use</th></tr></thead>
+        <tbody>
+          <tr><td>Start / Pause</td><td>Advances or freezes simulation time, task timers, and command transit.</td></tr>
+          <tr><td>1x / 2x / 5x / 10x</td><td>Changes simulation speed without creating another simulation clock.</td></tr>
+          <tr><td>Base / Module / Crew</td><td>Changes the 3D camera scale. Crew view supports walk and ride perspectives.</td></tr>
+          <tr><td>Task panel</td><td>Approve, deny, choose an alternative, execute an override, or delegate eligible work.</td></tr>
+          <tr><td>LisPy</td><td>Selects or edits the colony's browser-side governor program.</td></tr>
+        </tbody>
+      </table>
+      <div class="callout warning"><strong>Classroom Quick Start is intentionally
+        pinned.</strong> It uses fixed evidence and locks mutation controls so a
+        baseline and replay can be compared honestly.</div>
+    </section>
+
+    <section id="kited-twins">
+      <span class="label">Embodied virtual twins</span>
+      <h2>2. Follow the kite-marked vTwins</h2>
+      <p>Kited vTwins are telepresence actors inside the simulation. They are
+        deliberately separate from crew: they do not consume oxygen, water, food,
+        earn crew health, or increase colony headcount.</p>
+      <div class="grid">
+        <article class="card"><h3>KITE-SCOUT</h3><p>Observes system state and
+          interviews the exact crew member or robot involved in a problem. It
+          creates structured evidence without applying the repair itself.</p></article>
+        <article class="card"><h3>KITE-OPS</h3><p>Consumes verified evidence,
+          controls the approved operation, collaborates with Scout, and verifies
+          that the task's existing success condition was applied once.</p></article>
+      </div>
+      <table>
+        <thead><tr><th>Mode</th><th>Color</th><th>What you see</th></tr></thead>
+        <tbody>
+          <tr><td class="mode observe">OBSERVE</td><td>Cyan</td><td>Kite, target tether, scan activity, and direct state evidence.</td></tr>
+          <tr><td class="mode interview">INTERVIEW</td><td>Violet</td><td>Kite remains above Scout while a bounded question and answer are visible.</td></tr>
+          <tr><td class="mode control">CONTROL</td><td>Amber</td><td>Ops cites evidence and applies a capability-checked operation.</td></tr>
+          <tr><td class="mode collaborate">COLLABORATE</td><td>Green</td><td>Both twins share the target, evidence chain, and verification phase.</td></tr>
+        </tbody>
+      </table>
+      <h3>Try the shared repair</h3>
+      <ol>
+        <li>Launch <strong>Optimus Pathfinder</strong> or <strong>Hybrid Colony</strong>.</li>
+        <li>Run until a robot raises <strong>STUCK FASTENER - MANUAL OVERRIDE</strong>.</li>
+        <li>Choose <strong>DEPLOY KITED TWIN TEAM</strong>.</li>
+        <li>Advance four committed sols and watch the phase change above each kite.</li>
+      </ol>
+      <div class="flow" aria-label="Kited twin collaboration phases">
+        <span>Observe - 6 kWh</span><b>-&gt;</b>
+        <span>Interview - 8 kWh</span><b>-&gt;</b>
+        <span>Control - 18 kWh</span><b>-&gt;</b>
+        <span>Verify - 6 kWh</span>
+      </div>
+      <p>The team pays <strong>38 kWh</strong>, uses the existing task's repair
+        effect, and records both participants, every phase, evidence IDs, the
+        exact target robot, and the direct before/after delta.</p>
+    </section>
+
+    <section id="pairing">
+      <span class="label">Human intent + cryptographic authority</span>
+      <h2>3. Pair a connection with the six-digit PIN</h2>
+      <div class="callout security"><strong>The PIN is the final human key.</strong>
+        It confirms that a person intends to join these two exact tabs. Ephemeral
+        P-256 keys authenticate both directions underneath it; the PIN is not used
+        as the sole security mechanism.</div>
+      <div class="step">
+        <div class="step-number">1</div>
+        <div><h3>Keep Viewer open</h3><p>A mission can be running or paused. The
+          Viewer is the authority that must approve the connection.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <div><h3>Open Mission Control in a second tab</h3><p>Control generates an
+          ephemeral P-256 key and requests a bounded session. It cannot read state
+          or issue commands yet.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <div><h3>Compare all six digits</h3><p>The same zero-padded code appears in
+          both tabs. If the numbers differ or the requester is unfamiliar, choose
+          <strong>DENY</strong> or <strong>CANCEL</strong>.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-number">4</div>
+        <div><h3>Confirm on both sides</h3><p>Click <strong>CONFIRM MATCH</strong>
+          in Mission Control and <strong>ALLOW</strong> in Viewer. Either order is
+          supported, but both approvals are mandatory.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-number">5</div>
+        <div><h3>Look for TWIN LINKED</h3><p>Only after dual confirmation and
+          bidirectional signature verification do controls unlock and the external
+          connection appear as a kite-marked, identity-unverified actor.</p></div>
+      </div>
+      <div class="callout warning"><strong>Pairing never survives a security
+        boundary.</strong> Viewer reset, mission launch, cartridge import, either
+        page reload, denial, expiry, or cancellation revokes authority. Pair again
+        with a fresh PIN.</div>
+    </section>
+
+    <section id="control">
+      <span class="label">The paired operator surface</span>
+      <h2>4. Use Mission Control</h2>
+      <p>Once <strong>TWIN LINKED</strong> appears, each request is signed,
+        strictly sequenced, capability-checked, and targeted to the paired session.
+        Anonymous channel listeners receive no live colony, echo, wallet,
+        cartridge, or attestation data.</p>
+      <div class="grid">
+        <article class="card"><h3>Inspect</h3><p>GET STATE, GET ECHO, GET INERTIA,
+          GET SCORE, and ATTEST return signed Viewer data.</p></article>
+        <article class="card"><h3>Control allocations</h3><p>Adjust Heating, ISRU,
+          Greenhouse, and rationing. Values are normalized and rejected atomically
+          when invalid.</p></article>
+        <article class="card"><h3>Run LisPy</h3><p>Execute a bounded program against
+          current colony state or push a new browser governor. Results return in
+          signed canonical receipts.</p></article>
+        <article class="card"><h3>Emergency stop</h3><p>Stops the simulation clock
+          through a signed control command. Pairing and intervention provenance
+          remain visible.</p></article>
+      </div>
+      <pre class="terminal" aria-label="Example LisPy command">(begin
+  (set! heating_alloc 0.20)
+  (set! isru_alloc 0.55)
+  (set! greenhouse_alloc 0.25))</pre>
+      <div class="callout"><strong>Assistance is honest.</strong> A paired external
+        mutation enters the intervention ledger and makes the run assisted and
+        unranked. Reads and rejected commands do not pretend to change the colony.</div>
+    </section>
+
+    <section id="tasks">
+      <span class="label">Decisions with consequences</span>
+      <h2>5. Understand tasks and influence</h2>
+      <p>Tasks emerge from echo data: falling resources, equipment conditions,
+        crew health, weather, or a robot that is outside its confidence threshold.
+        Choices mutate the same simulation state that the next sol consumes.</p>
+      <table>
+        <thead><tr><th>Choice</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>Approve</td><td>Accept the requested action and its explicit tradeoff.</td></tr>
+          <tr><td>Deny</td><td>Keep the current policy or accept the denial consequence.</td></tr>
+          <tr><td>Alternative</td><td>Choose a compromise, EVA, split allocation, or other bounded route.</td></tr>
+          <tr><td>Override sequence</td><td>Send ordered commands with transit delay; wrong order or timeout can worsen damage.</td></tr>
+          <tr><td>Kited team</td><td>Delegate an eligible problem to complementary observe/interview/control capabilities.</td></tr>
+        </tbody>
+      </table>
+      <p>Task history keeps the actor, source echo, before state, after state,
+        direct delta, timeout status, and any kited evidence chain.</p>
+    </section>
+
+    <section id="echoes">
+      <span class="label">The colony nervous system</span>
+      <h2>6. Read echo frames</h2>
+      <p>Every committed sol creates an echo frame. Frame N describes what changed;
+        Frame N+1 consumes that result. This is how weather, hazards, tasks, visuals,
+        reflexes, and vTwin actions remain connected.</p>
+      <div class="grid">
+        <article class="card"><h3>Delta</h3><p>Resource and state movement for the
+          whole sol. It is not mislabeled as one actor's direct effect.</p></article>
+        <article class="card"><h3>Events</h3><p>Dust, radiation, equipment,
+          construction, research, crew, and terminal transitions.</p></article>
+        <article class="card"><h3>Kited evidence</h3><p>New observations,
+          interviews, completed problem traces, participants, and direct task
+          deltas.</p></article>
+        <article class="card"><h3>Reflexes and CRI</h3><p>Mid-heartbeat responses
+          and the Colony Risk Index explain pressure building between frames.</p></article>
+      </div>
+    </section>
+
+    <section id="cartridges">
+      <span class="label">Carry the organism</span>
+      <h2>7. Save, export, import, and replay cartridges</h2>
+      <p>A simulation cartridge carries colony state, echo memory, decisions,
+        interventions, vTwin evidence, RNG checkpoint, score, and trust metadata.</p>
+      <ol>
+        <li>Use the cartridge controls in Viewer to export a run.</li>
+        <li>Import or drop the cartridge into Viewer to resume supported state.</li>
+        <li>Use <a href="replay.html">Replay</a> to inspect retained frames and decisions.</li>
+        <li>Use <a href="simhub.html">SimHub</a> to compare public results.</li>
+      </ol>
+      <div class="callout security"><strong>Live authority is never carried in a
+        cartridge.</strong> PINs, private keys, open challenges, and connected
+        sessions are runtime-only. Imported identities and evidence are historical
+        and unverified until a fresh pairing occurs.</div>
+    </section>
+
+    <section id="readiness">
+      <span class="label">Large deterministic cohorts</span>
+      <h2>8. Open the Mission Readiness Observatory</h2>
+      <p>The <a href="mission-readiness.html">Extinction Cascade Observatory</a>
+        compares 1,000 deterministic missions before and after the reliability
+        corrections. It separates direct state evidence from temporal association.</p>
+      <div class="grid">
+        <article class="card"><h3>Before</h3><p>0% survived the 500-sol horizon;
+          restricted mean survival was 42.14 sols.</p></article>
+        <article class="card"><h3>Corrected model</h3><p>23.5% survived; restricted
+          mean survival reached 285.19 sols while retaining real failure risk.</p></article>
+        <article class="card"><h3>Controls</h3><p>No-hazard runs remain sustainable,
+          proving the model is not simply delaying inevitable extinction.</p></article>
+      </div>
+      <p>This report is analysis. The interactive product remains
+        <a href="viewer.html">Viewer</a>, where decisions and kited actors are
+        experienced in the world.</p>
+    </section>
+
+    <section id="troubleshooting">
+      <span class="label">Common fixes</span>
+      <h2>9. Troubleshooting</h2>
+      <table>
+        <thead><tr><th>Problem</th><th>What to do</th></tr></thead>
+        <tbody>
+          <tr><td>No PIN appears</td><td>Keep Viewer open, reload Mission Control, and choose START NEW PAIRING. Confirm both pages share the same origin.</td></tr>
+          <tr><td>PINs do not match</td><td>Deny or cancel immediately. Start a fresh handshake; never approve a near match.</td></tr>
+          <tr><td>Controls stay disabled</td><td>Both tabs must confirm. Wait for TWIN LINKED; an announce alone is intentionally insufficient.</td></tr>
+          <tr><td>Pairing disappeared</td><td>Reset, reload, mission launch, and cartridge import revoke authority by design. Pair again.</td></tr>
+          <tr><td>No 3D scene</td><td>The semantic kited-vTwin stage remains usable. Try a current Chromium/Firefox browser with WebGL enabled.</td></tr>
+          <tr><td>No stuck-fastener task</td><td>Use Optimus or Hybrid, keep robots alive, and continue the ordinary mission until the echo-driven task appears.</td></tr>
+          <tr><td>Run is unranked</td><td>Human or external control assistance is recorded honestly. Start a fresh autonomous run for ranking eligibility.</td></tr>
+          <tr><td>Imported run says unverified</td><td>Imports cannot restore live trust. Inspect the historical evidence and perform a fresh PIN pairing.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="glossary">
+      <span class="label">Words used throughout the app</span>
+      <h2>10. Glossary and next links</h2>
+      <div class="grid">
+        <article class="card"><h3>vTwin</h3><p>A virtual twin that observes or acts
+          inside the same simulation protocol as physical and human participants.</p></article>
+        <article class="card"><h3>Kited vTwin</h3><p>An embodied vTwin with a literal
+          kite above it, making identity, mode, target, and influence visible.</p></article>
+        <article class="card"><h3>Echo frame</h3><p>The bounded delta/evidence frame
+          generated each sol and consumed by the next.</p></article>
+        <article class="card"><h3>CRI</h3><p>Colony Risk Index, a 0-100 summary of
+          accumulating mission pressure.</p></article>
+        <article class="card"><h3>LisPy</h3><p>The small policy language used for
+          browser-side governors, task automation, and economic rules.</p></article>
+        <article class="card"><h3>Cartridge</h3><p>A portable simulation checkpoint
+          with state, evidence, decisions, and trust boundaries.</p></article>
+      </div>
+      <h3>Continue exploring</h3>
+      <div class="actions">
+        <a class="button primary" href="viewer.html">Play Viewer</a>
+        <a class="button" href="control.html">Pair Mission Control</a>
+        <a class="button" href="evolution.html">Evolution guide</a>
+        <a class="button" href="patterns.html">Pattern library</a>
+        <a class="button" href="hall-of-fame.html">LisPy Hall of Fame</a>
+        <a class="button" href="mission-readiness.html">Readiness report</a>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer class="footer">
+  Mars Barn Opus - First Principles to Mars<br>
+  Public simulation and education software. Not flight certification.
+</footer>
+</body>
+</html>

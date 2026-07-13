@@ -16,10 +16,12 @@ from config import (
     REPUTATION_DEFECT_PENALTY, REPUTATION_SABOTAGE_PENALTY,
     SABOTAGE_DETECTION_CHANCE, SABOTAGE_DAMAGE_FRACTION,
     RESOURCE_FACTOR_RANGES, GOVERNOR_ARCHETYPES,
-    O2_KG_PER_PERSON_PER_SOL, H2O_L_PER_PERSON_PER_SOL,
-    FOOD_KCAL_PER_PERSON_PER_SOL,
+    O2_KG_PER_PERSON_PER_SOL, FOOD_KCAL_PER_PERSON_PER_SOL,
 )
-from colony import Colony, create_colony, Allocation, Resources, step, serialize
+from colony import (
+    Colony, create_colony, Allocation, Resources, crew_water_balance,
+    step, serialize,
+)
 from governor import Governor, create_governor
 from events import EventEngine
 from mars import (
@@ -131,6 +133,7 @@ def create_world(num_colonies: int = 3, max_sols: int = 500,
             food_kcal=colony.resources.food_kcal,
             power_kwh=colony.resources.power_kwh,
             crew_size=colony.resources.crew_size,
+            power_capacity_kwh=colony.resources.power_capacity_kwh,
         )
 
     return world
@@ -197,6 +200,7 @@ def world_step(world: World) -> Dict:
             food_kcal=colony.resources.food_kcal,
             power_kwh=colony.resources.power_kwh,
             crew_size=colony.resources.crew_size,
+            power_capacity_kwh=colony.resources.power_capacity_kwh,
         )
 
     # --- Phase 3: Step colonies ---
@@ -329,18 +333,30 @@ def _process_trades(world: World, alive: List[str],
             colony.reputation = max(0.0, colony.reputation - REPUTATION_DEFECT_PENALTY * 0.5)
 
 
+def _crew_water_tank_draw(colony: Colony) -> float:
+    consumption_reduction = (
+        colony.research.get_effect("h2o_consumption_reduction")
+        if colony.research is not None else 0.0
+    )
+    return crew_water_balance(
+        colony.resources.crew_size,
+        consumption_reduction=consumption_reduction,
+    ).net_tank_draw_liters
+
+
 def _compute_trade_offer(src: Colony, dst: Colony) -> Tuple[Dict, Dict]:
     """Compute what to trade based on comparative advantage."""
     offering = {}
     requesting = {}
+    src_water_draw = _crew_water_tank_draw(src)
+    dst_water_draw = _crew_water_tank_draw(dst)
 
     resources = [
         ("o2_kg", src.resources.o2_kg, dst.resources.o2_kg,
          O2_KG_PER_PERSON_PER_SOL * src.resources.crew_size,
          O2_KG_PER_PERSON_PER_SOL * dst.resources.crew_size),
         ("h2o_liters", src.resources.h2o_liters, dst.resources.h2o_liters,
-         H2O_L_PER_PERSON_PER_SOL * src.resources.crew_size,
-         H2O_L_PER_PERSON_PER_SOL * dst.resources.crew_size),
+         src_water_draw, dst_water_draw),
         ("food_kcal", src.resources.food_kcal, dst.resources.food_kcal,
          FOOD_KCAL_PER_PERSON_PER_SOL * src.resources.crew_size,
          FOOD_KCAL_PER_PERSON_PER_SOL * dst.resources.crew_size),
@@ -384,6 +400,9 @@ def _execute_trade(src: Colony, dst: Colony,
         setattr(dst.resources, key, dst_val - amount)
         src_val = getattr(src.resources, key, 0)
         setattr(src.resources, key, src_val + amount)
+
+    src.resources.enforce_power_capacity()
+    dst.resources.enforce_power_capacity()
 
 
 def _process_sabotage(world: World, alive: List[str],
@@ -447,6 +466,7 @@ def _supply_drop(world: World, alive: List[str],
     for key, amount in SUPPLY_DROP_RESOURCES.items():
         current = getattr(colony.resources, key, 0)
         setattr(colony.resources, key, current + amount)
+    colony.resources.enforce_power_capacity()
 
     world.history.append(WorldEvent(
         sol=world.sol, event_type="supply_drop",

@@ -4,7 +4,12 @@ from __future__ import annotations
 import sys
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent.parent / "src"))
 
-from events import EventEngine, Event
+from events import EventEngine, Event, EFFECT_GENERATORS
+from config import (
+    DUST_STORM_MAX_DUST_FACTOR,
+    EVENT_SEVERITY_MAX,
+    MARS_YEAR_SOLS,
+)
 
 
 class TestEventEngine:
@@ -83,15 +88,35 @@ class TestEventEngine:
         assert len(dicts) == 1
         assert dicts[0]["type"] == "dust_storm"
         assert dicts[0]["description"] == "A storm!"
+        assert dicts[0]["onset"] is False
 
-    def test_100_sol_event_distribution(self):
-        """Over 100 sols, we should see a mix of event types."""
+    def test_dust_uses_one_optical_attenuation_path(self):
+        effects = EFFECT_GENERATORS["dust_storm"](EVENT_SEVERITY_MAX)
+        assert effects["dust_factor"] == DUST_STORM_MAX_DUST_FACTOR
+        assert "solar_multiplier" not in effects
+
+    def test_dust_is_not_blocked_during_former_safe_half_year(self):
+        e = EventEngine()
+        e.set_seed(0)
+        dust_onsets = []
+        former_gate_end = int(MARS_YEAR_SOLS * 0.5)
+        for sol in range(1, former_gate_end + 1):
+            dust_onsets.extend(
+                event.sol_started
+                for event in e.tick(sol)
+                if event.event_type == "dust_storm"
+            )
+        assert dust_onsets
+        assert min(dust_onsets) <= former_gate_end
+
+    def test_multi_year_event_distribution(self):
+        """Annualized hazards still produce a deterministic event mix."""
         e = EventEngine()
         e.set_seed(42)
         seen_types = set()
-        for sol in range(100):
+        for sol in range(int(MARS_YEAR_SOLS * 2)):
             new = e.tick(sol)
             for ev in new:
                 seen_types.add(ev.event_type)
-        # Should see at least 3 different event types in 100 sols
-        assert len(seen_types) >= 3, f"Only saw {seen_types}"
+        assert len(seen_types) >= 4, f"Only saw {seen_types}"
+        assert "seasonal_shift" not in seen_types

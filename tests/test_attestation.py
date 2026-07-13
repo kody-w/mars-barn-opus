@@ -461,6 +461,29 @@ class TestTwinVerificationGate:
             assert not duplicate.valid
             assert gate.last_verified_sol == 10
 
+    def test_verified_checkpoint_survives_gate_restart(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir = Path(tmpdir)
+            checkpoint = tmpdir / "last-sol"
+            first_gate = TwinVerificationGate(
+                require_on_chain=False,
+                checkpoint_path=checkpoint,
+            )
+            sol10 = _write_frame(tmpdir, _make_frame(10, prev_sol=9))
+            assert first_gate.verify_frame(sol10).valid
+            assert checkpoint.read_text() == "10"
+
+            restarted = TwinVerificationGate(
+                require_on_chain=False,
+                checkpoint_path=checkpoint,
+            )
+            assert restarted.last_verified_sol == 10
+            sol5 = _write_frame(tmpdir, _make_frame(5, prev_sol=4))
+            assert not restarted.verify_frame(sol5).valid
+            sol11 = _write_frame(tmpdir, _make_frame(11, prev_sol=10))
+            assert restarted.verify_frame(sol11).valid
+            assert checkpoint.read_text() == "11"
+
     def test_sequential_verification(self):
         gate = TwinVerificationGate(require_on_chain=False)
         with tempfile.TemporaryDirectory() as tmpdir:

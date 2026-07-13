@@ -9,6 +9,7 @@ from world import (
     _compute_trade_offer, _execute_trade,
 )
 from colony import create_colony
+from research import ResearchLab
 
 
 class TestWorldCreation:
@@ -121,6 +122,35 @@ class TestTradeOffer:
 
         assert offering["h2o_liters"] > 0
         assert "h2o_liters" not in requesting
+
+    def test_water_trade_uses_net_tank_runway(self):
+        src = create_colony("Source", crew_size=4)
+        dst = create_colony("Neighbor", crew_size=4)
+        src.resources.h2o_liters = 100
+        dst.resources.h2o_liters = 300
+
+        _, requesting = _compute_trade_offer(src, dst)
+
+        assert "h2o_liters" not in requesting
+
+        src.resources.h2o_liters = 5
+        _, requesting = _compute_trade_offer(src, dst)
+
+        assert requesting["h2o_liters"] > 0
+
+    def test_water_trade_applies_research_consumption_reduction(self):
+        src = create_colony("Source", crew_size=4)
+        dst = create_colony("Neighbor", crew_size=4)
+        src.resources.h2o_liters = 16
+        dst.resources.h2o_liters = 29
+
+        _, without_research = _compute_trade_offer(src, dst)
+        assert without_research["h2o_liters"] > 0
+
+        src.research = ResearchLab(completed=["water_recycling"])
+        _, with_research = _compute_trade_offer(src, dst)
+
+        assert "h2o_liters" not in with_research
 
     def test_execute_trade_conserves_combined_resources(self):
         src = create_colony("Source", crew_size=2)

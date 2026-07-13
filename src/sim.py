@@ -10,11 +10,11 @@ import json
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Callable, Dict, List, Optional
 
 from config import (
     DEFAULT_SOLS, DEFAULT_SEED, DEFAULT_COLONIES, BENCHMARK_SEEDS,
-    GOVERNOR_ARCHETYPES,
+    GOVERNOR_ARCHETYPES, MISSION_READINESS_DEFAULT_SEED_COUNT,
 )
 from colony import Colony, Resources, create_colony, Allocation, step, serialize
 from governor import Governor, create_governor
@@ -33,7 +33,8 @@ from autonomy import AutonomyEnforcer, AutonomyScoreboard, Phase
 
 
 def run_single(sols: int = DEFAULT_SOLS, seed: int = DEFAULT_SEED,
-               archetype: str = "engineer") -> Dict:
+               archetype: str = "engineer",
+               observer: Optional[Callable[[Dict], None]] = None) -> Dict:
     """Run a single-colony simulation."""
     terrain = generate_terrain(size=32, seed=seed)
     colony = create_colony("Solo", location_x=16, location_y=16)
@@ -47,6 +48,7 @@ def run_single(sols: int = DEFAULT_SOLS, seed: int = DEFAULT_SEED,
         food_kcal=colony.resources.food_kcal,
         power_kwh=colony.resources.power_kwh,
         crew_size=colony.resources.crew_size,
+        power_capacity_kwh=colony.resources.power_capacity_kwh,
     )
 
     for sol in range(sols):
@@ -78,11 +80,51 @@ def run_single(sols: int = DEFAULT_SOLS, seed: int = DEFAULT_SEED,
             food_kcal=colony.resources.food_kcal,
             power_kwh=colony.resources.power_kwh,
             crew_size=colony.resources.crew_size,
+            power_capacity_kwh=colony.resources.power_capacity_kwh,
         )
 
         step(colony, irradiance, ext_temp, allocation,
              active_events=events.active_event_dicts(),
              radiation_msv=rad)
+
+        if observer is not None:
+            observer({
+                "sol": colony.sol,
+                "new_events": [
+                    {
+                        "type": event.event_type,
+                        "severity": event.severity,
+                        "duration_sols": event.duration_sols,
+                    }
+                    for event in new_events
+                ],
+                "active_events": [
+                    {
+                        "type": event.event_type,
+                        "severity": event.severity,
+                        "remaining_sols": event.remaining_sols,
+                        "sol_started": event.sol_started,
+                    }
+                    for event in events.active_events
+                ],
+                "environment": {
+                    "dust_factor": dust_factor,
+                    "solar_multiplier": solar_mult,
+                    "irradiance_w_m2": irradiance,
+                    "exterior_temp_k": ext_temp,
+                },
+                "allocation": {
+                    "heating_fraction": allocation.heating_fraction,
+                    "isru_fraction": allocation.isru_fraction,
+                    "greenhouse_fraction": allocation.greenhouse_fraction,
+                    "food_ration": allocation.food_ration,
+                },
+                "resource_runway_sols": {
+                    resource: colony.resources.days_of(resource)
+                    for resource in ("o2", "h2o", "food", "power")
+                },
+                "state": serialize(colony),
+            })
 
     return {
         "mode": "single",
@@ -241,6 +283,27 @@ def display_benchmark(result: Dict) -> None:
     print(f"\n  Champion: {winner[0]} (avg {winner[1]['avg_survival']:.0f} sols)")
     print(f"  Last:     {loser[0]} (avg {loser[1]['avg_survival']:.0f} sols)")
     print(f"  Spread:   {winner[1]['avg_survival'] - loser[1]['avg_survival']:.0f} sols")
+    print(f"{'='*70}\n")
+
+
+def display_mission_readiness(result: Dict) -> None:
+    """Print the deterministic cohort headline."""
+    summary = result["summary"]
+    print(f"\n{'='*70}")
+    print("  EXTINCTION CASCADE OBSERVATORY — Mission Readiness")
+    print(f"{'='*70}")
+    print(
+        f"  Runs: {summary['runs']}  "
+        f"Alive: {summary['alive']}  Dead: {summary['dead']}"
+    )
+    print(
+        f"  Survival: {summary['survival_rate']:.1%}  "
+        f"RMST: {summary['rmst_sols']:.1f} sols  "
+        f"P10/P50/P90: {summary['p10_terminal_sol']}/"
+        f"{summary['p50_terminal_sol']}/"
+        f"{summary['p90_terminal_sol']}"
+    )
+    print("  Paths are observed temporal associations, not causal proof.")
     print(f"{'='*70}\n")
 
 
@@ -511,7 +574,10 @@ def run_interactive(seed: int = DEFAULT_SEED) -> None:
                             h2o_liters=colony.resources.h2o_liters,
                             food_kcal=colony.resources.food_kcal,
                             power_kwh=colony.resources.power_kwh,
-                            crew_size=colony.resources.crew_size)
+                            crew_size=colony.resources.crew_size,
+                            power_capacity_kwh=(
+                                colony.resources.power_capacity_kwh
+                            ))
             auto_alloc = auto_governor.decide(colony, len(events.active_events), prev)
             heating = int(auto_alloc.heating_fraction * 100)
             isru = int(auto_alloc.isru_fraction * 100)
@@ -634,12 +700,52 @@ def main() -> None:
                         help="List available built-in LisPy control programs")
     parser.add_argument("--autonomy", action="store_true",
                         help="Run autonomy benchmark — how long without human contact?")
+    parser.add_argument("--mission-readiness", action="store_true",
+                        help="Run deterministic cohort and cascade analysis")
+    parser.add_argument(
+        "--cohort-seeds",
+        type=int,
+        default=MISSION_READINESS_DEFAULT_SEED_COUNT,
+        help=(
+            "Number of consecutive deterministic seeds for mission-readiness "
+            f"mode (default: {MISSION_READINESS_DEFAULT_SEED_COUNT})"
+        ),
+    )
+    parser.add_argument(
+        "--cohort-archetypes",
+        nargs="+",
+        choices=list(GOVERNOR_ARCHETYPES.keys()),
+        help="Archetypes for mission-readiness mode (default: all)",
+    )
+    parser.add_argument(
+        "--baseline-json",
+        type=str,
+        help="Pre-correction cohort JSON to include in readiness comparison",
+    )
 
     args = parser.parse_args()
 
     start = time.time()
 
-    if args.autonomy:
+    if args.mission_readiness:
+        if args.cohort_seeds <= 0:
+            parser.error("--cohort-seeds must be positive")
+        from mission_readiness import build_before_after, run_cohort
+        seeds = range(args.seed, args.seed + args.cohort_seeds)
+        archetypes = (
+            args.cohort_archetypes
+            if args.cohort_archetypes
+            else list(GOVERNOR_ARCHETYPES)
+        )
+        cohort = run_cohort(seeds, archetypes, args.sols)
+        if args.baseline_json:
+            baseline = json.loads(Path(args.baseline_json).read_text())
+            result = build_before_after(baseline, cohort)
+        else:
+            result = cohort
+        if not args.json:
+            display_mission_readiness(cohort)
+    elif args.autonomy:
         print("\n  AUTONOMY BENCHMARK — Zero Human Contact")
         print("  How many sols can each governor survive alone?\n")
         scoreboard = AutonomyScoreboard()
@@ -680,7 +786,10 @@ def main() -> None:
         if args.json:
             print(json.dumps(result, indent=2))
         elapsed = time.time() - start
-        print(f"  Elapsed: {elapsed:.2f}s")
+        print(
+            f"  Elapsed: {elapsed:.2f}s",
+            file=sys.stderr if args.json else sys.stdout,
+        )
         return
     elif args.evolve:
         print("\n  Running governor evolution...")
@@ -720,20 +829,30 @@ def main() -> None:
     elapsed = time.time() - start
 
     if args.json:
-        print(json.dumps(result, indent=2))
+        print(json.dumps(result, indent=2, allow_nan=False))
 
     if args.json_file:
         with open(args.json_file, "w") as f:
-            json.dump(result, f, indent=2)
-        print(f"  Results written to {args.json_file}")
+            json.dump(result, f, indent=2, allow_nan=False)
+            f.write("\n")
+        print(
+            f"  Results written to {args.json_file}",
+            file=sys.stderr if args.json else sys.stdout,
+        )
 
     if args.html:
         html = generate_report(result)
         with open(args.html, "w") as f:
             f.write(html)
-        print(f"  HTML report written to {args.html}")
+        print(
+            f"  HTML report written to {args.html}",
+            file=sys.stderr if args.json else sys.stdout,
+        )
 
-    print(f"  Elapsed: {elapsed:.2f}s")
+    print(
+        f"  Elapsed: {elapsed:.2f}s",
+        file=sys.stderr if args.json else sys.stdout,
+    )
 
 
 if __name__ == "__main__":

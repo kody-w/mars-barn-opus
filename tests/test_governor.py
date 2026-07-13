@@ -136,9 +136,11 @@ class TestMemory:
             g.decide(c, prev_resources=prev)
             c.resources.o2_kg -= 0.5
 
-        # Now the decision should favor ISRU
+        # Memory should shift more power to ISRU than the same state alone.
+        fresh = create_governor("Fresh", "engineer")
+        baseline = fresh.decide(c)
         a = g.decide(c)
-        assert a.isru_fraction > 0.35
+        assert a.isru_fraction > baseline.isru_fraction
 
 
 class TestTrade:

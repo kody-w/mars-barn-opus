@@ -15,6 +15,18 @@ from typing import List, Dict, Optional
 from config import (
     EVENT_PROBABILITIES, EVENT_DURATION_RANGE,
     MARS_SOLAR_FLARE_DOSE_MSV,
+    DUST_STORM_MAX_DUST_FACTOR, DUST_DEVIL_MAX_DUST_FACTOR,
+    DUST_STORM_SEVERE_THRESHOLD, DUST_STORM_SEVERE_DURATION_MULTIPLIER,
+    DUST_DEVIL_CLEANING_SEVERITY_MAX, DUST_DEVIL_SOLAR_REPAIR_FRACTION,
+    SOLAR_FLARE_COMMS_DAMAGE_FRACTION,
+    SOLAR_FLARE_SOLAR_DAMAGE_FRACTION,
+    METEORITE_SOLAR_DAMAGE_FRACTION,
+    METEORITE_GREENHOUSE_DAMAGE_FRACTION,
+    METEORITE_HEATING_DAMAGE_FRACTION, METEORITE_O2_LOSS_KG,
+    METEORITE_WATER_LOSS_LITERS,
+    EQUIPMENT_FAILURE_ISRU_DAMAGE_FRACTION,
+    EQUIPMENT_FAILURE_POWER_LOSS_KWH, RADIATION_SPIKE_MSV,
+    EVENT_SEVERITY_MIN, EVENT_SEVERITY_MAX,
 )
 
 
@@ -38,21 +50,20 @@ class Event:
 # Event effect generators — each returns an effects dict based on severity
 
 def _dust_storm_effects(severity: float) -> Dict[str, float]:
-    """Dust storms reduce solar output, increase atmospheric opacity."""
+    """Dust storms attenuate sunlight through atmospheric opacity."""
     return {
-        "solar_multiplier": 1.0 - 0.8 * severity,    # Up to 80% solar reduction
-        "dust_factor": 1.0 + 3.0 * severity,          # Up to 4x optical depth
-        "solar_damage": 0.02 * severity,               # Minor panel degradation
+        "dust_factor": 1.0 + (DUST_STORM_MAX_DUST_FACTOR - 1.0) * severity,
     }
 
 
 def _dust_devil_effects(severity: float) -> Dict[str, float]:
     """Dust devils: minor, sometimes helpful (clean panels)."""
     return {
-        "solar_multiplier": 1.0 - 0.1 * severity,
-        "dust_factor": 1.0 + 0.3 * severity,
-        # Dust devils can actually clean solar panels (Spirit rover!)
-        "solar_repair": 0.01 * severity if severity < 0.3 else 0.0,
+        "dust_factor": 1.0 + (DUST_DEVIL_MAX_DUST_FACTOR - 1.0) * severity,
+        "solar_repair": (
+            DUST_DEVIL_SOLAR_REPAIR_FRACTION * severity
+            if severity < DUST_DEVIL_CLEANING_SEVERITY_MAX else 0.0
+        ),
     }
 
 
@@ -60,43 +71,39 @@ def _solar_flare_effects(severity: float) -> Dict[str, float]:
     """Solar flares: radiation spike, possible electronics damage."""
     return {
         "radiation_msv": MARS_SOLAR_FLARE_DOSE_MSV * severity,
-        "comms_damage": 0.1 * severity,
-        "solar_damage": 0.05 * severity,  # Electronics degradation
+        "comms_damage": SOLAR_FLARE_COMMS_DAMAGE_FRACTION * severity,
+        "solar_damage": SOLAR_FLARE_SOLAR_DAMAGE_FRACTION * severity,
     }
 
 
 def _meteorite_effects(severity: float) -> Dict[str, float]:
     """Meteorite impacts: potentially catastrophic."""
     return {
-        "solar_damage": 0.15 * severity,
-        "greenhouse_damage": 0.20 * severity,
-        "heating_damage": 0.10 * severity,
-        "o2_loss": 5.0 * severity,        # Habitat breach leak
-        "water_loss": 10.0 * severity,
+        "solar_damage": METEORITE_SOLAR_DAMAGE_FRACTION * severity,
+        "greenhouse_damage": METEORITE_GREENHOUSE_DAMAGE_FRACTION * severity,
+        "heating_damage": METEORITE_HEATING_DAMAGE_FRACTION * severity,
+        "o2_loss": METEORITE_O2_LOSS_KG * severity,
+        "water_loss": METEORITE_WATER_LOSS_LITERS * severity,
     }
 
 
 def _equipment_failure_effects(severity: float) -> Dict[str, float]:
-    """Random equipment failure: affects one system badly."""
-    # Pick a random system to fail more
+    """Random equipment failure: an onset pulse with a repair window."""
     return {
-        "isru_damage": 0.15 * severity,
-        "power_loss": 20.0 * severity,
+        "isru_damage": EQUIPMENT_FAILURE_ISRU_DAMAGE_FRACTION * severity,
+        "power_loss": EQUIPMENT_FAILURE_POWER_LOSS_KWH * severity,
     }
 
 
 def _seasonal_shift_effects(severity: float) -> Dict[str, float]:
-    """Seasonal changes: gradual temperature and solar shifts."""
-    return {
-        "temp_offset_k": -10.0 * severity,  # Cooling trend
-        "solar_multiplier": 1.0 - 0.15 * severity,
-    }
+    """Orbital seasonality is already represented in mars.py."""
+    return {}
 
 
 def _radiation_spike_effects(severity: float) -> Dict[str, float]:
     """GCR spike: elevated background radiation."""
     return {
-        "radiation_msv": 2.0 * severity,
+        "radiation_msv": RADIATION_SPIKE_MSV * severity,
     }
 
 
@@ -196,13 +203,21 @@ class EventEngine:
                 continue
 
             if self.rng.random() < probability:
-                severity = self.rng.uniform(0.2, 1.0)
+                severity = self.rng.uniform(
+                    EVENT_SEVERITY_MIN,
+                    EVENT_SEVERITY_MAX,
+                )
                 dur_range = EVENT_DURATION_RANGE[event_type]
                 duration = self.rng.randint(dur_range[0], dur_range[1])
 
                 # Scale duration with severity for storms
-                if event_type == "dust_storm" and severity > 0.7:
-                    duration = int(duration * 1.5)
+                if (
+                    event_type == "dust_storm"
+                    and severity > DUST_STORM_SEVERE_THRESHOLD
+                ):
+                    duration = int(
+                        duration * DUST_STORM_SEVERE_DURATION_MULTIPLIER
+                    )
 
                 gen = EFFECT_GENERATORS[event_type]
                 effects = gen(severity)
@@ -247,5 +262,7 @@ class EventEngine:
     def active_event_dicts(self) -> List[Dict]:
         """Return active events as plain dicts for colony.apply_events()."""
         return [{"type": e.event_type, "effects": e.effects,
-                 "severity": e.severity, "description": e.description}
+                 "severity": e.severity, "description": e.description,
+                 "onset": e.remaining_sols == e.duration_sols,
+                 "sol_started": e.sol_started}
                 for e in self.active_events]
