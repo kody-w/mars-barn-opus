@@ -1,0 +1,42 @@
+# Static Data Covenant (RAR CONSTITUTION.md Article XXIV): docs/os.html's
+# in-page GitHub renderer used to call api.github.com directly from the
+# visitor's browser. It now reads committed snapshots under
+# docs/data/github-repos/ for a small curated allowlist of repos; this
+# workflow keeps that data (stars, forks, description) from going stale.
+name: Refresh GitHub repo snapshot
+
+on:
+  schedule: [{ cron: '17 6 * * 1' }] # weekly, Monday 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: github-repo-snapshot
+  cancel-in-progress: false
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Harvest curated repo snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node docs/scripts/harvest-github-repo-snapshot.mjs
+      - name: Commit updated snapshot
+        run: |
+          set -euo pipefail
+          git config user.name github-actions
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add docs/data/github-repos
+          if git diff --cached --quiet; then
+            echo "no snapshot changes"
+            exit 0
+          fi
+          git commit -m "docs: refresh GitHub repo snapshot"
+          git push origin HEAD:main

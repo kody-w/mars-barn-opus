@@ -1376,13 +1376,25 @@ window.os = {
         } catch (e) { return null; }
       }
 
-      // GitHub repos (API)
+      // GitHub repos — Static Data Covenant (RAR CONSTITUTION.md Article XXIV):
+      // this in-page browser used to call api.github.com directly and
+      // unauthenticated for whatever github.com/owner/repo a visitor typed.
+      // A static snapshot can't pre-harvest "any repo anyone might type," so
+      // instead it serves a small curated set of repos from CI-harvested
+      // committed JSON (docs/data/github-repos/, see
+      // docs/scripts/harvest-github-repo-snapshot.mjs) and falls through to
+      // the existing "Page Unavailable" message for anything outside that
+      // set — the browser itself never calls api.github.com.
+      const GITHUB_SNAPSHOT_REPOS = ['kody-w/mars-barn-opus'];
       if (u.includes('github.com') && u.split('/').length >= 5) {
         try {
           const parts = new URL(url).pathname.split('/').filter(Boolean);
           const owner = parts[0], repo = parts[1];
-          const data = await (await fetch('https://api.github.com/repos/' + owner + '/' + repo)).json();
-          const readme = await (await fetch('https://api.github.com/repos/' + owner + '/' + repo + '/readme', {headers: {Accept: 'application/vnd.github.raw'}})).text().catch(() => '');
+          const snapshotKey = `${owner}/${repo}`.toLowerCase();
+          if (!GITHUB_SNAPSHOT_REPOS.includes(snapshotKey)) return null;
+          const base = new URL(`data/github-repos/${owner}__${repo}`, window.location.href).href;
+          const data = await (await fetch(base + '.json')).json();
+          const readme = await (await fetch(base + '.readme.md')).text().catch(() => '');
           return `<html><head><title>${data.full_name} · GitHub</title></head>
           <body style="background:#0d1117;color:#c9d1d9;font-family:-apple-system,sans-serif;padding:20px;max-width:900px;margin:0 auto">
             <h1 style="color:#58a6ff;font-size:20px">${data.full_name}</h1>
