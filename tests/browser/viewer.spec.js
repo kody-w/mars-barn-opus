@@ -987,7 +987,12 @@ test.describe('Viewer', () => {
     });
 
     test('resolved kited task callback cannot replace or retime the next task', async ({ page }) => {
+      const clockStart = Date.parse('2026-07-12T00:00:00Z');
+      await page.clock.install({ time: clockStart });
       await prepareKitedStuckBolt(page);
+      // Pause page time (an hour ahead, so never in the past) so the countdown and the resolved
+      // task's 1200 ms follow-up only move when the test moves the clock.
+      await page.clock.pauseAt(clockStart + 60 * 60 * 1000);
       const setup = await page.evaluate(() => {
         beginKitedTwinCollaboration();
         R = () => 1;
@@ -1020,7 +1025,9 @@ test.describe('Viewer', () => {
 
       expect(setup.shown).toBe(true);
       expect(setup.completionCount).toBe(1);
-      await page.waitForTimeout(1450);
+      // Move page time 1450 ms in one jump: every due timer fires once, so the countdown ticks
+      // exactly once and the 1200 ms follow-up runs while task B is active.
+      await page.clock.fastForward(1450);
       const after = await page.evaluate(taskBInstanceId => {
         const snapshot = {
           activeInstanceId: activeTask?.instanceId,
